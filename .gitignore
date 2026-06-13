@@ -1,0 +1,8 @@
+# Graphify cache
+graphify-out/cache/
+
+# Logs
+graphify.log
+
+# macOS
+.DS_Store

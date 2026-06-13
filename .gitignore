@@ -1,6 +1,10 @@
 # Graphify cache
 graphify-out/cache/
 
+# Graphify generated metadata
+graphify-out/.graphify_analysis.json
+graphify-out/.graphify_semantic_marker
+
 # Logs
 graphify.log
 

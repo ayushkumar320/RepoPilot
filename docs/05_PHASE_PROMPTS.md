@@ -178,18 +178,19 @@ Do not start the next phase. Stop and report what was built, test results, the f
 ```
 Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
 
-You are starting Phase 3 of Codebase Archaeologist. The goal: full `ArchaeologistState`, working Intent Router, Cartographer → Flow Tracer → Teacher learn subgraph, Verifier loop with Iteration-2 actionability rubric integrated, Postgres checkpointing with kill-resume working.
+You are starting Phase 3 of Codebase Archaeologist. The goal: full `ArchaeologistState` (with `IntentProfile` + `CapabilityPlan`), working **generic intent layer** (Intent Profiler → Capability Planner), composable capability library (Cartographer, Flow Tracer, Teacher), Verifier loop with Iteration-2 actionability rubric integrated, Postgres checkpointing with kill-resume working. **No hardcoded purpose enum anywhere.**
 
 Deliverables
 - `packages/agents/state.py` — `ArchaeologistState`, `Claim`, `Insight`, `CodeRef`, `Opportunity`, `TourSection`, `VerifierObjection` EXACTLY as specified in docs/03_ARCHITECTURE.md. Use Pydantic v2. Use `Annotated[..., add]` reducers on every append-only list. Validators must fail on:
     - `Claim.refs` empty
     - `Insight.so_what` empty
     - `Insight.goal_link` empty
-- `packages/agents/router/intent.py` — Intent Router node (pre-context layer 1) using `llama-3.1-8b-instant`. Captures `purpose` only (NOT `focus_hint` — that's the elicitation node's job). Prompt fits ≤ 2000 input tokens.
-- `packages/agents/learn/elicitation.py` — Learn Elicitation node (pre-context layer 2) using `llama-3.1-8b-instant`. Asks: "Are you here for the overall structure, a specific feature, or the data model?" Captures `focus_hint` ∈ `{overall_structure, specific_feature, data_model}`. The LangGraph edge from Intent Router (purpose=learn) → Learn Elicitation is unconditional; no Cartographer/Flow Tracer/Teacher node runs without `focus_hint` populated. Pydantic validator: Cartographer rejects state where `focus_hint is None`.
-- `packages/agents/prompts/goal_anchor.py` — single helper that renders the "goal anchor" block from `(purpose, focus_hint, contribution_intent)`. EVERY downstream generation prompt template begins with this block (Cartographer, Flow Tracer, Teacher, all three scanners, Q&A). Snapshot test pins the rendered output.
-- `packages/agents/learn/cartographer.py` — uses `graph_query` (entry_points, hubs, layers) → emits `system_map: list[Insight]`. **Tailors selection to `focus_hint`** — `data_model` privileges schema/ORM/dataclass hubs; `specific_feature` narrows to the relevant layer; `overall_structure` balances. Each Insight populates `finding/because/so_what/refs/goal_link`. The `goal_link` field must explicitly reference the captured `focus_hint`.
-- `packages/agents/learn/flow_tracer.py` — picks ONE flow aligned to `focus_hint`. Walks via `graph_traverse`. Emits `traced_flows: list[Insight]`.
+- `packages/agents/intent/profiler.py` — **Intent Profiler (generic intent layer, step 1)** using `llama-3.1-8b-instant`. Takes the user's free-text intent. Emits a draft `IntentProfile` (modality_weights ∈ [0,1] sparse over understand/change/evaluate/locate/compare, focus_keywords, audience_framing, output_shape_preference, success_criterion, raw_text preserved verbatim). Returns the draft to the UI for user confirmation; the confirmed profile is what lands in state. Prompt fits ≤ 2000 input tokens.
+- `packages/agents/intent/planner.py` — **Capability Planner (generic intent layer, step 2)**. Pure Python function `plan(IntentProfile) -> CapabilityPlan`. Rules over `modality_weights` and `raw_text` keyword signals. Outputs `active` (list of CapabilityName), `tilts` (per-capability), `output_shape`, and typed knobs (cartographer_tilt, flow_tracer_targets, lane_b_framing, ranker_weights). No LLM. Falls through to a sensible default (`["cartographer", "teacher"]`, `output_shape="narrative"`) if no rules match.
+- `packages/agents/prompts/goal_anchor.py` — single helper that renders the "goal anchor" block from `intent_profile` + the planner-derived tilts. EVERY downstream generation prompt template begins with this block (Cartographer, Flow Tracer, Teacher, all three scanners, Decision Archaeology, Q&A). Snapshot test pins the rendered output.
+- `packages/agents/learn/cartographer.py` — uses `graph_query` (entry_points, hubs, layers) → emits `system_map: list[Insight]`. **Tailors selection to `capability_plan.cartographer_tilt`** (`balanced` / `data_hubs` / `decision_hubs` / `hot_path`) and narrows by `intent_profile.focus_keywords`. Each Insight populates `finding/because/so_what/refs/goal_link`. The `goal_link` field must explicitly reference something in `intent_profile`.
+- **Architectural rule**: no node anywhere in `packages/agents/` may write `if state.purpose == "..."`. Capability behavior is parameterized exclusively by `intent_profile` + `capability_plan.tilts[capability_name]`. A CI grep check enforces this.
+- `packages/agents/learn/flow_tracer.py` — picks one or more flows aligned to `capability_plan.flow_tracer_targets` (planner-derived from `intent_profile.focus_keywords` + `raw_text` signals). Walks via `graph_traverse`. Emits `traced_flows: list[Insight]`.
 - `packages/agents/learn/teacher.py` — sequences map+flow into `draft_tour: list[TourSection]`. Emits mermaid in `TourSection.mermaid`. Every section ends in a next action (file to open, command to run, step to take).
 - `packages/agents/verifier/loop.py` — grounding check (from Phase 2) PLUS actionability rubric:
     - For each Claim: goal-relevant? (binary)
@@ -200,20 +201,22 @@ Deliverables
     - Conditional edges for verifier pass/fail/retry.
     - `recursion_limit=15`.
 - Iteration-2 prompt contracts: every generation prompt restates the three laws (goal-anchored / numbers carry consequences / sections end in motion) with contrastive ❌/✅ examples. Snapshot tests pin the rendered prompts.
-- `packages/evals/datasets/intent_routing_v1.jsonl` — 30 labeled utterances (purpose classification).
-- `packages/evals/datasets/focus_hint_capture_v1.jsonl` — 15 simulated answers to the Learn elicitation; expected `focus_hint` label.
+- `packages/evals/datasets/intent_profiling_v1.jsonl` — 50 free-text intents, per-row expected `IntentProfile` fields.
+- `packages/evals/datasets/planner_correctness_v1.jsonl` — same 50 entries, expected `CapabilityPlan.active` subset and key tilts.
 - `packages/evals/datasets/actionability_v1.jsonl` — 20 tour sections labeled `actionable` / `not_actionable` with rubric reasons.
 - `packages/evals/runners/checkpoint_resume.py` — starts a tour, kills mid-flight, resumes from checkpoint, asserts identical final state (modulo timestamps).
 
 Tests to write FIRST (TDD)
 1. `test_insight_so_what_required` — `Insight(..., so_what="")` raises ValidationError.
 2. `test_claim_refs_required` — `Claim(..., refs=[])` raises ValidationError.
-3. `test_intent_router_accuracy` — ≥ 95% on `intent_routing_v1`.
-3a. `test_focus_hint_capture_accuracy` — ≥ 95% on `focus_hint_capture_v1`.
-3b. `test_cartographer_rejects_missing_focus_hint` — invoking the Cartographer with `focus_hint=None` raises a ValidationError. Pre-context is non-optional.
-3c. `test_pre_context_shapes_output` — run Cartographer on flask with `focus_hint=data_model` vs `overall_structure`; assert the set of privileged hubs differs by ≥ 50%.
+3. `test_intent_profiler_per_field_accuracy` — ≥ 90% per field (modality_weights, focus_keywords, audience_framing, output_shape_preference) on `intent_profiling_v1`.
+3a. `test_planner_correctness` — ≥ 90% F1 on capability-subset selection from `planner_correctness_v1`.
+3b. `test_cartographer_rejects_missing_intent_profile` — invoking the Cartographer with `intent_profile=None` or `capability_plan=None` raises a ValidationError. The generic intent layer is non-optional.
+3c. `test_intent_shapes_output` — run the pipeline on flask with two materially different `IntentProfile`s ("explain request lifecycle" vs "audit auth surface for fragility"); assert resulting `draft_tour`s differ structurally by ≥ 50% on a sectional-overlap metric.
+3d. `test_no_purpose_enum_in_code` — CI grep asserts `if state.purpose ==` does not appear under `packages/agents/`. Elasticity guarantee.
+3e. `test_capability_library_independence` — each capability invocable standalone with a synthetic `IntentProfile + CapabilityPlan`, without any other capability running.
 4. `test_prompt_token_budget` — every node's rendered prompt is ≤ 2000 input tokens (`tiktoken`).
-4a. `test_goal_anchor_present_in_every_prompt` — render each generation prompt with sample state; assert the goal-anchor block (referencing `purpose` and `focus_hint`/`contribution_intent`) appears as the leading section in every one.
+4a. `test_goal_anchor_present_in_every_prompt` — render each generation prompt with sample state; assert the goal-anchor block (referencing `intent_profile.raw_text` + the relevant tilt fields) appears as the leading section in every one.
 5. `test_verifier_retries_then_flags` — synthesize a section that fails actionability; verifier objects; source node retries twice; after that claim status == "flagged" (not silently dropped).
 6. `test_checkpoint_resume` — start a tour, kill at any step, resume; final state matches a clean-run state.
 7. `test_actionability_eval_threshold` — ≥ 80% on `actionability_v1`.
@@ -221,17 +224,19 @@ Tests to write FIRST (TDD)
 
 Implementation order
 - State models + validators first (these are the keystone; build with TDD).
-- Intent Router (small, isolated, easy to nail accuracy on).
+- Intent Profiler + Capability Planner (the generic intent layer — small, isolated, evaluable on a labeled set).
 - Verifier loop with actionability rubric (needs to be in place BEFORE Cartographer/Teacher so you don't build prompts that bypass it).
 - Cartographer → Flow Tracer → Teacher.
 - LangGraph wiring last; checkpoint test is the integration gate.
 
 Quality gate (Definition of Done — restate exactly)
-- Intent Router ≥ 95% on `intent_routing_v1`.
-- Focus-hint capture ≥ 95% on `focus_hint_capture_v1`.
-- Pre-context-shapes-output test passes (≥ 50% delta in privileged hubs between `data_model` and `overall_structure` on flask).
+- Intent Profiler per-field accuracy ≥ 90% on `intent_profiling_v1`.
+- Capability Planner F1 ≥ 90% on `planner_correctness_v1`.
+- Capability library independence test passes (each capability invocable standalone).
+- Intent-shapes-output test passes (≥ 50% structural delta between two materially different `IntentProfile`s on flask).
+- No-purpose-enum-in-code grep check passes (CI greps `if state.purpose ==` under `packages/agents/`, must be zero hits).
 - Goal-anchor-present test passes on every generation prompt.
-- Full Learn tour on flask in < 4 minutes wall clock, every claim ref-linked, no `flagged` claims in the demo run.
+- Full tour on flask for an "understand request lifecycle" intent in < 4 minutes wall clock, every claim ref-linked, no `flagged` claims in the demo run.
 - Checkpoint resume passes.
 - Actionability ≥ 80% on `actionability_v1`.
 - No node prompt exceeds 2000 input tokens.
@@ -254,7 +259,7 @@ Deliverables
 - FastAPI endpoints in `apps/api/routes/`:
     - `POST /repos` — body `{repo_url}`; enqueues arq indexing; returns `{repo_id, status}`.
     - `GET /repos/{repo_id}/status` — returns `{status: queued|indexing|ready|error, progress?, error?}`.
-    - `POST /tours` — body `{repo_id, purpose?, focus_hint?}`; returns `{tour_id}` and a `stream_url`.
+    - `POST /tours` — body `{repo_id, intent_profile}` (confirmed profile from the elicitation step); returns `{tour_id}` and a `stream_url`.
     - `GET /tours/{tour_id}/stream` — SSE stream of tour events (sse-starlette).
     - `POST /tours/{tour_id}/ask` — body `{question}`; ask-anything escape hatch; returns answer + refs.
     - `GET /chunks/{chunk_id}` — authenticated chunk fetch for the code viewer (NOT the whole repo).
@@ -276,7 +281,7 @@ Deliverables
             - LEARN → "What part interests you most?" — three options: overall structure / a specific feature / the data model. If "specific feature", free-text input.
             - CONTRIBUTE → "What kind of contribution?" — four options: fix a reported issue / improve code quality / hunt for likely problems / show all, ranked.
         - "First impression" panel below the elicitation: subscribes to `GET /repos/{repo_id}/first-impression` (SSE). At ≥ 10s of indexing, an 8B-generated paragraph streams in (language mix, primary entry point, top hubs, last-commit recency).
-        - On submit, POST `/tours` with `{repo_id, purpose, focus_hint?, contribution_intent?}` and route to the tour view.
+        - On submit, POST `/tours` with `{repo_id, intent_profile}` (the confirmed profile) and route to the tour view.
         - Persisted in Zustand; displayed as a compact "You said: LEARN · data model" chip at the top of the tour with a one-click "change" link that re-runs the elicitation (no re-indexing).
     - Tour view: streamed text panel (left) + synchronized shiki code viewer (right). If indexing isn't complete when the user lands here, a slim progress bar shows at the top and tour generation starts as soon as `status == ready`.
     - **Verified-badge UI**: every claim with `status == "verified"` renders with a small `✓ grounded` badge; hover shows `verifier_note` and the chunk content. Claims with `status == "flagged"` render with a distinct warning treatment.
@@ -330,10 +335,10 @@ Do not start the next phase. Stop and report what was built, e2e test output, Li
 ```
 Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
 
-You are starting Phase 5 of Codebase Archaeologist. The goal: switching purpose to "contribute" produces a ranked Opportunity List from Lane A (issues) + Lane B (quality) + Lane C (suspicion), briefed by the Teacher. Lane C uses guarded language and always ends in `confirm_before_pr`.
+You are starting Phase 5 of Codebase Archaeologist. The goal: when the Capability Planner activates Lane A / Lane B / Lane C (based on the user's `IntentProfile` from Phase 3), the system produces a ranked Opportunity List briefed by the Teacher. Lane C uses guarded language and always ends in `confirm_before_pr`. **There is no hardcoded "contribute mode" branch** — lane activation is purely a function of the IntentProfile + the Planner's rules from Phase 3.
 
 Deliverables
-- `packages/agents/contribute/elicitation.py` — asks the 4-way intent question; populates `state.contribution_intent`.
+- **No new Elicitation node.** When the Planner activates one or more lanes but the IntentProfile underspecifies the contribution shape (e.g., `modality_weights.change` is high but no signal as to fix-issue vs. quality vs. hunt), the Teacher briefing prompt itself injects one targeted question. The answer updates `intent_profile.modality_weights` and triggers a one-shot Planner re-plan. Re-planning is cheap (deterministic, no LLM).
 - `packages/agents/contribute/lane_a_triage.py`:
     - Fetch open issues via `github_issues`.
     - Extract referenced files/symbols (regex + light NER).
@@ -352,9 +357,9 @@ Deliverables
     - Pre-filter structural patterns DETERMINISTICALLY (mutable defaults, swallow-except, race-shaped patterns, complex-no-error-handling, etc.).
     - Cap at top-N before any LLM sees it.
     - qwen3-32b with guarded-language prompt; banned vocabulary { "bug", "broken", "will crash", "obviously wrong" }; required vocabulary includes a `to_confirm:` step.
-- `packages/agents/contribute/ranker.py` — fully deterministic combined ranking (no LLM). Weighted combination of mergeability, approachability, evidence-strength. **Lane weights are gated by `contribution_intent`** captured by the Contribute Elicitation: `fix_issue` → Lane A weighted heaviest; `improve_quality` → Lane B; `hunt_problems` → Lane C; `show_all` → balanced. The active intent is also surfaced as a chip in the UI ("You're hunting problems — here's what's worth investigating") so the "why these" question is always answered.
-- All three scanner lanes' prompts MUST start with the shared `goal_anchor.py` block from Phase 3 (which renders `purpose` and `contribution_intent`). Snapshot test pins each lane's rendered prompt.
-- `packages/agents/contribute/briefing.py` — Teacher (70B) takes ranked top-N → briefing per opportunity → `draft_tour`. Each briefing entry carries an **intent-match tag** echoing `contribution_intent` ("matches: hunt problems") so the UI can render the chip without re-deriving it.
+- `packages/agents/contribute/ranker.py` — fully deterministic combined ranking (no LLM). Weighted combination of mergeability, approachability, evidence-strength. **Lane weights come from `capability_plan.ranker_weights`** — the Planner derived them from `intent_profile.modality_weights` + `raw_text` signals. The Planner's rationale (e.g., "weighted toward problem-hunting because the user said 'show me fragility'") is surfaced as a one-sentence chip in the UI so the "why these" question is always answered.
+- All three scanner lanes' prompts MUST start with the shared `goal_anchor.py` block from Phase 3 (which renders `intent_profile.raw_text` + the planner-derived tilts). Snapshot test pins each lane's rendered prompt.
+- `packages/agents/contribute/briefing.py` — Teacher (70B) takes ranked top-N → briefing per opportunity → `draft_tour`. Each briefing entry carries an **intent-match tag** derived from `intent_profile` (e.g., quoting the part of `raw_text` that triggered Lane C activation) so the UI can render the chip without re-deriving it. The Opportunity List header surfaces the Planner's `ranker_weights` rationale in one sentence so "why these" is always answered.
 - **Lane A considered-and-rejected trail**: Lane A persists the next-3 ranked-down issues with a one-line graph-backed reason ("touches a hub of fan-in 47", "no test files reference the affected module"). Exposed in `Opportunity` payload as `considered_and_rejected: list[RejectedItem]`.
 - **Per-opportunity CTAs (frontend)**: each Opportunity card renders two buttons — "Open files on GitHub" (deep links to each `files_to_touch` at the right line) and "Copy first step" (clipboard copy of `suggested_first_step`). No contribute briefing ships ending in prose alone.
 - Verifier rubric extensions for Lane C:
@@ -371,8 +376,9 @@ Tests to write FIRST (TDD)
 3. `test_lane_a_approachability_uses_graph_not_labels` — issue with `good first issue` label but on a hub function ranks LOWER than an unlabeled issue on an isolated function.
 4. `test_lane_b_dead_code_excludes_entry_points` — entry point with in-degree 0 not flagged.
 5. `test_ranker_deterministic` — identical inputs → identical ordering.
-5a. `test_ranker_respects_contribution_intent` — same scanner outputs but `contribution_intent=fix_issue` vs `improve_quality` produces materially different top-N orderings.
-5b. `test_goal_anchor_in_lane_prompts` — each lane's rendered prompt starts with the shared goal-anchor block referencing `contribution_intent`.
+5a. `test_ranker_respects_planner_weights` — same scanner outputs but `capability_plan.ranker_weights = {A:0.7,B:0.2,C:0.1}` vs `{A:0.1,B:0.2,C:0.7}` produces materially different top-N orderings.
+5b. `test_planner_activates_correct_lanes` — IntentProfile parsed from "find me a first PR" activates Lane A heavy; IntentProfile from "show me fragility" activates Lane C heavy. No hardcoded purpose enum involved.
+5c. `test_goal_anchor_in_lane_prompts` — each lane's rendered prompt starts with the shared goal-anchor block referencing `intent_profile.raw_text` and the relevant tilt.
 6. `test_file_mapping_eval_threshold` — ≥ 80% overlap on `file_mapping_v1`.
 7. `test_top3_issue_approachability_manual_review` — runs on the 3 eval repos and emits a report; the gate is "honest manual review ≥ 70%" — the test produces the artifact the human reviews.
 
@@ -391,7 +397,7 @@ Quality gate (Definition of Done — restate exactly)
 - Suspicion legitimacy ≥ 75% on `opportunity_quality_v1` Lane C entries.
 - Zero unverified claims shipped as fact in generated Contribute briefings on demo repos.
 - Banned-vocabulary regex test passes on 20 randomly sampled Lane C generations.
-- Intent-match chip visible on every Opportunity card; chip text matches the captured `contribution_intent`.
+- Intent-match chip visible on every Opportunity card; chip text quotes the relevant fragment of `intent_profile.raw_text` (no enum-shaped labels).
 - Considered-and-rejected trail shows 3 entries per repo per demo run; each entry has a graph-backed one-line reason.
 - CTA buttons present and functional on every Opportunity card (Playwright: deep-link URL correct; clipboard copy matches `suggested_first_step`).
 

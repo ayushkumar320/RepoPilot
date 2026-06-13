@@ -334,7 +334,7 @@ What **shifts** per intent — driven entirely by the `IntentProfile` and the Ca
 
 1. **Truthful over fluent.** Every factual claim ships with a `file:line` reference, verified by a separate model against the actual chunks. Claims the Verifier cannot ground are rendered as `flagged` — visible to the user, never silently shipped as fact. "I'm not sure" is a first-class answer.
 2. **Teach, don't dump.** Progressive disclosure. No stat dumps. No 600-line summaries. The Iteration-2 output contract makes this enforceable, not aspirational.
-3. **Meet the purpose.** `purpose`, `focus_hint`, and `contribution_intent` are injected into every generation prompt. A section that doesn't tie back to the user's goal is cut.
+3. **Meet the purpose.** The full `IntentProfile` (raw text + structured tilts) is injected into every generation prompt. A section that doesn't tie back to the user's stated intent is cut.
 4. **Narrow and deep.** Python + Learn must be excellent before TypeScript or anything else. Widening early is the failure mode that kills products like this.
 5. **Earn trust on real repos.** Quality is evaluated on real public repos — fastapi, httpx, flask — via an eval harness in CI. Not synthetic fixtures.
 

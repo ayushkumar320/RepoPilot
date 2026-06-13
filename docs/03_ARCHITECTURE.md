@@ -7,53 +7,65 @@ This is the design document. It is detailed by intent: getting the topology, sta
 ## Agent topology
 
 ```
-                                    user submits repo URL
+                              user submits repo URL + free-text intent
                                               │
                                               ▼
-                              ┌──────────────────────────────┐
-                              │       Intent Router          │   ◄── PRE-CONTEXT
-                              │   (llama-3.1-8b-instant)     │       LAYER 1:
-                              │   purpose ∈ {learn,           │       capture WHY
-                              │              contribute,      │
-                              │              question}        │
-                              └──────────┬───────────────────┘
-                                         │ conditional edge
-            ┌────────────────────────────┼─────────────────────────────┐
-            │                            │                             │
-            ▼                            ▼                             ▼
-   ┌────────────────┐         ┌──────────────────┐         ┌────────────────────┐
-   │ LEARN subgraph │         │ CONTRIBUTE       │         │  Q&A subgraph      │
-   │                │         │   subgraph       │         │                    │
-   │ Learn          │         │ Contribute       │         │ Hybrid retrieval   │
-   │ Elicitation    │◄PRE-CTX │ Elicitation      │◄PRE-CTX │  loop (≤3 hops):   │
-   │ (focus_hint)   │ LAYER 2 │ (intent)         │ LAYER 2 │ vector_search →    │
-   │      │         │         │      │           │         │ graph_traverse →   │
-   │      ▼         │         │      ▼           │         │ judge sufficiency  │
-   │ Cartographer   │         │  ┌─── A ───┐     │         │  (Q&A 70B primary, │
-   │   (70B)        │         │  │ Issue   │     │         │   qwen3-32b        │
-   │      │         │         │  │ Triage  │     │         │   fallback)        │
-   │      ▼         │         │  │ (70B)   │     │         └─────────┬──────────┘
-   │ Flow Tracer    │         │  └────┬────┘     │                   │
-   │   (qwen3-32b)  │         │  ┌─── B ───┐     │                   │
-   │      │         │         │  │ Code    │     │                   │
-   │      ▼         │         │  │ Health  │     │                   │
-   │ Teacher        │         │  │ (8B)    │     │                   │
-   │   (70B)        │         │  └────┬────┘     │                   │
-   │      │         │         │  ┌─── C ───┐     │                   │
-   │      │         │         │  │Suspicion│     │                   │
-   │      │         │         │  │(qwen3)  │     │                   │
-   │      │         │         │  └────┬────┘     │                   │
-   │      │         │         │       │          │                   │
-   │      │         │         │       ▼          │                   │
-   │      │         │         │  Opportunity     │                   │
-   │      │         │         │  Ranker (det.)   │                   │
-   │      │         │         │       │          │                   │
-   │      │         │         │       ▼          │                   │
-   │      │         │         │  Teacher         │                   │
-   │      │         │         │  briefing (70B)  │                   │
-   └──────┬─────────┘         └───────┬──────────┘                   │
-          │                           │                                │
-          └───────────┬───────────────┼────────────────────────────────┘
+   ┌──────────────────────────────────────────────────────────────────────────┐
+   │   GENERIC INTENT LAYER (universal — runs for every user, every time)     │
+   │                                                                          │
+   │   ┌─────────────────────────────┐    ┌────────────────────────────────┐  │
+   │   │     Intent Profiler         │    │     Capability Planner          │  │
+   │   │  (llama-3.1-8b-instant)     │───►│      (deterministic)            │  │
+   │   │                             │    │                                 │  │
+   │   │ free-text  ──► IntentProfile│    │ IntentProfile ─► plan: which    │  │
+   │   │  intent          {modality, │    │   capabilities run, with what   │  │
+   │   │                   focus_kw, │    │   tilts. Deterministic; no LLM. │  │
+   │   │                   audience, │    │                                 │  │
+   │   │                   shape,    │    │                                 │  │
+   │   │                   raw_text} │    │                                 │  │
+   │   └──────────────┬──────────────┘    └────────────────┬────────────────┘  │
+   │                  │ (user confirms via chip strip)     │                   │
+   └──────────────────┼─────────────────────────────────────┼───────────────────┘
+                      │                                     │
+                      │                                     ▼
+                      │                  ┌──────────────────────────────────┐
+                      │                  │  DYNAMIC PLAN over the           │
+                      │                  │  CAPABILITY LIBRARY              │
+                      │                  │                                  │
+                      │                  │  Any subset of, in any tilt:     │
+                      │                  │   · Cartographer (70B)           │
+                      │                  │   · Flow Tracer (qwen3-32b)      │
+                      │                  │   · Lane A Issue Triage (70B)    │
+                      │                  │   · Lane B Code Health (8B)      │
+                      │                  │   · Lane C Suspicion (qwen3-32b) │
+                      │                  │   · Decision Archaeology (70B)   │
+                      │                  │   · Teacher (70B) [terminal]     │
+                      │                  └────────────────┬─────────────────┘
+                      │                                   │
+                      ▼                                   ▼
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │              VERIFIER LOOP (universal — wraps every capability)         │
+   │             qwen2.5-coder:7b (local Ollama)                             │
+   │                                                                         │
+   │   Per-claim grounding check against read_chunks                         │
+   │   + Iteration-2 actionability rubric                                    │
+   │                                                                         │
+   │   pass → stream to client                                               │
+   │   fail → append to verifier_objections → source retries ≤ 2 →           │
+   │          render as "flagged" if still failing                           │
+   └─────────────────────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+              SSE stream to browser
+                      ▲
+                      │ (always-on, cross-cutting)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │     Q&A SUBGRAPH (universal — available throughout, for every user)     │
+   │     Hybrid retrieval (≤3 hops):                                         │
+   │       vector_search → graph_traverse → judge sufficiency                │
+   │     Reads the same IntentProfile; answers are framed accordingly.       │
+   │     Drives the synchronized code viewer just like tour claims do.       │
+   └─────────────────────────────────────────────────────────────────────────┘
                       │               │
                       ▼               ▼
             ┌─────────────────────────────────────────┐
@@ -80,14 +92,16 @@ This is the design document. It is detailed by intent: getting the topology, sta
                    diagram / section_end / done)
 ```
 
-A few topology notes that the diagram alone doesn't show:
+A few topology notes the diagram alone doesn't show:
 
-- **Pre-context capture is two-layered and runs before any analysis.** Layer 1 is the Intent Router (purpose). Layer 2 is the per-branch elicitation node (Learn Elicitation or Contribute Elicitation). Together they populate `purpose`, `focus_hint`, and `contribution_intent` in state. **Every generation node downstream reads these and injects them into its prompt** — the pre-context is the goal anchor that the Iteration-2 contract enforces against.
-- **Learn Elicitation is a real LangGraph node, not an optional inference step.** It runs unconditionally on the `learn` branch and asks: "Are you here for the overall structure, a specific feature, or the data model?" The user's answer is the `focus_hint` that determines which hubs Cartographer privileges and which flow Flow Tracer picks.
-- **The Verifier is not a node downstream of generation. It is a sub-graph that wraps every generating node**, with a conditional retry edge back to the source. This is why it appears as a single block at the bottom even though it fires repeatedly across the tour.
-- **Subgraphs share the same `ArchaeologistState`.** Subgraphs are organizational; there is one state object for the whole run.
-- **Contribute Lane A/B/C are parallel.** LangGraph runs them concurrently and the Ranker waits on all three. None of them ever blocks on another.
-- **The Q&A subgraph is reachable from any tour state**, not only from the initial router. It is the "ask me anything" escape hatch the user always has. Q&A answers are still framed by the captured pre-context — an OSS-contributor user asking "what does this function do?" gets the answer plus a hint about its blast radius; a learner asking the same question gets the answer plus where it sits in the system map.
+- **There are three universal layers and one dynamic layer.** The Generic Intent Layer (top), the Verifier Loop (wraps everything), and the Q&A Subgraph (always-on cross-cutting concern) run for *every* user every time, regardless of what they stated. The Dynamic Plan over the Capability Library is the *only* layer that varies per intent. This separation is the architectural property that makes the system purpose-elastic without a tangle of per-persona code paths.
+- **No fixed purpose enum, no fixed lens enum.** The Intent Profiler takes free text and emits a structured `IntentProfile`. Anything a user can articulate is supported. Adding a new kind of stated intent never requires schema changes — only (possibly) a new planner heuristic, and only if existing heuristics don't already produce a good plan.
+- **The Capability Planner is deterministic.** It is not an LLM. It maps `IntentProfile → plan` via testable rules. This is deliberate: planning correctness is verifiable in CI, and the planner does not consume Groq quota.
+- **The capability library is independently invocable.** Each block (Cartographer, Flow Tracer, Lane A/B/C, Decision Archaeology, Teacher, Q&A) takes the `IntentProfile` as input and runs standalone. The library has no internal "this only makes sense if X also ran" assumptions. This is what lets the planner compose freely.
+- **Q&A is universal, not branched.** It is a cross-cutting concern available throughout the lifecycle — before the tour, during the tour, after the tour. It reads the same `IntentProfile` as every other capability, so answers are always goal-anchored. It drives the synchronized code viewer the same way tour claims do.
+- **The Verifier wraps every generating capability**, with a conditional retry edge back to the source. It is a sub-graph that fires repeatedly across the run, not a single terminal node.
+- **One shared `ArchaeologistState`.** No subgraph owns its own state; the graph applies typed diffs from each capability's returns.
+- **Capabilities the planner activates in parallel run in parallel.** LangGraph concurrency handles this — e.g., Lane A/B/C in the contribute-shaped plans, or Cartographer + Decision Archaeology in the build-shaped plans.
 
 ---
 
@@ -95,19 +109,18 @@ A few topology notes that the diagram alone doesn't show:
 
 | Agent | Model | Job | Tools | Reads from state | Writes to state |
 |---|---|---|---|---|---|
-| **Intent Router** | `llama-3.1-8b-instant` | **Pre-context layer 1.** Classify the user's first turn into `learn` / `contribute` / `question`. Always the first node. | (none) | `repo_url`, user message | `purpose` |
-| **Learn Elicitation** | `llama-3.1-8b-instant` | **Pre-context layer 2 (Learn branch).** Ask: "Are you here for overall structure, a specific feature, or the data model?" Capture as `focus_hint`. Runs before Cartographer — no analysis happens until this answers. | (none) | `purpose` | `focus_hint` |
-| **Cartographer** | `llama-3.3-70b-versatile` | Build the system map: entry points (in-degree 0), hubs (top fan-in), layers (community detection). **Tailors the map to `focus_hint`** (e.g., `data_model` → privileges schema-shaped hubs, dataclass clusters, ORM models; `specific_feature` → narrows to relevant layer; `overall_structure` → balanced). Emit `Insight` objects — never raw metrics. | `graph_query`, `graph_metrics`, `read_chunks` | `repo_id`, `purpose`, `focus_hint` | `system_map[]` |
-| **Flow Tracer** | `qwen3-32b` | Pick ONE end-to-end flow that aligns with `focus_hint`. Walk it via graph traversal. Emit Insight objects per step. The Insight's `goal_link` field explicitly cites the captured pre-context. | `graph_traverse`, `read_chunks` | `system_map`, `focus_hint` | `traced_flows[]` |
-| **Teacher (Learn)** | `llama-3.3-70b-versatile` | Sequence the system map and traced flow into a narrative. Emit mermaid diagrams. Every section ends with a next action. Lead paragraph references the user's stated focus ("You said you're here for the data model — here is what that looks like in this codebase…"). | `read_chunks` | `system_map`, `traced_flows`, `purpose`, `focus_hint` | `draft_tour[]` |
-| **Contribute Elicitation** | `llama-3.1-8b-instant` | **Pre-context layer 2 (Contribute branch).** Ask the 4-way intent question. Capture as `contribution_intent`. Runs before any scanner — no lane starts until this answers. | (none) | `purpose` | `contribution_intent` |
-| **Issue Triage (Lane A)** | `llama-3.3-70b-versatile` | Score open issues by **graph-backed approachability** (blast radius, callers, isolation). | `github_issues`, `graph_metrics`, `read_chunks` | `repo_url`, `contribution_intent` | `triaged_issues[]`, contributes to `opportunity_list[]` |
-| **Code Health (Lane B)** | `llama-3.1-8b-instant` | Rank deterministic quality signals (hot-untested, missing docstrings on public API, AST dup, dead code, churn × complexity, TODO archaeology) by **mergeability**. | `graph_metrics`, `read_chunks` | `repo_id` | contributes to `opportunity_list[]` |
-| **Suspicion (Lane C)** | `qwen3-32b` | Explain pre-filtered structural anomalies with guarded language. Every suspicion includes a `to_confirm:` step. | `graph_metrics`, `read_chunks` | `repo_id` | contributes to `opportunity_list[]` |
-| **Opportunity Ranker** | (deterministic, no LLM) | Combine Lane A/B/C outputs into a single ranked `opportunity_list`. | (none) | A, B, C outputs | `opportunity_list[]` |
-| **Teacher (Contribute briefing)** | `llama-3.3-70b-versatile` | Take top-N opportunities, brief the user, end each with files to touch + suggested first step. | `read_chunks` | `opportunity_list`, `contribution_intent` | `draft_tour[]` |
-| **Q&A** | `llama-3.3-70b-versatile` (qwen3-32b fallback) | Hybrid retrieval loop with sufficiency judge, ≤ 3 hops. | `vector_search`, `graph_traverse`, `read_chunks` | `user_question`, `repo_id` | `draft_tour[]` (appended) |
-| **Verifier** | `qwen2.5-coder:7b` (Ollama) | Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric. | `read_chunks` | `draft_tour[]` (latest section) | `verifier_objections[]`, mutates `claim.status` |
+| **Intent Profiler** | `llama-3.1-8b-instant` | **Generic intent layer, step 1.** Reads the user's free-text intent statement. Emits a structured `IntentProfile` (modality_weights, focus_keywords, audience_framing, output_shape_preference, raw_text). Runs on every user, every time. Always the first node. | (none) | `repo_url`, user's free-text intent | `intent_profile` (draft) |
+| **Capability Planner** | (deterministic, no LLM) | **Generic intent layer, step 2.** Reads the confirmed `IntentProfile` and emits a `CapabilityPlan`: which capabilities to activate, in what order, and with what tilt parameters. Deterministic rules — verifiable in CI, consumes no LLM quota. | (none) | `intent_profile` | `capability_plan` |
+| **Cartographer** | `llama-3.3-70b-versatile` | (Optional, planner-activated.) Build the system map: entry points (in-degree 0), hubs (top fan-in), layers (community detection). **Tilt parameters from `capability_plan.cartographer_tilt`** select hub-selection bias (import-graph hubs / data-shaped hubs / hot-path hubs / decision-shaped hubs) and subsystem narrowing via `intent_profile.focus_keywords`. Emit `Insight` objects — never raw metrics. | `graph_query`, `graph_metrics`, `read_chunks` | `repo_id`, `intent_profile`, `capability_plan` | `system_map[]` |
+| **Flow Tracer** | `qwen3-32b` | (Optional, planner-activated.) Pick one or more end-to-end flows aligned with `capability_plan.flow_tracer_targets`. Walk each via graph traversal. Emit Insight objects per step. The Insight's `goal_link` cites the active part of the profile. | `graph_traverse`, `read_chunks` | `system_map`, `intent_profile`, `capability_plan` | `traced_flows[]` |
+| **Teacher** | `llama-3.3-70b-versatile` | (Terminal capability, almost always activated.) Sequences whichever capabilities ran into a coherent output. Output shape (`narrative` / `ranked_list` / `dossier` / `comparison_table`) and audience framing come from `intent_profile`. Every section ends in motion. Emits mermaid when shape is `narrative`. Lead paragraph echoes the user's `raw_text` intent. | `read_chunks` | `intent_profile`, plus any of `system_map`, `traced_flows`, `opportunity_list`, `decision_dossier` | `draft_tour[]` |
+| **Lane A — Issue Triage** | `llama-3.3-70b-versatile` | (Optional, planner-activated.) Score open issues by **graph-backed approachability** (blast radius, callers, isolation). Filter by `intent_profile.focus_keywords`. | `github_issues`, `graph_metrics`, `read_chunks` | `repo_url`, `intent_profile` | `triaged_issues[]`, contributes to `opportunity_list[]` |
+| **Lane B — Code Health** | `llama-3.1-8b-instant` | (Optional, planner-activated.) Rank deterministic quality signals (hot-untested, missing docstrings, AST dup, dead code, churn × complexity, TODO archaeology). Teacher framing — cleanup-opportunities vs. tradeoffs-visible-in-code — comes from `capability_plan.lane_b_framing`. | `graph_metrics`, `read_chunks` | `repo_id`, `intent_profile` | contributes to `opportunity_list[]` |
+| **Lane C — Suspicion** | `qwen3-32b` | (Optional, planner-activated.) Explain pre-filtered structural anomalies with guarded language. Every suspicion includes a `to_confirm:` step. Detector subset filterable by `focus_keywords` (security-shaped, async-shaped, IO-shaped). | `graph_metrics`, `read_chunks` | `repo_id`, `intent_profile` | contributes to `opportunity_list[]` |
+| **Decision Archaeology** | `llama-3.3-70b-versatile` | (Optional, planner-activated.) Reads `git log`, README, commit messages, and the import graph to extract architectural decisions + rationale. Activated when `modality_weights.evaluate` is high or `audience_framing` is build-vs-buy / paper / competitive. | `graph_query`, `graph_metrics`, `read_chunks`, GitPython | `repo_id`, `intent_profile` | `decision_dossier[]` |
+| **Opportunity Ranker** | (deterministic, no LLM) | Combine Lane A/B/C outputs into a single ranked `opportunity_list`. Ranking weights read from `capability_plan.ranker_weights` (planner-derived from `intent_profile.modality_weights`). | (none) | A, B, C outputs, `capability_plan` | `opportunity_list[]` |
+| **Q&A** | `llama-3.3-70b-versatile` (qwen3-32b fallback) | **Universal — always-on, available throughout the lifecycle.** Hybrid retrieval loop with sufficiency judge, ≤ 3 hops. Reads `intent_profile` to frame the answer. Drives the synchronized code viewer like any tour claim. | `vector_search`, `graph_traverse`, `read_chunks` | `user_question`, `repo_id`, `intent_profile` | `draft_tour[]` (appended) |
+| **Verifier** | `qwen2.5-coder:7b` (Ollama) | **Universal.** Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric (goal-relevance against `intent_profile`). Wraps every generating capability. | `read_chunks` | `draft_tour[]` (latest section), `intent_profile` | `verifier_objections[]`, mutates `claim.status` |
 
 ---
 
@@ -169,7 +182,7 @@ class Insight(BaseModel):
     because: str                # the structural/AST/graph reason
     so_what: str = Field(min_length=1)   # consequence for the user's goal
     refs: list[CodeRef] = Field(min_length=1)
-    goal_link: str = Field(min_length=1) # how this maps to purpose+focus_hint
+    goal_link: str = Field(min_length=1) # how this maps to intent_profile (raw_text / focus_keywords / audience_framing)
 
     # Empty so_what or goal_link fails validation. This is intentional.
 
@@ -212,45 +225,94 @@ class VerifierObjection(BaseModel):
     suggested_fix: str | None = None
 
 
+# ─── Generic intent layer ───────────────────────────────────────────────────
+
+# Modality is continuous, not categorical. Any combination is valid. Open-ended literal set
+# (we constrain to five well-understood axes; nothing about the architecture forbids extending it).
+Modality = Literal["understand", "change", "evaluate", "locate", "compare"]
+
+# Output shape can be unspecified — the Teacher picks based on the profile when so.
+OutputShape = Literal["narrative", "ranked_list", "dossier", "comparison_table", "unspecified"]
+
+
+class IntentProfile(BaseModel):
+    """
+    The product of the Intent Profiler. Free-text intent in, structured tilt out.
+    There is NO fixed enum of "purposes". Anything a user can articulate is supported.
+    """
+    raw_text: str = Field(min_length=1)          # the user's exact sentence — preserved verbatim
+    modality_weights: dict[Modality, float] = Field(default_factory=dict)
+    focus_keywords: list[str] = Field(default_factory=list)
+    audience_framing: str | None = None          # "for a PR" | "for internal docs" | "for a security report" | …
+    output_shape_preference: OutputShape = "unspecified"
+    success_criterion: str | None = None         # profiler-suggested measurable success condition; user-editable
+
+    @field_validator("modality_weights")
+    @classmethod
+    def _weights_in_unit_interval(cls, v: dict[Modality, float]) -> dict[Modality, float]:
+        if any(w < 0 or w > 1 for w in v.values()):
+            raise ValueError("modality weights must be in [0, 1]")
+        return v
+
+
+# ─── Capability planning ────────────────────────────────────────────────────
+
+CapabilityName = Literal[
+    "cartographer",
+    "flow_tracer",
+    "lane_a_issue_triage",
+    "lane_b_code_health",
+    "lane_c_suspicion",
+    "decision_archaeology",
+    "teacher",
+    # NOTE: q_and_a is universal/always-on, not planner-activated; not listed here.
+    # NOTE: the verifier is universal too; it wraps every active capability.
+]
+
+
+class CapabilityPlan(BaseModel):
+    """
+    The product of the Capability Planner. Deterministic, derivable from IntentProfile.
+    No LLM. Verifiable in CI.
+    """
+    active: list[CapabilityName] = Field(min_length=1)
+    tilts: dict[CapabilityName, dict] = Field(default_factory=dict)
+    output_shape: OutputShape
+    # Typed knobs for the most common tilts (still expressible via `tilts` for novelty):
+    cartographer_tilt: str | None = None      # "balanced" | "data_hubs" | "decision_hubs" | "hot_path" | …
+    flow_tracer_targets: list[str] = Field(default_factory=list)
+    lane_b_framing: str | None = None         # "cleanup_opportunities" | "tradeoffs_visible_in_code"
+    ranker_weights: dict[str, float] = Field(default_factory=dict)  # e.g. {"A": 0.6, "B": 0.3, "C": 0.1}
+
+
 # ─── Top-level state ────────────────────────────────────────────────────────
-
-Purpose = Literal["learn", "contribute", "question"]
-FocusHint = Literal["overall_structure", "specific_feature", "data_model"]
-ContributionIntent = Literal["fix_issue", "improve_quality", "hunt_problems", "show_all"]
-
 
 class ArchaeologistState(BaseModel):
     # — identity —
     repo_id: str
     repo_url: str
 
-    # — pre-context (captured BEFORE any analysis runs) —
-    # purpose: set by Intent Router (layer 1).
-    # focus_hint: set by Learn Elicitation (layer 2, learn branch).
-    # contribution_intent: set by Contribute Elicitation (layer 2, contribute branch).
-    # Downstream generation nodes MUST raise if their required pre-context field is None.
-    purpose: Purpose | None = None
-    focus_hint: FocusHint | None = None
-    contribution_intent: ContributionIntent | None = None
-    user_question: str | None = None
+    # — generic intent layer (set in this order, before any capability runs) —
+    intent_profile: IntentProfile | None = None       # Intent Profiler output, user-confirmed
+    capability_plan: CapabilityPlan | None = None     # Capability Planner output
+    user_question: str | None = None                  # Q&A inputs land here (Q&A is universal)
 
-    # — Learn artifacts —
+    # — Capability outputs (any subset may exist depending on the plan) —
     system_map: Annotated[list[Insight], add] = Field(default_factory=list)
     traced_flows: Annotated[list[Insight], add] = Field(default_factory=list)
-
-    # — Contribute artifacts —
     triaged_issues: Annotated[list[Opportunity], add] = Field(default_factory=list)
     opportunity_list: Annotated[list[Opportunity], add] = Field(default_factory=list)
+    decision_dossier: Annotated[list[Insight], add] = Field(default_factory=list)
 
     # — Output —
     draft_tour: Annotated[list[TourSection], add] = Field(default_factory=list)
 
     # — Verifier loop —
     verifier_objections: Annotated[list[VerifierObjection], add] = Field(default_factory=list)
-    retry_count: dict[int, int] = Field(default_factory=dict)  # section_order -> retries
+    retry_count: dict[int, int] = Field(default_factory=dict)
 
     # — Observability —
-    tokens_used: dict[str, int] = Field(default_factory=dict)  # model_name -> tokens
+    tokens_used: dict[str, int] = Field(default_factory=dict)
     errors: Annotated[list[str], add] = Field(default_factory=list)
 ```
 
@@ -258,10 +320,11 @@ class ArchaeologistState(BaseModel):
 
 1. **No agent writes another agent's field.** Use Python's typed return values. The reducer composes the diff.
 2. **Mutations only via node returns.** Never `state.foo.append(...)`. Always `return {"foo": [new_item]}`.
-3. **Reducer on append-only collections.** Verifier objections, errors, system_map, traced_flows, opportunity_list, draft_tour all use `Annotated[..., add]`.
+3. **Reducer on append-only collections.** Verifier objections, errors, system_map, traced_flows, opportunity_list, decision_dossier, draft_tour all use `Annotated[..., add]`.
 4. **`recursion_limit=15`.** Anything beyond is a loop bug. Found cheaper here than in production.
 5. **Validators do real work.** `Insight.so_what` empty → validation error → the bug is at the source node, not in the Teacher.
-6. **Pre-context is required before analysis.** No node downstream of an elicitation may run with its required pre-context field unset: Cartographer / Flow Tracer / Teacher (Learn) require `focus_hint`; Lane A/B/C / Ranker / Teacher (Contribute) require `contribution_intent`. Enforced by a guard at the top of each such node that raises if the field is `None`. The graph topology blocks the elicitation edge until the user answers, so this guard catches programmer error, not normal flow.
+6. **The generic intent layer must complete before any capability runs.** A capability node guard raises if `state.intent_profile is None` or `state.capability_plan is None`. The Q&A subgraph is exempt from this guard *only* in the case where the user asks a question before any tour starts — then the Q&A node creates a minimal `IntentProfile` from the question itself (which the Intent Profiler can do in one pass).
+7. **No capability code path depends on a "purpose" enum.** If you find yourself writing `if state.purpose == "learn":` you've reintroduced the bucketed model and broken the elasticity property. Capability behavior is parameterized by `intent_profile` + the capability's tilt entry in `capability_plan` — nothing else.
 
 ---
 
@@ -316,6 +379,84 @@ user_question
 
 ---
 
+## The Capability Planner
+
+The Planner is the deterministic heart of elasticity. It is a Python function: `plan(IntentProfile) -> CapabilityPlan`. No LLM. No state mutation. Pure transformation. Verifiable in CI on a labeled set of `(IntentProfile, expected CapabilityPlan)` pairs.
+
+The Planner's job is to encode "which subset of the capability library serves this intent, and how to tilt each member of the subset." A starter rule sketch (this is the v1 implementation; the file evolves):
+
+```python
+def plan(p: IntentProfile) -> CapabilityPlan:
+    active: list[CapabilityName] = []
+    tilts: dict[CapabilityName, dict] = {}
+
+    understand = p.modality_weights.get("understand", 0)
+    change     = p.modality_weights.get("change", 0)
+    evaluate   = p.modality_weights.get("evaluate", 0)
+    locate     = p.modality_weights.get("locate", 0)
+    compare    = p.modality_weights.get("compare", 0)
+
+    # Cartographer: needed whenever we're producing structural understanding
+    # or whenever narrowing by focus_keywords is requested.
+    if understand >= 0.2 or evaluate >= 0.2 or locate >= 0.3 or p.focus_keywords:
+        active.append("cartographer")
+        tilts["cartographer"] = {
+            "hub_bias": _pick_hub_bias(p),     # data / decision / hot_path / balanced
+            "narrow_to": p.focus_keywords,
+        }
+
+    # Flow Tracer: needed when the user wants to understand a path / lifecycle.
+    if understand >= 0.4 or "lifecycle" in p.raw_text.lower():
+        active.append("flow_tracer")
+        tilts["flow_tracer"] = {"targets": _infer_flow_targets(p)}
+
+    # Lane A: needed when the user wants to ship a PR against the issue tracker.
+    if change >= 0.4 and ("issue" in p.raw_text.lower() or "PR" in p.raw_text):
+        active.append("lane_a_issue_triage")
+
+    # Lane B: needed for quality cleanup work AND for surfacing tradeoffs.
+    if change >= 0.3 or evaluate >= 0.4:
+        active.append("lane_b_code_health")
+        tilts["lane_b_code_health"] = {
+            "framing": "tradeoffs_visible_in_code" if evaluate > change else "cleanup_opportunities",
+        }
+
+    # Lane C: needed for fragility / problem hunting / security audits.
+    fragility_signal = any(k in p.raw_text.lower()
+                           for k in ("fragile", "problem", "audit", "security", "vulnerab"))
+    if change >= 0.3 and (fragility_signal or "hunt" in p.raw_text.lower()):
+        active.append("lane_c_suspicion")
+        tilts["lane_c_suspicion"] = {"keyword_filter": p.focus_keywords}
+
+    # Decision Archaeology: needed when the user wants the "why" behind choices.
+    if evaluate >= 0.4 or compare >= 0.3 or "decision" in p.raw_text.lower():
+        active.append("decision_archaeology")
+
+    # Teacher: terminal capability; almost always activated.
+    active.append("teacher")
+
+    shape = p.output_shape_preference if p.output_shape_preference != "unspecified" \
+            else _infer_shape(active, p)
+
+    return CapabilityPlan(
+        active=active,
+        tilts=tilts,
+        output_shape=shape,
+        cartographer_tilt=tilts.get("cartographer", {}).get("hub_bias"),
+        flow_tracer_targets=tilts.get("flow_tracer", {}).get("targets", []),
+        lane_b_framing=tilts.get("lane_b_code_health", {}).get("framing"),
+        ranker_weights=_derive_ranker_weights(p) if "lane_a_issue_triage" in active else {},
+    )
+```
+
+**Why deterministic.** A planner that uses an LLM creates two problems: (1) every quota hit is a planning failure, not just a generation failure; (2) verifying "the planner does the right thing" becomes verifying an LLM, which is expensive and probabilistic. A rule-based planner is testable on a labeled set in milliseconds.
+
+**Why this is enough flexibility.** Any intent the user can articulate gets a plan: the rules read both structured `modality_weights` and the `raw_text` for keyword signals. New stated intents either fall through existing rules (the common case) or trigger a new rule (rare, and a one-line addition). Adding a new capability (say, a Security Scanner) means: (a) adding the capability to the library, (b) adding a rule like *"if `focus_keywords` includes a security term OR raw text contains `audit|security|vulnerab`, activate `security_scanner`."* No restructuring.
+
+**Why this is not just "if statements over a hidden enum."** The rules read continuous weights and free-text signals. Two users with very different stated intents can produce the same plan (e.g., a learner asking "explain async" and an evaluator asking "how solid is their async story" both get `cartographer + flow_tracer + teacher` — but the *tilts* differ because their `audience_framing` and `modality_weights` differ). And any intent that doesn't match an existing rule falls through to a default plan (`cartographer + teacher + narrative`) instead of erroring — the system is open, not closed.
+
+---
+
 ## Q&A drives the synchronized code viewer
 
 The Q&A subgraph is the user's escape hatch, but its answers are not text-only. Every Q&A answer carries the same `Claim[]` structure as tour sections — meaning every Q&A claim has `refs[]`, and **the UI scrolls the synchronized code viewer to the first ref of the first claim automatically** on answer. The user asks "where does the request lifecycle start?" and the viewer opens the file at the function. This is the synchronized code viewer pulled through the entire product, not just the scripted tour.
@@ -339,19 +480,31 @@ These surfaces are required deliverables in Phase 4 (verified badge, retrieval p
 
 ---
 
-## How pre-context flows through the system
+## How the intent profile flows through the system
 
 | Step | What gets captured / used |
 |---|---|
-| **User opens app** | (nothing yet — no analysis runs) |
-| **Intent Router fires** | Captures `purpose` ∈ `{learn, contribute, question}` from the first message. |
-| **Per-branch Elicitation fires** | Learn → `focus_hint`. Contribute → `contribution_intent`. The graph **blocks** here until the user answers; no scanner, Cartographer, or Q&A runs without pre-context. |
-| **Downstream prompts read pre-context** | Every generation prompt template injects `purpose`, `focus_hint`, and `contribution_intent` as the leading "goal anchor" block. The Iteration-2 Verifier rubric uses these same fields to check goal relevance — a section that doesn't tie back to the captured pre-context fails the rubric. |
-| **Contribute lane gating** | `contribution_intent` controls which lanes are active and how they're weighted in the Ranker: `fix_issue` → Lane A weighted heaviest; `improve_quality` → Lane B; `hunt_problems` → Lane C; `show_all` → all three balanced. |
-| **Q&A escape hatch** | When the user asks a question mid-tour, Q&A still reads `purpose` and `focus_hint` and frames the answer accordingly. |
-| **User changes their mind** | "Restart with a different purpose" re-runs from the Intent Router with the existing indexed repo. Indexing is not redone. |
+| **User opens app** | Indexing job enqueued in the background. Free-text intent box is the first thing the user sees. |
+| **Intent Profiler fires** | Reads the user's free-text intent and emits a draft `IntentProfile` (modality_weights, focus_keywords, audience_framing, output_shape_preference, suggested success_criterion). |
+| **User confirms via chip strip** | The draft profile renders as a compact "I'll focus on X · Y · Z, framed for W. Edit?" strip. User accepts, edits a chip, or rewrites the raw text. Confirmed `IntentProfile` is now committed to state. |
+| **Capability Planner fires** | Deterministic. Reads `intent_profile`, emits `capability_plan` (which capabilities to activate, in what order, with what tilts). No LLM, no quota. |
+| **Active capabilities run (possibly in parallel)** | LangGraph activates only the capability nodes named in `capability_plan.active`. Each reads `intent_profile` and its own entry in `capability_plan.tilts`. Capabilities the planner did not activate do not run — that is the elasticity. |
+| **Verifier wraps every generating capability** | Per-claim grounding check + actionability rubric. The rubric checks goal-relevance against `intent_profile`, not against any fixed purpose enum. |
+| **Teacher composes the output** | Reads `intent_profile.output_shape_preference` (and `capability_plan.output_shape` if the planner overrode it) to choose narrative / ranked_list / dossier / comparison_table. Audience framing comes from `intent_profile.audience_framing`. Lead paragraph echoes `intent_profile.raw_text` verbatim. |
+| **Q&A is reachable throughout** | Universal, cross-cutting. Reads the same `intent_profile`. Drives the synchronized code viewer. Available before, during, and after the planned capabilities have run. |
+| **User changes their mind** | The "You said:" chip strip stays editable. Editing the intent re-runs the Profiler + Planner only — no re-indexing. Capabilities that are still relevant under the new plan reuse their cached output; newly-activated capabilities run; deactivated ones don't. |
 
-The traceability property: for every paragraph the user sees, they can point at the pre-context fields that produced it. This is what "meet the purpose" looks like in practice.
+The traceability property: for every paragraph the user sees, they can point at the entry in `intent_profile` and the capability in `capability_plan` that produced it. This is what "meet the purpose" looks like in practice when the purpose is open-ended.
+
+### What "always-on" means for Q&A specifically
+
+The Q&A subgraph is not a node in the planned pipeline — it is a separate subgraph reachable from any state. Concretely:
+
+- A user can ask a question **before** any planned capability runs. In that case Q&A constructs a minimal `IntentProfile` from the question itself (single-pass profiler call) so the answer still gets framed and so the trust spine still applies.
+- A user can ask a question **between** planned capabilities. The Q&A subgraph reads whatever capability outputs exist so far; if it needs context the planned pipeline hasn't produced yet, it falls back to hybrid retrieval over the indexed repo.
+- A user can ask a question **after** the planned pipeline completes. Q&A reads the full state and the full `IntentProfile`.
+
+This is what the user means by "Q&A is for everyone" — there is no Q&A-vs-non-Q&A user. Every user has Q&A available the whole time. Every Q&A answer is verified by the same Verifier. Every Q&A answer drives the same synchronized code viewer.
 
 ---
 
@@ -420,10 +573,10 @@ Every Lane C output **must** end with a `confirm_before_pr` step — the user ru
 
 | Layer | What it actually does | Failure mode it catches |
 |---|---|---|
-| **1. State design** | `Insight` model has `min_length=1` validators on `so_what` and `goal_link`. Pydantic raises before the Insight enters state. | Cartographer emits a bullet with no actionable consequence. |
-| **2. Prompt contracts** | Every generation prompt restates the three laws and includes contrastive ❌/✅ examples. ❌: "23 files import this module." ✅: "This module is a hub — 23 files import it, so a signature change ripples broadly. If you're adding a feature, prefer extending vs. modifying." | Teacher slips into stat-dump mode under load. |
-| **3. Verifier 2nd rubric** | After grounding, the Verifier runs a binary actionability rubric: every claim goal-relevant? every section ends in action? Fail → objections appended → source node retries ≤ 2. | Teacher emits an on-topic section that doesn't end with a next step. |
-| **4. Eval harness** | Per-PR retrieval/generation runs hit eval datasets. Actionability rate ≥ 80%. Regex denylist test asserts forbidden phrases ("X functions", "Y classes" as standalone) never appear in generated tours. | Slow drift; a refactor weakens the prompt without anyone noticing until the eval fails CI. |
+| **1. State design** | `Insight` model has `min_length=1` validators on `so_what` and `goal_link`. `goal_link` must cite something in `intent_profile` (focus_keyword, modality, audience). Pydantic raises before the Insight enters state. | Cartographer emits a bullet with no actionable consequence, or one not tied to the user's stated intent. |
+| **2. Prompt contracts** | Every generation prompt opens with a "goal anchor" block that renders `intent_profile.raw_text` + the planner-derived tilts. The three laws (goal-anchored / numbers carry consequences / sections end in motion) follow, with contrastive ❌/✅ examples. ❌: "23 files import this module." ✅: "This module is a hub — 23 files import it, so a signature change ripples broadly. Since you said you're evaluating extensibility, this is a tradeoff worth flagging." | Teacher slips into stat-dump mode under load, or drifts from the stated intent. |
+| **3. Verifier 2nd rubric** | After grounding, the Verifier runs a binary actionability rubric: every claim goal-relevant against `intent_profile`? every section ends in action? Fail → objections appended → source node retries ≤ 2. | Teacher emits an on-topic-for-the-repo section that isn't on-topic for the user's stated intent. |
+| **4. Eval harness** | Per-PR retrieval/generation runs hit eval datasets. Actionability rate ≥ 80%. Regex denylist test asserts forbidden phrases ("X functions", "Y classes" as standalone) never appear in generated tours. **Plus**: a `test_pre_context_shapes_output` test that runs two materially different `IntentProfile`s on the same repo and asserts the resulting `draft_tour`s differ structurally by ≥ 50%. | Slow drift; a refactor weakens the prompt without anyone noticing until the eval fails CI. Or worse — the system stops actually tilting on intent and falls back to a generic default. |
 
 The point of four layers is that **no single layer is trusted**. The state validator catches the easy cases; the prompt catches the medium cases; the Verifier catches the hard cases; the eval catches the drift. Removing any layer doubles the bug rate.
 

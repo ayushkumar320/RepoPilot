@@ -10,7 +10,7 @@ Every choice below is paired with **why** and **what we rejected**. The constrai
 |---|---|---|---|
 | Judgment-heavy generation (Cartographer, Issue Triage, Teacher, Q&A) | **Groq `llama-3.3-70b-versatile`** | Free tier, fast inference (~250 tok/s), strong reasoning on long-context code questions. | OpenAI GPT-4o-mini (not free), Together.ai (slower free tier), Anthropic Claude Haiku via Bedrock (no free tier). |
 | Trace and explain code paths (Flow Tracer, Q&A fallback) | **Groq `qwen3-32b`** | Excellent at structured reasoning over code traces. Spreads load off the 70B quota. | Mixtral-8x7B (deprecated on Groq), DeepSeek-Coder-V2 (not on Groq). |
-| Cheap, high-volume routing & classification (Intent Router, Code Health, chunk summaries) | **Groq `llama-3.1-8b-instant`** | ≈ 14.4k RPD — by far the highest free quota. Sufficient for classification and structured summary tasks. Burns the cheap tier for the hot paths so the 70B isn't starved. | Groq Gemma2-9b (smaller context), local Ollama Llama3-8B (slower wall-clock on CPU laptops). |
+| Cheap, high-volume work (Intent Profiler, Code Health, chunk summaries) | **Groq `llama-3.1-8b-instant`** | ≈ 14.4k RPD — by far the highest free quota. Sufficient for free-text intent profiling, classification, and structured summary tasks. Burns the cheap tier for the hot paths so the 70B isn't starved. | Groq Gemma2-9b (smaller context), local Ollama Llama3-8B (slower wall-clock on CPU laptops). |
 | Verification (highest call volume of any agent) | **Ollama `qwen2.5-coder:7b`** (local) | Runs on the developer's machine. No quota at all. Specifically tuned for code grounding tasks. Removes the single biggest risk to rate-limit survival — verifier traffic. | Groq for verifier (would burn 70B quota in minutes), GPT-3.5 (not free). |
 | Embeddings | **Ollama `nomic-embed-text`** (local) | 768-dim, fast on CPU, no API quota. Quality is competitive with OpenAI `text-embedding-3-small` on code search benchmarks. | OpenAI embeddings (not free), Cohere embed-v3 (paid), bge-small (lower quality on code). |
 | Provider abstraction | **Custom `LLMProvider`** with Groq → Cerebras → Ollama fallback, SQLite response cache, exponential backoff on 429. | Agents never import `groq`/`ollama` directly. One place to swap models, one place to cache, one place to handle 429s. Provider-level fallback means a single quota hit doesn't kill the user's session. | Direct SDK use (scattered fallback logic), LangChain LLM wrappers (opinionated and heavy), LiteLLM (additional dep when one file does the job). |
@@ -19,7 +19,7 @@ Every choice below is paired with **why** and **what we rejected**. The constrai
 
 | Agent | Model | Rationale |
 |---|---|---|
-| Intent Router | `llama-3.1-8b-instant` | Fires on every request. Must be cheap. |
+| Intent Profiler | `llama-3.1-8b-instant` | Fires on every request. Must be cheap. |
 | Cartographer | `llama-3.3-70b-versatile` | High-stakes mental-model construction. |
 | Flow Tracer | `qwen3-32b` | Path reasoning. Spreads load off 70B. |
 | Teacher | `llama-3.3-70b-versatile` | Narrative quality matters most here. |
@@ -141,7 +141,7 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
    ┌───────────────────┐                ┌─────────────────────┐                 ┌────────────────────────┐
    │   LangGraph       │                │  Tools (det.)       │                 │  LLMProvider           │
    │   StateGraph      │                │  vector_search      │                 │  Groq → Cerebras → Ollama
-   │  ─ Intent Router  │                │  graph_traverse     │                 │  SQLite cache          │
+   │  ─ Intent Profiler│                │  graph_traverse     │                 │  SQLite cache          │
    │  ─ LEARN subgraph │ ──tool calls──►│  graph_query        │ ◄──reads from── │  Backoff on 429        │
    │  ─ CONTRIBUTE sub │                │  graph_metrics      │                 │  Per-model quota mgmt  │
    │  ─ Q&A subgraph   │                │  read_chunks        │                 └────────────┬───────────┘

@@ -1,4 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(graphify query:*)",
+      "Bash(graphify explain:*)",
+      "Bash(graphify path:*)",
+      "Bash(graphify update .)",
+      "Bash(git add graphify-out/graph.json graphify-out/manifest.json)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

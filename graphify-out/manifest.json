@@ -1,7 +1,67 @@
 {
   ".claude/settings.json": {
-    "mtime": 1781356055.8618152,
-    "ast_hash": "e1073342e958ac9f00716938c8f165e3",
-    "semantic_hash": "e1073342e958ac9f00716938c8f165e3"
+    "mtime": 1781376514.6850314,
+    "ast_hash": "bec7e41f18de2edfdd992273936711e4",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1781356021.2178826,
+    "ast_hash": "f1e53ecc9194573d3c28fc116c743a2e",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1781356021.218174,
+    "ast_hash": "0bc020d491fca99550c1ea3de0a5f862",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1781376461.7815971,
+    "ast_hash": "b36e3563466381a1d0ba95c2d04027e1",
+    "semantic_hash": ""
+  },
+  "docs/00_CLAUDE_BUILD_GUIDE.md": {
+    "mtime": 1781355167.401044,
+    "ast_hash": "7f42a912dd0c1974c84b8b2781921994",
+    "semantic_hash": ""
+  },
+  "docs/01_PROBLEM_AND_SOLUTION.md": {
+    "mtime": 1781355167.4014695,
+    "ast_hash": "034c7806f9edd198e4e418e785334e45",
+    "semantic_hash": ""
+  },
+  "docs/02_TECH_STACK.md": {
+    "mtime": 1781355167.4016802,
+    "ast_hash": "a1166a2851c1aae19bdd0ae7cb7d40c3",
+    "semantic_hash": ""
+  },
+  "docs/03_ARCHITECTURE.md": {
+    "mtime": 1781355167.4019923,
+    "ast_hash": "dd1e902ee1d30b08e8da3eaa4bc7ce78",
+    "semantic_hash": ""
+  },
+  "docs/04_BUILD_PLAN.md": {
+    "mtime": 1781355167.4022317,
+    "ast_hash": "8c34d2dc88933ebc5b2837cd5db2ec5c",
+    "semantic_hash": ""
+  },
+  "docs/05_PHASE_PROMPTS.md": {
+    "mtime": 1781355167.4024906,
+    "ast_hash": "ff2197a28eda56cef18527406c7b290a",
+    "semantic_hash": ""
+  },
+  ".agents/rules/project.md": {
+    "mtime": 1781376491.0465815,
+    "ast_hash": "fee2c7941d1f0b1400aad3023dbd18a2",
+    "semantic_hash": ""
+  },
+  ".claude/agents/codebase-explorer.md": {
+    "mtime": 1781376504.0606863,
+    "ast_hash": "0b070e4749244c6b8e72c85381524c73",
+    "semantic_hash": ""
+  },
+  ".claude/commands/graph-update.md": {
+    "mtime": 1781376509.6908228,
+    "ast_hash": "18f582dd4a26a2f2c38d72968a060ffe",
+    "semantic_hash": ""
   }
 }

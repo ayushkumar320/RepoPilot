@@ -4,6 +4,1006 @@
   "graph": {},
   "nodes": [
     {
+      "label": "graphify.md",
+      "file_type": "document",
+      "source_file": ".agents/rules/graphify.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "rules_graphify",
+      "community": 11,
+      "norm_label": "graphify.md"
+    },
+    {
+      "label": "graphify",
+      "file_type": "document",
+      "source_file": ".agents/rules/graphify.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "rules_graphify_graphify",
+      "community": 11,
+      "norm_label": "graphify"
+    },
+    {
+      "label": "project.md",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "rules_project",
+      "community": 13,
+      "norm_label": "project.md"
+    },
+    {
+      "label": "RepoPilot \u2014 Project Rules (portable)",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "rules_project_repopilot_project_rules_portable",
+      "community": 13,
+      "norm_label": "repopilot \u2014 project rules (portable)"
+    },
+    {
+      "label": "What this project is",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "rules_project_what_this_project_is",
+      "community": 13,
+      "norm_label": "what this project is"
+    },
+    {
+      "label": "Knowledge graph first",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "rules_project_knowledge_graph_first",
+      "community": 13,
+      "norm_label": "knowledge graph first"
+    },
+    {
+      "label": "Graph maintenance (mandatory)",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "rules_project_graph_maintenance_mandatory",
+      "community": 13,
+      "norm_label": "graph maintenance (mandatory)"
+    },
+    {
+      "label": "Engineering conventions",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "rules_project_engineering_conventions",
+      "community": 13,
+      "norm_label": "engineering conventions"
+    },
+    {
+      "label": "Authoring",
+      "file_type": "document",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "rules_project_authoring",
+      "community": 13,
+      "norm_label": "authoring"
+    },
+    {
+      "label": "graphify.md",
+      "file_type": "document",
+      "source_file": ".agents/workflows/graphify.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "workflows_graphify",
+      "community": 12,
+      "norm_label": "graphify.md"
+    },
+    {
+      "label": "Workflow: graphify",
+      "file_type": "document",
+      "source_file": ".agents/workflows/graphify.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "workflows_graphify_workflow_graphify",
+      "community": 12,
+      "norm_label": "workflow: graphify"
+    },
+    {
+      "label": "codebase-explorer.md",
+      "file_type": "document",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents_codebase_explorer",
+      "community": 14,
+      "norm_label": "codebase-explorer.md"
+    },
+    {
+      "label": "Mandatory order of operations",
+      "file_type": "document",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "agents_codebase_explorer_mandatory_order_of_operations",
+      "community": 14,
+      "norm_label": "mandatory order of operations"
+    },
+    {
+      "label": "What to return",
+      "file_type": "document",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "agents_codebase_explorer_what_to_return",
+      "community": 14,
+      "norm_label": "what to return"
+    },
+    {
+      "label": "Constraints",
+      "file_type": "document",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "agents_codebase_explorer_constraints",
+      "community": 14,
+      "norm_label": "constraints"
+    },
+    {
+      "label": "graph-update.md",
+      "file_type": "document",
+      "source_file": ".claude/commands/graph-update.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "commands_graph_update",
+      "community": 15,
+      "norm_label": "graph-update.md"
+    },
+    {
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "claude",
+      "community": 2,
+      "norm_label": "claude.md"
+    },
+    {
+      "label": "RepoPilot \u2014 Project Guide (Single Source of Truth)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "claude_repopilot_project_guide_single_source_of_truth",
+      "community": 2,
+      "norm_label": "repopilot \u2014 project guide (single source of truth)"
+    },
+    {
+      "label": "1. What this project is",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "claude_1_what_this_project_is",
+      "community": 2,
+      "norm_label": "1. what this project is"
+    },
+    {
+      "label": "2. How project knowledge is organized",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "claude_2_how_project_knowledge_is_organized",
+      "community": 2,
+      "norm_label": "2. how project knowledge is organized"
+    },
+    {
+      "label": "3. Knowledge Graph first (Graphify)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "claude_3_knowledge_graph_first_graphify",
+      "community": 2,
+      "norm_label": "3. knowledge graph first (graphify)"
+    },
+    {
+      "label": "4. Graph maintenance (mandatory)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "claude_4_graph_maintenance_mandatory",
+      "community": 2,
+      "norm_label": "4. graph maintenance (mandatory)"
+    },
+    {
+      "label": "5. Claude Code harness (`.claude/`)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "claude_5_claude_code_harness_claude",
+      "community": 2,
+      "norm_label": "5. claude code harness (`.claude/`)"
+    },
+    {
+      "label": "6. Engineering conventions",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "claude_6_engineering_conventions",
+      "community": 2,
+      "norm_label": "6. engineering conventions"
+    },
+    {
+      "label": "7. Definition of Done",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L111",
+      "_origin": "ast",
+      "id": "claude_7_definition_of_done",
+      "community": 2,
+      "norm_label": "7. definition of done"
+    },
+    {
+      "label": "8. For contributors (human or AI)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L142",
+      "_origin": "ast",
+      "id": "claude_8_for_contributors_human_or_ai",
+      "community": 2,
+      "norm_label": "8. for contributors (human or ai)"
+    },
+    {
+      "label": "00_CLAUDE_BUILD_GUIDE.md",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide",
+      "community": 6,
+      "norm_label": "00_claude_build_guide.md"
+    },
+    {
+      "label": "00 \u2014 Claude Build Guide (Standing Context)",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "community": 6,
+      "norm_label": "00 \u2014 claude build guide (standing context)"
+    },
+    {
+      "label": "Project one-liner",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_project_one_liner",
+      "community": 6,
+      "norm_label": "project one-liner"
+    },
+    {
+      "label": "Why pre-context is the first step (not inferred mid-flight)",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_why_pre_context_is_the_first_step_not_inferred_mid_flight",
+      "community": 6,
+      "norm_label": "why pre-context is the first step (not inferred mid-flight)"
+    },
+    {
+      "label": "Pre-context capture runs IN PARALLEL with indexing \u2014 never after it",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_pre_context_capture_runs_in_parallel_with_indexing_never_after_it",
+      "community": 6,
+      "norm_label": "pre-context capture runs in parallel with indexing \u2014 never after it"
+    },
+    {
+      "label": "The four trust surfaces \u2014 make every moat visible",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_the_four_trust_surfaces_make_every_moat_visible",
+      "community": 6,
+      "norm_label": "the four trust surfaces \u2014 make every moat visible"
+    },
+    {
+      "label": "The five principles",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_the_five_principles",
+      "community": 6,
+      "norm_label": "the five principles"
+    },
+    {
+      "label": "Iteration 1 \u2014 Contribute = opportunity engine, not issue browser",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_iteration_1_contribute_opportunity_engine_not_issue_browser",
+      "community": 6,
+      "norm_label": "iteration 1 \u2014 contribute = opportunity engine, not issue browser"
+    },
+    {
+      "label": "Iteration 2 \u2014 No stat dumps. Output contract, enforced four ways.",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_iteration_2_no_stat_dumps_output_contract_enforced_four_ways",
+      "community": 6,
+      "norm_label": "iteration 2 \u2014 no stat dumps. output contract, enforced four ways."
+    },
+    {
+      "label": "Tech stack (free / local only)",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L109",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_tech_stack_free_local_only",
+      "community": 6,
+      "norm_label": "tech stack (free / local only)"
+    },
+    {
+      "label": "Agent roster",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L131",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_agent_roster",
+      "community": 6,
+      "norm_label": "agent roster"
+    },
+    {
+      "label": "State schema rules",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L149",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_state_schema_rules",
+      "community": 6,
+      "norm_label": "state schema rules"
+    },
+    {
+      "label": "Per-PR Definition of Done",
+      "file_type": "document",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L163",
+      "_origin": "ast",
+      "id": "docs_00_claude_build_guide_per_pr_definition_of_done",
+      "community": 6,
+      "norm_label": "per-pr definition of done"
+    },
+    {
+      "label": "01_PROBLEM_AND_SOLUTION.md",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution",
+      "community": 7,
+      "norm_label": "01_problem_and_solution.md"
+    },
+    {
+      "label": "01 \u2014 Problem and Solution",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_01_problem_and_solution",
+      "community": 7,
+      "norm_label": "01 \u2014 problem and solution"
+    },
+    {
+      "label": "The problem",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_the_problem",
+      "community": 7,
+      "norm_label": "the problem"
+    },
+    {
+      "label": "Why existing tools fail this user",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_why_existing_tools_fail_this_user",
+      "community": 7,
+      "norm_label": "why existing tools fail this user"
+    },
+    {
+      "label": "The beachhead user",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_the_beachhead_user",
+      "community": 7,
+      "norm_label": "the beachhead user"
+    },
+    {
+      "label": "The solution",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_the_solution",
+      "community": 7,
+      "norm_label": "the solution"
+    },
+    {
+      "label": "The core bet",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_the_core_bet",
+      "community": 7,
+      "norm_label": "the core bet"
+    },
+    {
+      "label": "Learn vs. Contribute \u2014 what each tour delivers",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_learn_vs_contribute_what_each_tour_delivers",
+      "community": 7,
+      "norm_label": "learn vs. contribute \u2014 what each tour delivers"
+    },
+    {
+      "label": "The five principles (the contract this product lives or dies by)",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_the_five_principles_the_contract_this_product_lives_or_dies_by",
+      "community": 7,
+      "norm_label": "the five principles (the contract this product lives or dies by)"
+    },
+    {
+      "label": "Why agentic beats a single prompt",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_why_agentic_beats_a_single_prompt",
+      "community": 7,
+      "norm_label": "why agentic beats a single prompt"
+    },
+    {
+      "label": "Success criteria",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L99",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_success_criteria",
+      "community": 7,
+      "norm_label": "success criteria"
+    },
+    {
+      "label": "Hard scope fence \u2014 what v1 will NOT do",
+      "file_type": "document",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L115",
+      "_origin": "ast",
+      "id": "docs_01_problem_and_solution_hard_scope_fence_what_v1_will_not_do",
+      "community": 7,
+      "norm_label": "hard scope fence \u2014 what v1 will not do"
+    },
+    {
+      "label": "02_TECH_STACK.md",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack",
+      "community": 8,
+      "norm_label": "02_tech_stack.md"
+    },
+    {
+      "label": "02 \u2014 Tech Stack",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_02_tech_stack",
+      "community": 8,
+      "norm_label": "02 \u2014 tech stack"
+    },
+    {
+      "label": "LLM layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_llm_layer",
+      "community": 8,
+      "norm_label": "llm layer"
+    },
+    {
+      "label": "Per-agent model map",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_per_agent_model_map",
+      "community": 8,
+      "norm_label": "per-agent model map"
+    },
+    {
+      "label": "Groq free-tier survival strategy",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_groq_free_tier_survival_strategy",
+      "community": 8,
+      "norm_label": "groq free-tier survival strategy"
+    },
+    {
+      "label": "Orchestration layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_orchestration_layer",
+      "community": 8,
+      "norm_label": "orchestration layer"
+    },
+    {
+      "label": "Code intelligence layer (deterministic, NO LLM)",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L56",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_code_intelligence_layer_deterministic_no_llm",
+      "community": 8,
+      "norm_label": "code intelligence layer (deterministic, no llm)"
+    },
+    {
+      "label": "Storage layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_storage_layer",
+      "community": 8,
+      "norm_label": "storage layer"
+    },
+    {
+      "label": "Backend layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_backend_layer",
+      "community": 8,
+      "norm_label": "backend layer"
+    },
+    {
+      "label": "Frontend layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_frontend_layer",
+      "community": 8,
+      "norm_label": "frontend layer"
+    },
+    {
+      "label": "Quality layer",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L101",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_quality_layer",
+      "community": 8,
+      "norm_label": "quality layer"
+    },
+    {
+      "label": "ASCII full-stack diagram",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L115",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_ascii_full_stack_diagram",
+      "community": 8,
+      "norm_label": "ascii full-stack diagram"
+    },
+    {
+      "label": "03_ARCHITECTURE.md",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_03_architecture",
+      "community": 1,
+      "norm_label": "03_architecture.md"
+    },
+    {
+      "label": "03 \u2014 Architecture",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_03_architecture_03_architecture",
+      "community": 1,
+      "norm_label": "03 \u2014 architecture"
+    },
+    {
+      "label": "Agent topology",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_03_architecture_agent_topology",
+      "community": 1,
+      "norm_label": "agent topology"
+    },
+    {
+      "label": "Agent table",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "docs_03_architecture_agent_table",
+      "community": 1,
+      "norm_label": "agent table"
+    },
+    {
+      "label": "State schema (Pydantic v2)",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L114",
+      "_origin": "ast",
+      "id": "docs_03_architecture_state_schema_pydantic_v2",
+      "community": 1,
+      "norm_label": "state schema (pydantic v2)"
+    },
+    {
+      "label": "Deterministic tools",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L268",
+      "_origin": "ast",
+      "id": "docs_03_architecture_deterministic_tools",
+      "community": 1,
+      "norm_label": "deterministic tools"
+    },
+    {
+      "label": "Hybrid retrieval pattern (the Q&A spine)",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L285",
+      "_origin": "ast",
+      "id": "docs_03_architecture_hybrid_retrieval_pattern_the_q_a_spine",
+      "community": 1,
+      "norm_label": "hybrid retrieval pattern (the q&a spine)"
+    },
+    {
+      "label": "Q&A drives the synchronized code viewer",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L319",
+      "_origin": "ast",
+      "id": "docs_03_architecture_q_a_drives_the_synchronized_code_viewer",
+      "community": 1,
+      "norm_label": "q&a drives the synchronized code viewer"
+    },
+    {
+      "label": "Trust surfaces \u2014 how moats become visible",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L327",
+      "_origin": "ast",
+      "id": "docs_03_architecture_trust_surfaces_how_moats_become_visible",
+      "community": 1,
+      "norm_label": "trust surfaces \u2014 how moats become visible"
+    },
+    {
+      "label": "How pre-context flows through the system",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L342",
+      "_origin": "ast",
+      "id": "docs_03_architecture_how_pre_context_flows_through_the_system",
+      "community": 1,
+      "norm_label": "how pre-context flows through the system"
+    },
+    {
+      "label": "Iteration 1 \u2014 Contribute lanes, in detail",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L358",
+      "_origin": "ast",
+      "id": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
+      "community": 1,
+      "norm_label": "iteration 1 \u2014 contribute lanes, in detail"
+    },
+    {
+      "label": "Lane A \u2014 Issue Triage",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L360",
+      "_origin": "ast",
+      "id": "docs_03_architecture_lane_a_issue_triage",
+      "community": 1,
+      "norm_label": "lane a \u2014 issue triage"
+    },
+    {
+      "label": "Lane B \u2014 Quality Scanner",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L384",
+      "_origin": "ast",
+      "id": "docs_03_architecture_lane_b_quality_scanner",
+      "community": 1,
+      "norm_label": "lane b \u2014 quality scanner"
+    },
+    {
+      "label": "Lane C \u2014 Suspicion Scanner",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L397",
+      "_origin": "ast",
+      "id": "docs_03_architecture_lane_c_suspicion_scanner",
+      "community": 1,
+      "norm_label": "lane c \u2014 suspicion scanner"
+    },
+    {
+      "label": "Iteration 2 \u2014 Four-layer enforcement, in detail",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L419",
+      "_origin": "ast",
+      "id": "docs_03_architecture_iteration_2_four_layer_enforcement_in_detail",
+      "community": 1,
+      "norm_label": "iteration 2 \u2014 four-layer enforcement, in detail"
+    },
+    {
+      "label": "LangSmith \u2014 tracing and evals",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L432",
+      "_origin": "ast",
+      "id": "docs_03_architecture_langsmith_tracing_and_evals",
+      "community": 1,
+      "norm_label": "langsmith \u2014 tracing and evals"
+    },
+    {
+      "label": "Failure modes and cost design",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L444",
+      "_origin": "ast",
+      "id": "docs_03_architecture_failure_modes_and_cost_design",
+      "community": 1,
+      "norm_label": "failure modes and cost design"
+    },
+    {
+      "label": "04_BUILD_PLAN.md",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_04_build_plan",
+      "community": 9,
+      "norm_label": "04_build_plan.md"
+    },
+    {
+      "label": "04 \u2014 Build Plan",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_04_build_plan",
+      "community": 9,
+      "norm_label": "04 \u2014 build plan"
+    },
+    {
+      "label": "Phase 0 \u2014 Foundation",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_0_foundation",
+      "community": 9,
+      "norm_label": "phase 0 \u2014 foundation"
+    },
+    {
+      "label": "Phase 1 \u2014 Ingestion",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_1_ingestion",
+      "community": 9,
+      "norm_label": "phase 1 \u2014 ingestion"
+    },
+    {
+      "label": "Phase 2 \u2014 Hybrid Retrieval + Grounded Q&A (THE SPINE)",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_2_hybrid_retrieval_grounded_q_a_the_spine",
+      "community": 9,
+      "norm_label": "phase 2 \u2014 hybrid retrieval + grounded q&a (the spine)"
+    },
+    {
+      "label": "Phase 3 \u2014 Orchestration + Learn subgraph",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L149",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_3_orchestration_learn_subgraph",
+      "community": 9,
+      "norm_label": "phase 3 \u2014 orchestration + learn subgraph"
+    },
+    {
+      "label": "Phase 4 \u2014 Experience",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L190",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_4_experience",
+      "community": 9,
+      "norm_label": "phase 4 \u2014 experience"
+    },
+    {
+      "label": "Phase 5 \u2014 Contribute mode (Iteration 1)",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L247",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_5_contribute_mode_iteration_1",
+      "community": 9,
+      "norm_label": "phase 5 \u2014 contribute mode (iteration 1)"
+    },
+    {
+      "label": "Phase 6 \u2014 Harden and ship",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L285",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_phase_6_harden_and_ship",
+      "community": 9,
+      "norm_label": "phase 6 \u2014 harden and ship"
+    },
+    {
+      "label": "Per-PR Definition of Done",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L320",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_per_pr_definition_of_done",
+      "community": 9,
+      "norm_label": "per-pr definition of done"
+    },
+    {
+      "label": "Post-v0.1 backlog (prioritized)",
+      "file_type": "document",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L336",
+      "_origin": "ast",
+      "id": "docs_04_build_plan_post_v0_1_backlog_prioritized",
+      "community": 9,
+      "norm_label": "post-v0.1 backlog (prioritized)"
+    },
+    {
+      "label": "05_PHASE_PROMPTS.md",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts",
+      "community": 10,
+      "norm_label": "05_phase_prompts.md"
+    },
+    {
+      "label": "05 \u2014 Phase Prompts (paste-ready)",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "community": 10,
+      "norm_label": "05 \u2014 phase prompts (paste-ready)"
+    },
+    {
+      "label": "Phase 0 prompt \u2014 Foundation",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_0_prompt_foundation",
+      "community": 10,
+      "norm_label": "phase 0 prompt \u2014 foundation"
+    },
+    {
+      "label": "Phase 1 prompt \u2014 Ingestion",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_1_prompt_ingestion",
+      "community": 10,
+      "norm_label": "phase 1 prompt \u2014 ingestion"
+    },
+    {
+      "label": "Phase 2 prompt \u2014 Hybrid Retrieval + Grounded Q&A (the spine)",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L120",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_2_prompt_hybrid_retrieval_grounded_q_a_the_spine",
+      "community": 10,
+      "norm_label": "phase 2 prompt \u2014 hybrid retrieval + grounded q&a (the spine)"
+    },
+    {
+      "label": "Phase 3 prompt \u2014 Orchestration + Learn subgraph",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L176",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_3_prompt_orchestration_learn_subgraph",
+      "community": 10,
+      "norm_label": "phase 3 prompt \u2014 orchestration + learn subgraph"
+    },
+    {
+      "label": "Phase 4 prompt \u2014 Experience (FastAPI + Next.js + synchronized code viewer)",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L246",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_4_prompt_experience_fastapi_next_js_synchronized_code_viewer",
+      "community": 10,
+      "norm_label": "phase 4 prompt \u2014 experience (fastapi + next.js + synchronized code viewer)"
+    },
+    {
+      "label": "Phase 5 prompt \u2014 Contribute mode (Iteration 1)",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L328",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_5_prompt_contribute_mode_iteration_1",
+      "community": 10,
+      "norm_label": "phase 5 prompt \u2014 contribute mode (iteration 1)"
+    },
+    {
+      "label": "Phase 6 prompt \u2014 Harden and ship",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L405",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_6_prompt_harden_and_ship",
+      "community": 10,
+      "norm_label": "phase 6 prompt \u2014 harden and ship"
+    },
+    {
       "label": "Pre-context Capture",
       "file_type": "concept",
       "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
@@ -12,9 +1012,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_build_guide_pre_context",
       "community": 5,
-      "norm_label": "pre-context capture"
+      "norm_label": "pre-context capture",
+      "id": "claude_build_guide_pre_context"
     },
     {
       "label": "Intent Router",
@@ -25,9 +1025,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_intent_router",
       "community": 0,
-      "norm_label": "intent router"
+      "norm_label": "intent router",
+      "id": "architecture_intent_router"
     },
     {
       "label": "Learn Elicitation",
@@ -38,9 +1038,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_learn_elicitation",
-      "community": 1,
-      "norm_label": "learn elicitation"
+      "community": 0,
+      "norm_label": "learn elicitation",
+      "id": "architecture_learn_elicitation"
     },
     {
       "label": "Contribute Elicitation",
@@ -51,9 +1051,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_contribute_elicitation",
       "community": 0,
-      "norm_label": "contribute elicitation"
+      "norm_label": "contribute elicitation",
+      "id": "architecture_contribute_elicitation"
     },
     {
       "label": "Cartographer",
@@ -64,9 +1064,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_cartographer",
-      "community": 1,
-      "norm_label": "cartographer"
+      "community": 0,
+      "norm_label": "cartographer",
+      "id": "architecture_cartographer"
     },
     {
       "label": "Flow Tracer",
@@ -77,9 +1077,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_flow_tracer",
-      "community": 1,
-      "norm_label": "flow tracer"
+      "community": 0,
+      "norm_label": "flow tracer",
+      "id": "architecture_flow_tracer"
     },
     {
       "label": "Teacher",
@@ -90,9 +1090,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_teacher",
-      "community": 1,
-      "norm_label": "teacher"
+      "community": 0,
+      "norm_label": "teacher",
+      "id": "architecture_teacher"
     },
     {
       "label": "Verifier",
@@ -103,9 +1103,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_verifier",
-      "community": 2,
-      "norm_label": "verifier"
+      "community": 0,
+      "norm_label": "verifier",
+      "id": "architecture_verifier"
     },
     {
       "label": "Q&A Subgraph",
@@ -116,9 +1116,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_qa_subgraph",
-      "community": 2,
-      "norm_label": "q&a subgraph"
+      "community": 0,
+      "norm_label": "q&a subgraph",
+      "id": "architecture_qa_subgraph"
     },
     {
       "label": "ArchaeologistState",
@@ -129,9 +1129,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "architecture_archaeologist_state",
       "community": 0,
-      "norm_label": "archaeologiststate"
+      "norm_label": "archaeologiststate",
+      "id": "architecture_archaeologist_state"
     },
     {
       "label": "Groq",
@@ -142,9 +1142,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tech_stack_groq",
       "community": 0,
-      "norm_label": "groq"
+      "norm_label": "groq",
+      "id": "tech_stack_groq"
     },
     {
       "label": "Ollama",
@@ -155,9 +1155,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tech_stack_ollama",
-      "community": 2,
-      "norm_label": "ollama"
+      "community": 0,
+      "norm_label": "ollama",
+      "id": "tech_stack_ollama"
     },
     {
       "label": "LangGraph",
@@ -168,9 +1168,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tech_stack_langgraph",
       "community": 0,
-      "norm_label": "langgraph"
+      "norm_label": "langgraph",
+      "id": "tech_stack_langgraph"
     },
     {
       "label": "tree-sitter",
@@ -181,9 +1181,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tech_stack_tree_sitter",
       "community": 3,
-      "norm_label": "tree-sitter"
+      "norm_label": "tree-sitter",
+      "id": "tech_stack_tree_sitter"
     },
     {
       "label": "NetworkX",
@@ -194,9 +1194,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tech_stack_networkx",
       "community": 3,
-      "norm_label": "networkx"
+      "norm_label": "networkx",
+      "id": "tech_stack_networkx"
     },
     {
       "label": "Phase 0: Foundation",
@@ -207,9 +1207,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "build_plan_phase_0",
       "community": 4,
-      "norm_label": "phase 0: foundation"
+      "norm_label": "phase 0: foundation",
+      "id": "build_plan_phase_0"
     },
     {
       "label": "Phase 1: Ingestion",
@@ -220,12 +1220,892 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "build_plan_phase_1",
       "community": 3,
-      "norm_label": "phase 1: ingestion"
+      "norm_label": "phase 1: ingestion",
+      "id": "build_plan_phase_1"
     }
   ],
   "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/graphify.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "rules_graphify",
+      "target": "rules_graphify_graphify"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "rules_project",
+      "target": "rules_project_repopilot_project_rules_portable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "rules_project_repopilot_project_rules_portable",
+      "target": "rules_project_authoring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "rules_project_repopilot_project_rules_portable",
+      "target": "rules_project_engineering_conventions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "rules_project_repopilot_project_rules_portable",
+      "target": "rules_project_graph_maintenance_mandatory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "rules_project_repopilot_project_rules_portable",
+      "target": "rules_project_knowledge_graph_first",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/rules/project.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "rules_project_repopilot_project_rules_portable",
+      "target": "rules_project_what_this_project_is",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/workflows/graphify.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "workflows_graphify",
+      "target": "workflows_graphify_workflow_graphify"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "agents_codebase_explorer",
+      "target": "agents_codebase_explorer_constraints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "agents_codebase_explorer",
+      "target": "agents_codebase_explorer_mandatory_order_of_operations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/agents/codebase-explorer.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "agents_codebase_explorer",
+      "target": "agents_codebase_explorer_what_to_return",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "claude",
+      "target": "claude_repopilot_project_guide_single_source_of_truth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_1_what_this_project_is",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_2_how_project_knowledge_is_organized",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_3_knowledge_graph_first_graphify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_4_graph_maintenance_mandatory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_5_claude_code_harness_claude",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_6_engineering_conventions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_7_definition_of_done",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "claude_repopilot_project_guide_single_source_of_truth",
+      "target": "claude_8_for_contributors_human_or_ai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide",
+      "target": "docs_00_claude_build_guide_00_claude_build_guide_standing_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L131",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_agent_roster"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_iteration_1_contribute_opportunity_engine_not_issue_browser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_iteration_2_no_stat_dumps_output_contract_enforced_four_ways"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L163",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_per_pr_definition_of_done"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_project_one_liner"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L149",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_state_schema_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L109",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_tech_stack_free_local_only"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
+      "target": "docs_00_claude_build_guide_the_five_principles"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_project_one_liner",
+      "target": "docs_00_claude_build_guide_pre_context_capture_runs_in_parallel_with_indexing_never_after_it"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_project_one_liner",
+      "target": "docs_00_claude_build_guide_the_four_trust_surfaces_make_every_moat_visible"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_00_claude_build_guide_project_one_liner",
+      "target": "docs_00_claude_build_guide_why_pre_context_is_the_first_step_not_inferred_mid_flight"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution",
+      "target": "docs_01_problem_and_solution_01_problem_and_solution"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L115",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_01_problem_and_solution",
+      "target": "docs_01_problem_and_solution_hard_scope_fence_what_v1_will_not_do"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L99",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_01_problem_and_solution",
+      "target": "docs_01_problem_and_solution_success_criteria"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_01_problem_and_solution",
+      "target": "docs_01_problem_and_solution_the_problem"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_01_problem_and_solution",
+      "target": "docs_01_problem_and_solution_the_solution"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_problem",
+      "target": "docs_01_problem_and_solution_the_beachhead_user"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_problem",
+      "target": "docs_01_problem_and_solution_why_existing_tools_fail_this_user"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_solution",
+      "target": "docs_01_problem_and_solution_learn_vs_contribute_what_each_tour_delivers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_solution",
+      "target": "docs_01_problem_and_solution_the_core_bet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_solution",
+      "target": "docs_01_problem_and_solution_the_five_principles_the_contract_this_product_lives_or_dies_by"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
+      "source_location": "L87",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_01_problem_and_solution_the_solution",
+      "target": "docs_01_problem_and_solution_why_agentic_beats_a_single_prompt"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack",
+      "target": "docs_02_tech_stack_02_tech_stack"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L115",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_ascii_full_stack_diagram"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_backend_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_code_intelligence_layer_deterministic_no_llm"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_frontend_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_llm_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_orchestration_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L101",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_quality_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_02_tech_stack",
+      "target": "docs_02_tech_stack_storage_layer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_llm_layer",
+      "target": "docs_02_tech_stack_groq_free_tier_survival_strategy"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_02_tech_stack_llm_layer",
+      "target": "docs_02_tech_stack_per_agent_model_map"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture",
+      "target": "docs_03_architecture_03_architecture"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L94",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_agent_table"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_agent_topology"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L268",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_deterministic_tools"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L444",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_failure_modes_and_cost_design"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L342",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_how_pre_context_flows_through_the_system"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L285",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_hybrid_retrieval_pattern_the_q_a_spine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L358",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_iteration_1_contribute_lanes_in_detail"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L419",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_iteration_2_four_layer_enforcement_in_detail"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L432",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_langsmith_tracing_and_evals"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L319",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_q_a_drives_the_synchronized_code_viewer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L114",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_state_schema_pydantic_v2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L327",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_trust_surfaces_how_moats_become_visible"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L360",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
+      "target": "docs_03_architecture_lane_a_issue_triage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L384",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
+      "target": "docs_03_architecture_lane_b_quality_scanner"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L397",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
+      "target": "docs_03_architecture_lane_c_suspicion_scanner"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan",
+      "target": "docs_04_build_plan_04_build_plan"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L320",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_per_pr_definition_of_done"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_0_foundation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_1_ingestion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L110",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_2_hybrid_retrieval_grounded_q_a_the_spine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L149",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_3_orchestration_learn_subgraph"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L190",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_4_experience"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L247",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_5_contribute_mode_iteration_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L285",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_phase_6_harden_and_ship"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/04_BUILD_PLAN.md",
+      "source_location": "L336",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_04_build_plan_04_build_plan",
+      "target": "docs_04_build_plan_post_v0_1_backlog_prioritized"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts",
+      "target": "docs_05_phase_prompts_05_phase_prompts_paste_ready"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_0_prompt_foundation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_1_prompt_ingestion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L120",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_2_prompt_hybrid_retrieval_grounded_q_a_the_spine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L176",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_3_prompt_orchestration_learn_subgraph"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L246",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_4_prompt_experience_fastapi_next_js_synchronized_code_viewer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L328",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_5_prompt_contribute_mode_iteration_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L405",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
+      "target": "docs_05_phase_prompts_phase_6_prompt_harden_and_ship"
+    },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
@@ -358,5 +2238,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8c5d1ac1db79787536d63eb2bcf811514ccd92ca"
+  "built_at_commit": "dd7055759b7f6d2309c00f384858c2703af93850"
 }

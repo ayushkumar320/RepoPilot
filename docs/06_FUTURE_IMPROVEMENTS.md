@@ -1,4 +1,9 @@
 # 06 — Future Improvements (Pre-Build Review)
+### Tags:
+- M : Critical, must fix before Phase 0
+- S : Important, should fix before the phase where it bites
+- W : Worth doing, would polish v1 but can defer
+
 
 > **Status:** identified 2026-06-14, before Phase 0 begins.
 > **Purpose:** every item below is a doc-level fix that costs minutes now and saves days mid-phase. Work through the **Must** items before starting Phase 0. The **Should** items are best done in the same pass since the marginal editing cost is small. **Worth** items can be deferred to when you're naturally editing that section.

@@ -2,6 +2,22 @@
 
 > **Paste this file at the top of every build session.** It is the standing context every phase prompt assumes. It does not change between phases; the phase prompt in `05_PHASE_PROMPTS.md` adds the phase-specific goal and deliverables on top of this.
 
+## Documentation layering — read in this order, every phase
+
+There are four documents Claude Code must load before writing a single line of code in any phase. The layering is intentional: each layer constrains what's below it.
+
+| Layer | File | What it carries | Changes between phases? |
+|---|---|---|---|
+| **1. Project layer** | `CLAUDE.md` (project root) | Project-wide conventions, automated tooling, repo structure, anything Claude Code should obey across all sessions in this project. Loaded automatically by Claude Code; cited explicitly here so the layering is visible. | Rarely. |
+| **2. Standing build context** | `docs/00_CLAUDE_BUILD_GUIDE.md` (this file) | Phase-agnostic build rules: principles, tech stack, agent roster, state rules, Per-PR Definition of Done. | No. |
+| **3. Design keystone** | `docs/03_ARCHITECTURE.md` | The single source of truth for the architecture: agent topology, state schema, capability library, intent layer, verifier loop, tools. | Only when architecture genuinely changes. |
+| **4. Phase gates** | `docs/04_BUILD_PLAN.md` | Per-phase goals, task checklists, production-grade specifics, and the measurable quality gate that must pass before the phase ships. | Per phase ship; the schedule itself is stable. |
+| **5. Phase-specific overlay** | the matching block in `docs/05_PHASE_PROMPTS.md` | The phase's paste-ready prompt: TDD tests to write first, implementation order, and a verbatim restatement of the quality gate as the Definition of Done. | Per phase, by definition. |
+
+**Why CLAUDE.md is layer 1.** Claude Code auto-loads it, so it always wins on conflicts. If `CLAUDE.md` says "use uv, not pip" and `docs/00` happens to mention pip, Claude follows `CLAUDE.md`. The cascading rule is: **higher layer wins**. Every phase prompt restates this read order so no session starts cold.
+
+**Why every prompt explicitly cites all four.** Auto-loading is silent. Citing the layers in the prompt makes the chain auditable — when something goes wrong, "which layer did Claude read?" has a clear answer.
+
 ---
 
 ## Project one-liner
@@ -167,6 +183,7 @@ The full schema lives in `03_ARCHITECTURE.md`.
 
 Every pull request — feature, fix, or refactor — must satisfy **all** of:
 
+- [ ] **Documentation layering respected.** `CLAUDE.md` rules followed; `docs/00`, `docs/03`, and `docs/04` not contradicted. If the PR genuinely needs to change a higher layer, it updates that layer first, in a separate commit, with explicit justification in the PR description.
 - [ ] `ruff` clean (no warnings, no `# noqa` without a comment explaining why)
 - [ ] `mypy --strict` clean on touched packages
 - [ ] Tests written. Coverage **did not decrease** vs. main.

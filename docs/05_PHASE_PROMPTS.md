@@ -9,7 +9,7 @@ Each prompt is self-contained. They restate the exact quality gate as the Defini
 ## Phase 0 prompt — Foundation
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 0 of Codebase Archaeologist. The goal of this phase is a monorepo that builds, tests, and lints cleanly, with a working LLMProvider (cache + backoff + Ollama fallback), CI green, and `docker compose up` bringing the stack up clean.
 
@@ -62,7 +62,7 @@ Do not start the next phase. Stop and report what was built, the test results (w
 ## Phase 1 prompt — Ingestion
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 1 of Codebase Archaeologist. The goal: given a public GitHub URL, an arq worker clones the repo, parses with tree-sitter, chunks structurally, builds a NetworkX dependency graph, embeds chunks via Ollama nomic-embed-text, and persists everything to Postgres + pgvector. Idempotent on HEAD SHA. Indexing ≤ 90 s on httpx.
 
@@ -120,7 +120,7 @@ Do not start the next phase. Stop and report what was built, test results, the i
 ## Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine)
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 2 of Codebase Archaeologist. THIS IS THE SPINE OF THE PRODUCT. The goal: working hybrid retrieval (vector → graph) with a sufficiency judge and a Verifier grounding loop. LangSmith tracing on every run. Eval harness v1 in CI. Grounding accuracy ≥ 90% on httpx.
 
@@ -176,7 +176,7 @@ Do not start the next phase. Stop and report what was built, test results, the f
 ## Phase 3 prompt — Orchestration + Learn subgraph
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 3 of Codebase Archaeologist. The goal: full `ArchaeologistState` (with `IntentProfile` + `CapabilityPlan`), working **generic intent layer** (Intent Profiler → Capability Planner), composable capability library (Cartographer, Flow Tracer, Teacher), Verifier loop with Iteration-2 actionability rubric integrated, Postgres checkpointing with kill-resume working. **No hardcoded purpose enum anywhere.**
 
@@ -251,7 +251,7 @@ Do not start the next phase. Stop and report what was built, all eval numbers, t
 ## Phase 4 prompt — Experience (FastAPI + Next.js + synchronized code viewer)
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 4 of Codebase Archaeologist. The goal: a user pastes a GitHub URL into the browser and watches a tour stream in. The synchronized code viewer is the centerpiece demo moment. Cold-start `docker compose up` to working demo on flask.
 
@@ -333,7 +333,7 @@ Do not start the next phase. Stop and report what was built, e2e test output, Li
 ## Phase 5 prompt — Contribute mode (Iteration 1)
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 5 of Codebase Archaeologist. The goal: when the Capability Planner activates Lane A / Lane B / Lane C (based on the user's `IntentProfile` from Phase 3), the system produces a ranked Opportunity List briefed by the Teacher. Lane C uses guarded language and always ends in `confirm_before_pr`. **There is no hardcoded "contribute mode" branch** — lane activation is purely a function of the IntentProfile + the Planner's rules from Phase 3.
 
@@ -411,7 +411,7 @@ Do not start the next phase. Stop and report what was built, all eval numbers, a
 ## Phase 6 prompt — Harden and ship
 
 ```
-Read docs/00_CLAUDE_BUILD_GUIDE.md, docs/03_ARCHITECTURE.md, and docs/04_BUILD_PLAN.md before writing code.
+Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
 You are starting Phase 6 of Codebase Archaeologist. The goal: full eval matrix in CI, security pass, README with demo GIF + eval table + honest limitations, one-command quickstart verified clean on a fresh VM, tag v0.1.0.
 

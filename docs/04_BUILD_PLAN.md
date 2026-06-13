@@ -323,6 +323,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 Every PR within every phase must satisfy:
 
+- [ ] **Documentation layering respected.** `CLAUDE.md` rules followed; `docs/00`, `docs/03`, and `docs/04` not contradicted. If the PR genuinely needs to change a layer above it (e.g., an architectural decision that invalidates `docs/03`), the PR updates that layer first, in a separate commit, with explicit justification.
 - [ ] `ruff` clean.
 - [ ] `mypy --strict` clean on touched packages.
 - [ ] Tests written; coverage did not decrease vs. main.

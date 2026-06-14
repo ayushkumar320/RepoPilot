@@ -767,7 +767,7 @@
       "label": "Agent table",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L108",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "docs_03_architecture_agent_table",
       "community": 1,
@@ -777,7 +777,7 @@
       "label": "State schema (Pydantic v2)",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L127",
+      "source_location": "L105",
       "_origin": "ast",
       "id": "docs_03_architecture_state_schema_pydantic_v2",
       "community": 1,
@@ -787,7 +787,7 @@
       "label": "Deterministic tools",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L331",
+      "source_location": "L309",
       "_origin": "ast",
       "id": "docs_03_architecture_deterministic_tools",
       "community": 1,
@@ -797,7 +797,7 @@
       "label": "Hybrid retrieval pattern (the Q&A spine)",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L348",
+      "source_location": "L326",
       "_origin": "ast",
       "id": "docs_03_architecture_hybrid_retrieval_pattern_the_q_a_spine",
       "community": 1,
@@ -807,7 +807,7 @@
       "label": "The Capability Planner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L382",
+      "source_location": "L360",
       "_origin": "ast",
       "id": "docs_03_architecture_the_capability_planner",
       "community": 1,
@@ -817,7 +817,7 @@
       "label": "Q&A drives the synchronized code viewer",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L460",
+      "source_location": "L438",
       "_origin": "ast",
       "id": "docs_03_architecture_q_a_drives_the_synchronized_code_viewer",
       "community": 1,
@@ -827,7 +827,7 @@
       "label": "Trust surfaces \u2014 how moats become visible",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L468",
+      "source_location": "L446",
       "_origin": "ast",
       "id": "docs_03_architecture_trust_surfaces_how_moats_become_visible",
       "community": 1,
@@ -837,7 +837,7 @@
       "label": "How the intent profile flows through the system",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L483",
+      "source_location": "L461",
       "_origin": "ast",
       "id": "docs_03_architecture_how_the_intent_profile_flows_through_the_system",
       "community": 1,
@@ -847,7 +847,7 @@
       "label": "What \"always-on\" means for Q&A specifically",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L499",
+      "source_location": "L477",
       "_origin": "ast",
       "id": "docs_03_architecture_what_always_on_means_for_q_a_specifically",
       "community": 1,
@@ -857,7 +857,7 @@
       "label": "Iteration 1 \u2014 Contribute lanes, in detail",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L511",
+      "source_location": "L489",
       "_origin": "ast",
       "id": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
       "community": 1,
@@ -867,7 +867,7 @@
       "label": "Lane A \u2014 Issue Triage",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L513",
+      "source_location": "L491",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_a_issue_triage",
       "community": 1,
@@ -877,7 +877,7 @@
       "label": "Lane B \u2014 Quality Scanner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L537",
+      "source_location": "L515",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_b_quality_scanner",
       "community": 1,
@@ -887,7 +887,7 @@
       "label": "Lane C \u2014 Suspicion Scanner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L550",
+      "source_location": "L528",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_c_suspicion_scanner",
       "community": 1,
@@ -897,7 +897,7 @@
       "label": "Iteration 2 \u2014 Four-layer enforcement, in detail",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L572",
+      "source_location": "L550",
       "_origin": "ast",
       "id": "docs_03_architecture_iteration_2_four_layer_enforcement_in_detail",
       "community": 1,
@@ -907,7 +907,7 @@
       "label": "LangSmith \u2014 tracing and evals",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L585",
+      "source_location": "L563",
       "_origin": "ast",
       "id": "docs_03_architecture_langsmith_tracing_and_evals",
       "community": 1,
@@ -917,7 +917,7 @@
       "label": "Failure modes and cost design",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L597",
+      "source_location": "L575",
       "_origin": "ast",
       "id": "docs_03_architecture_failure_modes_and_cost_design",
       "community": 1,
@@ -1932,9 +1932,9 @@
       "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_00_claude_build_guide_00_claude_build_guide_standing_context",
-      "target": "docs_00_claude_build_guide_documentation_layering_read_in_this_order_every_phase",
-      "confidence_score": 1.0
+      "target": "docs_00_claude_build_guide_documentation_layering_read_in_this_order_every_phase"
     },
     {
       "relation": "contains",
@@ -2032,9 +2032,9 @@
       "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_00_claude_build_guide_project_one_liner",
-      "target": "docs_00_claude_build_guide_why_intent_capture_is_the_first_step_not_inferred_mid_flight",
-      "confidence_score": 1.0
+      "target": "docs_00_claude_build_guide_why_intent_capture_is_the_first_step_not_inferred_mid_flight"
     },
     {
       "relation": "contains",
@@ -2092,9 +2092,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_problem",
-      "target": "docs_01_problem_and_solution_who_this_is_for",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_who_this_is_for"
     },
     {
       "relation": "contains",
@@ -2112,9 +2112,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_fine_grained_mapping_example_stated_intents_what_the_capability_planner_picks",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_fine_grained_mapping_example_stated_intents_what_the_capability_planner_picks"
     },
     {
       "relation": "contains",
@@ -2122,9 +2122,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible"
     },
     {
       "relation": "contains",
@@ -2132,9 +2132,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_how_the_flow_handles_hard_to_context_map_responses",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_how_the_flow_handles_hard_to_context_map_responses"
     },
     {
       "relation": "contains",
@@ -2142,9 +2142,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_key_features_at_a_glance",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_key_features_at_a_glance"
     },
     {
       "relation": "contains",
@@ -2172,9 +2172,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L306",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_what_every_tour_delivers_universal_and_what_shifts_per_intent_variable",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_what_every_tour_delivers_universal_and_what_shifts_per_intent_variable"
     },
     {
       "relation": "contains",
@@ -2182,9 +2182,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_the_solution",
-      "target": "docs_01_problem_and_solution_what_these_four_have_in_common_and_why_it_matters",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_what_these_four_have_in_common_and_why_it_matters"
     },
     {
       "relation": "contains",
@@ -2202,9 +2202,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L104",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible",
-      "target": "docs_01_problem_and_solution_walkthrough_a_learner_ramping_on_django_s_request_lifecycle",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_walkthrough_a_learner_ramping_on_django_s_request_lifecycle"
     },
     {
       "relation": "contains",
@@ -2212,9 +2212,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible",
-      "target": "docs_01_problem_and_solution_walkthrough_b_contributor_finding_a_real_fix_in_httpx",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_walkthrough_b_contributor_finding_a_real_fix_in_httpx"
     },
     {
       "relation": "contains",
@@ -2222,9 +2222,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L166",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible",
-      "target": "docs_01_problem_and_solution_walkthrough_c_builder_evaluating_fastapi_to_ship_a_competitor",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_walkthrough_c_builder_evaluating_fastapi_to_ship_a_competitor"
     },
     {
       "relation": "contains",
@@ -2232,9 +2232,9 @@
       "source_file": "docs/01_PROBLEM_AND_SOLUTION.md",
       "source_location": "L204",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_01_problem_and_solution_four_concrete_walkthroughs_out_of_infinitely_many_possible",
-      "target": "docs_01_problem_and_solution_walkthrough_d_security_researcher_auditing_flask_s_session_handling",
-      "confidence_score": 1.0
+      "target": "docs_01_problem_and_solution_walkthrough_d_security_researcher_auditing_flask_s_session_handling"
     },
     {
       "relation": "contains",
@@ -2402,9 +2402,9 @@
       "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L483",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_03_architecture_03_architecture",
-      "target": "docs_03_architecture_how_the_intent_profile_flows_through_the_system",
-      "confidence_score": 1.0
+      "target": "docs_03_architecture_how_the_intent_profile_flows_through_the_system"
     },
     {
       "relation": "contains",
@@ -2472,9 +2472,9 @@
       "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L382",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_03_architecture_03_architecture",
-      "target": "docs_03_architecture_the_capability_planner",
-      "confidence_score": 1.0
+      "target": "docs_03_architecture_the_capability_planner"
     },
     {
       "relation": "contains",
@@ -2492,9 +2492,9 @@
       "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L499",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_03_architecture_how_the_intent_profile_flows_through_the_system",
-      "target": "docs_03_architecture_what_always_on_means_for_q_a_specifically",
-      "confidence_score": 1.0
+      "target": "docs_03_architecture_what_always_on_means_for_q_a_specifically"
     },
     {
       "relation": "contains",
@@ -2712,9 +2712,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements",
-      "target": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_06_future_improvements_pre_build_review"
     },
     {
       "relation": "contains",
@@ -2722,9 +2722,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_application_order",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_application_order"
     },
     {
       "relation": "contains",
@@ -2732,9 +2732,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_critical_must_fix_before_phase_0"
     },
     {
       "relation": "contains",
@@ -2742,9 +2742,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_how_to_use_this_document",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_how_to_use_this_document"
     },
     {
       "relation": "contains",
@@ -2752,9 +2752,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L114",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites"
     },
     {
       "relation": "contains",
@@ -2762,9 +2762,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L256",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_sign_off_checklist_do_not_start_phase_0_until_all_checked",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_sign_off_checklist_do_not_start_phase_0_until_all_checked"
     },
     {
       "relation": "contains",
@@ -2772,9 +2772,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_tags",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_tags"
     },
     {
       "relation": "contains",
@@ -2782,9 +2782,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L193",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
-      "target": "docs_06_future_improvements_worth_doing_would_polish_v1",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_worth_doing_would_polish_v1"
     },
     {
       "relation": "contains",
@@ -2792,9 +2792,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "target": "docs_06_future_improvements_m1_verifier_latency_on_local_ollama_isn_t_quantified_and_will_blow_the_phase_3_gate",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_m1_verifier_latency_on_local_ollama_isn_t_quantified_and_will_blow_the_phase_3_gate"
     },
     {
       "relation": "contains",
@@ -2802,9 +2802,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "target": "docs_06_future_improvements_m2_eval_dataset_labeling_is_30_hours_of_skilled_manual_work_and_isn_t_on_any_timeline",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_m2_eval_dataset_labeling_is_30_hours_of_skilled_manual_work_and_isn_t_on_any_timeline"
     },
     {
       "relation": "contains",
@@ -2812,9 +2812,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "target": "docs_06_future_improvements_m3_capability_independence_claim_is_false_the_planner_needs_a_dependency_dag",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_m3_capability_independence_claim_is_false_the_planner_needs_a_dependency_dag"
     },
     {
       "relation": "contains",
@@ -2822,9 +2822,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "target": "docs_06_future_improvements_m4_phase_4_experience_is_undersized_realistic_budget_is_10_14_days",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_m4_phase_4_experience_is_undersized_realistic_budget_is_10_14_days"
     },
     {
       "relation": "contains",
@@ -2832,9 +2832,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L102",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "target": "docs_06_future_improvements_m5_inconsistent_beachhead_language_between_docs_00_and_docs_01",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_m5_inconsistent_beachhead_language_between_docs_00_and_docs_01"
     },
     {
       "relation": "contains",
@@ -2842,9 +2842,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s1_mermaid_generation_is_unverifiable_and_can_lie_confidently",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s1_mermaid_generation_is_unverifiable_and_can_lie_confidently"
     },
     {
       "relation": "contains",
@@ -2852,9 +2852,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L128",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s2_per_tour_groq_token_budget_hasn_t_been_calculated_launch_concurrency_will_stall",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s2_per_tour_groq_token_budget_hasn_t_been_calculated_launch_concurrency_will_stall"
     },
     {
       "relation": "contains",
@@ -2862,9 +2862,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s3_intent_profiler_has_no_edit_loop_fallback_when_chip_strip_iteration_fails",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s3_intent_profiler_has_no_edit_loop_fallback_when_chip_strip_iteration_fails"
     },
     {
       "relation": "contains",
@@ -2872,9 +2872,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s4_prompt_injection_from_repo_contents_isn_t_acknowledged",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s4_prompt_injection_from_repo_contents_isn_t_acknowledged"
     },
     {
       "relation": "contains",
@@ -2882,9 +2882,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s5_the_verifier_itself_is_unverified_grounding_accuracy_isn_t_a_real_metric_until_it_is",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s5_the_verifier_itself_is_unverified_grounding_accuracy_isn_t_a_real_metric_until_it_is"
     },
     {
       "relation": "contains",
@@ -2892,9 +2892,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L181",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "target": "docs_06_future_improvements_s6_ci_eval_runtime_will_be_miserable_need_sampling_vs_full_matrix_split",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_s6_ci_eval_runtime_will_be_miserable_need_sampling_vs_full_matrix_split"
     },
     {
       "relation": "contains",
@@ -2902,9 +2902,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L195",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_worth_doing_would_polish_v1",
-      "target": "docs_06_future_improvements_w1_chip_strip_natural_language_rendering_as_an_explicit_task",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_w1_chip_strip_natural_language_rendering_as_an_explicit_task"
     },
     {
       "relation": "contains",
@@ -2912,9 +2912,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L207",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_worth_doing_would_polish_v1",
-      "target": "docs_06_future_improvements_w2_lane_a_rejected_reason_is_its_own_llm_task_and_needs_eval_coverage",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_w2_lane_a_rejected_reason_is_its_own_llm_task_and_needs_eval_coverage"
     },
     {
       "relation": "contains",
@@ -2922,9 +2922,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L219",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_worth_doing_would_polish_v1",
-      "target": "docs_06_future_improvements_w3_session_non_persistence_is_undefined_should_be_explicit",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_w3_session_non_persistence_is_undefined_should_be_explicit"
     },
     {
       "relation": "contains",
@@ -2932,9 +2932,9 @@
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_06_future_improvements_worth_doing_would_polish_v1",
-      "target": "docs_06_future_improvements_w4_default_plan_should_include_lane_b_for_generic_intents",
-      "confidence_score": 1.0
+      "target": "docs_06_future_improvements_w4_default_plan_should_include_lane_b_for_generic_intents"
     },
     {
       "relation": "contains",
@@ -2942,9 +2942,9 @@
       "source_file": "docs/README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme",
-      "target": "docs_readme_repopilot_documentation_set_overview",
-      "confidence_score": 1.0
+      "target": "docs_readme_repopilot_documentation_set_overview"
     },
     {
       "relation": "contains",
@@ -2952,9 +2952,9 @@
       "source_file": "docs/README.md",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
-      "target": "docs_readme_how_the_doc_set_fits_together",
-      "confidence_score": 1.0
+      "target": "docs_readme_how_the_doc_set_fits_together"
     },
     {
       "relation": "contains",
@@ -2962,9 +2962,9 @@
       "source_file": "docs/README.md",
       "source_location": "L104",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
-      "target": "docs_readme_one_paragraph_takeaway",
-      "confidence_score": 1.0
+      "target": "docs_readme_one_paragraph_takeaway"
     },
     {
       "relation": "contains",
@@ -2972,9 +2972,9 @@
       "source_file": "docs/README.md",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
-      "target": "docs_readme_per_doc_summaries",
-      "confidence_score": 1.0
+      "target": "docs_readme_per_doc_summaries"
     },
     {
       "relation": "contains",
@@ -2982,9 +2982,9 @@
       "source_file": "docs/README.md",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_00_claude_build_guide_standing_context_the_contract",
-      "confidence_score": 1.0
+      "target": "docs_readme_00_claude_build_guide_standing_context_the_contract"
     },
     {
       "relation": "contains",
@@ -2992,9 +2992,9 @@
       "source_file": "docs/README.md",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_01_problem_and_solution_the_thesis_why",
-      "confidence_score": 1.0
+      "target": "docs_readme_01_problem_and_solution_the_thesis_why"
     },
     {
       "relation": "contains",
@@ -3002,9 +3002,9 @@
       "source_file": "docs/README.md",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_02_tech_stack_the_toolbox_every_choice_why_what_was_rejected",
-      "confidence_score": 1.0
+      "target": "docs_readme_02_tech_stack_the_toolbox_every_choice_why_what_was_rejected"
     },
     {
       "relation": "contains",
@@ -3012,9 +3012,9 @@
       "source_file": "docs/README.md",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_03_architecture_the_blueprint_the_keystone_doc",
-      "confidence_score": 1.0
+      "target": "docs_readme_03_architecture_the_blueprint_the_keystone_doc"
     },
     {
       "relation": "contains",
@@ -3022,9 +3022,9 @@
       "source_file": "docs/README.md",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_04_build_plan_the_schedule_7_phases_each_with_a_hard_gate",
-      "confidence_score": 1.0
+      "target": "docs_readme_04_build_plan_the_schedule_7_phases_each_with_a_hard_gate"
     },
     {
       "relation": "contains",
@@ -3032,9 +3032,9 @@
       "source_file": "docs/README.md",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_05_phase_prompts_the_script_paste_ready",
-      "confidence_score": 1.0
+      "target": "docs_readme_05_phase_prompts_the_script_paste_ready"
     },
     {
       "relation": "contains",
@@ -3042,9 +3042,9 @@
       "source_file": "docs/README.md",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_readme_per_doc_summaries",
-      "target": "docs_readme_06_future_improvements_the_pre_build_punch_list",
-      "confidence_score": 1.0
+      "target": "docs_readme_06_future_improvements_the_pre_build_punch_list"
     },
     {
       "relation": "references",
@@ -3178,5 +3178,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "179957d90cfadae6b387c1a5c07a1f13f412bc63"
+  "built_at_commit": "479b6a4d0cce9c0e11023b60cc33bbeb0c103f35"
 }

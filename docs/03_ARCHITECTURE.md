@@ -57,6 +57,8 @@ This is the design document. It is detailed by intent: getting the topology, sta
                       │
                       ▼
               SSE stream to browser
+              (section_start / token / claim /
+               diagram / section_end / done)
                       ▲
                       │ (always-on, cross-cutting)
    ┌─────────────────────────────────────────────────────────────────────────┐
@@ -66,30 +68,6 @@ This is the design document. It is detailed by intent: getting the topology, sta
    │     Reads the same IntentProfile; answers are framed accordingly.       │
    │     Drives the synchronized code viewer just like tour claims do.       │
    └─────────────────────────────────────────────────────────────────────────┘
-                      │               │
-                      ▼               ▼
-            ┌─────────────────────────────────────────┐
-            │              VERIFIER LOOP              │
-            │      qwen2.5-coder:7b (local Ollama)    │
-            │                                         │
-            │  Per-claim grounding check              │
-            │   against read_chunks                   │
-            │  + Iteration-2 actionability rubric     │
-            │                                         │
-            │   pass? ─► stream to client             │
-            │   fail? ─► append to verifier_objections│
-            │              │                          │
-            │              ▼                          │
-            │     source node retries ≤ 2             │
-            │              │                          │
-            │   still failing? ─► render as "flagged" │
-            │                       (never as fact)   │
-            └─────────────────────────────────────────┘
-                              │
-                              ▼
-                  SSE stream to browser
-                  (section_start / token / claim /
-                   diagram / section_end / done)
 ```
 
 A few topology notes the diagram alone doesn't show:

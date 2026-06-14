@@ -20,33 +20,33 @@
     "semantic_hash": ""
   },
   "docs/00_CLAUDE_BUILD_GUIDE.md": {
-    "mtime": 1781355167.401044,
-    "ast_hash": "7f42a912dd0c1974c84b8b2781921994",
+    "mtime": 1781378808.477491,
+    "ast_hash": "824be67b8be2aa671c7a43968d6d4d7b",
     "semantic_hash": ""
   },
   "docs/01_PROBLEM_AND_SOLUTION.md": {
-    "mtime": 1781355167.4014695,
-    "ast_hash": "034c7806f9edd198e4e418e785334e45",
+    "mtime": 1781378329.650918,
+    "ast_hash": "4247b96937a36c4ef713e996364be79e",
     "semantic_hash": ""
   },
   "docs/02_TECH_STACK.md": {
-    "mtime": 1781355167.4016802,
-    "ast_hash": "a1166a2851c1aae19bdd0ae7cb7d40c3",
+    "mtime": 1781378329.6513202,
+    "ast_hash": "891716da99733b141909fb08a9a79488",
     "semantic_hash": ""
   },
   "docs/03_ARCHITECTURE.md": {
-    "mtime": 1781355167.4019923,
-    "ast_hash": "dd1e902ee1d30b08e8da3eaa4bc7ce78",
+    "mtime": 1781378329.6520698,
+    "ast_hash": "8bf77b237a2bbfbf3713f3999c4dcdb9",
     "semantic_hash": ""
   },
   "docs/04_BUILD_PLAN.md": {
-    "mtime": 1781355167.4022317,
-    "ast_hash": "8c34d2dc88933ebc5b2837cd5db2ec5c",
+    "mtime": 1781378808.4778266,
+    "ast_hash": "aba91d09ebb3103b073fd010425b1f1d",
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781355167.4024906,
-    "ast_hash": "ff2197a28eda56cef18527406c7b290a",
+    "mtime": 1781378808.4780486,
+    "ast_hash": "12334fb964c16d4d1c46f926a4bf9d24",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -62,6 +62,16 @@
   ".claude/commands/graph-update.md": {
     "mtime": 1781376509.6908228,
     "ast_hash": "18f582dd4a26a2f2c38d72968a060ffe",
+    "semantic_hash": ""
+  },
+  "docs/06_FUTURE_IMPROVEMENTS.md": {
+    "mtime": 1781378808.4782133,
+    "ast_hash": "6d88385459a673266f32ca3b996ea54c",
+    "semantic_hash": ""
+  },
+  "docs/README.md": {
+    "mtime": 1781453803.1743653,
+    "ast_hash": "dd6dfbf366f0d7f161b3da131969d3ab",
     "semantic_hash": ""
   }
 }

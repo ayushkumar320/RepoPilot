@@ -654,10 +654,20 @@
       "norm_label": "per-agent model map"
     },
     {
-      "label": "Groq free-tier survival strategy",
+      "label": "Per-tour token budget (rough)",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
       "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_02_tech_stack_per_tour_token_budget_rough",
+      "community": 8,
+      "norm_label": "per-tour token budget (rough)"
+    },
+    {
+      "label": "Groq free-tier survival strategy",
+      "file_type": "document",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "docs_02_tech_stack_groq_free_tier_survival_strategy",
       "community": 8,
@@ -667,7 +677,7 @@
       "label": "Orchestration layer",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L47",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "docs_02_tech_stack_orchestration_layer",
       "community": 8,
@@ -677,7 +687,7 @@
       "label": "Code intelligence layer (deterministic, NO LLM)",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L56",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "docs_02_tech_stack_code_intelligence_layer_deterministic_no_llm",
       "community": 8,
@@ -687,7 +697,7 @@
       "label": "Storage layer",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L69",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "docs_02_tech_stack_storage_layer",
       "community": 8,
@@ -697,7 +707,7 @@
       "label": "Backend layer",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L79",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "docs_02_tech_stack_backend_layer",
       "community": 8,
@@ -707,7 +717,7 @@
       "label": "Frontend layer",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L88",
+      "source_location": "L105",
       "_origin": "ast",
       "id": "docs_02_tech_stack_frontend_layer",
       "community": 8,
@@ -717,7 +727,7 @@
       "label": "Quality layer",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L101",
+      "source_location": "L118",
       "_origin": "ast",
       "id": "docs_02_tech_stack_quality_layer",
       "community": 8,
@@ -727,7 +737,7 @@
       "label": "ASCII full-stack diagram",
       "file_type": "document",
       "source_file": "docs/02_TECH_STACK.md",
-      "source_location": "L115",
+      "source_location": "L132",
       "_origin": "ast",
       "id": "docs_02_tech_stack_ascii_full_stack_diagram",
       "community": 8,
@@ -787,7 +797,7 @@
       "label": "Deterministic tools",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L309",
+      "source_location": "L348",
       "_origin": "ast",
       "id": "docs_03_architecture_deterministic_tools",
       "community": 1,
@@ -797,7 +807,7 @@
       "label": "Hybrid retrieval pattern (the Q&A spine)",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L326",
+      "source_location": "L365",
       "_origin": "ast",
       "id": "docs_03_architecture_hybrid_retrieval_pattern_the_q_a_spine",
       "community": 1,
@@ -807,17 +817,67 @@
       "label": "The Capability Planner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L360",
+      "source_location": "L399",
       "_origin": "ast",
       "id": "docs_03_architecture_the_capability_planner",
       "community": 1,
       "norm_label": "the capability planner"
     },
     {
+      "label": "Capability dependencies",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L494",
+      "_origin": "ast",
+      "id": "docs_03_architecture_capability_dependencies",
+      "community": 1,
+      "norm_label": "capability dependencies"
+    },
+    {
+      "label": "Mermaid is emitted deterministically, not by the LLM",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L523",
+      "_origin": "ast",
+      "id": "docs_03_architecture_mermaid_is_emitted_deterministically_not_by_the_llm",
+      "community": 1,
+      "norm_label": "mermaid is emitted deterministically, not by the llm"
+    },
+    {
+      "label": "Intent edit-loop fallback",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L535",
+      "_origin": "ast",
+      "id": "docs_03_architecture_intent_edit_loop_fallback",
+      "community": 1,
+      "norm_label": "intent edit-loop fallback"
+    },
+    {
+      "label": "Prompt-injection defense (chunk-as-data, not instructions)",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L550",
+      "_origin": "ast",
+      "id": "docs_03_architecture_prompt_injection_defense_chunk_as_data_not_instructions",
+      "community": 1,
+      "norm_label": "prompt-injection defense (chunk-as-data, not instructions)"
+    },
+    {
+      "label": "Verifier batching and concurrency",
+      "file_type": "document",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L571",
+      "_origin": "ast",
+      "id": "docs_03_architecture_verifier_batching_and_concurrency",
+      "community": 1,
+      "norm_label": "verifier batching and concurrency"
+    },
+    {
       "label": "Q&A drives the synchronized code viewer",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L438",
+      "source_location": "L589",
       "_origin": "ast",
       "id": "docs_03_architecture_q_a_drives_the_synchronized_code_viewer",
       "community": 1,
@@ -827,7 +887,7 @@
       "label": "Trust surfaces \u2014 how moats become visible",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L446",
+      "source_location": "L597",
       "_origin": "ast",
       "id": "docs_03_architecture_trust_surfaces_how_moats_become_visible",
       "community": 1,
@@ -837,7 +897,7 @@
       "label": "How the intent profile flows through the system",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L461",
+      "source_location": "L612",
       "_origin": "ast",
       "id": "docs_03_architecture_how_the_intent_profile_flows_through_the_system",
       "community": 1,
@@ -847,7 +907,7 @@
       "label": "What \"always-on\" means for Q&A specifically",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L477",
+      "source_location": "L628",
       "_origin": "ast",
       "id": "docs_03_architecture_what_always_on_means_for_q_a_specifically",
       "community": 1,
@@ -857,7 +917,7 @@
       "label": "Iteration 1 \u2014 Contribute lanes, in detail",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L489",
+      "source_location": "L640",
       "_origin": "ast",
       "id": "docs_03_architecture_iteration_1_contribute_lanes_in_detail",
       "community": 1,
@@ -867,7 +927,7 @@
       "label": "Lane A \u2014 Issue Triage",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L491",
+      "source_location": "L642",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_a_issue_triage",
       "community": 1,
@@ -877,7 +937,7 @@
       "label": "Lane B \u2014 Quality Scanner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L515",
+      "source_location": "L666",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_b_quality_scanner",
       "community": 1,
@@ -887,7 +947,7 @@
       "label": "Lane C \u2014 Suspicion Scanner",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L528",
+      "source_location": "L679",
       "_origin": "ast",
       "id": "docs_03_architecture_lane_c_suspicion_scanner",
       "community": 1,
@@ -897,7 +957,7 @@
       "label": "Iteration 2 \u2014 Four-layer enforcement, in detail",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L550",
+      "source_location": "L701",
       "_origin": "ast",
       "id": "docs_03_architecture_iteration_2_four_layer_enforcement_in_detail",
       "community": 1,
@@ -907,7 +967,7 @@
       "label": "LangSmith \u2014 tracing and evals",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L563",
+      "source_location": "L714",
       "_origin": "ast",
       "id": "docs_03_architecture_langsmith_tracing_and_evals",
       "community": 1,
@@ -917,7 +977,7 @@
       "label": "Failure modes and cost design",
       "file_type": "document",
       "source_file": "docs/03_ARCHITECTURE.md",
-      "source_location": "L575",
+      "source_location": "L726",
       "_origin": "ast",
       "id": "docs_03_architecture_failure_modes_and_cost_design",
       "community": 1,
@@ -957,7 +1017,7 @@
       "label": "Phase 1 \u2014 Ingestion",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L69",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_1_ingestion",
       "community": 9,
@@ -967,7 +1027,7 @@
       "label": "Phase 2 \u2014 Hybrid Retrieval + Grounded Q&A (THE SPINE)",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L110",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_2_hybrid_retrieval_grounded_q_a_the_spine",
       "community": 9,
@@ -977,7 +1037,7 @@
       "label": "Phase 3 \u2014 Orchestration + Learn subgraph",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L149",
+      "source_location": "L157",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_3_orchestration_learn_subgraph",
       "community": 9,
@@ -987,7 +1047,7 @@
       "label": "Phase 4 \u2014 Experience",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L192",
+      "source_location": "L204",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_4_experience",
       "community": 9,
@@ -997,7 +1057,7 @@
       "label": "Phase 5 \u2014 Contribute mode (Iteration 1)",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L249",
+      "source_location": "L266",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_5_contribute_mode_iteration_1",
       "community": 9,
@@ -1007,7 +1067,7 @@
       "label": "Phase 6 \u2014 Harden and ship",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L287",
+      "source_location": "L305",
       "_origin": "ast",
       "id": "docs_04_build_plan_phase_6_harden_and_ship",
       "community": 9,
@@ -1017,7 +1077,7 @@
       "label": "Per-PR Definition of Done",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L322",
+      "source_location": "L341",
       "_origin": "ast",
       "id": "docs_04_build_plan_per_pr_definition_of_done",
       "community": 9,
@@ -1027,7 +1087,7 @@
       "label": "Post-v0.1 backlog (prioritized)",
       "file_type": "document",
       "source_file": "docs/04_BUILD_PLAN.md",
-      "source_location": "L339",
+      "source_location": "L358",
       "_origin": "ast",
       "id": "docs_04_build_plan_post_v0_1_backlog_prioritized",
       "community": 9,
@@ -1170,7 +1230,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "docs_06_future_improvements_critical_must_fix_before_phase_0",
-      "community": 16,
+      "community": 19,
       "norm_label": "critical \u2014 must fix before phase 0"
     },
     {
@@ -1180,7 +1240,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "docs_06_future_improvements_m1_verifier_latency_on_local_ollama_isn_t_quantified_and_will_blow_the_phase_3_gate",
-      "community": 16,
+      "community": 19,
       "norm_label": "m1. verifier latency on local ollama isn't quantified and will blow the phase 3 gate"
     },
     {
@@ -1190,7 +1250,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "docs_06_future_improvements_m2_eval_dataset_labeling_is_30_hours_of_skilled_manual_work_and_isn_t_on_any_timeline",
-      "community": 16,
+      "community": 19,
       "norm_label": "m2. eval dataset labeling is ~30 hours of skilled manual work and isn't on any timeline"
     },
     {
@@ -1200,7 +1260,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "docs_06_future_improvements_m3_capability_independence_claim_is_false_the_planner_needs_a_dependency_dag",
-      "community": 16,
+      "community": 19,
       "norm_label": "m3. capability \"independence\" claim is false; the planner needs a dependency dag"
     },
     {
@@ -1210,7 +1270,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "docs_06_future_improvements_m4_phase_4_experience_is_undersized_realistic_budget_is_10_14_days",
-      "community": 16,
+      "community": 19,
       "norm_label": "m4. phase 4 (experience) is undersized; realistic budget is 10\u201314 days"
     },
     {
@@ -1220,7 +1280,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "docs_06_future_improvements_m5_inconsistent_beachhead_language_between_docs_00_and_docs_01",
-      "community": 16,
+      "community": 19,
       "norm_label": "m5. inconsistent beachhead language between docs/00 and docs/01"
     },
     {
@@ -1230,7 +1290,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "docs_06_future_improvements_important_fix_before_the_phase_where_it_bites",
-      "community": 18,
+      "community": 16,
       "norm_label": "important \u2014 fix before the phase where it bites"
     },
     {
@@ -1240,7 +1300,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s1_mermaid_generation_is_unverifiable_and_can_lie_confidently",
-      "community": 18,
+      "community": 16,
       "norm_label": "s1. mermaid generation is unverifiable and can lie confidently"
     },
     {
@@ -1250,7 +1310,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s2_per_tour_groq_token_budget_hasn_t_been_calculated_launch_concurrency_will_stall",
-      "community": 18,
+      "community": 16,
       "norm_label": "s2. per-tour groq token budget hasn't been calculated; launch concurrency will stall"
     },
     {
@@ -1260,7 +1320,7 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s3_intent_profiler_has_no_edit_loop_fallback_when_chip_strip_iteration_fails",
-      "community": 18,
+      "community": 16,
       "norm_label": "s3. intent profiler has no edit-loop fallback when chip-strip iteration fails"
     },
     {
@@ -1270,7 +1330,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s4_prompt_injection_from_repo_contents_isn_t_acknowledged",
-      "community": 18,
+      "community": 16,
       "norm_label": "s4. prompt injection from repo contents isn't acknowledged"
     },
     {
@@ -1280,7 +1340,7 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s5_the_verifier_itself_is_unverified_grounding_accuracy_isn_t_a_real_metric_until_it_is",
-      "community": 18,
+      "community": 16,
       "norm_label": "s5. the verifier itself is unverified \u2014 grounding-accuracy isn't a real metric until it is"
     },
     {
@@ -1290,7 +1350,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "docs_06_future_improvements_s6_ci_eval_runtime_will_be_miserable_need_sampling_vs_full_matrix_split",
-      "community": 18,
+      "community": 16,
       "norm_label": "s6. ci eval runtime will be miserable; need sampling vs full-matrix split"
     },
     {
@@ -1344,10 +1404,130 @@
       "norm_label": "w4. default plan should include lane b for generic intents"
     },
     {
+      "label": "Second-pass review additions (2026-06-14)",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L245",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "community": 18,
+      "norm_label": "second-pass review additions (2026-06-14)"
+    },
+    {
+      "label": "M6. Failure modes catalog is thin; the architecture is hand-wavy on partial failures",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L249",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_m6_failure_modes_catalog_is_thin_the_architecture_is_hand_wavy_on_partial_failures",
+      "community": 18,
+      "norm_label": "m6. failure modes catalog is thin; the architecture is hand-wavy on partial failures"
+    },
+    {
+      "label": "M7. Decision Archaeology was added as a capability but Phase 3 doesn't include building it",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L275",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_m7_decision_archaeology_was_added_as_a_capability_but_phase_3_doesn_t_include_building_it",
+      "community": 18,
+      "norm_label": "m7. decision archaeology was added as a capability but phase 3 doesn't include building it"
+    },
+    {
+      "label": "S7. Auth, rate-limiting, and GitHub API token sourcing is undefined \u2014 Lane A breaks on day one",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L292",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s7_auth_rate_limiting_and_github_api_token_sourcing_is_undefined_lane_a_breaks_on_day_one",
+      "community": 18,
+      "norm_label": "s7. auth, rate-limiting, and github api token sourcing is undefined \u2014 lane a breaks on day one"
+    },
+    {
+      "label": "S8. The \"retrieval-path chip on every claim\" claim is too broad",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L312",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s8_the_retrieval_path_chip_on_every_claim_claim_is_too_broad",
+      "community": 18,
+      "norm_label": "s8. the \"retrieval-path chip on every claim\" claim is too broad"
+    },
+    {
+      "label": "S9. No user-feedback mechanism in v1 \u2014 we'll learn nothing outside the eval set",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L330",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s9_no_user_feedback_mechanism_in_v1_we_ll_learn_nothing_outside_the_eval_set",
+      "community": 18,
+      "norm_label": "s9. no user-feedback mechanism in v1 \u2014 we'll learn nothing outside the eval set"
+    },
+    {
+      "label": "S10. Indexing edge cases (Python 2, `.pyi`, `.ipynb`, vendored deps, generated code) are unspecified",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L342",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s10_indexing_edge_cases_python_2_pyi_ipynb_vendored_deps_generated_code_are_unspecified",
+      "community": 18,
+      "norm_label": "s10. indexing edge cases (python 2, `.pyi`, `.ipynb`, vendored deps, generated code) are unspecified"
+    },
+    {
+      "label": "S11. Embedding model versioning + migration story is missing",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L360",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s11_embedding_model_versioning_migration_story_is_missing",
+      "community": 18,
+      "norm_label": "s11. embedding model versioning + migration story is missing"
+    },
+    {
+      "label": "S12. Concurrent indexing of the same repo is a race condition",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L372",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_s12_concurrent_indexing_of_the_same_repo_is_a_race_condition",
+      "community": 18,
+      "norm_label": "s12. concurrent indexing of the same repo is a race condition"
+    },
+    {
+      "label": "W5. Repo update detection on revisit is undefined",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L384",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_w5_repo_update_detection_on_revisit_is_undefined",
+      "community": 18,
+      "norm_label": "w5. repo update detection on revisit is undefined"
+    },
+    {
+      "label": "W6. Production deployment story missing \u2014 Docker Compose is dev-only",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L396",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_w6_production_deployment_story_missing_docker_compose_is_dev_only",
+      "community": 18,
+      "norm_label": "w6. production deployment story missing \u2014 docker compose is dev-only"
+    },
+    {
+      "label": "W7. Q&A conversation thread / multi-turn \u2014 currently each question is independent",
+      "file_type": "document",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L415",
+      "_origin": "ast",
+      "id": "docs_06_future_improvements_w7_q_a_conversation_thread_multi_turn_currently_each_question_is_independent",
+      "community": 18,
+      "norm_label": "w7. q&a conversation thread / multi-turn \u2014 currently each question is independent"
+    },
+    {
       "label": "Application order",
       "file_type": "document",
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
-      "source_location": "L243",
+      "source_location": "L427",
       "_origin": "ast",
       "id": "docs_06_future_improvements_application_order",
       "community": 16,
@@ -1357,7 +1537,7 @@
       "label": "Sign-off checklist (do not start Phase 0 until all checked)",
       "file_type": "document",
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
-      "source_location": "L256",
+      "source_location": "L445",
       "_origin": "ast",
       "id": "docs_06_future_improvements_sign_off_checklist_do_not_start_phase_0_until_all_checked",
       "community": 16,
@@ -2349,6 +2529,16 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/02_TECH_STACK.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "docs_02_tech_stack_llm_layer",
+      "target": "docs_02_tech_stack_per_tour_token_budget_rough",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -2420,6 +2610,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L535",
+      "weight": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_intent_edit_loop_fallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L358",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -2445,6 +2645,26 @@
       "confidence_score": 1.0,
       "source": "docs_03_architecture_03_architecture",
       "target": "docs_03_architecture_langsmith_tracing_and_evals"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L523",
+      "weight": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_mermaid_is_emitted_deterministically_not_by_the_llm",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L550",
+      "weight": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_prompt_injection_defense_chunk_as_data_not_instructions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -2485,6 +2705,26 @@
       "confidence_score": 1.0,
       "source": "docs_03_architecture_03_architecture",
       "target": "docs_03_architecture_trust_surfaces_how_moats_become_visible"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L571",
+      "weight": 1.0,
+      "source": "docs_03_architecture_03_architecture",
+      "target": "docs_03_architecture_verifier_batching_and_concurrency",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/03_ARCHITECTURE.md",
+      "source_location": "L494",
+      "weight": 1.0,
+      "source": "docs_03_architecture_the_capability_planner",
+      "target": "docs_03_architecture_capability_dependencies",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -2760,6 +3000,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L245",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_06_future_improvements_pre_build_review",
+      "target": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
       "source_location": "L256",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -2935,6 +3185,116 @@
       "confidence_score": 1.0,
       "source": "docs_06_future_improvements_worth_doing_would_polish_v1",
       "target": "docs_06_future_improvements_w4_default_plan_should_include_lane_b_for_generic_intents"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L249",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_m6_failure_modes_catalog_is_thin_the_architecture_is_hand_wavy_on_partial_failures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L275",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_m7_decision_archaeology_was_added_as_a_capability_but_phase_3_doesn_t_include_building_it",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L342",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s10_indexing_edge_cases_python_2_pyi_ipynb_vendored_deps_generated_code_are_unspecified",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L360",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s11_embedding_model_versioning_migration_story_is_missing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L372",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s12_concurrent_indexing_of_the_same_repo_is_a_race_condition",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s7_auth_rate_limiting_and_github_api_token_sourcing_is_undefined_lane_a_breaks_on_day_one",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L312",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s8_the_retrieval_path_chip_on_every_claim_claim_is_too_broad",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L330",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_s9_no_user_feedback_mechanism_in_v1_we_ll_learn_nothing_outside_the_eval_set",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_w5_repo_update_detection_on_revisit_is_undefined",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L396",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_w6_production_deployment_story_missing_docker_compose_is_dev_only",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/06_FUTURE_IMPROVEMENTS.md",
+      "source_location": "L415",
+      "weight": 1.0,
+      "source": "docs_06_future_improvements_second_pass_review_additions_2026_06_14",
+      "target": "docs_06_future_improvements_w7_q_a_conversation_thread_multi_turn_currently_each_question_is_independent",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3178,5 +3538,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "479b6a4d0cce9c0e11023b60cc33bbeb0c103f35"
+  "built_at_commit": "dfed0955413b0594f26fcb8509441e9378d4bfb6"
 }

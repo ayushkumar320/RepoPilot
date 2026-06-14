@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "docs/00_CLAUDE_BUILD_GUIDE.md": {
-    "mtime": 1781378808.477491,
-    "ast_hash": "824be67b8be2aa671c7a43968d6d4d7b",
+    "mtime": 1781531714.3065135,
+    "ast_hash": "ea7397a07ee952b2e134509d40df3d60",
     "semantic_hash": ""
   },
   "docs/01_PROBLEM_AND_SOLUTION.md": {
@@ -30,23 +30,23 @@
     "semantic_hash": ""
   },
   "docs/02_TECH_STACK.md": {
-    "mtime": 1781378329.6513202,
-    "ast_hash": "891716da99733b141909fb08a9a79488",
+    "mtime": 1781531714.30686,
+    "ast_hash": "00b911f7b578906134964b6634e1678b",
     "semantic_hash": ""
   },
   "docs/03_ARCHITECTURE.md": {
-    "mtime": 1781453949.3956678,
-    "ast_hash": "83c067c952677e5173cb940a8906e379",
+    "mtime": 1781531714.3074753,
+    "ast_hash": "a304fc15153fa8d0851f6c83ac28d5a2",
     "semantic_hash": ""
   },
   "docs/04_BUILD_PLAN.md": {
-    "mtime": 1781378808.4778266,
-    "ast_hash": "aba91d09ebb3103b073fd010425b1f1d",
+    "mtime": 1781531714.307943,
+    "ast_hash": "881b560fc53fcb61895a6f31a70bf43b",
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781378808.4780486,
-    "ast_hash": "12334fb964c16d4d1c46f926a4bf9d24",
+    "mtime": 1781531714.3083994,
+    "ast_hash": "fdfd0e85be6c72278bcf3d18f12f00da",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "docs/06_FUTURE_IMPROVEMENTS.md": {
-    "mtime": 1781378808.4782133,
-    "ast_hash": "6d88385459a673266f32ca3b996ea54c",
+    "mtime": 1781531714.3086507,
+    "ast_hash": "34b641284982b1328dd11a29d5212547",
     "semantic_hash": ""
   },
   "docs/README.md": {

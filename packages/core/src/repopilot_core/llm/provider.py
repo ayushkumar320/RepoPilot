@@ -311,9 +311,7 @@ class _OllamaClient(_BaseClient):
         self._http = http
         self._base_url = base_url.rstrip("/")
 
-    async def embed(
-        self, binding: ModelBinding, text: str
-    ) -> EmbeddingResponse:
+    async def embed(self, binding: ModelBinding, text: str) -> EmbeddingResponse:
         body = {"model": binding.physical_model, "prompt": text}
         resp = await self._http.post(f"{self._base_url}/api/embeddings", json=body)
         if resp.status_code == 429:
@@ -464,9 +462,7 @@ class LLMProvider:
             f"all providers failed for {model.value}: {last_error!r}"
         ) from last_error
 
-    async def embed(
-        self, text: str, *, model: ModelId = ModelId.EMBEDDINGS
-    ) -> EmbeddingResponse:
+    async def embed(self, text: str, *, model: ModelId = ModelId.EMBEDDINGS) -> EmbeddingResponse:
         """Embed ``text`` via Ollama (the only embeddings provider in v1).
 
         Same cache + fallback story as :meth:`generate`, but the chain is

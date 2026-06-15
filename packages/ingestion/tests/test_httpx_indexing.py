@@ -56,22 +56,14 @@ async def test_graph_known_call_chain_httpx() -> None:
             rel = path.relative_to(clone.path)
             mod = ".".join(rel.with_suffix("").parts)
             parsed = parse_file(path, module=mod)
-            modules.append(
-                ModuleSource(module=mod, rel_path=str(rel), source=parsed.source)
-            )
+            modules.append(ModuleSource(module=mod, rel_path=str(rel), source=parsed.source))
         graph = build_graph(modules)
 
     # The exact symbol IDs depend on httpx's package layout; we assert a
     # path exists between Client.send and the lower-level transport hop.
-    candidates_from = [
-        n for n in graph.nodes if n.endswith("Client.send")
-    ]
-    candidates_to = [
-        n for n in graph.nodes if n.endswith("HTTPTransport.handle_request")
-    ]
+    candidates_from = [n for n in graph.nodes if n.endswith("Client.send")]
+    candidates_to = [n for n in graph.nodes if n.endswith("HTTPTransport.handle_request")]
     assert candidates_from and candidates_to, "expected httpx symbols missing"
-    assert any(
-        nx.has_path(graph, src, dst)
-        for src in candidates_from
-        for dst in candidates_to
-    ), "no graph path Client.send → HTTPTransport.handle_request"
+    assert any(nx.has_path(graph, src, dst) for src in candidates_from for dst in candidates_to), (
+        "no graph path Client.send → HTTPTransport.handle_request"
+    )

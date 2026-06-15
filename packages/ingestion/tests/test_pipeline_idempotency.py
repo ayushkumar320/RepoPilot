@@ -30,18 +30,14 @@ async def test_revisit_with_advanced_remote_returns_stale_status(
     """When the remote HEAD has moved past the indexed SHA → status=stale."""
     engine = _StubEngine(indexed={"https://github.com/encode/httpx": "old-sha"})
     monkeypatch.setattr(pipeline_mod, "make_engine", lambda settings: engine)
-    monkeypatch.setattr(
-        pipeline_mod, "remote_head_sha", lambda repo_url: "new-sha"
-    )
+    monkeypatch.setattr(pipeline_mod, "remote_head_sha", lambda repo_url: "new-sha")
 
     async def fake_known(eng: Any, *, repo_url: str) -> str | None:
         return engine.indexed.get(repo_url)
 
     monkeypatch.setattr(pipeline_mod, "known_head_sha", fake_known)
 
-    result: PipelineResult = await revisit_status(
-        repo_url="https://github.com/encode/httpx"
-    )
+    result: PipelineResult = await revisit_status(repo_url="https://github.com/encode/httpx")
     assert result.status == "stale"
     assert result.indexed_sha == "old-sha"
     assert result.remote_sha == "new-sha"
@@ -53,9 +49,7 @@ async def test_revisit_with_matching_remote_returns_already_indexed(
 ) -> None:
     engine = _StubEngine(indexed={"https://github.com/encode/httpx": "same-sha"})
     monkeypatch.setattr(pipeline_mod, "make_engine", lambda settings: engine)
-    monkeypatch.setattr(
-        pipeline_mod, "remote_head_sha", lambda repo_url: "same-sha"
-    )
+    monkeypatch.setattr(pipeline_mod, "remote_head_sha", lambda repo_url: "same-sha")
 
     async def fake_known(eng: Any, *, repo_url: str) -> str | None:
         return engine.indexed.get(repo_url)
@@ -73,9 +67,7 @@ async def test_revisit_unknown_repo_returns_stale(
 ) -> None:
     engine = _StubEngine(indexed={})
     monkeypatch.setattr(pipeline_mod, "make_engine", lambda settings: engine)
-    monkeypatch.setattr(
-        pipeline_mod, "remote_head_sha", lambda repo_url: "fresh-sha"
-    )
+    monkeypatch.setattr(pipeline_mod, "remote_head_sha", lambda repo_url: "fresh-sha")
 
     async def fake_known(eng: Any, *, repo_url: str) -> str | None:
         return None

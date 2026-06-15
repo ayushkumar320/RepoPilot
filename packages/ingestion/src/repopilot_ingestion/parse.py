@@ -112,9 +112,7 @@ def _extract_imports(root: Node, source: str) -> list[ImportEdge]:
     return out
 
 
-def _walk_dotted_aliases(
-    node: Node, source: str
-) -> list[tuple[str, str | None]]:
+def _walk_dotted_aliases(node: Node, source: str) -> list[tuple[str, str | None]]:
     """Yield ``(dotted_module, alias_or_None)`` pairs from an ``import`` node."""
     out: list[tuple[str, str | None]] = []
     for child in node.children:
@@ -152,9 +150,7 @@ def _parse_from_import(node: Node, source: str) -> list[ImportEdge]:
     return [ImportEdge(module=module, names=tuple(names), aliases=aliases)]
 
 
-def _extract_symbols(
-    node: Node, source: str, *, parent_qual: str
-) -> list[ParsedSymbol]:
+def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[ParsedSymbol]:
     out: list[ParsedSymbol] = []
     for child in _iter_block_children(node):
         if child.type in {"function_definition", "decorated_definition"}:

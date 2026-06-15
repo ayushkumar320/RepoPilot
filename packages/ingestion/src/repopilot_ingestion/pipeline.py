@@ -63,9 +63,7 @@ class PipelineResult:
     edge_count: int | None = None
 
 
-async def revisit_status(
-    *, repo_url: str, settings: Settings | None = None
-) -> PipelineResult:
+async def revisit_status(*, repo_url: str, settings: Settings | None = None) -> PipelineResult:
     """Decide whether ``repo_url`` is already-current, stale, or unknown.
 
     Cheap — runs ``git ls-remote`` (no clone) and a single SELECT against
@@ -86,9 +84,7 @@ async def revisit_status(
                 indexed_sha=indexed_sha,
                 remote_sha=remote_sha,
             )
-        return PipelineResult(
-            status="stale", indexed_sha=indexed_sha, remote_sha=remote_sha
-        )
+        return PipelineResult(status="stale", indexed_sha=indexed_sha, remote_sha=remote_sha)
     finally:
         await engine.dispose()
 
@@ -103,12 +99,8 @@ async def index_repo(
     settings = settings or Settings()
     engine = make_engine(settings)
     try:
-        with clone_to_tempdir(
-            repo_url, root=settings.ingestion_clone_root
-        ) as clone:
-            already = await repo_already_indexed(
-                engine, repo_url=repo_url, head_sha=clone.head_sha
-            )
+        with clone_to_tempdir(repo_url, root=settings.ingestion_clone_root) as clone:
+            already = await repo_already_indexed(engine, repo_url=repo_url, head_sha=clone.head_sha)
             if already:
                 log.info(
                     "pipeline.already_indexed",
@@ -140,16 +132,11 @@ async def index_repo(
             graph = build_graph(modules)
             adjacency = graph_to_adjacency(graph)
 
-            summarised = await summarise_chunks(
-                chunks, provider=provider, settings=settings
-            )
-            embedded = await embed_chunks(
-                chunks, provider=provider, settings=settings
-            )
+            summarised = await summarise_chunks(chunks, provider=provider, settings=settings)
+            embedded = await embed_chunks(chunks, provider=provider, settings=settings)
 
             embed_index: dict[tuple[str, int, int], EmbeddedChunk] = {
-                (e.chunk.file_path, e.chunk.start_line, e.chunk.end_line): e
-                for e in embedded
+                (e.chunk.file_path, e.chunk.start_line, e.chunk.end_line): e for e in embedded
             }
 
             persist_result = await persist_index(
@@ -189,9 +176,7 @@ def _scan_python_files(
         module = _path_to_module(rel)
         parsed = parse_file(py_path, module=module)
         loc_total += parsed.line_count
-        modules.append(
-            ModuleSource(module=module, rel_path=str(rel), source=parsed.source)
-        )
+        modules.append(ModuleSource(module=module, rel_path=str(rel), source=parsed.source))
         chunks.extend(chunk_file(parsed, rel_path=rel))
     return modules, chunks, loc_total
 

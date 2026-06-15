@@ -68,12 +68,8 @@ def upgrade() -> None:
         sa.Column("summary", sa.Text(), nullable=True),
         sa.Column("content", sa.Text(), nullable=False),
     )
-    op.create_index(
-        "ix_chunks_repo_symbol", "chunks", ["repo_id", "symbol"], unique=False
-    )
-    op.create_index(
-        "ix_chunks_repo_file", "chunks", ["repo_id", "file_path"], unique=False
-    )
+    op.create_index("ix_chunks_repo_symbol", "chunks", ["repo_id", "symbol"], unique=False)
+    op.create_index("ix_chunks_repo_file", "chunks", ["repo_id", "file_path"], unique=False)
 
     # `vector(768)` — emitted as raw SQL because the migration env must not
     # depend on pgvector's SQLAlchemy types.

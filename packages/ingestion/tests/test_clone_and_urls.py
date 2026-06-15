@@ -20,9 +20,7 @@ from repopilot_ingestion.clone import parse_github_url
         ("http://github.com/pallets/flask", ("pallets", "flask")),
     ],
 )
-def test_parse_github_url_accepts_canonical_forms(
-    url: str, expected: tuple[str, str]
-) -> None:
+def test_parse_github_url_accepts_canonical_forms(url: str, expected: tuple[str, str]) -> None:
     assert parse_github_url(url) == expected
 
 

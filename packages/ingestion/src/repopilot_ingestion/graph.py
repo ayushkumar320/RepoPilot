@@ -228,9 +228,7 @@ class _Resolver(ast.NodeVisitor):
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
         self._visit_function_like(node)
 
-    def _visit_function_like(
-        self, node: ast.FunctionDef | ast.AsyncFunctionDef
-    ) -> None:
+    def _visit_function_like(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
         qual = f"{self.current_qual}.{node.name}"
         self.current_qual_stack.append(qual)
         self.generic_visit(node)

@@ -106,9 +106,7 @@ def _slice_lines(lines: list[str], start: int, end: int) -> str:
     return "".join(lines[start - 1 : end])
 
 
-def _module_residue_lines(
-    total_lines: int, occupied: list[tuple[int, int]]
-) -> list[int]:
+def _module_residue_lines(total_lines: int, occupied: list[tuple[int, int]]) -> list[int]:
     """Return the sorted 1-based line numbers NOT covered by any occupied span."""
     occupied_sorted = sorted(occupied)
     blocked: set[int] = set()

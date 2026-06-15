@@ -31,6 +31,7 @@ dev = [
     "pytest-cov>=5.0.0",
     "respx>=0.21.1",
     "pre-commit>=3.8.0",
+    "types-networkx>=3.3,<4",
 ]
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -103,6 +104,7 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--cov=repopilot_core",
+    "--cov=repopilot_ingestion",
     "--cov-report=term-missing",
     "--cov-fail-under=80",
 ]
@@ -119,7 +121,18 @@ filterwarnings = [
 [tool.coverage.run]
 branch = true
 source = ["packages/core/src", "packages/ingestion/src", "packages/agents/src"]
-omit = ["**/tests/**", "**/__init__.py"]
+# Skip live-service orchestration: exercised under `slow` / `integration`
+# markers, not in the fast CI lane. Same for migration scripts.
+omit = [
+    "**/tests/**",
+    "**/__init__.py",
+    "**/migrations/**",
+    "packages/ingestion/src/repopilot_ingestion/persist.py",
+    "packages/ingestion/src/repopilot_ingestion/pipeline.py",
+    "packages/ingestion/src/repopilot_ingestion/embed.py",
+    "packages/ingestion/src/repopilot_ingestion/summary.py",
+    "apps/api/src/repopilot_api/jobs/**",
+]
 
 [tool.coverage.report]
 exclude_lines = [

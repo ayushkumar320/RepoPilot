@@ -1,10 +1,21 @@
 [project]
 name = "repopilot-ingestion"
 version = "0.0.1"
-description = "Phase 1 — clone → parse → chunk → graph → embed → persist (built next phase)."
+description = "Phase 1 — clone -> parse -> chunk -> graph -> embed -> persist."
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "repopilot-core",
+    "tree-sitter>=0.23,<0.24",
+    "tree-sitter-python>=0.23,<0.24",
+    "networkx>=3.3,<4",
+    "gitpython>=3.1.43,<4",
+    "sqlalchemy[asyncio]>=2.0.34,<3",
+    "psycopg[binary]>=3.2,<4",
+    "pgvector>=0.3.6,<0.4",
+    "alembic>=1.13,<2",
+    "arq>=0.26,<0.27",
+    "httpx>=0.27,<0.29",
+    "structlog>=24.4,<25",
 ]
 
 [build-system]

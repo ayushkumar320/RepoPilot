@@ -81,6 +81,21 @@ class LLMResponse:
         return self.prompt_tokens + self.completion_tokens
 
 
+@dataclass(slots=True)
+class EmbeddingResponse:
+    """Provider-agnostic embedding shape."""
+
+    vector: list[float]
+    model: ModelId
+    provider: ProviderName
+    physical_model: str
+    cached: bool = False
+
+    @property
+    def dim(self) -> int:
+        return len(self.vector)
+
+
 # ─── Cache ──────────────────────────────────────────────────────────────────
 
 
@@ -96,6 +111,14 @@ class _SQLiteCache:
         response_text TEXT NOT NULL,
         prompt_tokens INTEGER NOT NULL,
         completion_tokens INTEGER NOT NULL,
+        created_at REAL NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS embedding_cache (
+        key TEXT PRIMARY KEY,
+        model TEXT NOT NULL,
+        provider TEXT NOT NULL,
+        physical_model TEXT NOT NULL,
+        vector_json TEXT NOT NULL,
         created_at REAL NOT NULL
     );
     """
@@ -151,6 +174,42 @@ class _SQLiteCache:
                         response.text,
                         response.prompt_tokens,
                         response.completion_tokens,
+                        time.time(),
+                    ),
+                )
+
+    async def get_embedding(self, key: str) -> EmbeddingResponse | None:
+        async with self._lock:
+            with self._connect() as conn:
+                row = conn.execute(
+                    "SELECT model, provider, physical_model, vector_json "
+                    "FROM embedding_cache WHERE key = ?",
+                    (key,),
+                ).fetchone()
+        if row is None:
+            return None
+        model_s, provider_s, physical, vector_json = row
+        return EmbeddingResponse(
+            vector=json.loads(vector_json),
+            model=ModelId(model_s),
+            provider=ProviderName(provider_s),
+            physical_model=physical,
+            cached=True,
+        )
+
+    async def put_embedding(self, key: str, response: EmbeddingResponse) -> None:
+        async with self._lock:
+            with self._connect() as conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO embedding_cache "
+                    "(key, model, provider, physical_model, vector_json, created_at) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        key,
+                        response.model.value,
+                        response.provider.value,
+                        response.physical_model,
+                        json.dumps(response.vector, separators=(",", ":")),
                         time.time(),
                     ),
                 )
@@ -251,6 +310,23 @@ class _OllamaClient(_BaseClient):
     def __init__(self, http: httpx.AsyncClient, base_url: str) -> None:
         self._http = http
         self._base_url = base_url.rstrip("/")
+
+    async def embed(
+        self, binding: ModelBinding, text: str
+    ) -> EmbeddingResponse:
+        body = {"model": binding.physical_model, "prompt": text}
+        resp = await self._http.post(f"{self._base_url}/api/embeddings", json=body)
+        if resp.status_code == 429:
+            raise RateLimitError("ollama returned 429 (embeddings)")
+        resp.raise_for_status()
+        data = resp.json()
+        vector = list(data.get("embedding") or [])
+        return EmbeddingResponse(
+            vector=vector,
+            model=ModelId.EMBEDDINGS,
+            provider=self.provider,
+            physical_model=binding.physical_model,
+        )
 
     async def chat(
         self,
@@ -388,6 +464,57 @@ class LLMProvider:
             f"all providers failed for {model.value}: {last_error!r}"
         ) from last_error
 
+    async def embed(
+        self, text: str, *, model: ModelId = ModelId.EMBEDDINGS
+    ) -> EmbeddingResponse:
+        """Embed ``text`` via Ollama (the only embeddings provider in v1).
+
+        Same cache + fallback story as :meth:`generate`, but the chain is
+        Ollama-only and the cache is a separate SQLite table keyed on
+        ``sha256(model + text)``.
+        """
+        canonical = json.dumps(
+            {"model": model.value, "text": text}, sort_keys=True, separators=(",", ":")
+        )
+        key = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+        cached = await self.cache.get_embedding(key)
+        if cached is not None:
+            cached.model = model
+            return cached
+
+        chain = RESOLUTION.get(model)
+        if not chain:
+            raise ProviderError(f"no resolution chain for {model.value}")
+
+        last_error: Exception | None = None
+        for binding in chain:
+            client = self.clients.get(binding.provider)
+            if not isinstance(client, _OllamaClient):
+                continue
+            try:
+                response = await self._embed_with_429_retry(client, binding, text)
+            except RateLimitError as exc:
+                last_error = exc
+                continue
+            except (httpx.HTTPError, ConnectionError, OSError) as exc:
+                last_error = exc
+                log.warning(
+                    "llm.embed_transport_error",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    error=str(exc),
+                )
+                continue
+
+            response.model = model
+            await self.cache.put_embedding(key, response)
+            return response
+
+        raise ProviderError(
+            f"all providers failed for {model.value}: {last_error!r}"
+        ) from last_error
+
     # ── helpers ────────────────────────────────────────────────────────────
 
     async def _call_with_429_retry(
@@ -417,5 +544,27 @@ class LLMProvider:
                     provider=binding.provider.value,
                     attempt=attempt,
                     delay=round(delay, 3),
+                )
+                await asyncio.sleep(delay)
+
+    async def _embed_with_429_retry(
+        self,
+        client: _OllamaClient,
+        binding: ModelBinding,
+        text: str,
+    ) -> EmbeddingResponse:
+        max_attempts = max(1, self.settings.llm_max_429_retries)
+        attempt = 0
+        while True:
+            try:
+                return await client.embed(binding, text)
+            except RateLimitError:
+                attempt += 1
+                if attempt >= max_attempts:
+                    raise
+                delay = _backoff_delay(
+                    attempt - 1,
+                    self.settings.llm_backoff_base_seconds,
+                    self.settings.llm_backoff_max_seconds,
                 )
                 await asyncio.sleep(delay)

@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None
 
+    # ── Ingestion (Phase 1) ──────────────────────────────────────────────────
+    ingestion_clone_root: Path = Field(default_factory=lambda: Path(".cache/clones"))
+    ingestion_max_repo_loc: int = 200_000
+    ingestion_summary_concurrency: int = 8
+    ingestion_embed_batch_size: int = 32
+    ingestion_embed_concurrency: int = 4
+
     # ── Datastores ───────────────────────────────────────────────────────────
     postgres_dsn: str = "postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot"
     redis_url: str = "redis://localhost:6379/0"

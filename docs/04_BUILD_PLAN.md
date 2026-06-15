@@ -89,6 +89,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
   - `repos`: `id, url, head_sha, status, indexed_at, embedding_model_name, embedding_model_version, unresolved_dynamic_count, python2_syntax BOOL, indexing_stages JSONB`
 - [ ] `apps/api/jobs/index_repo.py` — arq job that runs the pipeline end-to-end.
 - [ ] Idempotency: if `(repo_url, head_sha)` already indexed, no-op.
+- [ ] **Revisit staleness check.** When a known `repo_url` is re-submitted, the API does a lightweight `git ls-remote <repo_url>` (no clone) to read the current default-branch HEAD before deciding what to do. If it matches `repos.head_sha`, the cached index is served immediately. If it differs, the API returns `{ status: "stale", indexed_sha, remote_sha, commits_behind_estimate }` and the frontend renders a banner ("This repo has new commits since we last indexed it (~N commits). Re-index? (~90s)"). Re-indexing is opt-in; the user can also choose to stream a first-impression and tour off the cached index while deciding. Test: `test_revisit_with_advanced_remote_returns_stale_status`.
 - [ ] **Concurrent-indexing lock.** Before any work, the arq job acquires a Postgres advisory lock keyed on `hashtext(repo_url || head_sha)`. A second concurrent job for the same key short-circuits to "wait for existing indexing", polls `repos.status`, and returns the cached `repo_id` once the first completes. Test: `test_concurrent_indexing_same_repo_does_not_duplicate`.
 - [ ] **Embedding model versioning.** Indexing job records the embedding model name + version it used. Q&A always embeds the query with the model that matches the stored vectors. When the configured model differs from stored, the repo is automatically marked for re-index. Test: `test_query_embedded_with_stored_model`.
 - [ ] **Typed errors.** Every fail-edge in the indexing pipeline emits an `ArchaeologistError` (codes defined in docs/03). Tests: `test_repo_without_python_files_rejected_with_useful_message`, `test_invalid_repo_url_returns_typed_error`, `test_partial_indexing_failure_records_stage`.
@@ -211,7 +212,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 - [ ] FastAPI endpoints:
   - `POST /repos` — enqueue indexing; returns `repo_id`.
-  - `GET /repos/{repo_id}/status` — `queued | indexing | ready | error`.
+  - `GET /repos/{repo_id}/status` — `queued | indexing | ready | error | stale` (`stale` includes `indexed_sha`, `remote_sha`, `commits_behind_estimate`; UI renders the revisit-staleness banner from §Phase 1).
   - `POST /tours` — start a tour given `repo_id`, optional `purpose` hint.
   - `GET /tours/{tour_id}/stream` — SSE stream of tour events.
   - `POST /tours/{tour_id}/ask` — Q&A escape hatch.
@@ -278,7 +279,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 - [ ] **Lane A considered-and-rejected trail**: Lane A persists not only its top-N accepted opportunities but the next-3 ranked-down items with a one-line reason ("touches a hub of fan-in 47", "no test files reference the affected module"). The Opportunity List UI shows these below the accepted list under a collapsed "considered and rejected" disclosure. This is a deliberate transparency surface — the user sees the triage, not just the verdict.
 - [ ] **Per-opportunity CTAs (frontend)**: each Opportunity card renders two buttons — "Open files on GitHub" (deep links to each `files_to_touch` at the right line) and "Copy first step" (clipboard copy of `suggested_first_step`). The contribute briefing never ends in prose alone.
 - [ ] **Eval-labeling time: ~2 days** across the two Phase 5 datasets.
-- [ ] `packages/evals/datasets/opportunity_quality_v1.jsonl` — hand-labeled top-N opportunities per eval repo: `is_approachable` (bool), `is_legit` (bool, for Lane C).
+- [ ] `packages/evals/datasets/opportunity_quality_v1.jsonl` — hand-labeled top-N opportunities per eval repo: `is_approachable` (bool), `is_legit` (bool, for Lane C), and `rejected_reasons_honest` (bool, for Lane A considered-and-rejected entries — true iff the one-line graph-backed reason is factually defensible against the graph adjacency, not invented post-hoc).
 - [ ] `packages/evals/datasets/file_mapping_v1.jsonl` — for 20 opportunities, the correct `files_to_touch` set; eval checks ≥ 80% overlap.
 - [ ] LangGraph wiring: Lane A/B/C run in parallel; Ranker waits on all three.
 
@@ -298,6 +299,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 - [ ] **Banned-vocabulary regex test passes** on 20 randomly sampled Lane C generations.
 - [ ] **Intent-match chip visible** on every Opportunity card; chip text quotes the relevant fragment of `intent_profile.raw_text` (no fixed-enum labels).
 - [ ] **Considered-and-rejected trail** shows 3 entries per repo on each demo run; each entry has a graph-backed one-line reason.
+- [ ] **Rejected-reason honesty ≥ 80%** on `opportunity_quality_v1` `rejected_reasons_honest` labels — i.e., when Lane A says "ranked down because X", X is checkable against the graph or issue metadata, not LLM-confabulated.
 - [ ] **CTA buttons present and functional** on every Opportunity card (Playwright: click "Open files on GitHub" → correct deep-link URL; click "Copy first step" → clipboard contains `suggested_first_step`).
 
 ---
@@ -321,6 +323,13 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
   - **Eval table** with current scores per repo.
   - **Honest limitations** section: Python-only, public repos only, ingestion cap, known failure modes (dynamic dispatch, decorator-heavy code).
 - [ ] `make quickstart` script tested on a clean macOS and Linux VM.
+- [ ] **Deployment topology doc** (`docs/DEPLOY.md`) — explicit hosted-demo recipe so reviewers know the stack is hostable, not just local. v0.1 baseline:
+  - **Frontend (Next.js)** → Vercel free tier.
+  - **API + arq worker** → fly.io or Railway (small VM, ~$5/mo). Note: Ollama cannot run on serverless because of the model weights.
+  - **Postgres + pgvector** → Neon or Supabase free tier (verify the free tier has pgvector enabled).
+  - **Ollama (Verifier + embeddings)** → same fly.io VM as the API (needs ≥ 4 GB RAM for `qwen2.5-coder:7b` Q4) or a sibling small VM. The verifier latency budget assumes co-located Ollama; cross-region adds ~80–200 ms per claim.
+  - **Redis** → Upstash free tier.
+  - **Document monthly cost at idle (~$5–15) and the manual scale-down steps** if the free tier limits are hit.
 - [ ] Tag `v0.1.0`.
 
 **Production-grade specifics**
@@ -370,5 +379,7 @@ Every PR within every phase must satisfy:
 | 9 | **Starter-branch scaffolding** | After picking an opportunity, "scaffold a starter branch" runs a tiny Aider/Sweep-style edit producing a draft diff for the user to refine. Big leverage on the contribute promise. | The PR-quality bar is its own product. v0.1 hands off to GitHub at the "files to touch" step instead. |
 | 10 | **Stuck-loop re-entry** | When a user picks an opportunity and gets stuck mid-work, a "I'm stuck" button re-enters Q&A with the opportunity preloaded as context. | Requires session continuity beyond a single tour run — clean to add once tours are persisted. |
 | 11 | **Common-questions overlay per repo** | After we've toured N users through fastapi, surface "common questions on this repo" as a starting affordance. Compounds with usage. | Needs aggregated session data; meaningless until we have real users. |
+| 12 | **Session persistence + shareable tour URLs** | Re-opening the app resumes the last tour; a shareable read-only URL lets a user send a tour to a teammate. Big leverage on the "trust" pitch — others can replay the exact tour. | Requires durable tour storage (Postgres tour table + serialized state), URL signing, and a stable retrieval shape. Clean to add once the tour event schema has stopped moving. |
+| 13 | **Q&A multi-turn (`qa_history`)** | Lets users ask building, sequential questions ("how does middleware work?" → "how does my middleware get registered?"). Schema slot reserved in `ArchaeologistState.qa_history` from v1 so adding the UI is a small change later. | Wants a dedicated eval set for follow-up coherence; not blocking v0.1. |
 
 The backlog is ordered by leverage, not by ease. We pick from the top after v0.1 ships and the first real users push back on what hurts most.

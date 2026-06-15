@@ -88,6 +88,7 @@ Deliverables
     - `repos(id, url, head_sha, status, indexed_at)`
 - `apps/api/jobs/index_repo.py` — arq job orchestrating clone → parse → chunk → graph → summary → embed → persist.
 - Idempotency: if `(repo_url, head_sha)` already indexed, exit with status `already_indexed`.
+- Revisit staleness check: when a known `repo_url` is re-submitted, do a `git ls-remote <repo_url>` (no clone) to read the current default-branch HEAD. If it differs from `repos.head_sha`, return `{status: "stale", indexed_sha, remote_sha}` so the frontend can render the "re-index?" banner. Test: `test_revisit_with_advanced_remote_returns_stale_status`.
 - Hard cap: reject repos > 200k LOC at the queue boundary.
 
 Tests to write FIRST (TDD)
@@ -258,7 +259,7 @@ You are starting Phase 4 of Codebase Archaeologist. The goal: a user pastes a Gi
 Deliverables
 - FastAPI endpoints in `apps/api/routes/`:
     - `POST /repos` — body `{repo_url}`; enqueues arq indexing; returns `{repo_id, status}`.
-    - `GET /repos/{repo_id}/status` — returns `{status: queued|indexing|ready|error, progress?, error?}`.
+    - `GET /repos/{repo_id}/status` — returns `{status: queued|indexing|ready|error|stale, progress?, error?, indexed_sha?, remote_sha?, commits_behind_estimate?}`. On `stale`, the frontend renders the revisit banner ("This repo has new commits since we last indexed it — re-index? (~90s)") and offers to stream a first-impression off the cached index while the user decides.
     - `POST /tours` — body `{repo_id, intent_profile}` (confirmed profile from the elicitation step); returns `{tour_id}` and a `stream_url`.
     - `GET /tours/{tour_id}/stream` — SSE stream of tour events (sse-starlette).
     - `POST /tours/{tour_id}/ask` — body `{question}`; ask-anything escape hatch; returns answer + refs.
@@ -366,7 +367,7 @@ Deliverables
     - Regex denylist check on Lane C output (banned vocabulary triggers rejection).
     - `Opportunity.confirm_before_pr` required when `lane == "C_suspicion"`; Pydantic raises if absent.
 - Eval datasets:
-    - `packages/evals/datasets/opportunity_quality_v1.jsonl` — hand-labeled top-N opportunities per eval repo: `is_approachable`, `is_legit`.
+    - `packages/evals/datasets/opportunity_quality_v1.jsonl` — hand-labeled top-N opportunities per eval repo: `is_approachable`, `is_legit`, and `rejected_reasons_honest` (Lane A considered-and-rejected entries — true iff the one-line reason is checkable against the graph/issue metadata, not invented post-hoc).
     - `packages/evals/datasets/file_mapping_v1.jsonl` — 20 opportunities with correct `files_to_touch`.
 - LangGraph wiring: Lane A/B/C run in parallel via concurrent edges; Ranker is a synchronization point.
 
@@ -399,6 +400,7 @@ Quality gate (Definition of Done — restate exactly)
 - Banned-vocabulary regex test passes on 20 randomly sampled Lane C generations.
 - Intent-match chip visible on every Opportunity card; chip text quotes the relevant fragment of `intent_profile.raw_text` (no enum-shaped labels).
 - Considered-and-rejected trail shows 3 entries per repo per demo run; each entry has a graph-backed one-line reason.
+- Rejected-reason honesty ≥ 80% on `opportunity_quality_v1` `rejected_reasons_honest` labels.
 - CTA buttons present and functional on every Opportunity card (Playwright: deep-link URL correct; clipboard copy matches `suggested_first_step`).
 
 Per-PR Definition of Done from docs/00 applies.
@@ -431,6 +433,7 @@ Deliverables
     - HONEST limitations section: Python only; public repos only; 200kLOC cap; known failure modes (dynamic dispatch, decorator-rewritten signatures, `getattr` polymorphism); free-tier quotas mean ~1k full tours/day max.
     - License + contributing notes.
 - `make quickstart` script verified on a clean macOS VM and a clean Ubuntu 22.04 VM.
+- `docs/DEPLOY.md` — hosted-demo recipe: Vercel (Next.js) + fly.io or Railway (API + arq + Ollama, ≥4 GB RAM for `qwen2.5-coder:7b` Q4) + Neon or Supabase (Postgres + pgvector) + Upstash (Redis). Note that Ollama cannot run on serverless. Document monthly idle cost (~$5–15) and the scale-down path if free-tier limits are hit.
 - Tag `v0.1.0` (do NOT push the tag without user approval).
 
 Tests to write FIRST (TDD)

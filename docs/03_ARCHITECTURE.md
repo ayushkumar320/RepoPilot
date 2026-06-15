@@ -313,6 +313,7 @@ class ArchaeologistState(BaseModel):
     intent_profile: IntentProfile | None = None       # Intent Profiler output, user-confirmed
     capability_plan: CapabilityPlan | None = None     # Capability Planner output
     user_question: str | None = None                  # Q&A inputs land here (Q&A is universal)
+    qa_history: Annotated[list[QAExchange], add] = Field(default_factory=list)  # last N (question, answer, refs) tuples — see "Q&A multi-turn" below
 
     # — Capability outputs (any subset may exist depending on the plan) —
     system_map: Annotated[list[Insight], add] = Field(default_factory=list)
@@ -634,6 +635,10 @@ The Q&A subgraph is not a node in the planned pipeline — it is a separate subg
 - A user can ask a question **after** the planned pipeline completes. Q&A reads the full state and the full `IntentProfile`.
 
 This is what the user means by "Q&A is for everyone" — there is no Q&A-vs-non-Q&A user. Every user has Q&A available the whole time. Every Q&A answer is verified by the same Verifier. Every Q&A answer drives the same synchronized code viewer.
+
+### Q&A multi-turn (schema-reserved in v1, surfaced post-v0.1)
+
+`ArchaeologistState.qa_history` is an append-only list of `QAExchange(question: str, answer_claims: list[Claim], asked_at: datetime)`. In v1 the Q&A node *writes* each completed exchange to `qa_history` (capped at the last 8), but the Q&A prompt only consumes the **current** `user_question` plus the `IntentProfile` — each question is answered independently. The slot exists so that the post-v0.1 multi-turn upgrade is a prompt-shape change (inject the last 3 exchanges into the Q&A prompt context) rather than a state-schema migration. See backlog item 13 in [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md).
 
 ---
 

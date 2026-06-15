@@ -17,12 +17,11 @@ The docs form a layered chain, from "why" to "exactly what to type into Claude C
 03 ARCHITECTURE           →  HOW it's wired: agents, state, tools, verifier (the blueprint)
 04 BUILD_PLAN             →  WHEN/in what order to build it: 7 phases + gates (the schedule)
 05 PHASE_PROMPTS          →  paste-ready prompts to execute each phase (the script)
-06 FUTURE_IMPROVEMENTS    →  pre-build punch list of doc fixes (the pre-flight checklist)
 ```
 
-**Reading order for a build session:** `CLAUDE.md` → `docs/00` → `docs/03` → `docs/04` → the matching `docs/05` phase block. `docs/06` sits *next to* that chain as a pre-build punch list.
+**Reading order for a build session:** `CLAUDE.md` → `docs/00` → `docs/03` → `docs/04` → the matching `docs/05` phase block.
 
-> ⚠️ **Known drift:** docs 00, 01, 04, 05 describe the evolved design (free-text intent → Intent Profiler → Capability Planner → a shared capability library, with **no fixed modes**). Parts of **doc 03 still describe the older "three-bucket" model** (learn/contribute/question with an Intent Router). Doc 01's capability-library model is the current truth; doc 03's topology section is the part most due for a refresh. Doc 06 tracks related inconsistencies (M5 = beachhead language drift between 00 and 01; M3 = the capability-independence claim).
+> The pre-build doc-review punch list (`06_FUTURE_IMPROVEMENTS.md`) was applied in full and removed before Phase 0 — all of its M/S/W items are now folded into the docs above. Git history retains the original review for context.
 
 ---
 
@@ -87,20 +86,8 @@ Ends with the **Per-PR Definition of Done** and an **11-item prioritized post-v0
 
 One **paste-ready Claude Code prompt per phase (0–6)**, each used on top of doc 00's standing context — turning doc 04's checklist + gate for that phase into an executable instruction. This is the operational bridge: doc 04 says *what* a phase delivers; doc 05 is the literal text you feed the agent to *build* it.
 
-### 06 — Future Improvements *(the pre-build punch list)*
-
-A doc-level review (dated 2026-06-14, before Phase 0) of issues to fix *in the docs* before writing code, tagged **M** (must-fix before Phase 0), **S** (should-fix before the phase where it bites), **W** (worth doing). Highlights:
-- **M1** Verifier latency on local Ollama isn't quantified → needs per-section batch verification + streaming + a hash cache or the Phase 3 <4-min gate fails.
-- **M2** ~15–35 hours of eval-dataset labeling is invisible in phase budgets → add explicit labeling time.
-- **M3** the "every capability runs standalone" claim is false → `CapabilityPlan` needs a dependency DAG (Flow Tracer needs Cartographer, etc.).
-- **M4** Phase 4 is undersized → realistic budget is 10–14 days.
-- **M5** beachhead language drift between doc 00 ("junior devs") and doc 01 ("anyone with a stated purpose").
-- **S1–S6:** unverifiable mermaid; per-tour Groq token budget; intent edit-loop fallback; prompt injection from repo contents; the Verifier itself is unverified; CI eval runtime needs a sampling/full-matrix split.
-- **W1–W4:** chip-strip natural-language rendering; Lane A rejected-reason eval coverage; explicit session non-persistence in the scope fence; default plan should include a lightweight Lane B.
-Ends with an application order and a sign-off checklist (*do not start Phase 0 until all M items are checked*).
-
 ---
 
 ## One-paragraph takeaway
 
-RepoPilot's docs describe a **multi-agent, grounding-first codebase-onboarding tool** whose single differentiating bet is capturing the user's *intent* in free text before any analysis and adapting a shared library of specialized agents to it — with truthfulness enforced by a deterministic AST/graph layer and a separate verifier model, and quality enforced by hard, measured phase gates. The spec is unusually disciplined: a strict scope fence, merge-blocker metrics, a documentation-layering rule, and an "everything runs free on a laptop" constraint. The main item to reconcile before building is **doc 03's older bucketed topology vs. the capability-library model** the rest of the set has moved to (tracked in doc 06).
+RepoPilot's docs describe a **multi-agent, grounding-first codebase-onboarding tool** whose single differentiating bet is capturing the user's *intent* in free text before any analysis and adapting a shared library of specialized agents to it — with truthfulness enforced by a deterministic AST/graph layer and a separate verifier model, and quality enforced by hard, measured phase gates. The spec is unusually disciplined: a strict scope fence, merge-blocker metrics, a documentation-layering rule, and an "everything runs free on a laptop" constraint. The pre-build doc review has been fully applied and the spec is consistent across docs 00–05.

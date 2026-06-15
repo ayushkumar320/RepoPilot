@@ -384,5 +384,6 @@ We will be tempted to add each of these. We will not.
 - **No paid-tier dependencies.** Groq free tier + Ollama local + free hosting. The whole stack is free-tier survivable.
 - **No "feature suggestions" lane in Contribute.** Lane D is deferred — except for suggestions explicitly grounded in the repo's own stated intent (TODOs, CONTRIBUTING.md, README planned-features).
 - **No HITL (human-in-the-loop) interrupts in v1.** Tours run to completion or error. Pause/edit/resume is a post-v0.1 enhancement.
+- **No session persistence in v1.** Tours are ephemeral — closing the tab loses the tour, and re-opening the app starts fresh. Re-pasting the same repo URL reuses the cached *index* (so indexing doesn't repeat) but generates a new tour. Shareable tour URLs and resumable sessions are on the post-v0.1 backlog.
 
 This fence exists because every successful narrow product was tempted to widen and held the line. We hold the line.

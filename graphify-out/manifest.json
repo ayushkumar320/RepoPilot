@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781551890.049018,
-    "ast_hash": "5f30f05d76ec809800639f6ee479141e",
+    "mtime": 1781552990.6603034,
+    "ast_hash": "3f61929d05f8757af81a93602f5951dd",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -120,13 +120,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/__init__.py": {
-    "mtime": 1781533155.6361752,
-    "ast_hash": "5e9bb746fa516d3c23d6b2376193b139",
-    "semantic_hash": ""
-  },
-  "packages/agents/tests/test_agents_imports.py": {
-    "mtime": 1781533155.6363106,
-    "ast_hash": "fb91d4615929f0a809e56cdddcf6105b",
+    "mtime": 1781553289.306188,
+    "ast_hash": "dbbd97e3b70e933b3c49929d5587e19d",
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/__init__.py": {
@@ -332,6 +327,106 @@
   "packages/ingestion/tests/test_pipeline_idempotency.py": {
     "mtime": 1781551286.925011,
     "ast_hash": "06af3eec1fcc9b0d8965429886b00168",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/qa/__init__.py": {
+    "mtime": 1781553208.8641071,
+    "ast_hash": "5d65c1c9ddbbaaa30b5feb3505d8d6ae",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/qa/graph.py": {
+    "mtime": 1781553389.7769642,
+    "ast_hash": "85831fd952a558407d76760e72a14e6c",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/qa/prompts.py": {
+    "mtime": 1781553389.7767324,
+    "ast_hash": "3e448ea673b2aacea2ab6787e5646946",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/qa/types.py": {
+    "mtime": 1781553389.750072,
+    "ast_hash": "9fd566f6d8e2424b6a3387c72ae72b23",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/__init__.py": {
+    "mtime": 1781553035.7050622,
+    "ast_hash": "e7bcffef2e8a549ed6f4603d7f6e1e8b",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/_adjacency.py": {
+    "mtime": 1781553085.0644033,
+    "ast_hash": "891f01260057350e9798bb5df61098fd",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/github_issues.py": {
+    "mtime": 1781553158.9935138,
+    "ast_hash": "75629d862a08d49b1c48a408259bc620",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/graph_metrics.py": {
+    "mtime": 1781553389.7769754,
+    "ast_hash": "200378241518e866561b2b516bdaa9ba",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/graph_query.py": {
+    "mtime": 1781553389.776723,
+    "ast_hash": "ae638f15d23ce538941e541f3339ebaa",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/graph_traverse.py": {
+    "mtime": 1781553389.777314,
+    "ast_hash": "75469b9436887e032e8c0b923400df2f",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/read_chunks.py": {
+    "mtime": 1781553389.7524743,
+    "ast_hash": "162139c48e05e9abdb152eb9aa28b047",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/tools/vector_search.py": {
+    "mtime": 1781553389.776904,
+    "ast_hash": "275a7438341ac81c5de7b2ff3ba03a49",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/types.py": {
+    "mtime": 1781553027.7027533,
+    "ast_hash": "74146d983ead1b0f48e6ed49902d1c13",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/verifier/__init__.py": {
+    "mtime": 1781553166.9850929,
+    "ast_hash": "4d98f05b431a2f5362cba3185a71fec6",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/verifier/grounding.py": {
+    "mtime": 1781553389.777451,
+    "ast_hash": "082301a7c85e4a53df0ea8272e510bce",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/conftest.py": {
+    "mtime": 1781553389.777191,
+    "ast_hash": "7f75779e3557833511fb99f4ecf91e32",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_graph_query.py": {
+    "mtime": 1781553389.7502117,
+    "ast_hash": "1c3f26461db7393b3abb23d3d8710a9f",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_qa_graph.py": {
+    "mtime": 1781553406.295904,
+    "ast_hash": "60997c9b81e331e2a4a1f7dfdb4a88e6",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_types.py": {
+    "mtime": 1781553317.328769,
+    "ast_hash": "970675a9ed0046e45b45330648f8f15a",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_verifier_grounding.py": {
+    "mtime": 1781553403.2218704,
+    "ast_hash": "af710a356cb40d7dbcbd71c64a2473f4",
     "semantic_hash": ""
   }
 }

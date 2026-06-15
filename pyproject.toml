@@ -105,6 +105,7 @@ addopts = [
     "--strict-config",
     "--cov=repopilot_core",
     "--cov=repopilot_ingestion",
+    "--cov=repopilot_agents",
     "--cov-report=term-missing",
     "--cov-fail-under=80",
 ]
@@ -132,6 +133,13 @@ omit = [
     "packages/ingestion/src/repopilot_ingestion/embed.py",
     "packages/ingestion/src/repopilot_ingestion/summary.py",
     "apps/api/src/repopilot_api/jobs/**",
+    # Phase 2 tools that touch live Postgres/Ollama — exercised under
+    # slow/integration, not the fast lane.
+    "packages/agents/src/repopilot_agents/tools/vector_search.py",
+    "packages/agents/src/repopilot_agents/tools/read_chunks.py",
+    "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
+    "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
+    "packages/agents/src/repopilot_agents/tools/_adjacency.py",
 ]
 
 [tool.coverage.report]

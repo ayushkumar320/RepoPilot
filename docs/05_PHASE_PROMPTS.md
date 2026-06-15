@@ -300,6 +300,30 @@ packages/evals/src/repopilot_evals/
 - Coverage stays ≥ 80 % on the fast-testable layer (mirror Phase 1's `omit` rule for the LangSmith-/Postgres-/Ollama-dependent paths).
 - `make ci` must include `ruff format --check` (Phase 1 lesson — see "Three latent CI bugs" above).
 
+### Phase 2 — explicit deferrals (must clear before Phase 3 starts)
+
+These items are **deferred, not skipped.** The code that exercises them is wired with feature flags / empty dataset files so flipping them on later is a config change, not a refactor. Both deferrals are merge-blockers for Phase 3.
+
+| Deferral | Why deferred | Unblock condition | Forcing function |
+|---|---|---|---|
+| **Eval dataset labeling** (`httpx_qa_v1`, `verifier_quality_v1`, `sampled_pr_v1`) | 3–5 hrs of focused human work that would block Phase 2 code progress. Ship the runner + empty schema-stamped JSONL files now; label before Phase 3. | All three JSONL files contain ≥ their required row counts (15 + 30 + 5) with passing schema validation. | A CI check fails if `httpx_qa_v1.jsonl` has < 15 rows when Phase 3 work begins. |
+| **LangSmith tracing** (`LANGSMITH_API_KEY` wiring + `@traceable` decorators) | Requires a provisioned account and key. The `traces visible` gate is not satisfiable without it. | `LANGSMITH_API_KEY` set in `.env`; `@traceable` decorators flipped from no-op to live. | Phase 3's "checkpoint resume" gate needs LangSmith for the eval matrix anyway — natural forcing function. |
+
+**What this means in practice for Phase 2:**
+
+- The four gates that depend on these — `grounding accuracy ≥ 90%`, `multi-hop chain test`, `forced-hallucination test`, `LangSmith traces visible` — are **scaffolded but unmeasured.** The code paths exist; the gate numbers do not.
+- Phase 2 ships when: tools work, verifier rejects unsupported claims in unit tests, the Q&A LangGraph composes end-to-end on a synthetic fixture, fast-lane CI is green.
+- Phase 3 **must** pick up the labeling + LangSmith key as its first task. If those don't land in Phase 3, the demo in Phase 4 has nothing to stand on (`docs/01` principle 1 is the trustworthiness claim).
+
+**Phase 3 entry checklist** (paste-runnable; the Phase 3 prompt below assumes these are green):
+
+- [ ] `httpx_qa_v1.jsonl` has 15 labeled rows; grounding eval runs without errors.
+- [ ] `verifier_quality_v1.jsonl` has 30 labeled triples; verifier accuracy measured ≥ 92%.
+- [ ] `LANGSMITH_API_KEY` provisioned in `.env`; a sample trace is visible at the project URL.
+- [ ] PR-time sampled eval runs in ≤ 5 min on `main` (per `docs/06` S6).
+
+If any box is unchecked when Phase 3 starts, do that first — not the orchestration work.
+
 ---
 
 ## Phase 3 prompt — Orchestration + Learn subgraph

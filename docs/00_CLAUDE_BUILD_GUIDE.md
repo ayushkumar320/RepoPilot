@@ -22,7 +22,7 @@ There are four documents Claude Code must load before writing a single line of c
 
 ## Project one-liner
 
-**Codebase Archaeologist** is a web app where a developer pastes a public GitHub repo URL and gets a **purpose-driven, guided onboarding tour** of an unfamiliar codebase, powered by a multi-agent AI system. The beachhead is **junior developers and first-time OSS contributors** working on **Python repositories** on **public GitHub**. We do not try to be a general code-search tool, an IDE plugin, or a multi-language platform in v1.
+**Codebase Archaeologist** is a web app where a developer pastes a public GitHub repo URL and gets a **purpose-driven, guided onboarding tour** of an unfamiliar codebase, powered by a multi-agent AI system. It serves **any developer with a stated purpose**, working on **Python repositories** on **public GitHub** (≤ 200kLOC). The constraint is in the technology and the intent-elastic capability library — not in who shows up. We do not try to be a general code-search tool, an IDE plugin, or a multi-language platform in v1.
 
 The single distinguishing bet: **before analyzing anything, the system captures pre-context about the user as a free-text intent statement and adapts to it.** There is **no fixed enum of purposes** — no "learn / contribute / build" buttons, no hidden three-bucket system. Pre-context capture is a deliberate, visible, first-class phase consisting of:
 
@@ -61,7 +61,7 @@ Every architectural moat we have over competitors must be **visible in the UI**,
 | Moat | UI surface |
 |---|---|
 | **Verified grounding** | Every Claim shows a small "✓ grounded" badge when `status == "verified"`. Hover reveals the verifier's confirmation and the chunk it grounded against. Claims with `status == "flagged"` render with a distinct warning treatment — never silently dropped. |
-| **Hybrid retrieval (vector + graph)** | Every Claim and every Q&A answer shows its retrieval path on hover: e.g., `vector_search(k=8) → graph_traverse(2 hops)`. Competitors using pure vector search cannot show this — that's the point. |
+| **Provenance chip (replaces retrieval-path)** | Every Claim shows a typed provenance chip naming where it came from: `vector_then_graph`, `graph_only`, `deterministic_detector(name)`, or `structural_pattern(name)`. Hover reveals the path or the detector signature. The "hybrid retrieval" moat (vector + graph) shows up specifically as the `vector_then_graph` provenance — the chip framing now honestly covers Q&A claims (which retrieve) AND Lane B/C claims (which don't). |
 | **Purpose traceability** | A persistent "You said:" chip at the top of the tour shows the captured pre-context. Every Opportunity card carries an "intent match" chip ("matches: hunt problems"). Lane A surfaces a "considered and rejected" trail for the top-3 ranked-down issues so the user sees the triage thinking, not just the verdict. |
 | **Action over narrative** | Every section ends in a button or copyable next step. Contribute briefings end with "Open files on GitHub" and "Copy first step" buttons per opportunity — never in prose alone. |
 
@@ -192,6 +192,6 @@ Every pull request — feature, fix, or refactor — must satisfy **all** of:
 - [ ] State mutations only via typed node returns.
 - [ ] Every factual output path runs through the Verifier.
 - [ ] LangSmith trace reviewed (link in PR description).
-- [ ] **Retrieval-touching PRs run the eval harness and post the numbers in the PR description** — before/after, not just after.
+- [ ] **Retrieval-touching PRs run the SAMPLED eval harness and post the numbers in the PR description** — before/after, not just after. Full matrix runs on `main` post-merge.
 
 Phase prompts assume this is enforced. Do not relax it without explicit user approval.

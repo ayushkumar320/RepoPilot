@@ -31,6 +31,23 @@ Every choice below is paired with **why** and **what we rejected**. The constrai
 | Verifier | `qwen2.5-coder:7b` (Ollama) | Highest call volume — must be local. |
 | Chunk summaries (ingestion) | `llama-3.1-8b-instant` | Batch, cached, low-stakes. |
 
+### Per-tour token budget (rough)
+
+Estimated for a moderately complex `understand`-shaped tour on a 50kLOC repo. Numbers are upper-bound input + output combined per capability.
+
+| Capability | Model | Input tok | Output tok | Notes |
+|---|---|---|---|---|
+| Intent Profiler | 8B | ~400 | ~150 | Per session (not per tour). |
+| Cartographer | 70B | ~1.5k | ~1.5k | Reads graph_query results + chunk summaries. |
+| Flow Tracer | qwen3-32b | ~2.0k | ~1.5k | Reads traversal path + chunk content. |
+| Teacher | 70B | ~3.0k | ~2.0k | Reads all upstream Insight objects. |
+| Verifier (per claim) | qwen2.5-coder:7b (local) | ~500 | ~80 | × ~30 claims = ~17k tok, but local, so zero Groq cost. |
+| Q&A (if used) | 70B | ~2.5k | ~1.0k | Per question. |
+
+**70B-specific math.** A single Learn-shaped tour costs **~8k tokens** on `llama-3.3-70b-versatile` (Cartographer + Teacher + 1 Q&A). Groq's 70B free tier is **6k TPM**, so one tour comfortably fits a minute. **Concurrency limit: 1 active 70B-heavy tour per Groq key.** A second concurrent tour triggers the 429-backoff-then-fallback chain. The `MAX_TOURS_PER_IP_PER_HOUR` rate-limit (default 5) protects against single-IP abuse; a server-wide semaphore on 70B calls protects against multi-IP contention.
+
+---
+
 ### Groq free-tier survival strategy
 
 Groq limits are **per model**, not per account. As of writing: ≈ 30 RPM / 6k TPM / 1k RPD on `llama-3.3-70b-versatile`; `llama-3.1-8b-instant` gets ≈ 14.4k RPD. The architecture exploits this:

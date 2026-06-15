@@ -214,7 +214,7 @@ Tests to write FIRST (TDD)
 3b. `test_cartographer_rejects_missing_intent_profile` — invoking the Cartographer with `intent_profile=None` or `capability_plan=None` raises a ValidationError. The generic intent layer is non-optional.
 3c. `test_intent_shapes_output` — run the pipeline on flask with two materially different `IntentProfile`s ("explain request lifecycle" vs "audit auth surface for fragility"); assert resulting `draft_tour`s differ structurally by ≥ 50% on a sectional-overlap metric.
 3d. `test_no_purpose_enum_in_code` — CI grep asserts `if state.purpose ==` does not appear under `packages/agents/`. Elasticity guarantee.
-3e. `test_capability_library_independence` — each capability invocable standalone with a synthetic `IntentProfile + CapabilityPlan`, without any other capability running.
+3e. `test_capability_library_dependencies_satisfied` — for every active capability, all declared dependencies are also active; a topological sort exists; LangGraph compiles in dependency order.
 4. `test_prompt_token_budget` — every node's rendered prompt is ≤ 2000 input tokens (`tiktoken`).
 4a. `test_goal_anchor_present_in_every_prompt` — render each generation prompt with sample state; assert the goal-anchor block (referencing `intent_profile.raw_text` + the relevant tilt fields) appears as the leading section in every one.
 5. `test_verifier_retries_then_flags` — synthesize a section that fails actionability; verifier objects; source node retries twice; after that claim status == "flagged" (not silently dropped).
@@ -232,7 +232,7 @@ Implementation order
 Quality gate (Definition of Done — restate exactly)
 - Intent Profiler per-field accuracy ≥ 90% on `intent_profiling_v1`.
 - Capability Planner F1 ≥ 90% on `planner_correctness_v1`.
-- Capability library independence test passes (each capability invocable standalone).
+- Capability library dependencies-satisfied test passes (every active capability's declared deps are active; topological sort exists).
 - Intent-shapes-output test passes (≥ 50% structural delta between two materially different `IntentProfile`s on flask).
 - No-purpose-enum-in-code grep check passes (CI greps `if state.purpose ==` under `packages/agents/`, must be zero hits).
 - Goal-anchor-present test passes on every generation prompt.

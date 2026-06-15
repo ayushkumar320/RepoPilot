@@ -23,7 +23,7 @@ The reading order for build sessions remains: `CLAUDE.md` → `docs/00` → `doc
 
 ### M1. Verifier latency on local Ollama isn't quantified and will blow the Phase 3 gate
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** `qwen2.5-coder:7b` on Ollama runs ~10–15 tok/s on a typical M-series Mac. A 30-claim tour with ~500 tokens of context per verification call and ~30% retry rate is ~3 minutes of Verifier-only sequential latency. The Phase 3 gate (`Full Learn tour on flask < 4 minutes`) cannot pass without batching.
 
@@ -41,7 +41,7 @@ The reading order for build sessions remains: `CLAUDE.md` → `docs/00` → `doc
 
 ### M2. Eval dataset labeling is ~30 hours of skilled manual work and isn't on any timeline
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Across phases:
 - `intent_profiling_v1` — 50 labeled intents (Phase 3)
@@ -64,7 +64,7 @@ The reading order for build sessions remains: `CLAUDE.md` → `docs/00` → `doc
 
 ### M3. Capability "independence" claim is false; the Planner needs a dependency DAG
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Docs claim every capability runs standalone with a synthetic `IntentProfile`. In reality:
 - **Flow Tracer** needs a starting symbol (from Cartographer or `focus_keywords`).
@@ -85,7 +85,7 @@ The reading order for build sessions remains: `CLAUDE.md` → `docs/00` → `doc
 
 ### M4. Phase 4 (Experience) is undersized; realistic budget is 10–14 days
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Phase 4 builds: FastAPI with 5 endpoints + SSE protocol + chunk endpoint; Next.js 15 RSC app with URL input + indexing progress + intent capture screen with chip strip + first-impression panel + tour split-pane + streamed claims with verified-badge + retrieval-path chip + mermaid renderer + shiki synchronized code viewer + Q&A box + re-plan flow + considered-and-rejected disclosure (added in Phase 5) + per-opportunity CTAs; plus Playwright e2e + Lighthouse + SSE stability test.
 
@@ -101,7 +101,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### M5. Inconsistent beachhead language between docs/00 and docs/01
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** [docs/00_CLAUDE_BUILD_GUIDE.md](00_CLAUDE_BUILD_GUIDE.md) line 9 still reads *"The beachhead is **junior developers and first-time OSS contributors**."* [docs/01_PROBLEM_AND_SOLUTION.md](01_PROBLEM_AND_SOLUTION.md) has widened to "anyone with a stated purpose." Every phase prompt reads docs/00, so the bucketed framing will leak back into implementation.
 
@@ -115,7 +115,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S1. Mermaid generation is unverifiable and can lie confidently
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** The Teacher emits mermaid diagrams. The Verifier checks claims (text + refs) but **does not** check mermaid structural correctness. A wrong diagram (`A → B → C` when graph is `A → B → D`) is a confident visual lie. Violates principle 1 (truthful over fluent).
 
@@ -127,7 +127,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S2. Per-tour Groq token budget hasn't been calculated; launch concurrency will stall
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** A typical Learn tour: Cartographer ~2k tokens out + Flow Tracer ~3k + Teacher ~4k + Verifier retries ~2k = ~11k+ tokens per tour on the 70B for one user. Groq's 6k TPM cap means **one tour ~exhausts a minute of quota**. Two concurrent users → throttled.
 
@@ -142,7 +142,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S3. Intent Profiler has no edit-loop fallback when chip-strip iteration fails
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** If the Profiler misreads the intent and the user can't articulate the fix in chip-strip terms, the flow has no exit. The docs assume "click a chip to fix" always works.
 
@@ -154,7 +154,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S4. Prompt injection from repo contents isn't acknowledged
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Public repos are adversarial. Docstrings, comments, README sections can contain prompt-injection strings. The Cartographer + Teacher read these as input.
 
@@ -168,7 +168,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S5. The Verifier itself is unverified — grounding-accuracy isn't a real metric until it is
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** "Grounding accuracy ≥ 90%" is measured by trusting Verifier verdicts. If the Verifier is wrong 15% of the time, the measured number is a function of two error rates we can't separate.
 
@@ -180,7 +180,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### S6. CI eval runtime will be miserable; need sampling vs full-matrix split
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Phase 6 says full eval matrix on PR for 3 repos = 15–30 min per PR + Groq quota burn. Dev loop becomes unusable.
 
@@ -194,7 +194,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### W1. Chip-strip natural-language rendering as an explicit task
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Showing `modality: change=0.5, evaluate=0.5` in the chip strip is incomprehensible to users. It needs to render as natural language: *"I'll find quality cleanups in the testing layer and flag what looks fragile, framed for a casual contributor."*
 
@@ -206,7 +206,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### W2. Lane A "rejected reason" is its own LLM task and needs eval coverage
 
-- [ ] **Status:** open
+- [ ] **Status:** open — deferred (Worth tier)
 
 **What's wrong.** Lane A says "we looked at #234 but it touches a hub of fan-in 47" — a generation task with its own failure modes. Currently not in `opportunity_quality_v1`.
 
@@ -218,7 +218,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### W3. Session non-persistence is undefined; should be explicit
 
-- [ ] **Status:** open
+- [ ] **Status:** open — deferred (Worth tier)
 
 **What's wrong.** Closing the tab loses the tour. Re-opening starts fresh. This is fine for v1 but the doc set is silent.
 
@@ -230,7 +230,7 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ### W4. Default plan should include Lane B for generic intents
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Many real users will paste a URL and write "explain this repo" — generic. The default plan (`cartographer + teacher + narrative`) is non-empty but doesn't show the system's strongest moves. Adding lightweight Lane B (untested-hot-code + missing docstrings only) surfaces the obvious quality signals even on a generic intent.
 
@@ -248,7 +248,7 @@ A deeper audit after the first pass surfaced 11 more gaps. Same severity scheme.
 
 ### M6. Failure modes catalog is thin; the architecture is hand-wavy on partial failures
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) has a "Failure modes and cost design" table that covers 8 scenarios. The real-world surface is much wider and several common ones aren't covered:
 
@@ -274,7 +274,7 @@ A deeper audit after the first pass surfaced 11 more gaps. Same severity scheme.
 
 ### M7. Decision Archaeology was added as a capability but Phase 3 doesn't include building it
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** The elastic-intent refactor added Decision Archaeology to the capability library and the agent table in [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md). But [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) Phase 3 task list does not include building it — Phase 3 still describes "Cartographer → Flow Tracer → Teacher". Phase 5 doesn't include it either. So as written, Decision Archaeology is in the schema but never gets built.
 
@@ -291,7 +291,7 @@ Recommendation: option 1 (defer to v0.2). The architecture stays elastic; the im
 
 ### S7. Auth, rate-limiting, and GitHub API token sourcing is undefined — Lane A breaks on day one
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Lane A uses PyGithub to fetch open issues. Unauthenticated GitHub API requests are capped at **60 per hour per IP**. The first 60 users in an hour on launch day all share that quota. Authenticated requests get 5,000/hour but require a token. The docs are silent on:
 
@@ -311,7 +311,7 @@ Recommendation: option 1 (defer to v0.2). The architecture stays elastic; the im
 
 ### S8. The "retrieval-path chip on every claim" claim is too broad
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** [docs/00_CLAUDE_BUILD_GUIDE.md](00_CLAUDE_BUILD_GUIDE.md) and [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) say every claim shows a retrieval path (`vector_search → graph_traverse · 2 hops`). But:
 
@@ -329,7 +329,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### S9. No user-feedback mechanism in v1 — we'll learn nothing outside the eval set
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** The eval set is hand-labeled in `evals/`. After launch, real users will encounter cases that aren't in any eval set. With no feedback mechanism, we can't tell which sections worked vs didn't, which Q&A answers were trusted, which opportunities were acted on. Eval-set quality plateaus quickly without real signal.
 
@@ -341,7 +341,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### S10. Indexing edge cases (Python 2, `.pyi`, `.ipynb`, vendored deps, generated code) are unspecified
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Real Python repos contain more than `.py` files written in Python 3:
 
@@ -359,7 +359,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### S11. Embedding model versioning + migration story is missing
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Embeddings are stored in pgvector for every chunk. If Ollama bumps `nomic-embed-text` (or we switch models for a v0.2 quality boost), the stored embeddings are silently incompatible — new queries get embedded with one model, existing vectors are from another, retrieval quality silently degrades.
 
@@ -371,7 +371,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### S12. Concurrent indexing of the same repo is a race condition
 
-- [ ] **Status:** open
+- [x] **Status:** done in this commit
 
 **What's wrong.** Two users paste the same repo URL within 90 seconds. The arq worker picks up both jobs. Both clone, both parse, both write to Postgres. Without a uniqueness constraint and a row-level lock, you get duplicate chunks, duplicate embeddings, an inconsistent graph adjacency, and possibly a deadlock.
 
@@ -383,7 +383,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### W5. Repo update detection on revisit is undefined
 
-- [ ] **Status:** open
+- [ ] **Status:** open — deferred (Worth tier)
 
 **What's wrong.** A user came to repo `X` last week; the system indexed `X` at SHA `abc123`. This week, `X` is at SHA `def456` (active project, 50 new commits). The user pastes the URL again. Do we re-index automatically, warn them about staleness, or silently use the old index?
 
@@ -395,7 +395,7 @@ The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer c
 
 ### W6. Production deployment story missing — Docker Compose is dev-only
 
-- [ ] **Status:** open
+- [ ] **Status:** open — deferred (Worth tier)
 
 **What's wrong.** [docs/02_TECH_STACK.md](02_TECH_STACK.md) and the build plan describe `docker compose up` for local dev. No story for hosting the v1 demo: Vercel/Railway/fly.io? Where does Postgres run? Where does Ollama run? Ollama notably **cannot easily run on serverless** because of the model weights.
 
@@ -414,7 +414,7 @@ Total monthly cost estimate at idle: $5–15. Document this so reviewers know th
 
 ### W7. Q&A conversation thread / multi-turn — currently each question is independent
 
-- [ ] **Status:** open
+- [ ] **Status:** open — deferred (Worth tier)
 
 **What's wrong.** The Q&A subgraph as designed treats each question as standalone. A user asking *"how does middleware work?"* then *"how does my middleware get registered?"* loses context — the second question's "my" can't refer to the first answer's content. Real users will ask sequential, building questions.
 

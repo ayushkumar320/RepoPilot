@@ -1,16 +1,16 @@
 # Graph Report - RepoPilot  (2026-06-16)
 
 ## Corpus Check
-- 83 files · ~56,514 words
+- 83 files · ~56,965 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 796 nodes · 1504 edges · 54 communities (41 shown, 13 thin omitted)
+- 798 nodes · 1506 edges · 61 communities (47 shown, 14 thin omitted)
 - Extraction: 76% EXTRACTED · 24% INFERRED · 0% AMBIGUOUS · INFERRED: 361 edges (avg confidence: 0.53)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6065ccfc`
+- Built from commit: `31311b66`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -59,9 +59,16 @@
 - [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
 - [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `LLMProvider` - 56 edges
@@ -84,13 +91,13 @@
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/core/src/repopilot_core/llm/provider.py
 - `WorkerSettings` --uses--> `PipelineResult`  [INFERRED]
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/ingestion/src/repopilot_ingestion/pipeline.py
-- `create_app()` --calls--> `get_settings()`  [EXTRACTED]
-  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/settings.py
+- `startup()` --calls--> `get_settings()`  [EXTRACTED]
+  apps/api/src/repopilot_api/jobs/index_repo.py → packages/core/src/repopilot_core/settings.py
 
 ## Import Cycles
 - 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (54 total, 13 thin omitted)
+## Communities (61 total, 14 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.17
@@ -137,8 +144,8 @@ Cohesion: 0.50
 Nodes (3): Constraints, Mandatory order of operations, What to return
 
 ### Community 16 - "Community 16"
-Cohesion: 0.06
-Nodes (67): AsyncClient, BaseSettings, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age (+59 more)
+Cohesion: 0.07
+Nodes (57): AsyncClient, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age, Logical, agent-facing model identifiers. (+49 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.17
@@ -146,11 +153,11 @@ Nodes (11): 00 — Claude Build Guide (Standing Context) *(the contract)*, 01 �
 
 ### Community 18 - "Community 18"
 Cohesion: 0.17
-Nodes (22): RateLimitError, HTTP 429 from a provider — triggers retry/fallback inside the provider., ProviderName, Shared fixtures for the core package's tests., Message, FakeClient, make_provider(), make_response() (+14 more)
+Nodes (20): ProviderName, Shared fixtures for the core package's tests., FakeClient, make_provider(), make_response(), Test double for an LLM provider client., Build an LLMProvider that uses the supplied fakes for every provider., _msgs() (+12 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.14
-Nodes (12): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., configure_logging(), _drop_chunk_content() (+4 more)
+Cohesion: 0.13
+Nodes (14): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., configure_logging(), _drop_chunk_content() (+6 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -161,28 +168,28 @@ Cohesion: 0.11
 Nodes (18): dependencies, next, react, react-dom, devDependencies, @types/node, @types/react, @types/react-dom (+10 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.29
-Nodes (6): Current Build Phase, How to advance the phase, Pending Phase 0 verifications (host-bound, do these on your machine), Phase 0 — what landed, Phase 1 — kickoff checklist, Phase ladder
+Cohesion: 0.22
+Nodes (8): Current Build Phase, How to advance the phase, Phase 0 — what landed, Phase 1 — what landed, Phase 2 — what landed (most recent), Phase 3 — entry checklist (the active block), Phase 3 — kickoff outline (read after entry checklist clears), Phase ladder
 
 ### Community 23 - "Community 23"
 Cohesion: 0.40
 Nodes (4): Quickstart (local dev), Repo layout, RepoPilot, Status
 
 ### Community 25 - "Community 25"
-Cohesion: 0.16
-Nodes (19): CloneResult, LLMProvider, Single entrypoint to every LLM call in the system., Chunk, LLMProvider, Settings, Chunk, LLMProvider (+11 more)
+Cohesion: 0.21
+Nodes (25): BaseSettings, CloneResult, LLMProvider, Single entrypoint to every LLM call in the system., ModuleSource, Chunk, LLMProvider, Settings (+17 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.07
-Nodes (31): ChunkHit, ChunkContent, AsyncEngine, LLMProvider, answer_user_prompt(), Q&A prompt templates.  Three prompts, all under the 2000-token budget from ``doc, _render_chunks(), sufficiency_user_prompt() (+23 more)
+Cohesion: 0.09
+Nodes (24): BaseModel, QAClaim, Types specific to the Q&A subgraph (sufficiency judge + final answer)., A single grounded claim in the Q&A answer., LangGraph nodes + capability library.  Phase 2 surface: the six deterministic to, ChunkContent, ChunkHit, CodeRef (+16 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.08
 Nodes (49): Node, Path, Path, Path, ParsedFile, ParsedSymbol, chunk_file(), _class_header_content() (+41 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.05
-Nodes (74): BaseModel, Claim, Message, AsyncEngine, ChunkContent, LLMProvider, AsyncEngine, ChunkContent (+66 more)
+Cohesion: 0.15
+Nodes (20): AsyncEngine, ChunkContent, LLMProvider, _apply(), _Cache, Claim, _objection_if_rejected(), Per-claim grounding check against ``read_chunks``.  The Verifier is the single l (+12 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.30
@@ -209,16 +216,16 @@ Cohesion: 0.28
 Nodes (8): Any, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, shutdown(), startup(), WorkerSettings
 
 ### Community 46 - "Community 46"
-Cohesion: 0.17
-Nodes (17): EmbeddedChunk, AsyncEngine, Settings, EmbeddedChunk, Batched async embedder over chunks via the central ``LLMProvider``.  The provide, known_head_sha(), make_engine(), persist_index() (+9 more)
+Cohesion: 0.16
+Nodes (17): EmbeddedChunk, AsyncEngine, Settings, known_head_sha(), make_engine(), persist_index(), PersistResult, Persist Phase 1 pipeline output to Postgres + pgvector.  The functions here are (+9 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.11
-Nodes (18): Path, clone_to_tempdir(), parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, remote_head_sha() (+10 more)
+Cohesion: 0.15
+Nodes (14): Path, clone_to_tempdir(), parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, remote_head_sha() (+6 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.43
-Nodes (6): ModuleSource, Path, _iter_python_files(), _path_to_module(), End-to-end Phase 1 pipeline orchestrator.  Wires: clone → parse → chunk → graph, _scan_python_files()
+Cohesion: 0.24
+Nodes (9): Phase 1 — clone -> parse -> chunk -> graph -> embed -> persist., index_repo(), _iter_python_files(), _path_to_module(), End-to-end Phase 1 pipeline orchestrator.  Wires: clone → parse → chunk → graph, Full ingestion pipeline. Idempotent on ``(repo_url, head_sha)``., _scan_python_files(), Phase 1 quality gate: httpx (~50 kLOC) indexes in ≤ 90 s. (+1 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.11
@@ -228,19 +235,43 @@ Nodes (13): Any, ChunkContent, CodeRef, Shared fixtures: stubbed engine + LLMPro
 Cohesion: 0.40
 Nodes (5): github_issues(), Issue, ``github_issues`` — Phase 5 dependency, stubbed in Phase 2.  The signature is lo, Subset of the GitHub issue shape Lane A scores on., Phase 5 will implement; raises until then so Lane A fails loudly.
 
+### Community 51 - "Community 51"
+Cohesion: 0.20
+Nodes (21): Claim, AsyncEngine, ChunkContent, LLMProvider, answer_question(), _Context, _extend_context(), _generate_answer() (+13 more)
+
+### Community 53 - "Community 53"
+Cohesion: 0.15
+Nodes (13): Any, ChunkContent, CodeRef, MonkeyPatch, _chunk(), _patch_tools(), End-to-end Q&A tests against fully stubbed dependencies.  We monkey-patch the th, Returns canned text responses in queue order. (+5 more)
+
+### Community 56 - "Community 56"
+Cohesion: 0.20
+Nodes (14): Any, MonkeyPatch, Verifier tests: JSON parsing, parse-fail rejection (D4), caching (M1)., _StubEngine, _StubProvider, test_parse_verdict_accepts_clean_json(), test_parse_verdict_extracts_json_from_prose(), test_parse_verdict_returns_none_on_garbage() (+6 more)
+
+### Community 57 - "Community 57"
+Cohesion: 0.20
+Nodes (6): Shared core: settings, logging, and the LLMProvider abstraction., Application settings, loaded from environment / `.env` via pydantic-settings., Batched async embedder over chunks via the central ``LLMProvider``.  The provide, Test 5 from the Phase 0 TDD checklist., `.env.example` shipped at the repo root must be a valid pydantic-settings source, test_settings_loads_from_env_example()
+
+### Community 58 - "Community 58"
+Cohesion: 0.29
+Nodes (6): ChunkHit, AsyncEngine, LLMProvider, ``vector_search`` — pgvector cosine k-NN over indexed chunks.  Embeds the query, Return the top-``k`` chunks for ``query`` in ``repo_id``., vector_search()
+
+### Community 59 - "Community 59"
+Cohesion: 0.60
+Nodes (5): ChunkContent, answer_user_prompt(), Q&A prompt templates.  Three prompts, all under the 2000-token budget from ``doc, _render_chunks(), sufficiency_user_prompt()
+
 ## Knowledge Gaps
-- **174 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+169 more)
+- **177 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+172 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `LLMProvider` connect `Community 25` to `Community 32`, `Community 36`, `Community 45`, `Community 46`, `Community 16`, `Community 48`, `Community 18`, `Community 29`?**
+- **Why does `LLMProvider` connect `Community 25` to `Community 32`, `Community 36`, `Community 45`, `Community 46`, `Community 16`, `Community 18`, `Community 51`, `Community 58`?**
   _High betweenness centrality (0.115) - this node is a cross-community bridge._
-- **Why does `Settings` connect `Community 16` to `Community 32`, `Community 36`, `Community 46`, `Community 48`, `Community 18`, `Community 25`?**
+- **Why does `Settings` connect `Community 25` to `Community 36`, `Community 46`, `Community 16`, `Community 18`, `Community 19`, `Community 57`?**
   _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `ModelId` connect `Community 16` to `Community 32`, `Community 25`, `Community 18`, `Community 46`?**
+- **Why does `ModelId` connect `Community 16` to `Community 32`, `Community 46`, `Community 18`, `Community 51`, `Community 25`?**
   _High betweenness centrality (0.054) - this node is a cross-community bridge._
 - **Are the 48 inferred relationships involving `LLMProvider` (e.g. with `Any` and `ChunkHit`) actually correct?**
   _`LLMProvider` has 48 INFERRED edges - model-reasoned connections that need verification._

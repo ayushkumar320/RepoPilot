@@ -20,7 +20,7 @@
     "semantic_hash": ""
   },
   "docs/00_CLAUDE_BUILD_GUIDE.md": {
-    "mtime": 1781531714.3065135,
+    "mtime": 1781502539.9904718,
     "ast_hash": "ea7397a07ee952b2e134509d40df3d60",
     "semantic_hash": ""
   },
@@ -30,23 +30,23 @@
     "semantic_hash": ""
   },
   "docs/02_TECH_STACK.md": {
-    "mtime": 1781531714.30686,
+    "mtime": 1781502441.067117,
     "ast_hash": "00b911f7b578906134964b6634e1678b",
     "semantic_hash": ""
   },
   "docs/03_ARCHITECTURE.md": {
-    "mtime": 1781531714.3074753,
-    "ast_hash": "a304fc15153fa8d0851f6c83ac28d5a2",
+    "mtime": 1781531695.2312915,
+    "ast_hash": "cb74969e45d5ab3ac35359d519bdf81d",
     "semantic_hash": ""
   },
   "docs/04_BUILD_PLAN.md": {
-    "mtime": 1781531714.307943,
-    "ast_hash": "881b560fc53fcb61895a6f31a70bf43b",
+    "mtime": 1781531754.7512724,
+    "ast_hash": "3f2c84caf044da6d350a275c3c672e66",
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781531714.3083994,
-    "ast_hash": "fdfd0e85be6c72278bcf3d18f12f00da",
+    "mtime": 1781531760.3945997,
+    "ast_hash": "a80bfefc7126752dbc2f94b83cfe2dcc",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -62,11 +62,6 @@
   ".claude/commands/graph-update.md": {
     "mtime": 1781376716.9783056,
     "ast_hash": "18f582dd4a26a2f2c38d72968a060ffe",
-    "semantic_hash": ""
-  },
-  "docs/06_FUTURE_IMPROVEMENTS.md": {
-    "mtime": 1781531714.3086507,
-    "ast_hash": "34b641284982b1328dd11a29d5212547",
     "semantic_hash": ""
   },
   "docs/README.md": {

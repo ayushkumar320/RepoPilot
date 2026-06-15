@@ -38,8 +38,6 @@ jobs:
         run: uv run mypy packages apps
 
       - name: Tests + coverage (≥80%)
-        env:
-          REPOPILOT_ENV: test
         run: uv run pytest -m "not slow and not integration" --cov-fail-under=80
 
       - name: Gitleaks

@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: repopilot
+      POSTGRES_PASSWORD: repopilot
+      POSTGRES_DB: repopilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U repopilot -d repopilot"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./infra/ollama/entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    environment:
+      OLLAMA_KEEP_ALIVE: "24h"
+      OLLAMA_PRELOAD_MODELS: "qwen2.5-coder:7b nomic-embed-text"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q qwen2.5-coder"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 120s
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_models:

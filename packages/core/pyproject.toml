@@ -1,0 +1,19 @@
+[project]
+name = "repopilot-core"
+version = "0.0.1"
+description = "Shared core: settings, logging, and the single LLMProvider all agents go through."
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "pydantic>=2.7",
+    "pydantic-settings>=2.4",
+    "structlog>=24.4",
+    "httpx>=0.27",
+    "tenacity>=9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/repopilot_core"]

@@ -1,0 +1,129 @@
+[project]
+name = "repopilot"
+version = "0.0.1"
+description = "RepoPilot — purpose-driven, grounded codebase onboarding tours."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "Proprietary" }
+
+[tool.uv.workspace]
+members = [
+    "packages/core",
+    "packages/ingestion",
+    "packages/agents",
+    "packages/evals",
+    "apps/api",
+]
+
+[tool.uv.sources]
+repopilot-core = { workspace = true }
+repopilot-ingestion = { workspace = true }
+repopilot-agents = { workspace = true }
+repopilot-evals = { workspace = true }
+repopilot-api = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6.0",
+    "mypy>=1.11.0",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=5.0.0",
+    "respx>=0.21.1",
+    "pre-commit>=3.8.0",
+]
+
+# ────────────────────────────────────────────────────────────────────────────
+# ruff
+# ────────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["packages/*/src", "apps/*/src", "apps/*"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",             # isort
+    "UP",            # pyupgrade
+    "B",             # flake8-bugbear
+    "SIM",           # flake8-simplify
+    "ASYNC",         # async best-practices
+    "RUF",           # ruff-specific
+]
+ignore = [
+    "E501",          # line length — formatter handles it
+    "B008",          # function call in argument default (FastAPI uses this)
+    "RUF001",        # ambiguous unicode in strings — docs use en dashes intentionally
+    "RUF002",        # ambiguous unicode in docstrings — same reason
+    "RUF003",        # ambiguous unicode in comments — same reason
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["B011", "SIM117"]
+
+# ────────────────────────────────────────────────────────────────────────────
+# mypy
+# ────────────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+disallow_untyped_decorators = false   # FastAPI / pytest decorators
+plugins = ["pydantic.mypy"]
+mypy_path = [
+    "packages/core/src",
+    "packages/ingestion/src",
+    "packages/agents/src",
+    "packages/evals/src",
+    "apps/api/src",
+]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "*.tests.*"]
+disallow_untyped_defs = false
+
+# ────────────────────────────────────────────────────────────────────────────
+# pytest
+# ────────────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = [
+    "packages/core/tests",
+    "packages/ingestion/tests",
+    "packages/agents/tests",
+    "packages/evals/tests",
+    "apps/api/tests",
+]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=repopilot_core",
+    "--cov-report=term-missing",
+    "--cov-fail-under=80",
+]
+asyncio_mode = "auto"
+markers = [
+    "slow: opt-in slow tests (e.g., full httpx index) — skipped by default in CI fast lane.",
+    "integration: requires live services (Postgres, Ollama, Redis).",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:pydantic.*",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["packages/core/src", "packages/ingestion/src", "packages/agents/src"]
+omit = ["**/tests/**", "**/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

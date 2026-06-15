@@ -4,6 +4,1834 @@
   "graph": {},
   "nodes": [
     {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_api_init",
+      "community": 19,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "FastAPI app entrypoint. Endpoints are added in Phase 4.",
+      "file_type": "rationale",
+      "source_file": "apps/api/src/repopilot_api/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_api_init_rationale_1",
+      "community": 19,
+      "norm_label": "fastapi app entrypoint. endpoints are added in phase 4."
+    },
+    {
+      "label": "app.py",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_api_app",
+      "community": 19,
+      "norm_label": "app.py"
+    },
+    {
+      "label": "create_app()",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "repopilot_api_app_create_app",
+      "community": 19,
+      "norm_label": "create_app()"
+    },
+    {
+      "label": "FastAPI",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "fastapi",
+      "community": 19,
+      "norm_label": "fastapi"
+    },
+    {
+      "label": "FastAPI scaffold \u2014 health-check only in Phase 0.",
+      "file_type": "rationale",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_api_app_rationale_1",
+      "community": 19,
+      "norm_label": "fastapi scaffold \u2014 health-check only in phase 0."
+    },
+    {
+      "label": "test_health.py",
+      "file_type": "code",
+      "source_file": "apps/api/tests/test_health.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_health",
+      "community": 19,
+      "norm_label": "test_health.py"
+    },
+    {
+      "label": "test_health_returns_ok()",
+      "file_type": "code",
+      "source_file": "apps/api/tests/test_health.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "tests_test_health_test_health_returns_ok",
+      "community": 19,
+      "norm_label": "test_health_returns_ok()"
+    },
+    {
+      "label": "next.config.mjs",
+      "file_type": "code",
+      "source_file": "apps/web/next.config.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "web_next_config",
+      "community": 34,
+      "norm_label": "next.config.mjs"
+    },
+    {
+      "label": "nextConfig",
+      "file_type": "code",
+      "source_file": "apps/web/next.config.mjs",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "web_next_config_nextconfig",
+      "community": 34,
+      "norm_label": "nextconfig"
+    },
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "web_package",
+      "community": 21,
+      "norm_label": "package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "web_package_name",
+      "community": 21,
+      "norm_label": "name"
+    },
+    {
+      "label": "private",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "web_package_private",
+      "community": 21,
+      "norm_label": "private"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "web_package_version",
+      "community": 21,
+      "norm_label": "version"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "web_package_scripts",
+      "community": 21,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "dev",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "web_package_scripts_dev",
+      "community": 21,
+      "norm_label": "dev"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "web_package_scripts_build",
+      "community": 21,
+      "norm_label": "build"
+    },
+    {
+      "label": "start",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "web_package_scripts_start",
+      "community": 21,
+      "norm_label": "start"
+    },
+    {
+      "label": "lint",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "web_package_scripts_lint",
+      "community": 21,
+      "norm_label": "lint"
+    },
+    {
+      "label": "typecheck",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "web_package_scripts_typecheck",
+      "community": 21,
+      "norm_label": "typecheck"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "web_package_dependencies",
+      "community": 21,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "next",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "web_package_dependencies_next",
+      "community": 21,
+      "norm_label": "next"
+    },
+    {
+      "label": "react",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "web_package_dependencies_react",
+      "community": 21,
+      "norm_label": "react"
+    },
+    {
+      "label": "react-dom",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "web_package_dependencies_react_dom",
+      "community": 21,
+      "norm_label": "react-dom"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "web_package_devdependencies",
+      "community": 21,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@types/node",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "web_package_devdependencies_types_node",
+      "community": 21,
+      "norm_label": "@types/node"
+    },
+    {
+      "label": "@types/react",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "web_package_devdependencies_types_react",
+      "community": 21,
+      "norm_label": "@types/react"
+    },
+    {
+      "label": "@types/react-dom",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "web_package_devdependencies_types_react_dom",
+      "community": 21,
+      "norm_label": "@types/react-dom"
+    },
+    {
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "web_package_devdependencies_typescript",
+      "community": 21,
+      "norm_label": "typescript"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_layout",
+      "community": 24,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "app_layout_metadata",
+      "community": 24,
+      "norm_label": "metadata"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "app_layout_rootlayout",
+      "community": 24,
+      "norm_label": "rootlayout()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_page",
+      "community": 26,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "Home()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_page_home",
+      "community": 26,
+      "norm_label": "home()"
+    },
+    {
+      "label": "tsconfig.json",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "web_tsconfig",
+      "community": 20,
+      "norm_label": "tsconfig.json"
+    },
+    {
+      "label": "compilerOptions",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions",
+      "community": 20,
+      "norm_label": "compileroptions"
+    },
+    {
+      "label": "target",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_target",
+      "community": 20,
+      "norm_label": "target"
+    },
+    {
+      "label": "lib",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_lib",
+      "community": 20,
+      "norm_label": "lib"
+    },
+    {
+      "label": "allowJs",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_allowjs",
+      "community": 20,
+      "norm_label": "allowjs"
+    },
+    {
+      "label": "skipLibCheck",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_skiplibcheck",
+      "community": 20,
+      "norm_label": "skiplibcheck"
+    },
+    {
+      "label": "strict",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_strict",
+      "community": 20,
+      "norm_label": "strict"
+    },
+    {
+      "label": "noEmit",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_noemit",
+      "community": 20,
+      "norm_label": "noemit"
+    },
+    {
+      "label": "esModuleInterop",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_esmoduleinterop",
+      "community": 20,
+      "norm_label": "esmoduleinterop"
+    },
+    {
+      "label": "module",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_module",
+      "community": 20,
+      "norm_label": "module"
+    },
+    {
+      "label": "moduleResolution",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_moduleresolution",
+      "community": 20,
+      "norm_label": "moduleresolution"
+    },
+    {
+      "label": "resolveJsonModule",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_resolvejsonmodule",
+      "community": 20,
+      "norm_label": "resolvejsonmodule"
+    },
+    {
+      "label": "isolatedModules",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_isolatedmodules",
+      "community": 20,
+      "norm_label": "isolatedmodules"
+    },
+    {
+      "label": "jsx",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_jsx",
+      "community": 20,
+      "norm_label": "jsx"
+    },
+    {
+      "label": "incremental",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_incremental",
+      "community": 20,
+      "norm_label": "incremental"
+    },
+    {
+      "label": "plugins",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_plugins",
+      "community": 20,
+      "norm_label": "plugins"
+    },
+    {
+      "label": "paths",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "web_tsconfig_compileroptions_paths",
+      "community": 20,
+      "norm_label": "paths"
+    },
+    {
+      "label": "@/*",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "web_tsconfig_paths",
+      "community": 20,
+      "norm_label": "@/*"
+    },
+    {
+      "label": "include",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "web_tsconfig_include",
+      "community": 20,
+      "norm_label": "include"
+    },
+    {
+      "label": "exclude",
+      "file_type": "code",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "web_tsconfig_exclude",
+      "community": 20,
+      "norm_label": "exclude"
+    },
+    {
+      "label": "entrypoint.sh",
+      "file_type": "code",
+      "source_file": "infra/ollama/entrypoint.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "ollama_entrypoint",
+      "community": 28,
+      "norm_label": "entrypoint.sh"
+    },
+    {
+      "label": "entrypoint.sh script",
+      "file_type": "code",
+      "source_file": "infra/ollama/entrypoint.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "users_ayush_projects_codebasearchiologist_infra_ollama_entrypoint_sh__entry",
+      "community": 28,
+      "norm_label": "entrypoint.sh script"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/agents/src/repopilot_agents/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_agents_init",
+      "community": 29,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "Phase 2+ deliverables: Intent Profiler, Capability Planner, Cartographer, etc.",
+      "file_type": "rationale",
+      "source_file": "packages/agents/src/repopilot_agents/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_agents_init_rationale_1",
+      "community": 29,
+      "norm_label": "phase 2+ deliverables: intent profiler, capability planner, cartographer, etc."
+    },
+    {
+      "label": "test_agents_imports.py",
+      "file_type": "code",
+      "source_file": "packages/agents/tests/test_agents_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_agents_imports",
+      "community": 32,
+      "norm_label": "test_agents_imports.py"
+    },
+    {
+      "label": "test_agents_package_imports()",
+      "file_type": "code",
+      "source_file": "packages/agents/tests/test_agents_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_agents_imports_test_agents_package_imports",
+      "community": 32,
+      "norm_label": "test_agents_package_imports()"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_init",
+      "community": 19,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "Shared core: settings, logging, and the LLMProvider abstraction.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_init_rationale_1",
+      "community": 19,
+      "norm_label": "shared core: settings, logging, and the llmprovider abstraction."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_init",
+      "community": 27,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "The single doorway to LLM calls. Agents import `LLMProvider` and `ModelId` only.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_init_rationale_1",
+      "community": 27,
+      "norm_label": "the single doorway to llm calls. agents import `llmprovider` and `modelid` only."
+    },
+    {
+      "label": "models.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_models",
+      "community": 16,
+      "norm_label": "models.py"
+    },
+    {
+      "label": "ProviderName",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "llm_models_providername",
+      "community": 16,
+      "norm_label": "providername"
+    },
+    {
+      "label": "StrEnum",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "strenum",
+      "community": 16,
+      "norm_label": "strenum"
+    },
+    {
+      "label": "ModelId",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "llm_models_modelid",
+      "community": 16,
+      "norm_label": "modelid"
+    },
+    {
+      "label": "ModelBinding",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "llm_models_modelbinding",
+      "community": 16,
+      "norm_label": "modelbinding"
+    },
+    {
+      "label": "Logical model identifiers and their physical-model resolution per provider.  Age",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_models_rationale_1",
+      "community": 16,
+      "norm_label": "logical model identifiers and their physical-model resolution per provider.  age"
+    },
+    {
+      "label": "Logical, agent-facing model identifiers.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "llm_models_rationale_22",
+      "community": 16,
+      "norm_label": "logical, agent-facing model identifiers."
+    },
+    {
+      "label": "The concrete model name to send to a given provider for one `ModelId`.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "llm_models_rationale_38",
+      "community": 16,
+      "norm_label": "the concrete model name to send to a given provider for one `modelid`."
+    },
+    {
+      "label": "provider.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_provider",
+      "community": 16,
+      "norm_label": "provider.py"
+    },
+    {
+      "label": "ProviderError",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L50",
+      "_origin": "ast",
+      "id": "llm_provider_providererror",
+      "community": 16,
+      "norm_label": "providererror"
+    },
+    {
+      "label": "RuntimeError",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "runtimeerror",
+      "community": 16,
+      "norm_label": "runtimeerror"
+    },
+    {
+      "label": "RateLimitError",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "llm_provider_ratelimiterror",
+      "community": 16,
+      "norm_label": "ratelimiterror"
+    },
+    {
+      "label": "Message",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "llm_provider_message",
+      "community": 16,
+      "norm_label": "message"
+    },
+    {
+      "label": ".to_openai()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "llm_provider_message_to_openai",
+      "community": 16,
+      "norm_label": ".to_openai()"
+    },
+    {
+      "label": "LLMResponse",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "llm_provider_llmresponse",
+      "community": 16,
+      "norm_label": "llmresponse"
+    },
+    {
+      "label": ".total_tokens()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "llm_provider_llmresponse_total_tokens",
+      "community": 16,
+      "norm_label": ".total_tokens()"
+    },
+    {
+      "label": "_SQLiteCache",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "llm_provider_sqlitecache",
+      "community": 16,
+      "norm_label": "_sqlitecache"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "llm_provider_sqlitecache_init",
+      "community": 16,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": "Path",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "community": 16,
+      "norm_label": "path"
+    },
+    {
+      "label": "._connect()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "llm_provider_sqlitecache_connect",
+      "community": 16,
+      "norm_label": "._connect()"
+    },
+    {
+      "label": "Connection",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "connection",
+      "community": 16,
+      "norm_label": "connection"
+    },
+    {
+      "label": ".get()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L116",
+      "_origin": "ast",
+      "id": "llm_provider_sqlitecache_get",
+      "community": 16,
+      "norm_label": ".get()"
+    },
+    {
+      "label": ".put()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L138",
+      "_origin": "ast",
+      "id": "llm_provider_sqlitecache_put",
+      "community": 16,
+      "norm_label": ".put()"
+    },
+    {
+      "label": "_cache_key()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "llm_provider_cache_key",
+      "community": 16,
+      "norm_label": "_cache_key()"
+    },
+    {
+      "label": "ModelId",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "modelid",
+      "community": 16,
+      "norm_label": "modelid"
+    },
+    {
+      "label": "Any",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "community": 16,
+      "norm_label": "any"
+    },
+    {
+      "label": "_backoff_delay()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "llm_provider_backoff_delay",
+      "community": 18,
+      "norm_label": "_backoff_delay()"
+    },
+    {
+      "label": "_BaseClient",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L181",
+      "_origin": "ast",
+      "id": "llm_provider_baseclient",
+      "community": 16,
+      "norm_label": "_baseclient"
+    },
+    {
+      "label": ".chat()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "llm_provider_baseclient_chat",
+      "community": 16,
+      "norm_label": ".chat()"
+    },
+    {
+      "label": "ModelBinding",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "modelbinding",
+      "community": 16,
+      "norm_label": "modelbinding"
+    },
+    {
+      "label": "_OpenAICompatibleClient",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L195",
+      "_origin": "ast",
+      "id": "llm_provider_openaicompatibleclient",
+      "community": 16,
+      "norm_label": "_openaicompatibleclient"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "_origin": "ast",
+      "id": "llm_provider_openaicompatibleclient_init",
+      "community": 16,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": "ProviderName",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "_origin": "ast",
+      "id": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "community": 16,
+      "norm_label": "providername"
+    },
+    {
+      "label": "AsyncClient",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "_origin": "ast",
+      "id": "asyncclient",
+      "community": 16,
+      "norm_label": "asyncclient"
+    },
+    {
+      "label": ".chat()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "_origin": "ast",
+      "id": "llm_provider_openaicompatibleclient_chat",
+      "community": 16,
+      "norm_label": ".chat()"
+    },
+    {
+      "label": "_OllamaClient",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L246",
+      "_origin": "ast",
+      "id": "llm_provider_ollamaclient",
+      "community": 16,
+      "norm_label": "_ollamaclient"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L251",
+      "_origin": "ast",
+      "id": "llm_provider_ollamaclient_init",
+      "community": 16,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": ".chat()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "_origin": "ast",
+      "id": "llm_provider_ollamaclient_chat",
+      "community": 16,
+      "norm_label": ".chat()"
+    },
+    {
+      "label": "LLMProvider",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L289",
+      "_origin": "ast",
+      "id": "llm_provider_llmprovider",
+      "community": 16,
+      "norm_label": "llmprovider"
+    },
+    {
+      "label": ".build()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "_origin": "ast",
+      "id": "llm_provider_llmprovider_build",
+      "community": 16,
+      "norm_label": ".build()"
+    },
+    {
+      "label": "Settings",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "_origin": "ast",
+      "id": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "community": 16,
+      "norm_label": "settings"
+    },
+    {
+      "label": "Self",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "_origin": "ast",
+      "id": "self",
+      "community": 16,
+      "norm_label": "self"
+    },
+    {
+      "label": ".aclose()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L331",
+      "_origin": "ast",
+      "id": "llm_provider_llmprovider_aclose",
+      "community": 16,
+      "norm_label": ".aclose()"
+    },
+    {
+      "label": ".generate()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "_origin": "ast",
+      "id": "llm_provider_llmprovider_generate",
+      "community": 16,
+      "norm_label": ".generate()"
+    },
+    {
+      "label": "._call_with_429_retry()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "_origin": "ast",
+      "id": "llm_provider_llmprovider_call_with_429_retry",
+      "community": 16,
+      "norm_label": "._call_with_429_retry()"
+    },
+    {
+      "label": "The single LLMProvider every agent goes through.  Responsibilities (Phase 0 deli",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_1",
+      "community": 16,
+      "norm_label": "the single llmprovider every agent goes through.  responsibilities (phase 0 deli"
+    },
+    {
+      "label": "All providers in the fallback chain failed.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L51",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_51",
+      "community": 16,
+      "norm_label": "all providers in the fallback chain failed."
+    },
+    {
+      "label": "HTTP 429 from a provider \u2014 triggers retry/fallback inside the provider.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_55",
+      "community": 16,
+      "norm_label": "http 429 from a provider \u2014 triggers retry/fallback inside the provider."
+    },
+    {
+      "label": "Provider-agnostic response shape.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_69",
+      "community": 16,
+      "norm_label": "provider-agnostic response shape."
+    },
+    {
+      "label": "Thread-safe SQLite cache keyed on the canonical request hash.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_88",
+      "community": 16,
+      "norm_label": "thread-safe sqlite cache keyed on the canonical request hash."
+    },
+    {
+      "label": "Exponential backoff with full jitter. attempt=0 is the first retry.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L173",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_173",
+      "community": 18,
+      "norm_label": "exponential backoff with full jitter. attempt=0 is the first retry."
+    },
+    {
+      "label": "Common interface for provider HTTP shims.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L182",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_182",
+      "community": 16,
+      "norm_label": "common interface for provider http shims."
+    },
+    {
+      "label": "Speaks the OpenAI chat-completions shape. Used for Groq and Cerebras.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L196",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_196",
+      "community": 16,
+      "norm_label": "speaks the openai chat-completions shape. used for groq and cerebras."
+    },
+    {
+      "label": "Native Ollama API client.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L247",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_247",
+      "community": 16,
+      "norm_label": "native ollama api client."
+    },
+    {
+      "label": "Single entrypoint to every LLM call in the system.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L290",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_290",
+      "community": 16,
+      "norm_label": "single entrypoint to every llm call in the system."
+    },
+    {
+      "label": "Default wiring used by the app. Tests pass `clients` for full control.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L308",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_308",
+      "community": 16,
+      "norm_label": "default wiring used by the app. tests pass `clients` for full control."
+    },
+    {
+      "label": "Generate a completion. Hits cache first; otherwise walks the fallback chain.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L343",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_343",
+      "community": 16,
+      "norm_label": "generate a completion. hits cache first; otherwise walks the fallback chain."
+    },
+    {
+      "label": "Per-binding 429 retry loop with exponential backoff + jitter.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L400",
+      "_origin": "ast",
+      "id": "llm_provider_rationale_400",
+      "community": 16,
+      "norm_label": "per-binding 429 retry loop with exponential backoff + jitter."
+    },
+    {
+      "label": "logging.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_logging",
+      "community": 19,
+      "norm_label": "logging.py"
+    },
+    {
+      "label": "_drop_chunk_content()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "repopilot_core_logging_drop_chunk_content",
+      "community": 19,
+      "norm_label": "_drop_chunk_content()"
+    },
+    {
+      "label": "Any",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "packages_core_src_repopilot_core_logging_py_any",
+      "community": 19,
+      "norm_label": "any"
+    },
+    {
+      "label": "EventDict",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "eventdict",
+      "community": 19,
+      "norm_label": "eventdict"
+    },
+    {
+      "label": "configure_logging()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "repopilot_core_logging_configure_logging",
+      "community": 19,
+      "norm_label": "configure_logging()"
+    },
+    {
+      "label": "Structlog setup: JSON renderer in prod/CI, human-friendly renderer in dev/tests.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_logging_rationale_1",
+      "community": 19,
+      "norm_label": "structlog setup: json renderer in prod/ci, human-friendly renderer in dev/tests."
+    },
+    {
+      "label": "Strip any field carrying raw repo content. Logs must never persist source code.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "repopilot_core_logging_rationale_16",
+      "community": 19,
+      "norm_label": "strip any field carrying raw repo content. logs must never persist source code."
+    },
+    {
+      "label": "Wire up structlog. Idempotent \u2014 safe to call from app startup and from tests.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "repopilot_core_logging_rationale_23",
+      "community": 19,
+      "norm_label": "wire up structlog. idempotent \u2014 safe to call from app startup and from tests."
+    },
+    {
+      "label": "settings.py",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_settings",
+      "community": 19,
+      "norm_label": "settings.py"
+    },
+    {
+      "label": "Settings",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "repopilot_core_settings_settings",
+      "community": 16,
+      "norm_label": "settings"
+    },
+    {
+      "label": "BaseSettings",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "basesettings",
+      "community": 16,
+      "norm_label": "basesettings"
+    },
+    {
+      "label": "get_settings()",
+      "file_type": "code",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "repopilot_core_settings_get_settings",
+      "community": 19,
+      "norm_label": "get_settings()"
+    },
+    {
+      "label": "Application settings, loaded from environment / `.env` via pydantic-settings.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_core_settings_rationale_1",
+      "community": 19,
+      "norm_label": "application settings, loaded from environment / `.env` via pydantic-settings."
+    },
+    {
+      "label": "Single source of runtime configuration.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "repopilot_core_settings_rationale_13",
+      "community": 16,
+      "norm_label": "single source of runtime configuration."
+    },
+    {
+      "label": "Cached settings accessor. Tests should call `get_settings.cache_clear()`.",
+      "file_type": "rationale",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "repopilot_core_settings_rationale_58",
+      "community": 19,
+      "norm_label": "cached settings accessor. tests should call `get_settings.cache_clear()`."
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/core/tests/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_init",
+      "community": 35,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "conftest.py",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_conftest",
+      "community": 18,
+      "norm_label": "conftest.py"
+    },
+    {
+      "label": "_reset_settings_cache()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "tests_conftest_reset_settings_cache",
+      "community": 18,
+      "norm_label": "_reset_settings_cache()"
+    },
+    {
+      "label": "tmp_settings()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "tests_conftest_tmp_settings",
+      "community": 16,
+      "norm_label": "tmp_settings()"
+    },
+    {
+      "label": "Path",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "packages_core_tests_conftest_py_path",
+      "community": 16,
+      "norm_label": "path"
+    },
+    {
+      "label": "Settings",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "packages_core_tests_conftest_py_settings",
+      "community": 16,
+      "norm_label": "settings"
+    },
+    {
+      "label": "FakeClient",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "tests_conftest_fakeclient",
+      "community": 18,
+      "norm_label": "fakeclient"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "tests_conftest_fakeclient_init",
+      "community": 18,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": "ProviderName",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "packages_core_tests_conftest_py_providername",
+      "community": 16,
+      "norm_label": "providername"
+    },
+    {
+      "label": ".chat()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "tests_conftest_fakeclient_chat",
+      "community": 18,
+      "norm_label": ".chat()"
+    },
+    {
+      "label": "make_provider()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "tests_conftest_make_provider",
+      "community": 18,
+      "norm_label": "make_provider()"
+    },
+    {
+      "label": "LLMProvider",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "llmprovider",
+      "community": 16,
+      "norm_label": "llmprovider"
+    },
+    {
+      "label": "make_response()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "tests_conftest_make_response",
+      "community": 18,
+      "norm_label": "make_response()"
+    },
+    {
+      "label": "LLMResponse",
+      "file_type": "code",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "llmresponse",
+      "community": 16,
+      "norm_label": "llmresponse"
+    },
+    {
+      "label": "Shared fixtures for the core package's tests.",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_conftest_rationale_1",
+      "community": 18,
+      "norm_label": "shared fixtures for the core package's tests."
+    },
+    {
+      "label": "Test double for an LLM provider client.",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "tests_conftest_rationale_45",
+      "community": 18,
+      "norm_label": "test double for an llm provider client."
+    },
+    {
+      "label": "Build an LLMProvider that uses the supplied fakes for every provider.",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "tests_conftest_rationale_67",
+      "community": 18,
+      "norm_label": "build an llmprovider that uses the supplied fakes for every provider."
+    },
+    {
+      "label": "test_llm_provider.py",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider",
+      "community": 18,
+      "norm_label": "test_llm_provider.py"
+    },
+    {
+      "label": "_msgs()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_msgs",
+      "community": 18,
+      "norm_label": "_msgs()"
+    },
+    {
+      "label": "Message",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "message",
+      "community": 18,
+      "norm_label": "message"
+    },
+    {
+      "label": "test_llm_cache_hit_avoids_api_call()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "community": 18,
+      "norm_label": "test_llm_cache_hit_avoids_api_call()"
+    },
+    {
+      "label": "test_llm_429_backoff_retries()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "community": 18,
+      "norm_label": "test_llm_429_backoff_retries()"
+    },
+    {
+      "label": "test_backoff_delay_is_bounded()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_backoff_delay_is_bounded",
+      "community": 18,
+      "norm_label": "test_backoff_delay_is_bounded()"
+    },
+    {
+      "label": "test_llm_forced_429_storm_falls_back_to_ollama()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L84",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "community": 18,
+      "norm_label": "test_llm_forced_429_storm_falls_back_to_ollama()"
+    },
+    {
+      "label": "test_llm_chain_exhausted_raises_provider_error()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L137",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "community": 18,
+      "norm_label": "test_llm_chain_exhausted_raises_provider_error()"
+    },
+    {
+      "label": "test_llm_token_counter_increments()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L158",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "community": 18,
+      "norm_label": "test_llm_token_counter_increments()"
+    },
+    {
+      "label": "test_ollama_only_models_skip_groq()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L177",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "community": 18,
+      "norm_label": "test_ollama_only_models_skip_groq()"
+    },
+    {
+      "label": "test_real_httpx_429_path()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L200",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_test_real_httpx_429_path",
+      "community": 18,
+      "norm_label": "test_real_httpx_429_path()"
+    },
+    {
+      "label": "Phase 0 TDD tests 1\u20134 for `LLMProvider`.  Each test is one of the gates from `do",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_rationale_1",
+      "community": 18,
+      "norm_label": "phase 0 tdd tests 1\u20134 for `llmprovider`.  each test is one of the gates from `do"
+    },
+    {
+      "label": "Groq is 429ing indefinitely; Cerebras is 429ing indefinitely.     The provider m",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_rationale_85",
+      "community": 18,
+      "norm_label": "groq is 429ing indefinitely; cerebras is 429ing indefinitely.     the provider m"
+    },
+    {
+      "label": "VERIFIER and EMBEDDINGS resolve to Ollama only \u2014 Groq must not be touched.",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L178",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_rationale_178",
+      "community": 18,
+      "norm_label": "verifier and embeddings resolve to ollama only \u2014 groq must not be touched."
+    },
+    {
+      "label": "End-to-end with a real httpx client and respx mocks for the HTTP layer.      Thi",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L201",
+      "_origin": "ast",
+      "id": "tests_test_llm_provider_rationale_201",
+      "community": 18,
+      "norm_label": "end-to-end with a real httpx client and respx mocks for the http layer.      thi"
+    },
+    {
+      "label": "test_settings.py",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_settings",
+      "community": 19,
+      "norm_label": "test_settings.py"
+    },
+    {
+      "label": "test_settings_loads_from_env_example()",
+      "file_type": "code",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "tests_test_settings_test_settings_loads_from_env_example",
+      "community": 19,
+      "norm_label": "test_settings_loads_from_env_example()"
+    },
+    {
+      "label": "Test 5 from the Phase 0 TDD checklist.",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_settings_rationale_1",
+      "community": 19,
+      "norm_label": "test 5 from the phase 0 tdd checklist."
+    },
+    {
+      "label": "`.env.example` shipped at the repo root must be a valid pydantic-settings source",
+      "file_type": "rationale",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "tests_test_settings_rationale_11",
+      "community": 19,
+      "norm_label": "`.env.example` shipped at the repo root must be a valid pydantic-settings source"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/evals/src/repopilot_evals/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_evals_init",
+      "community": 30,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "Datasets and runners are added as each phase needs them (Phase 2+).",
+      "file_type": "rationale",
+      "source_file": "packages/evals/src/repopilot_evals/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_evals_init_rationale_1",
+      "community": 30,
+      "norm_label": "datasets and runners are added as each phase needs them (phase 2+)."
+    },
+    {
+      "label": "test_evals_imports.py",
+      "file_type": "code",
+      "source_file": "packages/evals/tests/test_evals_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_evals_imports",
+      "community": 33,
+      "norm_label": "test_evals_imports.py"
+    },
+    {
+      "label": "test_evals_package_imports()",
+      "file_type": "code",
+      "source_file": "packages/evals/tests/test_evals_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_evals_imports_test_evals_package_imports",
+      "community": 33,
+      "norm_label": "test_evals_package_imports()"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_ingestion_init",
+      "community": 31,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "Phase 1 deliverables land here: clone, parse, chunk, graph, embed, persist.",
+      "file_type": "rationale",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "repopilot_ingestion_init_rationale_1",
+      "community": 31,
+      "norm_label": "phase 1 deliverables land here: clone, parse, chunk, graph, embed, persist."
+    },
+    {
+      "label": "test_ingestion_imports.py",
+      "file_type": "code",
+      "source_file": "packages/ingestion/tests/test_ingestion_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_ingestion_imports",
+      "community": 25,
+      "norm_label": "test_ingestion_imports.py"
+    },
+    {
+      "label": "test_ingestion_package_imports()",
+      "file_type": "code",
+      "source_file": "packages/ingestion/tests/test_ingestion_imports.py",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "tests_test_ingestion_imports_test_ingestion_package_imports",
+      "community": 25,
+      "norm_label": "test_ingestion_package_imports()"
+    },
+    {
+      "label": "Phase 1 will populate this directory; the placeholder keeps pytest collection ha",
+      "file_type": "rationale",
+      "source_file": "packages/ingestion/tests/test_ingestion_imports.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_ingestion_imports_rationale_1",
+      "community": 25,
+      "norm_label": "phase 1 will populate this directory; the placeholder keeps pytest collection ha"
+    },
+    {
       "label": "graphify.md",
       "file_type": "document",
       "source_file": ".agents/rules/graphify.md",
@@ -264,6 +2092,56 @@
       "norm_label": "8. for contributors (human or ai)"
     },
     {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 23,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "RepoPilot",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme_repopilot",
+      "community": 23,
+      "norm_label": "repopilot"
+    },
+    {
+      "label": "Quickstart (local dev)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "readme_quickstart_local_dev",
+      "community": 23,
+      "norm_label": "quickstart (local dev)"
+    },
+    {
+      "label": "Repo layout",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "readme_repo_layout",
+      "community": 23,
+      "norm_label": "repo layout"
+    },
+    {
+      "label": "Status",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "readme_status",
+      "community": 23,
+      "norm_label": "status"
+    },
+    {
       "label": "00_CLAUDE_BUILD_GUIDE.md",
       "file_type": "document",
       "source_file": "docs/00_CLAUDE_BUILD_GUIDE.md",
@@ -410,7 +2288,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution",
-      "community": 16,
+      "community": 7,
       "norm_label": "01_problem_and_solution.md"
     },
     {
@@ -420,7 +2298,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_01_problem_and_solution",
-      "community": 16,
+      "community": 7,
       "norm_label": "01 \u2014 problem and solution"
     },
     {
@@ -430,7 +2308,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_the_problem",
-      "community": 16,
+      "community": 7,
       "norm_label": "the problem"
     },
     {
@@ -440,7 +2318,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_why_existing_tools_fail_this_user",
-      "community": 16,
+      "community": 7,
       "norm_label": "why existing tools fail this user"
     },
     {
@@ -450,7 +2328,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_who_this_is_for",
-      "community": 16,
+      "community": 7,
       "norm_label": "who this is for"
     },
     {
@@ -600,7 +2478,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_success_criteria",
-      "community": 16,
+      "community": 7,
       "norm_label": "success criteria"
     },
     {
@@ -610,7 +2488,7 @@
       "source_location": "L372",
       "_origin": "ast",
       "id": "docs_01_problem_and_solution_hard_scope_fence_what_v1_will_not_do",
-      "community": 16,
+      "community": 7,
       "norm_label": "hard scope fence \u2014 what v1 will not do"
     },
     {
@@ -1194,6 +3072,76 @@
       "norm_label": "phase 6 prompt \u2014 harden and ship"
     },
     {
+      "label": "CURRENT_PHASE.md",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_current_phase",
+      "community": 22,
+      "norm_label": "current_phase.md"
+    },
+    {
+      "label": "Current Build Phase",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_current_phase_current_build_phase",
+      "community": 22,
+      "norm_label": "current build phase"
+    },
+    {
+      "label": "Phase ladder",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "docs_current_phase_phase_ladder",
+      "community": 22,
+      "norm_label": "phase ladder"
+    },
+    {
+      "label": "Phase 0 \u2014 what landed",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "docs_current_phase_phase_0_what_landed",
+      "community": 22,
+      "norm_label": "phase 0 \u2014 what landed"
+    },
+    {
+      "label": "Pending Phase 0 verifications (host-bound, do these on your machine)",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "docs_current_phase_pending_phase_0_verifications_host_bound_do_these_on_your_machine",
+      "community": 22,
+      "norm_label": "pending phase 0 verifications (host-bound, do these on your machine)"
+    },
+    {
+      "label": "Phase 1 \u2014 kickoff checklist",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L50",
+      "_origin": "ast",
+      "id": "docs_current_phase_phase_1_kickoff_checklist",
+      "community": 22,
+      "norm_label": "phase 1 \u2014 kickoff checklist"
+    },
+    {
+      "label": "How to advance the phase",
+      "file_type": "document",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "docs_current_phase_how_to_advance_the_phase",
+      "community": 22,
+      "norm_label": "how to advance the phase"
+    },
+    {
       "label": "README.md",
       "file_type": "document",
       "source_file": "docs/README.md",
@@ -1527,6 +3475,3927 @@
   ],
   "links": [
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/__init__.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "repopilot_api_init",
+      "target": "repopilot_api_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_api_init_rationale_1",
+      "target": "repopilot_api_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "repopilot_api_app",
+      "target": "fastapi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "repopilot_api_app",
+      "target": "repopilot_api_app_create_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "repopilot_api_app",
+      "target": "repopilot_core_logging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "repopilot_api_app",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_api_app_rationale_1",
+      "target": "repopilot_api_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "repopilot_api_app_create_app",
+      "target": "fastapi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "repopilot_api_app_create_app",
+      "target": "repopilot_core_logging_configure_logging"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/api/src/repopilot_api/app.py",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "repopilot_api_app_create_app",
+      "target": "repopilot_core_settings_get_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/api/tests/test_health.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "tests_test_health_test_health_returns_ok",
+      "target": "repopilot_api_app_create_app"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tests/test_health.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tests_test_health",
+      "target": "tests_test_health_test_health_returns_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/next.config.mjs",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "web_next_config",
+      "target": "web_next_config_nextconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_devdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_private",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "web_package",
+      "target": "web_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "web_package_scripts",
+      "target": "web_package_scripts_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "web_package_scripts",
+      "target": "web_package_scripts_dev",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "web_package_scripts",
+      "target": "web_package_scripts_lint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "web_package_scripts",
+      "target": "web_package_scripts_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "web_package_scripts",
+      "target": "web_package_scripts_typecheck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "web_package_dependencies",
+      "target": "web_package_dependencies_next",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "web_package_dependencies",
+      "target": "web_package_dependencies_react",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "web_package_dependencies",
+      "target": "web_package_dependencies_react_dom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "web_package_devdependencies",
+      "target": "web_package_devdependencies_types_node",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "web_package_devdependencies",
+      "target": "web_package_devdependencies_types_react",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "web_package_devdependencies",
+      "target": "web_package_devdependencies_types_react_dom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "web_package_devdependencies",
+      "target": "web_package_devdependencies_typescript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_layout",
+      "target": "app_layout_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "app_layout",
+      "target": "app_layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "app_page",
+      "target": "app_page_home",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "web_tsconfig",
+      "target": "web_tsconfig_compileroptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "web_tsconfig",
+      "target": "web_tsconfig_exclude",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "web_tsconfig",
+      "target": "web_tsconfig_include",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_allowjs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_esmoduleinterop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_incremental",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_isolatedmodules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_lib",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_module",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_moduleresolution",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_noemit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_paths",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_plugins",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_resolvejsonmodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_skiplibcheck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_strict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions",
+      "target": "web_tsconfig_compileroptions_target",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/tsconfig.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "web_tsconfig_compileroptions_paths",
+      "target": "web_tsconfig_paths",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "infra/ollama/entrypoint.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "ollama_entrypoint",
+      "target": "users_ayush_projects_codebasearchiologist_infra_ollama_entrypoint_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/agents/src/repopilot_agents/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_agents_init_rationale_1",
+      "target": "repopilot_agents_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/agents/tests/test_agents_imports.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_agents_imports",
+      "target": "tests_test_agents_imports_test_agents_package_imports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/__init__.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "repopilot_core_init",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_core_init_rationale_1",
+      "target": "repopilot_core_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "llm_init_rationale_1",
+      "target": "llm_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "llm_models",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "llm_models",
+      "target": "llm_models_modelid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "llm_models",
+      "target": "llm_models_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "llm_models_rationale_1",
+      "target": "llm_models",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "asyncclient",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "connection",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "llm_models_providername",
+      "target": "strenum",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_baseclient",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmresponse",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_message",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_providererror",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ratelimiterror",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L14",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelbinding",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelid",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "self",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_models_providername",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "llm_models_modelid",
+      "target": "strenum",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "asyncclient",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "connection",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "llm_models_rationale_22",
+      "target": "llm_models_modelid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_baseclient",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmresponse",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_message",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_providererror",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ratelimiterror",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L14",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelbinding",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelid",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "self",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L11",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_models_modelid",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "asyncclient",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "connection",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/models.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "llm_models_rationale_38",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_baseclient",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_llmresponse",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_message",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_providererror",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_ratelimiterror",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelbinding",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "modelid",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L41",
+      "weight": 0.8,
+      "source": "self",
+      "target": "llm_models_modelbinding",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_backoff_delay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_cache_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L289",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L246",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_ollamaclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_openaicompatibleclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_providererror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_ratelimiterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "llm_provider_sqlitecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "llm_provider",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_1",
+      "target": "llm_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L353",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_providererror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_providererror",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "llm_provider_providererror",
+      "target": "runtimeerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_51",
+      "target": "llm_provider_providererror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L15",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_provider_providererror",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "llm_provider_ratelimiterror",
+      "target": "runtimeerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L271",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "llm_provider_ratelimiterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L231",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "llm_provider_ratelimiterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_ratelimiterror",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_55",
+      "target": "llm_provider_ratelimiterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L15",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_provider_ratelimiterror",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "target": "llm_provider_ratelimiterror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "target": "llm_provider_ratelimiterror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "target": "llm_provider_ratelimiterror"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "llm_provider_baseclient_chat",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "llm_provider_cache_key",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "llm_provider_message",
+      "target": "llm_provider_message_to_openai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_message",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "llm_provider_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L15",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_provider_message",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "llm_provider_cache_key",
+      "target": "llm_provider_message_to_openai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L263",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "llm_provider_message_to_openai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L218",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "llm_provider_message_to_openai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "llm_provider_baseclient_chat",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "llm_provider_llmresponse",
+      "target": "llm_provider_llmresponse_total_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_llmresponse",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_69",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_get",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_put",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_provider_llmresponse",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L328",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "llm_provider_sqlitecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_88",
+      "target": "llm_provider_sqlitecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_provider_sqlitecache_connect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_provider_sqlitecache_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_provider_sqlitecache_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache",
+      "target": "llm_provider_sqlitecache_put",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_sqlitecache",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "tests_conftest_make_provider",
+      "target": "llm_provider_sqlitecache"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_init",
+      "target": "llm_provider_sqlitecache_connect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_init",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_path",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_connect",
+      "target": "connection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_get",
+      "target": "llm_provider_sqlitecache_connect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_put",
+      "target": "llm_provider_sqlitecache_connect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "connection",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L345",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_sqlitecache_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L274",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "llm_provider_sqlitecache_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L235",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "llm_provider_sqlitecache_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_get",
+      "target": "modelid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "llm_provider_sqlitecache_get",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_sqlitecache_put",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "llm_provider_cache_key",
+      "target": "modelid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "llm_provider_cache_key",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L344",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_cache_key",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "modelid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "modelid",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "llm_provider_baseclient_chat",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_any",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L410",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "llm_provider_backoff_delay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_173",
+      "target": "llm_provider_backoff_delay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_backoff_delay_is_bounded",
+      "target": "llm_provider_backoff_delay"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "llm_provider_baseclient",
+      "target": "llm_provider_baseclient_chat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_baseclient",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L246",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_182",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_conftest_make_provider",
+      "target": "llm_provider_baseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "llm_provider_baseclient_chat",
+      "target": "modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_chat",
+      "target": "modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_chat",
+      "target": "modelbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "modelbinding",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L314",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "llm_provider_openaicompatibleclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_provider_openaicompatibleclient_chat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "llm_provider_openaicompatibleclient_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_openaicompatibleclient",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L196",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_196",
+      "target": "llm_provider_openaicompatibleclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_init",
+      "target": "asyncclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "llm_provider_openaicompatibleclient_init",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_providername",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "asyncclient",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "asyncclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L251",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient_init",
+      "target": "asyncclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L327",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "llm_provider_ollamaclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_provider_ollamaclient_chat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L251",
+      "weight": 1.0,
+      "source": "llm_provider_ollamaclient",
+      "target": "llm_provider_ollamaclient_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_ollamaclient",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L247",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_247",
+      "target": "llm_provider_ollamaclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L405",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_call_with_429_retry",
+      "target": "llm_provider_ollamaclient_chat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L331",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_provider_llmprovider_aclose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_provider_llmprovider_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_provider_llmprovider_call_with_429_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L337",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider",
+      "target": "llm_provider_llmprovider_generate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "llm_provider_llmprovider",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L290",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_290",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L15",
+      "weight": 0.8,
+      "source": "message",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L12",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "llm_provider_llmprovider",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L309",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "repopilot_core_settings_get_settings"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L301",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_build",
+      "target": "self",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L308",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_308",
+      "target": "llm_provider_llmprovider_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "packages_core_src_repopilot_core_llm_provider_py_settings",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L42",
+      "weight": 0.8,
+      "source": "self",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L362",
+      "weight": 1.0,
+      "source": "llm_provider_llmprovider_generate",
+      "target": "llm_provider_llmprovider_call_with_429_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L343",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_343",
+      "target": "llm_provider_llmprovider_generate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/llm/provider.py",
+      "source_location": "L400",
+      "weight": 1.0,
+      "source": "llm_provider_rationale_400",
+      "target": "llm_provider_llmprovider_call_with_429_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "repopilot_core_logging",
+      "target": "repopilot_core_logging_configure_logging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "repopilot_core_logging",
+      "target": "repopilot_core_logging_drop_chunk_content",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "repopilot_core_logging",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_rationale_1",
+      "target": "repopilot_core_logging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_drop_chunk_content",
+      "target": "eventdict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_drop_chunk_content",
+      "target": "packages_core_src_repopilot_core_logging_py_any",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_rationale_16",
+      "target": "repopilot_core_logging_drop_chunk_content",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_configure_logging",
+      "target": "repopilot_core_settings_get_settings"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/logging.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "repopilot_core_logging_rationale_23",
+      "target": "repopilot_core_logging_configure_logging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "repopilot_core_settings",
+      "target": "repopilot_core_settings_get_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "repopilot_core_settings",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_core_settings_rationale_1",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "tests_test_settings",
+      "target": "repopilot_core_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "llmprovider",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "llmresponse",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_path",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_providername",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "packages_core_tests_conftest_py_settings",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "repopilot_core_settings_get_settings",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "repopilot_core_settings_rationale_13",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "repopilot_core_settings_settings",
+      "target": "basesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L19",
+      "weight": 0.8,
+      "source": "tests_conftest_fakeclient",
+      "target": "repopilot_core_settings_settings",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tests_test_settings_test_settings_loads_from_env_example",
+      "target": "repopilot_core_settings_settings"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/src/repopilot_core/settings.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "repopilot_core_settings_rationale_58",
+      "target": "repopilot_core_settings_get_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "tests_conftest_reset_settings_cache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "tests_conftest",
+      "target": "tests_conftest_tmp_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_conftest_rationale_1",
+      "target": "tests_conftest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_conftest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "tests_conftest_tmp_settings",
+      "target": "packages_core_tests_conftest_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "tests_conftest_tmp_settings",
+      "target": "packages_core_tests_conftest_py_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_conftest_make_provider",
+      "target": "packages_core_tests_conftest_py_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L23",
+      "weight": 0.8,
+      "source": "message",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "tests_conftest_fakeclient",
+      "target": "tests_conftest_fakeclient_chat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "tests_conftest_fakeclient",
+      "target": "tests_conftest_fakeclient_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "tests_conftest_rationale_45",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "tests_conftest_fakeclient_init",
+      "target": "packages_core_tests_conftest_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_conftest_make_provider",
+      "target": "packages_core_tests_conftest_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "tests_conftest_make_response",
+      "target": "packages_core_tests_conftest_py_providername",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_conftest_make_provider",
+      "target": "llmprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "tests_conftest_rationale_67",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/conftest.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "tests_conftest_make_response",
+      "target": "llmresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_backoff_delay_is_bounded",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L200",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider",
+      "target": "tests_test_llm_provider_test_real_httpx_429_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_rationale_1",
+      "target": "tests_test_llm_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_msgs",
+      "target": "message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_429_backoff_retries",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_cache_hit_avoids_api_call",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L226",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_real_httpx_429_path",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_test_llm_token_counter_increments",
+      "target": "message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_rationale_85",
+      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_ollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L178",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_rationale_178",
+      "target": "tests_test_llm_provider_test_ollama_only_models_skip_groq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_llm_provider.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "tests_test_llm_provider_rationale_201",
+      "target": "tests_test_llm_provider_test_real_httpx_429_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "tests_test_settings",
+      "target": "tests_test_settings_test_settings_loads_from_env_example",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_settings_rationale_1",
+      "target": "tests_test_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/core/tests/test_settings.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "tests_test_settings_rationale_11",
+      "target": "tests_test_settings_test_settings_loads_from_env_example",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/evals/src/repopilot_evals/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_evals_init_rationale_1",
+      "target": "repopilot_evals_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/evals/tests/test_evals_imports.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_evals_imports",
+      "target": "tests_test_evals_imports_test_evals_package_imports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "repopilot_ingestion_init_rationale_1",
+      "target": "repopilot_ingestion_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/tests/test_ingestion_imports.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_test_ingestion_imports",
+      "target": "tests_test_ingestion_imports_test_ingestion_package_imports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/tests/test_ingestion_imports.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_ingestion_imports_rationale_1",
+      "target": "tests_test_ingestion_imports",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".agents/rules/graphify.md",
@@ -1725,6 +7594,46 @@
       "confidence_score": 1.0,
       "source": "claude_repopilot_project_guide_single_source_of_truth",
       "target": "claude_8_for_contributors_human_or_ai"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "readme_repopilot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "readme_repopilot",
+      "target": "readme_quickstart_local_dev",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "readme_repopilot",
+      "target": "readme_repo_layout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "readme_repopilot",
+      "target": "readme_status",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -2372,9 +8281,9 @@
       "source_file": "docs/03_ARCHITECTURE.md",
       "source_location": "L639",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_03_architecture_how_the_intent_profile_flows_through_the_system",
-      "target": "docs_03_architecture_q_a_multi_turn_schema_reserved_in_v1_surfaced_post_v0_1",
-      "confidence_score": 1.0
+      "target": "docs_03_architecture_q_a_multi_turn_schema_reserved_in_v1_surfaced_post_v0_1"
     },
     {
       "relation": "contains",
@@ -2595,6 +8504,66 @@
       "confidence_score": 1.0,
       "source": "docs_05_phase_prompts_05_phase_prompts_paste_ready",
       "target": "docs_05_phase_prompts_phase_6_prompt_harden_and_ship"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_current_phase",
+      "target": "docs_current_phase_current_build_phase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "docs_current_phase_current_build_phase",
+      "target": "docs_current_phase_how_to_advance_the_phase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "docs_current_phase_current_build_phase",
+      "target": "docs_current_phase_phase_0_what_landed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "docs_current_phase_current_build_phase",
+      "target": "docs_current_phase_phase_1_kickoff_checklist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "docs_current_phase_current_build_phase",
+      "target": "docs_current_phase_phase_ladder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "docs_current_phase_phase_0_what_landed",
+      "target": "docs_current_phase_pending_phase_0_verifications_host_bound_do_these_on_your_machine",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -2828,5 +8797,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "491fa56a9dd315c45a33b429f321d86957d15041"
+  "built_at_commit": "7c3dc1fdd7921107902ef06f4d9ae64197777eeb"
 }

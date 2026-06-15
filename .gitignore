@@ -20,3 +20,34 @@ graphify.log
 
 # macOS
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+.python-version.local
+
+# uv: keep uv.lock committed for reproducible installs.
+
+# Local LLM cache
+.cache/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts

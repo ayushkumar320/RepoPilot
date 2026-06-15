@@ -1,16 +1,16 @@
 # Graph Report - CodebaseArchiologist  (2026-06-15)
 
 ## Corpus Check
-- 14 files · ~34,900 words
+- 42 files · ~39,672 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 147 nodes · 130 edges · 18 communities (14 shown, 4 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- 341 nodes · 520 edges · 36 communities (24 shown, 12 thin omitted)
+- Extraction: 77% EXTRACTED · 23% INFERRED · 0% AMBIGUOUS · INFERRED: 121 edges (avg confidence: 0.51)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `491fa56a`
+- Built from commit: `7c3dc1fd`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -32,35 +32,49 @@
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 34|Community 34]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `03 — Architecture` - 18 edges
-2. `00 — Claude Build Guide (Standing Context)` - 10 edges
-3. `The solution` - 10 edges
-4. `04 — Build Plan` - 10 edges
-5. `RepoPilot — Project Guide (Single Source of Truth)` - 9 edges
-6. `02 — Tech Stack` - 9 edges
-7. `05 — Phase Prompts (paste-ready)` - 8 edges
-8. `Per-doc summaries` - 7 edges
-9. `RepoPilot — Project Rules (portable)` - 6 edges
-10. `01 — Problem and Solution` - 5 edges
+1. `Settings` - 29 edges
+2. `ModelId` - 28 edges
+3. `ProviderName` - 27 edges
+4. `ModelBinding` - 20 edges
+5. `LLMResponse` - 20 edges
+6. `Message` - 19 edges
+7. `FakeClient` - 19 edges
+8. `03 — Architecture` - 18 edges
+9. `LLMProvider` - 17 edges
+10. `compilerOptions` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Intent Router` --references--> `Groq`  [EXTRACTED]
-  docs/03_ARCHITECTURE.md → docs/02_TECH_STACK.md
-- `Intent Router` --references--> `LangGraph`  [EXTRACTED]
-  docs/03_ARCHITECTURE.md → docs/02_TECH_STACK.md
-- `Verifier` --references--> `Ollama`  [EXTRACTED]
-  docs/03_ARCHITECTURE.md → docs/02_TECH_STACK.md
-- `Phase 1: Ingestion` --references--> `tree-sitter`  [EXTRACTED]
-  docs/04_BUILD_PLAN.md → docs/02_TECH_STACK.md
-- `Phase 1: Ingestion` --references--> `NetworkX`  [EXTRACTED]
-  docs/04_BUILD_PLAN.md → docs/02_TECH_STACK.md
+- `create_app()` --calls--> `configure_logging()`  [EXTRACTED]
+  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/logging.py
+- `create_app()` --calls--> `get_settings()`  [EXTRACTED]
+  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/settings.py
+- `test_health_returns_ok()` --calls--> `create_app()`  [INFERRED]
+  apps/api/tests/test_health.py → apps/api/src/repopilot_api/app.py
+- `Message` --uses--> `ProviderName`  [INFERRED]
+  packages/core/tests/test_llm_provider.py → packages/core/src/repopilot_core/llm/models.py
+- `FakeClient` --uses--> `ProviderName`  [INFERRED]
+  packages/core/tests/conftest.py → packages/core/src/repopilot_core/llm/models.py
 
 ## Import Cycles
-- None detected.
+- 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (18 total, 4 thin omitted)
+## Communities (36 total, 12 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.17
@@ -83,8 +97,8 @@ Cohesion: 0.14
 Nodes (13): 00 — Claude Build Guide (Standing Context), Agent roster, Documentation layering — read in this order, every phase, Iteration 1 — Contribute = opportunity engine, not issue browser, Iteration 2 — No stat dumps. Output contract, enforced four ways., Per-PR Definition of Done, Pre-context capture runs IN PARALLEL with indexing — never after it, Project one-liner (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.14
-Nodes (14): Fine-grained mapping: example stated intents → what the Capability Planner picks, Four concrete walkthroughs (out of infinitely many possible), How the flow handles "hard-to-context-map" responses, Key features (at a glance), The core bet, The five principles (the contract this product lives or dies by), The solution, Walkthrough A — Learner ramping on Django's request lifecycle (+6 more)
+Cohesion: 0.10
+Nodes (20): 01 — Problem and Solution, Fine-grained mapping: example stated intents → what the Capability Planner picks, Four concrete walkthroughs (out of infinitely many possible), Hard scope fence — what v1 will NOT do, How the flow handles "hard-to-context-map" responses, Key features (at a glance), Success criteria, The core bet (+12 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.15
@@ -107,30 +121,56 @@ Cohesion: 0.50
 Nodes (3): Constraints, Mandatory order of operations, What to return
 
 ### Community 16 - "Community 16"
-Cohesion: 0.29
-Nodes (6): 01 — Problem and Solution, Hard scope fence — what v1 will NOT do, Success criteria, The problem, Who this is for, Why existing tools fail this user
+Cohesion: 0.10
+Nodes (48): AsyncClient, BaseSettings, Connection, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age, Logical, agent-facing model identifiers. (+40 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.18
 Nodes (10): 00 — Claude Build Guide (Standing Context) *(the contract)*, 01 — Problem and Solution *(the thesis / "why")*, 02 — Tech Stack *(the toolbox — every choice + why + what was rejected)*, 03 — Architecture *(the blueprint — the keystone doc)*, 04 — Build Plan *(the schedule — 7 phases, each with a hard gate)*, 05 — Phase Prompts *(the script — paste-ready)*, How the doc set fits together, One-paragraph takeaway (+2 more)
 
+### Community 18 - "Community 18"
+Cohesion: 0.16
+Nodes (22): _backoff_delay(), Exponential backoff with full jitter. attempt=0 is the first retry., Message, FakeClient, make_provider(), make_response(), Shared fixtures for the core package's tests., Test double for an LLM provider client. (+14 more)
+
+### Community 19 - "Community 19"
+Cohesion: 0.09
+Nodes (19): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., Shared core: settings, logging, and the LLMProvider abstraction., configure_logging() (+11 more)
+
+### Community 20 - "Community 20"
+Cohesion: 0.10
+Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
+
+### Community 21 - "Community 21"
+Cohesion: 0.11
+Nodes (18): dependencies, next, react, react-dom, devDependencies, @types/node, @types/react, @types/react-dom (+10 more)
+
+### Community 22 - "Community 22"
+Cohesion: 0.29
+Nodes (6): Current Build Phase, How to advance the phase, Pending Phase 0 verifications (host-bound, do these on your machine), Phase 0 — what landed, Phase 1 — kickoff checklist, Phase ladder
+
+### Community 23 - "Community 23"
+Cohesion: 0.40
+Nodes (4): Quickstart (local dev), Repo layout, RepoPilot, Status
+
 ## Knowledge Gaps
-- **109 isolated node(s):** `graphify`, `What this project is`, `Knowledge graph first`, `Graph maintenance (mandatory)`, `Engineering conventions` (+104 more)
+- **153 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+148 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `The solution` connect `Community 7` to `Community 16`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Why does `01 — Problem and Solution` connect `Community 16` to `Community 7`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **What connects `graphify`, `What this project is`, `Knowledge graph first` to the rest of the system?**
-  _109 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
-- **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
-- **Should `Community 7` be split into smaller, more focused modules?**
-  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+- **Why does `Settings` connect `Community 16` to `Community 18`, `Community 19`?**
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+- **Why does `FakeClient` connect `Community 18` to `Community 16`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `get_settings()` connect `Community 19` to `Community 16`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Are the 24 inferred relationships involving `Settings` (e.g. with `AsyncClient` and `Connection`) actually correct?**
+  _`Settings` has 24 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 25 inferred relationships involving `ModelId` (e.g. with `AsyncClient` and `Connection`) actually correct?**
+  _`ModelId` has 25 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 25 inferred relationships involving `ProviderName` (e.g. with `AsyncClient` and `Connection`) actually correct?**
+  _`ProviderName` has 25 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 18 inferred relationships involving `ModelBinding` (e.g. with `AsyncClient` and `Connection`) actually correct?**
+  _`ModelBinding` has 18 INFERRED edges - model-reasoned connections that need verification._

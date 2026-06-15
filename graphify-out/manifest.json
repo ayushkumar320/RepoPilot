@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781552990.6603034,
-    "ast_hash": "3f61929d05f8757af81a93602f5951dd",
+    "mtime": 1781554088.913004,
+    "ast_hash": "71c80fdbe7d0b233e99e37e4c58b2175",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "docs/README.md": {
-    "mtime": 1781532090.0304043,
-    "ast_hash": "7a9dbd9760e20ce68d4f6602e5dbeac7",
+    "mtime": 1781554108.7775536,
+    "ast_hash": "97b417dd3d311be677fabcb6ea027698",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/__init__.py": {

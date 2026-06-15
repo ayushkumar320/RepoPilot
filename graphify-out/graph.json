@@ -2858,7 +2858,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_core_init",
-      "community": 51,
+      "community": 16,
       "norm_label": "__init__.py"
     },
     {
@@ -2868,7 +2868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_core_init_rationale_1",
-      "community": 51,
+      "community": 16,
       "norm_label": "shared core: settings, logging, and the llmprovider abstraction."
     },
     {
@@ -3648,7 +3648,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_core_settings",
-      "community": 51,
+      "community": 16,
       "norm_label": "settings.py"
     },
     {
@@ -3658,7 +3658,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "repopilot_core_settings_settings",
-      "community": 25,
+      "community": 16,
       "norm_label": "settings"
     },
     {
@@ -3668,7 +3668,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "basesettings",
-      "community": 25,
+      "community": 16,
       "norm_label": "basesettings"
     },
     {
@@ -3678,7 +3678,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "repopilot_core_settings_get_settings",
-      "community": 19,
+      "community": 16,
       "norm_label": "get_settings()"
     },
     {
@@ -3688,7 +3688,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_core_settings_rationale_1",
-      "community": 51,
+      "community": 16,
       "norm_label": "application settings, loaded from environment / `.env` via pydantic-settings."
     },
     {
@@ -3698,7 +3698,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "repopilot_core_settings_rationale_13",
-      "community": 25,
+      "community": 16,
       "norm_label": "single source of runtime configuration."
     },
     {
@@ -3708,7 +3708,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "repopilot_core_settings_rationale_65",
-      "community": 19,
+      "community": 16,
       "norm_label": "cached settings accessor. tests should call `get_settings.cache_clear()`."
     },
     {
@@ -4158,7 +4158,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_settings",
-      "community": 51,
+      "community": 16,
       "norm_label": "test_settings.py"
     },
     {
@@ -4168,7 +4168,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "tests_test_settings_test_settings_loads_from_env_example",
-      "community": 51,
+      "community": 16,
       "norm_label": "test_settings_loads_from_env_example()"
     },
     {
@@ -4178,7 +4178,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_settings_rationale_1",
-      "community": 51,
+      "community": 16,
       "norm_label": "test 5 from the phase 0 tdd checklist."
     },
     {
@@ -4188,7 +4188,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "tests_test_settings_rationale_11",
-      "community": 51,
+      "community": 16,
       "norm_label": "`.env.example` shipped at the repo root must be a valid pydantic-settings source"
     },
     {
@@ -4448,7 +4448,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone_cloneresult_repo_id",
-      "community": 53,
+      "community": 25,
       "norm_label": ".repo_id()"
     },
     {
@@ -4478,7 +4478,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone_clone_to_tempdir",
-      "community": 48,
+      "community": 47,
       "norm_label": "clone_to_tempdir()"
     },
     {
@@ -4488,7 +4488,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_clone_py_path",
-      "community": 48,
+      "community": 47,
       "norm_label": "path"
     },
     {
@@ -4508,7 +4508,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone_rationale_46",
-      "community": 53,
+      "community": 25,
       "norm_label": "canonical primary key used across the schema: ``owner/name@sha``."
     },
     {
@@ -4538,7 +4538,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone_rationale_84",
-      "community": 48,
+      "community": 47,
       "norm_label": "shallow-clone ``repo_url`` into a tempdir; clean up on exit.      the yielded :c"
     },
     {
@@ -4608,7 +4608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed",
-      "community": 51,
+      "community": 46,
       "norm_label": "embed.py"
     },
     {
@@ -4618,7 +4618,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_embeddedchunk",
-      "community": 25,
+      "community": 46,
       "norm_label": "embeddedchunk"
     },
     {
@@ -4668,7 +4668,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_rationale_1",
-      "community": 51,
+      "community": 46,
       "norm_label": "batched async embedder over chunks via the central ``llmprovider``.  the provide"
     },
     {
@@ -5548,7 +5548,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "repopilot_ingestion_pipeline_index_repo",
-      "community": 48,
+      "community": 25,
       "norm_label": "index_repo()"
     },
     {
@@ -5588,7 +5588,7 @@
       "source_location": "L167",
       "_origin": "ast",
       "id": "modulesource",
-      "community": 25,
+      "community": 48,
       "norm_label": "modulesource"
     },
     {
@@ -5618,7 +5618,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_pipeline_py_path",
-      "community": 25,
+      "community": 48,
       "norm_label": "path"
     },
     {
@@ -5658,7 +5658,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "repopilot_ingestion_pipeline_rationale_98",
-      "community": 48,
+      "community": 25,
       "norm_label": "full ingestion pipeline. idempotent on ``(repo_url, head_sha)``."
     },
     {
@@ -5698,7 +5698,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_chunk",
-      "community": 25,
+      "community": 16,
       "norm_label": "chunk"
     },
     {
@@ -5718,7 +5718,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "repopilot_ingestion_summary_summarise_chunks",
-      "community": 46,
+      "community": 16,
       "norm_label": "summarise_chunks()"
     },
     {
@@ -5728,7 +5728,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_llmprovider",
-      "community": 25,
+      "community": 16,
       "norm_label": "llmprovider"
     },
     {
@@ -5738,7 +5738,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_settings",
-      "community": 25,
+      "community": 16,
       "norm_label": "settings"
     },
     {
@@ -5758,7 +5758,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "repopilot_ingestion_summary_rationale_54",
-      "community": 46,
+      "community": 16,
       "norm_label": "summarise every chunk concurrently, bounded by the configured semaphore."
     },
     {
@@ -6188,7 +6188,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing",
-      "community": 48,
+      "community": 47,
       "norm_label": "test_httpx_indexing.py"
     },
     {
@@ -6198,7 +6198,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_test_indexing_under_90s",
-      "community": 48,
+      "community": 47,
       "norm_label": "test_indexing_under_90s()"
     },
     {
@@ -6208,7 +6208,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_test_graph_known_call_chain_httpx",
-      "community": 48,
+      "community": 47,
       "norm_label": "test_graph_known_call_chain_httpx()"
     },
     {
@@ -6218,7 +6218,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_rationale_1",
-      "community": 48,
+      "community": 47,
       "norm_label": "slow / integration: full phase 1 pipeline against the real ``httpx`` repo.  gate"
     },
     {
@@ -6228,7 +6228,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_rationale_26",
-      "community": 48,
+      "community": 47,
       "norm_label": "phase 1 quality gate: httpx (~50 kloc) indexes in \u2264 90 s."
     },
     {
@@ -6238,7 +6238,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_rationale_46",
-      "community": 48,
+      "community": 47,
       "norm_label": "a known call chain in httpx must exist as a graph path.      this runs without p"
     },
     {
@@ -7562,10 +7562,20 @@
       "norm_label": "phase 2 \u2014 explicit deferrals (must clear before phase 3 starts)"
     },
     {
+      "label": "Phase 2 \u2014 as built (post-merge addendum)",
+      "file_type": "document",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L327",
+      "_origin": "ast",
+      "id": "docs_05_phase_prompts_phase_2_as_built_post_merge_addendum",
+      "community": 10,
+      "norm_label": "phase 2 \u2014 as built (post-merge addendum)"
+    },
+    {
       "label": "Phase 3 prompt \u2014 Orchestration + Learn subgraph",
       "file_type": "document",
       "source_file": "docs/05_PHASE_PROMPTS.md",
-      "source_location": "L329",
+      "source_location": "L394",
       "_origin": "ast",
       "id": "docs_05_phase_prompts_phase_3_prompt_orchestration_learn_subgraph",
       "community": 10,
@@ -7575,7 +7585,7 @@
       "label": "Phase 4 prompt \u2014 Experience (FastAPI + Next.js + synchronized code viewer)",
       "file_type": "document",
       "source_file": "docs/05_PHASE_PROMPTS.md",
-      "source_location": "L404",
+      "source_location": "L469",
       "_origin": "ast",
       "id": "docs_05_phase_prompts_phase_4_prompt_experience_fastapi_next_js_synchronized_code_viewer",
       "community": 10,
@@ -7585,7 +7595,7 @@
       "label": "Phase 5 prompt \u2014 Contribute mode (Iteration 1)",
       "file_type": "document",
       "source_file": "docs/05_PHASE_PROMPTS.md",
-      "source_location": "L486",
+      "source_location": "L551",
       "_origin": "ast",
       "id": "docs_05_phase_prompts_phase_5_prompt_contribute_mode_iteration_1",
       "community": 10,
@@ -7595,7 +7605,7 @@
       "label": "Phase 6 prompt \u2014 Harden and ship",
       "file_type": "document",
       "source_file": "docs/05_PHASE_PROMPTS.md",
-      "source_location": "L565",
+      "source_location": "L630",
       "_origin": "ast",
       "id": "docs_05_phase_prompts_phase_6_prompt_harden_and_ship",
       "community": 10,
@@ -7692,10 +7702,20 @@
       "norm_label": "repopilot \u2014 documentation set overview"
     },
     {
+      "label": "Build progress at a glance",
+      "file_type": "document",
+      "source_file": "docs/README.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_readme_build_progress_at_a_glance",
+      "community": 17,
+      "norm_label": "build progress at a glance"
+    },
+    {
       "label": "How the doc set fits together",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L9",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "docs_readme_how_the_doc_set_fits_together",
       "community": 17,
@@ -7705,7 +7725,7 @@
       "label": "Per-doc summaries",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L28",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "docs_readme_per_doc_summaries",
       "community": 17,
@@ -7715,7 +7735,7 @@
       "label": "01 \u2014 Problem and Solution *(the thesis / \"why\")*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L30",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "docs_readme_01_problem_and_solution_the_thesis_why",
       "community": 17,
@@ -7725,7 +7745,7 @@
       "label": "00 \u2014 Claude Build Guide (Standing Context) *(the contract)*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L41",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "docs_readme_00_claude_build_guide_standing_context_the_contract",
       "community": 17,
@@ -7735,7 +7755,7 @@
       "label": "02 \u2014 Tech Stack *(the toolbox \u2014 every choice + why + what was rejected)*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L52",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "docs_readme_02_tech_stack_the_toolbox_every_choice_why_what_was_rejected",
       "community": 17,
@@ -7745,7 +7765,7 @@
       "label": "03 \u2014 Architecture *(the blueprint \u2014 the keystone doc)*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L62",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "docs_readme_03_architecture_the_blueprint_the_keystone_doc",
       "community": 17,
@@ -7755,7 +7775,7 @@
       "label": "04 \u2014 Build Plan *(the schedule \u2014 7 phases, each with a hard gate)*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L72",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "docs_readme_04_build_plan_the_schedule_7_phases_each_with_a_hard_gate",
       "community": 17,
@@ -7765,7 +7785,7 @@
       "label": "05 \u2014 Phase Prompts *(the script \u2014 paste-ready)*",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L85",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "docs_readme_05_phase_prompts_the_script_paste_ready",
       "community": 17,
@@ -7775,7 +7795,7 @@
       "label": "One-paragraph takeaway",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L91",
+      "source_location": "L103",
       "_origin": "ast",
       "id": "docs_readme_one_paragraph_takeaway",
       "community": 17,
@@ -8745,9 +8765,9 @@
       "source_file": "packages/agents/src/repopilot_agents/__init__.py",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_init",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "rationale_for",
@@ -8765,9 +8785,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/__init__.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_init_rationale_1",
-      "target": "qa_init",
-      "confidence_score": 1.0
+      "target": "qa_init"
     },
     {
       "relation": "contains",
@@ -8775,9 +8795,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_answer_question",
-      "confidence_score": 1.0
+      "target": "qa_graph_answer_question"
     },
     {
       "relation": "contains",
@@ -8785,9 +8805,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_context",
-      "confidence_score": 1.0
+      "target": "qa_graph_context"
     },
     {
       "relation": "contains",
@@ -8795,9 +8815,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_extend_context",
-      "confidence_score": 1.0
+      "target": "qa_graph_extend_context"
     },
     {
       "relation": "contains",
@@ -8805,9 +8825,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L205",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_generate_answer",
-      "confidence_score": 1.0
+      "target": "qa_graph_generate_answer"
     },
     {
       "relation": "contains",
@@ -8815,9 +8835,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L218",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_is_not_found",
-      "confidence_score": 1.0
+      "target": "qa_graph_is_not_found"
     },
     {
       "relation": "contains",
@@ -8825,9 +8845,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_judge_sufficiency",
-      "confidence_score": 1.0
+      "target": "qa_graph_judge_sufficiency"
     },
     {
       "relation": "contains",
@@ -8835,9 +8855,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L223",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_parse_claims",
-      "confidence_score": 1.0
+      "target": "qa_graph_parse_claims"
     },
     {
       "relation": "contains",
@@ -8845,9 +8865,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "qa_graph_qaresult",
-      "confidence_score": 1.0
+      "target": "qa_graph_qaresult"
     },
     {
       "relation": "imports_from",
@@ -8856,9 +8876,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "rationale_for",
@@ -8866,9 +8886,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_rationale_1",
-      "target": "qa_graph",
-      "confidence_score": 1.0
+      "target": "qa_graph"
     },
     {
       "relation": "references",
@@ -8877,9 +8897,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_qaresult",
-      "confidence_score": 1.0
+      "target": "qa_graph_qaresult"
     },
     {
       "relation": "inherits",
@@ -8887,9 +8907,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_qaresult",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "uses",
@@ -8897,9 +8917,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -8907,9 +8927,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -8917,9 +8937,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -8927,9 +8947,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -8937,9 +8957,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -8947,9 +8967,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_qaresult",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "rationale_for",
@@ -8957,9 +8977,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L62",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_rationale_62",
-      "target": "qa_graph_qaresult",
-      "confidence_score": 1.0
+      "target": "qa_graph_qaresult"
     },
     {
       "relation": "inherits",
@@ -8967,9 +8987,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types_qaclaim",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -8977,9 +8997,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types_sufficiencyverdict",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -8987,9 +9007,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_chunkcontent",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -8997,9 +9017,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_chunkhit",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9007,9 +9027,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_coderef",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9017,9 +9037,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_graphqueryresult",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9027,9 +9047,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_path",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9037,9 +9057,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_symbolmetrics",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9047,9 +9067,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues_issue",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9057,9 +9077,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_claim",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9067,9 +9087,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verifierobjection",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "inherits",
@@ -9077,9 +9097,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verifierverdict",
-      "target": "basemodel",
-      "confidence_score": 1.0
+      "target": "basemodel"
     },
     {
       "relation": "calls",
@@ -9088,9 +9108,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_context",
-      "confidence_score": 1.0
+      "target": "qa_graph_context"
     },
     {
       "relation": "uses",
@@ -9098,9 +9118,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9108,9 +9128,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9118,9 +9138,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9128,9 +9148,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9138,9 +9158,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9148,9 +9168,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "qa_graph_context",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "references",
@@ -9159,9 +9179,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_extend_context",
-      "target": "qa_graph_context",
-      "confidence_score": 1.0
+      "target": "qa_graph_context"
     },
     {
       "relation": "references",
@@ -9170,9 +9190,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine"
     },
     {
       "relation": "references",
@@ -9181,9 +9201,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider"
     },
     {
       "relation": "calls",
@@ -9192,9 +9212,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_extend_context",
-      "confidence_score": 1.0
+      "target": "qa_graph_extend_context"
     },
     {
       "relation": "calls",
@@ -9203,9 +9223,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_generate_answer",
-      "confidence_score": 1.0
+      "target": "qa_graph_generate_answer"
     },
     {
       "relation": "calls",
@@ -9214,9 +9234,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_is_not_found",
-      "confidence_score": 1.0
+      "target": "qa_graph_is_not_found"
     },
     {
       "relation": "calls",
@@ -9225,9 +9245,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_judge_sufficiency",
-      "confidence_score": 1.0
+      "target": "qa_graph_judge_sufficiency"
     },
     {
       "relation": "calls",
@@ -9236,9 +9256,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_answer_question",
-      "target": "qa_graph_parse_claims",
-      "confidence_score": 1.0
+      "target": "qa_graph_parse_claims"
     },
     {
       "relation": "calls",
@@ -9290,9 +9310,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_rationale_91",
-      "target": "qa_graph_answer_question",
-      "confidence_score": 1.0
+      "target": "qa_graph_answer_question"
     },
     {
       "relation": "calls",
@@ -9333,9 +9353,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9343,9 +9363,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9353,9 +9373,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9363,9 +9383,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9373,9 +9393,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9383,9 +9403,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "uses",
@@ -9393,9 +9413,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9403,9 +9423,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9413,9 +9433,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9423,9 +9443,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9433,9 +9453,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9443,9 +9463,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "references",
@@ -9454,9 +9474,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L205",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_generate_answer",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider"
     },
     {
       "relation": "references",
@@ -9465,9 +9485,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_judge_sufficiency",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider"
     },
     {
       "relation": "references",
@@ -9476,9 +9496,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_extend_context",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent"
     },
     {
       "relation": "uses",
@@ -9486,9 +9506,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9496,9 +9516,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9506,9 +9526,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9516,9 +9536,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9526,9 +9546,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9536,9 +9556,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "references",
@@ -9547,9 +9567,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L205",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_generate_answer",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent"
     },
     {
       "relation": "references",
@@ -9558,9 +9578,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_judge_sufficiency",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent"
     },
     {
       "relation": "references",
@@ -9569,9 +9589,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L223",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_parse_claims",
-      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent"
     },
     {
       "relation": "calls",
@@ -9591,9 +9611,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_judge_sufficiency",
-      "target": "sufficiencyverdict",
-      "confidence_score": 1.0
+      "target": "sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9601,9 +9621,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9611,9 +9631,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9621,9 +9641,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9631,9 +9651,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9641,9 +9661,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9651,9 +9671,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "sufficiencyverdict",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "calls",
@@ -9673,9 +9693,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L223",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_parse_claims",
-      "target": "claim",
-      "confidence_score": 1.0
+      "target": "claim"
     },
     {
       "relation": "rationale_for",
@@ -9683,9 +9703,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L224",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_graph_rationale_224",
-      "target": "qa_graph_parse_claims",
-      "confidence_score": 1.0
+      "target": "qa_graph_parse_claims"
     },
     {
       "relation": "uses",
@@ -9693,9 +9713,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L51",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -9703,9 +9723,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -9713,9 +9733,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L52",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -9723,9 +9743,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 0.5
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "uses",
@@ -9733,9 +9753,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -9743,9 +9763,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
       "source_location": "L46",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "claim",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "contains",
@@ -9753,9 +9773,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts",
-      "target": "qa_prompts_answer_user_prompt",
-      "confidence_score": 1.0
+      "target": "qa_prompts_answer_user_prompt"
     },
     {
       "relation": "contains",
@@ -9763,9 +9783,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts",
-      "target": "qa_prompts_render_chunks",
-      "confidence_score": 1.0
+      "target": "qa_prompts_render_chunks"
     },
     {
       "relation": "contains",
@@ -9773,9 +9793,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts",
-      "target": "qa_prompts_sufficiency_user_prompt",
-      "confidence_score": 1.0
+      "target": "qa_prompts_sufficiency_user_prompt"
     },
     {
       "relation": "imports_from",
@@ -9784,9 +9804,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "rationale_for",
@@ -9794,9 +9814,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_rationale_1",
-      "target": "qa_prompts",
-      "confidence_score": 1.0
+      "target": "qa_prompts"
     },
     {
       "relation": "calls",
@@ -9805,9 +9825,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_answer_user_prompt",
-      "target": "qa_prompts_render_chunks",
-      "confidence_score": 1.0
+      "target": "qa_prompts_render_chunks"
     },
     {
       "relation": "references",
@@ -9816,9 +9836,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_render_chunks",
-      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent"
     },
     {
       "relation": "calls",
@@ -9827,9 +9847,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_sufficiency_user_prompt",
-      "target": "qa_prompts_render_chunks",
-      "confidence_score": 1.0
+      "target": "qa_prompts_render_chunks"
     },
     {
       "relation": "references",
@@ -9838,9 +9858,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_answer_user_prompt",
-      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent"
     },
     {
       "relation": "references",
@@ -9849,9 +9869,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/prompts.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_prompts_sufficiency_user_prompt",
-      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_qa_prompts_py_chunkcontent"
     },
     {
       "relation": "contains",
@@ -9859,9 +9879,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types",
-      "target": "qa_types_qaclaim",
-      "confidence_score": 1.0
+      "target": "qa_types_qaclaim"
     },
     {
       "relation": "contains",
@@ -9869,9 +9889,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 1.0
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "rationale_for",
@@ -9879,9 +9899,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types_rationale_1",
-      "target": "qa_types",
-      "confidence_score": 1.0
+      "target": "qa_types"
     },
     {
       "relation": "rationale_for",
@@ -9889,9 +9909,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types_rationale_13",
-      "target": "qa_types_sufficiencyverdict",
-      "confidence_score": 1.0
+      "target": "qa_types_sufficiencyverdict"
     },
     {
       "relation": "rationale_for",
@@ -9899,9 +9919,9 @@
       "source_file": "packages/agents/src/repopilot_agents/qa/types.py",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "qa_types_rationale_21",
-      "target": "qa_types_qaclaim",
-      "confidence_score": 1.0
+      "target": "qa_types_qaclaim"
     },
     {
       "relation": "rationale_for",
@@ -9909,9 +9929,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/__init__.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_init_rationale_1",
-      "target": "tools_init",
-      "confidence_score": 1.0
+      "target": "tools_init"
     },
     {
       "relation": "imports_from",
@@ -9920,9 +9940,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency",
-      "target": "repopilot_ingestion_db",
-      "confidence_score": 1.0
+      "target": "repopilot_ingestion_db"
     },
     {
       "relation": "contains",
@@ -9930,9 +9950,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency",
-      "target": "tools_adjacency_invalidate",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_invalidate"
     },
     {
       "relation": "contains",
@@ -9940,9 +9960,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency",
-      "target": "tools_adjacency_load_graph",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_load_graph"
     },
     {
       "relation": "contains",
@@ -9950,9 +9970,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency",
-      "target": "tools_adjacency_reset_cache",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_reset_cache"
     },
     {
       "relation": "rationale_for",
@@ -9960,9 +9980,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_rationale_1",
-      "target": "tools_adjacency",
-      "confidence_score": 1.0
+      "target": "tools_adjacency"
     },
     {
       "relation": "references",
@@ -9971,9 +9991,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_load_graph",
-      "target": "packages_agents_src_repopilot_agents_tools_adjacency_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_adjacency_py_asyncengine"
     },
     {
       "relation": "references",
@@ -9982,9 +10002,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_load_graph",
-      "target": "packages_agents_src_repopilot_agents_tools_adjacency_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_adjacency_py_digraph"
     },
     {
       "relation": "rationale_for",
@@ -9992,9 +10012,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_rationale_28",
-      "target": "tools_adjacency_load_graph",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_load_graph"
     },
     {
       "relation": "calls",
@@ -10035,9 +10055,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_rationale_65",
-      "target": "tools_adjacency_invalidate",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_invalidate"
     },
     {
       "relation": "rationale_for",
@@ -10045,9 +10065,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/_adjacency.py",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_adjacency_rationale_70",
-      "target": "tools_adjacency_reset_cache",
-      "confidence_score": 1.0
+      "target": "tools_adjacency_reset_cache"
     },
     {
       "relation": "contains",
@@ -10055,9 +10075,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues",
-      "target": "tools_github_issues_github_issues",
-      "confidence_score": 1.0
+      "target": "tools_github_issues_github_issues"
     },
     {
       "relation": "contains",
@@ -10065,9 +10085,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues",
-      "target": "tools_github_issues_issue",
-      "confidence_score": 1.0
+      "target": "tools_github_issues_issue"
     },
     {
       "relation": "rationale_for",
@@ -10075,9 +10095,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues_rationale_1",
-      "target": "tools_github_issues",
-      "confidence_score": 1.0
+      "target": "tools_github_issues"
     },
     {
       "relation": "references",
@@ -10086,9 +10106,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues_github_issues",
-      "target": "tools_github_issues_issue",
-      "confidence_score": 1.0
+      "target": "tools_github_issues_issue"
     },
     {
       "relation": "rationale_for",
@@ -10096,9 +10116,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues_rationale_16",
-      "target": "tools_github_issues_issue",
-      "confidence_score": 1.0
+      "target": "tools_github_issues_issue"
     },
     {
       "relation": "rationale_for",
@@ -10106,9 +10126,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/github_issues.py",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_github_issues_rationale_29",
-      "target": "tools_github_issues_github_issues",
-      "confidence_score": 1.0
+      "target": "tools_github_issues_github_issues"
     },
     {
       "relation": "imports",
@@ -10117,9 +10137,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "ast",
-      "confidence_score": 1.0
+      "target": "ast"
     },
     {
       "relation": "imports_from",
@@ -10128,9 +10148,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -10139,9 +10159,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "repopilot_ingestion_db",
-      "confidence_score": 1.0
+      "target": "repopilot_ingestion_db"
     },
     {
       "relation": "contains",
@@ -10149,9 +10169,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "tools_graph_metrics_chunk_content",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_chunk_content"
     },
     {
       "relation": "contains",
@@ -10159,9 +10179,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "tools_graph_metrics_cyclomatic",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_cyclomatic"
     },
     {
       "relation": "contains",
@@ -10169,9 +10189,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "tools_graph_metrics_graph_metrics",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_graph_metrics"
     },
     {
       "relation": "contains",
@@ -10179,9 +10199,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics",
-      "target": "tools_graph_metrics_has_tests",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_has_tests"
     },
     {
       "relation": "rationale_for",
@@ -10189,9 +10209,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_rationale_1",
-      "target": "tools_graph_metrics",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics"
     },
     {
       "relation": "references",
@@ -10200,9 +10220,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_graph_metrics",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10211,9 +10231,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_graph_metrics",
-      "target": "symbolmetrics",
-      "confidence_score": 1.0
+      "target": "symbolmetrics"
     },
     {
       "relation": "calls",
@@ -10222,9 +10242,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_graph_metrics",
-      "target": "tools_graph_metrics_chunk_content",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_chunk_content"
     },
     {
       "relation": "calls",
@@ -10233,9 +10253,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_graph_metrics",
-      "target": "tools_graph_metrics_cyclomatic",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_cyclomatic"
     },
     {
       "relation": "calls",
@@ -10244,9 +10264,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_graph_metrics",
-      "target": "tools_graph_metrics_has_tests",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_has_tests"
     },
     {
       "relation": "rationale_for",
@@ -10254,9 +10274,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_rationale_33",
-      "target": "tools_graph_metrics_graph_metrics",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_graph_metrics"
     },
     {
       "relation": "references",
@@ -10265,9 +10285,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_chunk_content",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10276,9 +10296,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_has_tests",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine"
     },
     {
       "relation": "rationale_for",
@@ -10286,9 +10306,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_rationale_71",
-      "target": "tools_graph_metrics_cyclomatic",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_cyclomatic"
     },
     {
       "relation": "rationale_for",
@@ -10296,9 +10316,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_metrics.py",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_metrics_rationale_96",
-      "target": "tools_graph_metrics_has_tests",
-      "confidence_score": 1.0
+      "target": "tools_graph_metrics_has_tests"
     },
     {
       "relation": "imports_from",
@@ -10307,9 +10327,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "contains",
@@ -10317,9 +10337,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_call_subgraph",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_call_subgraph"
     },
     {
       "relation": "contains",
@@ -10327,9 +10347,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_entry_points",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_entry_points"
     },
     {
       "relation": "contains",
@@ -10337,9 +10357,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_graph_query",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_graph_query"
     },
     {
       "relation": "contains",
@@ -10347,9 +10367,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_hubs",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_hubs"
     },
     {
       "relation": "contains",
@@ -10357,9 +10377,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_layers",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_layers"
     },
     {
       "relation": "contains",
@@ -10367,9 +10387,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query",
-      "target": "tools_graph_query_neighbours",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_neighbours"
     },
     {
       "relation": "rationale_for",
@@ -10377,9 +10397,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_rationale_1",
-      "target": "tools_graph_query",
-      "confidence_score": 1.0
+      "target": "tools_graph_query"
     },
     {
       "relation": "calls",
@@ -10454,9 +10474,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "graphqueryresult",
-      "confidence_score": 1.0
+      "target": "graphqueryresult"
     },
     {
       "relation": "references",
@@ -10465,9 +10485,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10476,9 +10496,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "querykind",
-      "confidence_score": 1.0
+      "target": "querykind"
     },
     {
       "relation": "calls",
@@ -10487,9 +10507,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "tools_graph_query_entry_points",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_entry_points"
     },
     {
       "relation": "calls",
@@ -10498,9 +10518,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "tools_graph_query_hubs",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_hubs"
     },
     {
       "relation": "calls",
@@ -10509,9 +10529,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "tools_graph_query_layers",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_layers"
     },
     {
       "relation": "calls",
@@ -10520,9 +10540,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_graph_query",
-      "target": "tools_graph_query_neighbours",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_neighbours"
     },
     {
       "relation": "rationale_for",
@@ -10530,9 +10550,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_rationale_43",
-      "target": "tools_graph_query_graph_query",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_graph_query"
     },
     {
       "relation": "references",
@@ -10541,9 +10561,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_entry_points",
-      "target": "graphqueryresult",
-      "confidence_score": 1.0
+      "target": "graphqueryresult"
     },
     {
       "relation": "references",
@@ -10552,9 +10572,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_hubs",
-      "target": "graphqueryresult",
-      "confidence_score": 1.0
+      "target": "graphqueryresult"
     },
     {
       "relation": "references",
@@ -10563,9 +10583,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_layers",
-      "target": "graphqueryresult",
-      "confidence_score": 1.0
+      "target": "graphqueryresult"
     },
     {
       "relation": "references",
@@ -10574,9 +10594,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_neighbours",
-      "target": "graphqueryresult",
-      "confidence_score": 1.0
+      "target": "graphqueryresult"
     },
     {
       "relation": "references",
@@ -10585,9 +10605,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_call_subgraph",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph"
     },
     {
       "relation": "calls",
@@ -10596,9 +10616,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_entry_points",
-      "target": "tools_graph_query_call_subgraph",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_call_subgraph"
     },
     {
       "relation": "calls",
@@ -10607,9 +10627,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_hubs",
-      "target": "tools_graph_query_call_subgraph",
-      "confidence_score": 1.0
+      "target": "tools_graph_query_call_subgraph"
     },
     {
       "relation": "references",
@@ -10618,9 +10638,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_entry_points",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph"
     },
     {
       "relation": "references",
@@ -10629,9 +10649,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_hubs",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph"
     },
     {
       "relation": "references",
@@ -10640,9 +10660,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_layers",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph"
     },
     {
       "relation": "references",
@@ -10651,9 +10671,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_query.py",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_query_neighbours",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph"
     },
     {
       "relation": "imports_from",
@@ -10662,9 +10682,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -10673,9 +10693,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse",
-      "target": "repopilot_ingestion_db",
-      "confidence_score": 1.0
+      "target": "repopilot_ingestion_db"
     },
     {
       "relation": "contains",
@@ -10683,9 +10703,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse",
-      "target": "tools_graph_traverse_graph_traverse",
-      "confidence_score": 1.0
+      "target": "tools_graph_traverse_graph_traverse"
     },
     {
       "relation": "contains",
@@ -10693,9 +10713,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse",
-      "target": "tools_graph_traverse_resolve_refs",
-      "confidence_score": 1.0
+      "target": "tools_graph_traverse_resolve_refs"
     },
     {
       "relation": "rationale_for",
@@ -10703,9 +10723,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_rationale_1",
-      "target": "tools_graph_traverse",
-      "confidence_score": 1.0
+      "target": "tools_graph_traverse"
     },
     {
       "relation": "references",
@@ -10714,9 +10734,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_graph_traverse",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_asyncengine"
     },
     {
       "relation": "calls",
@@ -10725,9 +10745,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_graph_traverse",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_coderef"
     },
     {
       "relation": "references",
@@ -10736,9 +10756,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_graph_traverse",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_path",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_path"
     },
     {
       "relation": "calls",
@@ -10747,9 +10767,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_graph_traverse",
-      "target": "tools_graph_traverse_resolve_refs",
-      "confidence_score": 1.0
+      "target": "tools_graph_traverse_resolve_refs"
     },
     {
       "relation": "rationale_for",
@@ -10757,9 +10777,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_rationale_38",
-      "target": "tools_graph_traverse_graph_traverse",
-      "confidence_score": 1.0
+      "target": "tools_graph_traverse_graph_traverse"
     },
     {
       "relation": "references",
@@ -10768,9 +10788,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_resolve_refs",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10779,9 +10799,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/graph_traverse.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_graph_traverse_resolve_refs",
-      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_graph_traverse_py_coderef"
     },
     {
       "relation": "imports_from",
@@ -10790,9 +10810,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -10801,9 +10821,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks",
-      "target": "repopilot_ingestion_db",
-      "confidence_score": 1.0
+      "target": "repopilot_ingestion_db"
     },
     {
       "relation": "contains",
@@ -10811,9 +10831,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks",
-      "target": "tools_read_chunks_read_chunks",
-      "confidence_score": 1.0
+      "target": "tools_read_chunks_read_chunks"
     },
     {
       "relation": "rationale_for",
@@ -10821,9 +10841,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks_rationale_1",
-      "target": "tools_read_chunks",
-      "confidence_score": 1.0
+      "target": "tools_read_chunks"
     },
     {
       "relation": "rationale_for",
@@ -10831,9 +10851,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks_rationale_33",
-      "target": "tools_read_chunks_read_chunks",
-      "confidence_score": 1.0
+      "target": "tools_read_chunks_read_chunks"
     },
     {
       "relation": "references",
@@ -10842,9 +10862,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks_read_chunks",
-      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10853,9 +10873,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks_read_chunks",
-      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_chunkcontent"
     },
     {
       "relation": "references",
@@ -10864,9 +10884,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/read_chunks.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_read_chunks_read_chunks",
-      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_read_chunks_py_coderef"
     },
     {
       "relation": "calls",
@@ -10886,9 +10906,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "contains",
@@ -10896,9 +10916,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search",
-      "target": "tools_vector_search_vector_search",
-      "confidence_score": 1.0
+      "target": "tools_vector_search_vector_search"
     },
     {
       "relation": "rationale_for",
@@ -10906,9 +10926,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search_rationale_1",
-      "target": "tools_vector_search",
-      "confidence_score": 1.0
+      "target": "tools_vector_search"
     },
     {
       "relation": "rationale_for",
@@ -10916,9 +10936,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search_rationale_35",
-      "target": "tools_vector_search_vector_search",
-      "confidence_score": 1.0
+      "target": "tools_vector_search_vector_search"
     },
     {
       "relation": "references",
@@ -10927,9 +10947,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search_vector_search",
-      "target": "chunkhit",
-      "confidence_score": 1.0
+      "target": "chunkhit"
     },
     {
       "relation": "references",
@@ -10938,9 +10958,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search_vector_search",
-      "target": "packages_agents_src_repopilot_agents_tools_vector_search_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_vector_search_py_asyncengine"
     },
     {
       "relation": "references",
@@ -10949,9 +10969,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_vector_search_vector_search",
-      "target": "packages_agents_src_repopilot_agents_tools_vector_search_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_tools_vector_search_py_llmprovider"
     },
     {
       "relation": "calls",
@@ -10970,9 +10990,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L22",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_tools_vector_search_py_asyncengine",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -10980,9 +11000,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L22",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_tools_vector_search_py_llmprovider",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -10990,9 +11010,9 @@
       "source_file": "packages/agents/src/repopilot_agents/tools/vector_search.py",
       "source_location": "L22",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "chunkhit",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "imports_from",
@@ -11001,9 +11021,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "contains",
@@ -11011,9 +11031,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_chunkcontent",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_chunkcontent"
     },
     {
       "relation": "contains",
@@ -11021,9 +11041,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_chunkhit",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_chunkhit"
     },
     {
       "relation": "contains",
@@ -11031,9 +11051,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_coderef",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_coderef"
     },
     {
       "relation": "contains",
@@ -11041,9 +11061,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_graphqueryresult",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_graphqueryresult"
     },
     {
       "relation": "contains",
@@ -11051,9 +11071,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_path",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_path"
     },
     {
       "relation": "contains",
@@ -11061,9 +11081,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types",
-      "target": "repopilot_agents_types_symbolmetrics",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_symbolmetrics"
     },
     {
       "relation": "rationale_for",
@@ -11071,9 +11091,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_1",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -11082,9 +11102,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -11093,9 +11113,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -11104,9 +11124,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "imports_from",
@@ -11115,9 +11135,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "repopilot_agents_types",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types"
     },
     {
       "relation": "method",
@@ -11125,9 +11145,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_coderef",
-      "target": "repopilot_agents_types_coderef_end_after_start",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_coderef_end_after_start"
     },
     {
       "relation": "rationale_for",
@@ -11135,9 +11155,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_19",
-      "target": "repopilot_agents_types_coderef",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_coderef"
     },
     {
       "relation": "calls",
@@ -11222,9 +11242,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_38",
-      "target": "repopilot_agents_types_chunkcontent",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_chunkcontent"
     },
     {
       "relation": "rationale_for",
@@ -11232,9 +11252,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_47",
-      "target": "repopilot_agents_types_chunkhit",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_chunkhit"
     },
     {
       "relation": "calls",
@@ -11253,9 +11273,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L62",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_path",
-      "target": "repopilot_agents_types_path_depth",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_path_depth"
     },
     {
       "relation": "rationale_for",
@@ -11263,9 +11283,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_56",
-      "target": "repopilot_agents_types_path",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_path"
     },
     {
       "relation": "calls",
@@ -11295,9 +11315,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_67",
-      "target": "repopilot_agents_types_symbolmetrics",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_symbolmetrics"
     },
     {
       "relation": "rationale_for",
@@ -11305,9 +11325,9 @@
       "source_file": "packages/agents/src/repopilot_agents/types.py",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_agents_types_rationale_78",
-      "target": "repopilot_agents_types_graphqueryresult",
-      "confidence_score": 1.0
+      "target": "repopilot_agents_types_graphqueryresult"
     },
     {
       "relation": "rationale_for",
@@ -11315,9 +11335,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/__init__.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_init_rationale_1",
-      "target": "verifier_init",
-      "confidence_score": 1.0
+      "target": "verifier_init"
     },
     {
       "relation": "contains",
@@ -11325,9 +11345,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_apply",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_apply"
     },
     {
       "relation": "contains",
@@ -11335,9 +11355,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_cache",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache"
     },
     {
       "relation": "contains",
@@ -11345,9 +11365,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "contains",
@@ -11355,9 +11375,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_objection_if_rejected",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_objection_if_rejected"
     },
     {
       "relation": "contains",
@@ -11365,9 +11385,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_parse_verdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_parse_verdict"
     },
     {
       "relation": "contains",
@@ -11375,9 +11395,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L110",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_reset_cache",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_reset_cache"
     },
     {
       "relation": "contains",
@@ -11385,9 +11405,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_user_prompt",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_user_prompt"
     },
     {
       "relation": "contains",
@@ -11395,9 +11415,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "contains",
@@ -11405,9 +11425,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "contains",
@@ -11415,9 +11435,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_verify_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claim"
     },
     {
       "relation": "contains",
@@ -11425,9 +11445,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L215",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_verify_claims",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claims"
     },
     {
       "relation": "contains",
@@ -11435,9 +11455,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_verifyresult",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifyresult"
     },
     {
       "relation": "rationale_for",
@@ -11445,9 +11465,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_1",
-      "target": "verifier_grounding",
-      "confidence_score": 1.0
+      "target": "verifier_grounding"
     },
     {
       "relation": "uses",
@@ -11455,9 +11475,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L10",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_verifier_grounding_py_any",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -11465,9 +11485,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L10",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_verifier_grounding_py_monkeypatch",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -11475,9 +11495,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L10",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_verifier_grounding_stubengine",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -11485,9 +11505,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L10",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_verifier_grounding_stubprovider",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "references",
@@ -11496,9 +11516,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_apply",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "uses",
@@ -11506,9 +11526,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_claim",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11516,9 +11536,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_claim",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11526,9 +11546,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_claim",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "method",
@@ -11536,9 +11556,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_claim",
-      "target": "verifier_grounding_claim_refs_non_empty",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim_refs_non_empty"
     },
     {
       "relation": "references",
@@ -11547,9 +11567,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_objection_if_rejected",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "rationale_for",
@@ -11557,9 +11577,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_51",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "references",
@@ -11568,9 +11588,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_user_prompt",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "references",
@@ -11579,9 +11599,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "references",
@@ -11590,9 +11610,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L215",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claims",
-      "target": "verifier_grounding_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "references",
@@ -11601,9 +11621,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_claim_refs_non_empty",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef"
     },
     {
       "relation": "uses",
@@ -11611,9 +11631,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11621,9 +11641,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11631,9 +11651,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "references",
@@ -11642,9 +11662,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_objection_if_rejected",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "rationale_for",
@@ -11652,9 +11672,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_67",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "uses",
@@ -11662,9 +11682,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierobjection",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11672,9 +11692,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierobjection",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11682,9 +11702,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierobjection",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "calls",
@@ -11693,9 +11713,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L175",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_verifierobjection",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierobjection"
     },
     {
       "relation": "uses",
@@ -11703,9 +11723,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L74",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_qa_graph_py_any",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "uses",
@@ -11713,9 +11733,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L74",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_qa_graph_py_chunkcontent",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "uses",
@@ -11723,9 +11743,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L74",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_qa_graph_py_coderef",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "uses",
@@ -11733,9 +11753,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L74",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_tests_test_qa_graph_py_monkeypatch",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "uses",
@@ -11743,9 +11763,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L74",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_qa_graph_scriptedprovider",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 0.5
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11754,9 +11774,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_apply",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11765,9 +11785,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache_get",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11776,9 +11796,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache_put",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11787,9 +11807,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_objection_if_rejected",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11798,9 +11818,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_parse_verdict",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "rationale_for",
@@ -11808,9 +11828,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_75",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "uses",
@@ -11818,9 +11838,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierverdict",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11828,9 +11848,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierverdict",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11838,9 +11858,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifierverdict",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "calls",
@@ -11849,9 +11869,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_verifierverdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifierverdict"
     },
     {
       "relation": "references",
@@ -11860,9 +11880,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_verifyresult",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifyresult"
     },
     {
       "relation": "references",
@@ -11871,9 +11891,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L215",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claims",
-      "target": "verifier_grounding_verifyresult",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verifyresult"
     },
     {
       "relation": "uses",
@@ -11881,9 +11901,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifyresult",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11891,9 +11911,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifyresult",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11901,9 +11921,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_verifyresult",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "uses",
@@ -11911,9 +11931,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_cache",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -11921,9 +11941,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_cache",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -11931,9 +11951,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "verifier_grounding_cache",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "method",
@@ -11941,9 +11961,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache",
-      "target": "verifier_grounding_cache_get",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_get"
     },
     {
       "relation": "method",
@@ -11951,9 +11971,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache",
-      "target": "verifier_grounding_cache_key",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_key"
     },
     {
       "relation": "method",
@@ -11961,9 +11981,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache",
-      "target": "verifier_grounding_cache_put",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_put"
     },
     {
       "relation": "rationale_for",
@@ -11971,9 +11991,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_91",
-      "target": "verifier_grounding_cache",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache"
     },
     {
       "relation": "references",
@@ -11982,9 +12002,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_cache_key",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent"
     },
     {
       "relation": "calls",
@@ -11993,9 +12013,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L178",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_cache_key",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_key"
     },
     {
       "relation": "uses",
@@ -12003,9 +12023,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -12013,9 +12033,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -12023,9 +12043,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "references",
@@ -12034,9 +12054,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_user_prompt",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent"
     },
     {
       "relation": "calls",
@@ -12045,9 +12065,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L179",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_cache_get",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_get"
     },
     {
       "relation": "calls",
@@ -12056,9 +12076,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L206",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_cache_put",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_cache_put"
     },
     {
       "relation": "rationale_for",
@@ -12066,9 +12086,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_111",
-      "target": "verifier_grounding_reset_cache",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_reset_cache"
     },
     {
       "relation": "calls",
@@ -12077,9 +12097,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L191",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_user_prompt",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_user_prompt"
     },
     {
       "relation": "calls",
@@ -12131,9 +12151,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_144",
-      "target": "verifier_grounding_parse_verdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_parse_verdict"
     },
     {
       "relation": "calls",
@@ -12142,9 +12162,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L196",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_parse_verdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_parse_verdict"
     },
     {
       "relation": "calls",
@@ -12174,9 +12194,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L165",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_165",
-      "target": "verifier_grounding_verify_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claim"
     },
     {
       "relation": "references",
@@ -12185,9 +12205,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine"
     },
     {
       "relation": "references",
@@ -12196,9 +12216,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider"
     },
     {
       "relation": "calls",
@@ -12207,9 +12227,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L181",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_apply",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_apply"
     },
     {
       "relation": "calls",
@@ -12218,9 +12238,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L186",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claim",
-      "target": "verifier_grounding_objection_if_rejected",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_objection_if_rejected"
     },
     {
       "relation": "calls",
@@ -12229,9 +12249,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L226",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claims",
-      "target": "verifier_grounding_verify_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claim"
     },
     {
       "relation": "uses",
@@ -12239,9 +12259,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -12249,9 +12269,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -12259,9 +12279,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "references",
@@ -12270,9 +12290,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L215",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claims",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider"
     },
     {
       "relation": "uses",
@@ -12280,9 +12300,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L40",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
-      "target": "llm_models_modelid",
-      "confidence_score": 0.5
+      "target": "llm_models_modelid"
     },
     {
       "relation": "uses",
@@ -12290,9 +12310,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
-      "target": "llm_provider_llmprovider",
-      "confidence_score": 0.5
+      "target": "llm_provider_llmprovider"
     },
     {
       "relation": "uses",
@@ -12300,9 +12320,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L41",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
-      "target": "llm_provider_message",
-      "confidence_score": 0.5
+      "target": "llm_provider_message"
     },
     {
       "relation": "references",
@@ -12311,9 +12331,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L215",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_verify_claims",
-      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine"
     },
     {
       "relation": "calls",
@@ -12332,9 +12352,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L222",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_222",
-      "target": "verifier_grounding_verify_claims",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claims"
     },
     {
       "relation": "contains",
@@ -12342,9 +12362,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_fakechunk",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakechunk"
     },
     {
       "relation": "contains",
@@ -12352,9 +12372,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_fakeengine",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeengine"
     },
     {
       "relation": "contains",
@@ -12362,9 +12382,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_fakeprovider",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider"
     },
     {
       "relation": "contains",
@@ -12372,9 +12392,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_make_content",
-      "confidence_score": 1.0
+      "target": "tests_conftest_make_content"
     },
     {
       "relation": "contains",
@@ -12382,9 +12402,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L107",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_make_ref",
-      "confidence_score": 1.0
+      "target": "tests_conftest_make_ref"
     },
     {
       "relation": "contains",
@@ -12392,9 +12412,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_reset_caches",
-      "confidence_score": 1.0
+      "target": "tests_conftest_reset_caches"
     },
     {
       "relation": "contains",
@@ -12402,9 +12422,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_sample_adjacency",
-      "confidence_score": 1.0
+      "target": "tests_conftest_sample_adjacency"
     },
     {
       "relation": "contains",
@@ -12412,9 +12432,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_sample_chunks",
-      "confidence_score": 1.0
+      "target": "tests_conftest_sample_chunks"
     },
     {
       "relation": "contains",
@@ -12422,9 +12442,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_stubresponse",
-      "confidence_score": 1.0
+      "target": "tests_conftest_stubresponse"
     },
     {
       "relation": "rationale_for",
@@ -12432,9 +12452,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_agents_tests_conftest_py_tests_conftest_rationale_1",
-      "target": "packages_agents_tests_conftest_py_tests_conftest",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_tests_conftest"
     },
     {
       "relation": "references",
@@ -12443,9 +12463,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_sample_chunks",
-      "target": "tests_conftest_fakechunk",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakechunk"
     },
     {
       "relation": "method",
@@ -12453,9 +12473,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeengine",
-      "target": "tests_conftest_fakeengine_dispose",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeengine_dispose"
     },
     {
       "relation": "rationale_for",
@@ -12463,9 +12483,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_rationale_37",
-      "target": "tests_conftest_fakeengine",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeengine"
     },
     {
       "relation": "references",
@@ -12474,9 +12494,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L107",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_make_ref",
-      "target": "packages_agents_tests_conftest_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_coderef"
     },
     {
       "relation": "references",
@@ -12485,9 +12505,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_make_content",
-      "target": "packages_agents_tests_conftest_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_coderef"
     },
     {
       "relation": "references",
@@ -12496,9 +12516,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_make_content",
-      "target": "packages_agents_tests_conftest_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_chunkcontent"
     },
     {
       "relation": "method",
@@ -12506,9 +12526,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L140",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider",
-      "target": "tests_conftest_fakeprovider_aclose",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider_aclose"
     },
     {
       "relation": "method",
@@ -12516,9 +12536,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider",
-      "target": "tests_conftest_fakeprovider_embed",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider_embed"
     },
     {
       "relation": "method",
@@ -12526,9 +12546,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider",
-      "target": "tests_conftest_fakeprovider_generate",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider_generate"
     },
     {
       "relation": "method",
@@ -12536,9 +12556,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider",
-      "target": "tests_conftest_fakeprovider_init",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider_init"
     },
     {
       "relation": "rationale_for",
@@ -12546,9 +12566,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_rationale_121",
-      "target": "tests_conftest_fakeprovider",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeprovider"
     },
     {
       "relation": "references",
@@ -12557,9 +12577,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider_init",
-      "target": "packages_agents_tests_conftest_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_any"
     },
     {
       "relation": "references",
@@ -12568,9 +12588,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider_embed",
-      "target": "packages_agents_tests_conftest_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_any"
     },
     {
       "relation": "references",
@@ -12579,9 +12599,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_fakeprovider_generate",
-      "target": "packages_agents_tests_conftest_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_conftest_py_any"
     },
     {
       "relation": "method",
@@ -12589,9 +12609,9 @@
       "source_file": "packages/agents/tests/conftest.py",
       "source_location": "L149",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_conftest_stubresponse",
-      "target": "tests_conftest_stubresponse_total_tokens",
-      "confidence_score": 1.0
+      "target": "tests_conftest_stubresponse_total_tokens"
     },
     {
       "relation": "contains",
@@ -12599,9 +12619,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "contains",
@@ -12609,9 +12629,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_callees_of_a",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_callees_of_a"
     },
     {
       "relation": "contains",
@@ -12619,9 +12639,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_callers_of_c",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_callers_of_c"
     },
     {
       "relation": "contains",
@@ -12629,9 +12649,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_callers_requires_symbol",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_callers_requires_symbol"
     },
     {
       "relation": "contains",
@@ -12639,9 +12659,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_entry_points",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_entry_points"
     },
     {
       "relation": "contains",
@@ -12649,9 +12669,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_hubs_ranked_by_fan_in",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_hubs_ranked_by_fan_in"
     },
     {
       "relation": "contains",
@@ -12659,9 +12679,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query",
-      "target": "tests_test_graph_query_test_layers_returns_one_row_per_node",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_test_layers_returns_one_row_per_node"
     },
     {
       "relation": "rationale_for",
@@ -12669,9 +12689,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_rationale_1",
-      "target": "tests_test_graph_query",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query"
     },
     {
       "relation": "calls",
@@ -12680,9 +12700,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_callees_of_a",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "calls",
@@ -12691,9 +12711,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_callers_of_c",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "calls",
@@ -12702,9 +12722,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_callers_requires_symbol",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "calls",
@@ -12713,9 +12733,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_entry_points",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "calls",
@@ -12724,9 +12744,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_hubs_ranked_by_fan_in",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "calls",
@@ -12735,9 +12755,9 @@
       "source_file": "packages/agents/tests/test_graph_query.py",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_graph_query_test_layers_returns_one_row_per_node",
-      "target": "tests_test_graph_query_prime_cache",
-      "confidence_score": 1.0
+      "target": "tests_test_graph_query_prime_cache"
     },
     {
       "relation": "contains",
@@ -12745,9 +12765,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_chunk",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_chunk"
     },
     {
       "relation": "contains",
@@ -12755,9 +12775,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_patch_tools",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_patch_tools"
     },
     {
       "relation": "contains",
@@ -12765,9 +12785,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_ref",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_ref"
     },
     {
       "relation": "contains",
@@ -12775,9 +12795,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_scriptedprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider"
     },
     {
       "relation": "contains",
@@ -12785,9 +12805,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_test_grounded_answer_produces_verified_claims",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_test_grounded_answer_produces_verified_claims"
     },
     {
       "relation": "contains",
@@ -12795,9 +12815,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_test_hallucination_short_circuit_returns_not_found_sentinel",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_test_hallucination_short_circuit_returns_not_found_sentinel"
     },
     {
       "relation": "contains",
@@ -12805,9 +12825,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L132",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph",
-      "target": "tests_test_qa_graph_test_hop_budget_enforced_at_three",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_test_hop_budget_enforced_at_three"
     },
     {
       "relation": "rationale_for",
@@ -12815,9 +12835,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_rationale_1",
-      "target": "tests_test_qa_graph",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph"
     },
     {
       "relation": "calls",
@@ -12826,9 +12846,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_chunk",
-      "target": "tests_test_qa_graph_ref",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_ref"
     },
     {
       "relation": "references",
@@ -12837,9 +12857,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_ref",
-      "target": "packages_agents_tests_test_qa_graph_py_coderef",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_qa_graph_py_coderef"
     },
     {
       "relation": "references",
@@ -12848,9 +12868,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_chunk",
-      "target": "packages_agents_tests_test_qa_graph_py_chunkcontent",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_qa_graph_py_chunkcontent"
     },
     {
       "relation": "rationale_for",
@@ -12858,9 +12878,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_rationale_29",
-      "target": "tests_test_qa_graph_scriptedprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider"
     },
     {
       "relation": "method",
@@ -12868,9 +12888,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_scriptedprovider",
-      "target": "tests_test_qa_graph_scriptedprovider_embed",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider_embed"
     },
     {
       "relation": "method",
@@ -12878,9 +12898,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_scriptedprovider",
-      "target": "tests_test_qa_graph_scriptedprovider_generate",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider_generate"
     },
     {
       "relation": "method",
@@ -12888,9 +12908,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_scriptedprovider",
-      "target": "tests_test_qa_graph_scriptedprovider_init",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider_init"
     },
     {
       "relation": "calls",
@@ -12899,9 +12919,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_test_grounded_answer_produces_verified_claims",
-      "target": "tests_test_qa_graph_scriptedprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider"
     },
     {
       "relation": "calls",
@@ -12910,9 +12930,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_test_hallucination_short_circuit_returns_not_found_sentinel",
-      "target": "tests_test_qa_graph_scriptedprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider"
     },
     {
       "relation": "calls",
@@ -12921,9 +12941,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_test_hop_budget_enforced_at_three",
-      "target": "tests_test_qa_graph_scriptedprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_qa_graph_scriptedprovider"
     },
     {
       "relation": "references",
@@ -12932,9 +12952,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_scriptedprovider_generate",
-      "target": "packages_agents_tests_test_qa_graph_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_qa_graph_py_any"
     },
     {
       "relation": "references",
@@ -12943,9 +12963,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_scriptedprovider_embed",
-      "target": "packages_agents_tests_test_qa_graph_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_qa_graph_py_any"
     },
     {
       "relation": "references",
@@ -12954,9 +12974,9 @@
       "source_file": "packages/agents/tests/test_qa_graph.py",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_qa_graph_patch_tools",
-      "target": "packages_agents_tests_test_qa_graph_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_qa_graph_py_monkeypatch"
     },
     {
       "relation": "contains",
@@ -12964,9 +12984,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "tests_test_types_test_chunk_hit_distance_must_be_non_negative",
-      "confidence_score": 1.0
+      "target": "tests_test_types_test_chunk_hit_distance_must_be_non_negative"
     },
     {
       "relation": "contains",
@@ -12974,9 +12994,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "tests_test_types_test_coderef_accepts_equal_lines",
-      "confidence_score": 1.0
+      "target": "tests_test_types_test_coderef_accepts_equal_lines"
     },
     {
       "relation": "contains",
@@ -12984,9 +13004,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "tests_test_types_test_coderef_rejects_end_before_start",
-      "confidence_score": 1.0
+      "target": "tests_test_types_test_coderef_rejects_end_before_start"
     },
     {
       "relation": "contains",
@@ -12994,9 +13014,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "tests_test_types_test_path_depth_is_steps_minus_one",
-      "confidence_score": 1.0
+      "target": "tests_test_types_test_path_depth_is_steps_minus_one"
     },
     {
       "relation": "contains",
@@ -13004,9 +13024,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types",
-      "target": "tests_test_types_test_path_requires_at_least_one_step",
-      "confidence_score": 1.0
+      "target": "tests_test_types_test_path_requires_at_least_one_step"
     },
     {
       "relation": "rationale_for",
@@ -13014,9 +13034,9 @@
       "source_file": "packages/agents/tests/test_types.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_types_rationale_1",
-      "target": "tests_test_types",
-      "confidence_score": 1.0
+      "target": "tests_test_types"
     },
     {
       "relation": "contains",
@@ -13024,9 +13044,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_stubengine",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubengine"
     },
     {
       "relation": "contains",
@@ -13034,9 +13054,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_stubprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider"
     },
     {
       "relation": "contains",
@@ -13044,9 +13064,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_accepts_clean_json",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_accepts_clean_json"
     },
     {
       "relation": "contains",
@@ -13054,9 +13074,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_extracts_json_from_prose",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_extracts_json_from_prose"
     },
     {
       "relation": "contains",
@@ -13064,9 +13084,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_garbage",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_garbage"
     },
     {
       "relation": "contains",
@@ -13074,9 +13094,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_invalid_decision",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_invalid_decision"
     },
     {
       "relation": "contains",
@@ -13084,9 +13104,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_verify_claim_parse_fail_rejects",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_verify_claim_parse_fail_rejects"
     },
     {
       "relation": "contains",
@@ -13094,9 +13114,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_verify_claim_rejects_when_refs_have_no_chunks",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_verify_claim_rejects_when_refs_have_no_chunks"
     },
     {
       "relation": "contains",
@@ -13104,9 +13124,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L114",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider"
     },
     {
       "relation": "rationale_for",
@@ -13114,9 +13134,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_rationale_1",
-      "target": "tests_test_verifier_grounding",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding"
     },
     {
       "relation": "method",
@@ -13124,9 +13144,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_stubprovider",
-      "target": "tests_test_verifier_grounding_stubprovider_generate",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider_generate"
     },
     {
       "relation": "method",
@@ -13134,9 +13154,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_stubprovider",
-      "target": "tests_test_verifier_grounding_stubprovider_init",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider_init"
     },
     {
       "relation": "calls",
@@ -13145,9 +13165,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_parse_fail_rejects",
-      "target": "tests_test_verifier_grounding_stubprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider"
     },
     {
       "relation": "calls",
@@ -13156,9 +13176,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_rejects_when_refs_have_no_chunks",
-      "target": "tests_test_verifier_grounding_stubprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider"
     },
     {
       "relation": "calls",
@@ -13167,9 +13187,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L128",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider",
-      "target": "tests_test_verifier_grounding_stubprovider",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubprovider"
     },
     {
       "relation": "references",
@@ -13178,9 +13198,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_stubprovider_generate",
-      "target": "packages_agents_tests_test_verifier_grounding_py_any",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_verifier_grounding_py_any"
     },
     {
       "relation": "calls",
@@ -13189,9 +13209,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_parse_fail_rejects",
-      "target": "tests_test_verifier_grounding_stubengine",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubengine"
     },
     {
       "relation": "calls",
@@ -13200,9 +13220,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_rejects_when_refs_have_no_chunks",
-      "target": "tests_test_verifier_grounding_stubengine",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubengine"
     },
     {
       "relation": "calls",
@@ -13211,9 +13231,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L140",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider",
-      "target": "tests_test_verifier_grounding_stubengine",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_stubengine"
     },
     {
       "relation": "references",
@@ -13222,9 +13242,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_rejects_when_refs_have_no_chunks",
-      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch"
     },
     {
       "relation": "references",
@@ -13233,9 +13253,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claim_parse_fail_rejects",
-      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch"
     },
     {
       "relation": "references",
@@ -13244,9 +13264,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L114",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider",
-      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch"
     },
     {
       "relation": "imports_from",
@@ -16559,9 +16579,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "repopilot_core_settings",
-      "confidence_score": 1.0
+      "target": "repopilot_core_settings"
     },
     {
       "relation": "contains",
@@ -16775,9 +16795,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L22",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "target": "repopilot_core_settings_settings",
-      "confidence_score": 0.5
+      "target": "repopilot_core_settings_settings"
     },
     {
       "relation": "uses",
@@ -16987,9 +17007,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_fakeclient",
-      "confidence_score": 1.0
+      "target": "tests_conftest_fakeclient"
     },
     {
       "relation": "contains",
@@ -16997,9 +17017,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_make_provider",
-      "confidence_score": 1.0
+      "target": "tests_conftest_make_provider"
     },
     {
       "relation": "contains",
@@ -17007,9 +17027,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_make_response",
-      "confidence_score": 1.0
+      "target": "tests_conftest_make_response"
     },
     {
       "relation": "contains",
@@ -17017,9 +17037,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_reset_settings_cache",
-      "confidence_score": 1.0
+      "target": "tests_conftest_reset_settings_cache"
     },
     {
       "relation": "contains",
@@ -17027,9 +17047,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest",
-      "target": "tests_conftest_tmp_settings",
-      "confidence_score": 1.0
+      "target": "tests_conftest_tmp_settings"
     },
     {
       "relation": "rationale_for",
@@ -17037,9 +17057,9 @@
       "source_file": "packages/core/tests/conftest.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "packages_core_tests_conftest_py_tests_conftest_rationale_1",
-      "target": "packages_core_tests_conftest_py_tests_conftest",
-      "confidence_score": 1.0
+      "target": "packages_core_tests_conftest_py_tests_conftest"
     },
     {
       "relation": "references",
@@ -19007,9 +19027,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L35",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "target": "repopilot_ingestion_embed_embeddedchunk",
-      "confidence_score": 0.5
+      "target": "repopilot_ingestion_embed_embeddedchunk"
     },
     {
       "relation": "uses",
@@ -19456,9 +19476,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/graph.py",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_graph_build_graph",
-      "target": "packages_ingestion_src_repopilot_ingestion_graph_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_graph_py_digraph"
     },
     {
       "relation": "calls",
@@ -19598,9 +19618,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/graph.py",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_graph_graph_to_adjacency",
-      "target": "packages_ingestion_src_repopilot_ingestion_graph_py_digraph",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_graph_py_digraph"
     },
     {
       "relation": "rationale_for",
@@ -20825,9 +20845,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_persist_make_engine",
-      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine"
     },
     {
       "relation": "references",
@@ -20888,9 +20908,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L36",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "target": "repopilot_ingestion_summary_summarisedchunk",
-      "confidence_score": 0.5
+      "target": "repopilot_ingestion_summary_summarisedchunk"
     },
     {
       "relation": "references",
@@ -20899,9 +20919,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_persist_known_head_sha",
-      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine"
     },
     {
       "relation": "references",
@@ -20910,9 +20930,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_persist_persist_index",
-      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine"
     },
     {
       "relation": "references",
@@ -20921,9 +20941,9 @@
       "source_file": "packages/ingestion/src/repopilot_ingestion/persist.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "repopilot_ingestion_persist_repo_already_indexed",
-      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_src_repopilot_ingestion_persist_py_asyncengine"
     },
     {
       "relation": "calls",
@@ -21129,9 +21149,9 @@
       "source_file": "packages/ingestion/tests/test_pipeline_idempotency.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch",
-      "target": "repopilot_ingestion_pipeline_pipelineresult",
-      "confidence_score": 0.5
+      "target": "repopilot_ingestion_pipeline_pipelineresult"
     },
     {
       "relation": "references",
@@ -22106,9 +22126,9 @@
       "source_file": "packages/ingestion/tests/test_pipeline_idempotency.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_pipeline_idempotency_test_revisit_with_advanced_remote_returns_stale_status",
-      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch"
     },
     {
       "relation": "references",
@@ -22117,9 +22137,9 @@
       "source_file": "packages/ingestion/tests/test_pipeline_idempotency.py",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_pipeline_idempotency_test_revisit_unknown_repo_returns_stale",
-      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch"
     },
     {
       "relation": "references",
@@ -22128,9 +22148,9 @@
       "source_file": "packages/ingestion/tests/test_pipeline_idempotency.py",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_pipeline_idempotency_test_revisit_with_matching_remote_returns_already_indexed",
-      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch",
-      "confidence_score": 1.0
+      "target": "packages_ingestion_tests_test_pipeline_idempotency_py_monkeypatch"
     },
     {
       "relation": "contains",
@@ -23256,11 +23276,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/05_PHASE_PROMPTS.md",
-      "source_location": "L303",
+      "source_location": "L327",
       "weight": 1.0,
       "source": "docs_05_phase_prompts_phase_2_prompt_hybrid_retrieval_grounded_q_a_the_spine",
-      "target": "docs_05_phase_prompts_phase_2_explicit_deferrals_must_clear_before_phase_3_starts",
+      "target": "docs_05_phase_prompts_phase_2_as_built_post_merge_addendum",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/05_PHASE_PROMPTS.md",
+      "source_location": "L303",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_05_phase_prompts_phase_2_prompt_hybrid_retrieval_grounded_q_a_the_spine",
+      "target": "docs_05_phase_prompts_phase_2_explicit_deferrals_must_clear_before_phase_3_starts"
     },
     {
       "relation": "contains",
@@ -23341,6 +23371,16 @@
       "confidence_score": 1.0,
       "source": "docs_readme",
       "target": "docs_readme_repopilot_documentation_set_overview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/README.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "docs_readme_repopilot_documentation_set_overview",
+      "target": "docs_readme_build_progress_at_a_glance",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -23564,5 +23604,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "dcc441fc3d471b2c7be30c896397511a19ee51b7"
+  "built_at_commit": "6065ccfcb8e214884a5f7e07a746b2a0b76b0a93"
 }

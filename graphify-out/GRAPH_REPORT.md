@@ -1,16 +1,16 @@
 # Graph Report - RepoPilot  (2026-06-16)
 
 ## Corpus Check
-- 83 files · ~55,236 words
+- 83 files · ~56,514 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 794 nodes · 1502 edges · 56 communities (42 shown, 14 thin omitted)
+- 796 nodes · 1504 edges · 54 communities (41 shown, 13 thin omitted)
 - Extraction: 76% EXTRACTED · 24% INFERRED · 0% AMBIGUOUS · INFERRED: 361 edges (avg confidence: 0.53)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dcc441fc`
+- Built from commit: `6065ccfc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -59,9 +59,7 @@
 - [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
-- [[_COMMUNITY_Community 51|Community 51]]
 - [[_COMMUNITY_Community 52|Community 52]]
-- [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
 
@@ -86,13 +84,13 @@
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/core/src/repopilot_core/llm/provider.py
 - `WorkerSettings` --uses--> `PipelineResult`  [INFERRED]
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/ingestion/src/repopilot_ingestion/pipeline.py
-- `startup()` --calls--> `get_settings()`  [EXTRACTED]
-  apps/api/src/repopilot_api/jobs/index_repo.py → packages/core/src/repopilot_core/settings.py
+- `create_app()` --calls--> `get_settings()`  [EXTRACTED]
+  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/settings.py
 
 ## Import Cycles
 - 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (56 total, 14 thin omitted)
+## Communities (54 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.17
@@ -127,8 +125,8 @@ Cohesion: 0.18
 Nodes (10): 04 — Build Plan, Per-PR Definition of Done, Phase 0 — Foundation, Phase 1 — Ingestion, Phase 2 — Hybrid Retrieval + Grounded Q&A (THE SPINE), Phase 3 — Orchestration + Learn subgraph, Phase 4 — Experience, Phase 5 — Contribute mode (Iteration 1) (+2 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.17
-Nodes (11): 05 — Phase Prompts (paste-ready), Phase 0 prompt — Foundation, Phase 1 — as built (post-merge addendum), Phase 1 prompt — Ingestion, Phase 2 — explicit deferrals (must clear before Phase 3 starts), Phase 2 — pre-build plan (decisions + build order), Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine), Phase 3 prompt — Orchestration + Learn subgraph (+3 more)
+Cohesion: 0.15
+Nodes (12): 05 — Phase Prompts (paste-ready), Phase 0 prompt — Foundation, Phase 1 — as built (post-merge addendum), Phase 1 prompt — Ingestion, Phase 2 — as built (post-merge addendum), Phase 2 — explicit deferrals (must clear before Phase 3 starts), Phase 2 — pre-build plan (decisions + build order), Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine) (+4 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.29
@@ -139,20 +137,20 @@ Cohesion: 0.50
 Nodes (3): Constraints, Mandatory order of operations, What to return
 
 ### Community 16 - "Community 16"
-Cohesion: 0.07
-Nodes (52): AsyncClient, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age, Logical, agent-facing model identifiers. (+44 more)
+Cohesion: 0.06
+Nodes (67): AsyncClient, BaseSettings, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age (+59 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.18
-Nodes (10): 00 — Claude Build Guide (Standing Context) *(the contract)*, 01 — Problem and Solution *(the thesis / "why")*, 02 — Tech Stack *(the toolbox — every choice + why + what was rejected)*, 03 — Architecture *(the blueprint — the keystone doc)*, 04 — Build Plan *(the schedule — 7 phases, each with a hard gate)*, 05 — Phase Prompts *(the script — paste-ready)*, How the doc set fits together, One-paragraph takeaway (+2 more)
+Cohesion: 0.17
+Nodes (11): 00 — Claude Build Guide (Standing Context) *(the contract)*, 01 — Problem and Solution *(the thesis / "why")*, 02 — Tech Stack *(the toolbox — every choice + why + what was rejected)*, 03 — Architecture *(the blueprint — the keystone doc)*, 04 — Build Plan *(the schedule — 7 phases, each with a hard gate)*, 05 — Phase Prompts *(the script — paste-ready)*, Build progress at a glance, How the doc set fits together (+3 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.17
 Nodes (22): RateLimitError, HTTP 429 from a provider — triggers retry/fallback inside the provider., ProviderName, Shared fixtures for the core package's tests., Message, FakeClient, make_provider(), make_response() (+14 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.13
-Nodes (14): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., configure_logging(), _drop_chunk_content() (+6 more)
+Cohesion: 0.14
+Nodes (12): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., configure_logging(), _drop_chunk_content() (+4 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -171,8 +169,8 @@ Cohesion: 0.40
 Nodes (4): Quickstart (local dev), Repo layout, RepoPilot, Status
 
 ### Community 25 - "Community 25"
-Cohesion: 0.21
-Nodes (25): BaseSettings, CloneResult, LLMProvider, Single entrypoint to every LLM call in the system., ModuleSource, Chunk, LLMProvider, Settings (+17 more)
+Cohesion: 0.16
+Nodes (19): CloneResult, LLMProvider, Single entrypoint to every LLM call in the system., Chunk, LLMProvider, Settings, Chunk, LLMProvider (+11 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.07
@@ -211,16 +209,16 @@ Cohesion: 0.28
 Nodes (8): Any, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, shutdown(), startup(), WorkerSettings
 
 ### Community 46 - "Community 46"
-Cohesion: 0.16
-Nodes (17): EmbeddedChunk, AsyncEngine, Settings, known_head_sha(), make_engine(), persist_index(), PersistResult, Persist Phase 1 pipeline output to Postgres + pgvector.  The functions here are (+9 more)
+Cohesion: 0.17
+Nodes (17): EmbeddedChunk, AsyncEngine, Settings, EmbeddedChunk, Batched async embedder over chunks via the central ``LLMProvider``.  The provide, known_head_sha(), make_engine(), persist_index() (+9 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.18
-Nodes (10): parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, remote_head_sha(), Phase 1 — clone -> parse -> chunk -> graph -> embed -> persist., RuntimeError, Pure-logic tests around URL parsing and the revisit/staleness contract.  The net (+2 more)
+Cohesion: 0.11
+Nodes (18): Path, clone_to_tempdir(), parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, remote_head_sha() (+10 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.17
-Nodes (14): Path, clone_to_tempdir(), Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, index_repo(), _iter_python_files(), _path_to_module(), End-to-end Phase 1 pipeline orchestrator.  Wires: clone → parse → chunk → graph, Full ingestion pipeline. Idempotent on ``(repo_url, head_sha)``. (+6 more)
+Cohesion: 0.43
+Nodes (6): ModuleSource, Path, _iter_python_files(), _path_to_module(), End-to-end Phase 1 pipeline orchestrator.  Wires: clone → parse → chunk → graph, _scan_python_files()
 
 ### Community 49 - "Community 49"
 Cohesion: 0.11
@@ -230,21 +228,17 @@ Nodes (13): Any, ChunkContent, CodeRef, Shared fixtures: stubbed engine + LLMPro
 Cohesion: 0.40
 Nodes (5): github_issues(), Issue, ``github_issues`` — Phase 5 dependency, stubbed in Phase 2.  The signature is lo, Subset of the GitHub issue shape Lane A scores on., Phase 5 will implement; raises until then so Lane A fails loudly.
 
-### Community 51 - "Community 51"
-Cohesion: 0.20
-Nodes (6): Shared core: settings, logging, and the LLMProvider abstraction., Application settings, loaded from environment / `.env` via pydantic-settings., Batched async embedder over chunks via the central ``LLMProvider``.  The provide, Test 5 from the Phase 0 TDD checklist., `.env.example` shipped at the repo root must be a valid pydantic-settings source, test_settings_loads_from_env_example()
-
 ## Knowledge Gaps
-- **172 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+167 more)
+- **174 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+169 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `LLMProvider` connect `Community 25` to `Community 32`, `Community 36`, `Community 45`, `Community 46`, `Community 16`, `Community 18`, `Community 29`?**
-  _High betweenness centrality (0.116) - this node is a cross-community bridge._
-- **Why does `Settings` connect `Community 25` to `Community 32`, `Community 36`, `Community 46`, `Community 16`, `Community 18`, `Community 51`, `Community 19`?**
+- **Why does `LLMProvider` connect `Community 25` to `Community 32`, `Community 36`, `Community 45`, `Community 46`, `Community 16`, `Community 48`, `Community 18`, `Community 29`?**
+  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `Settings` connect `Community 16` to `Community 32`, `Community 36`, `Community 46`, `Community 48`, `Community 18`, `Community 25`?**
   _High betweenness centrality (0.056) - this node is a cross-community bridge._
 - **Why does `ModelId` connect `Community 16` to `Community 32`, `Community 25`, `Community 18`, `Community 46`?**
   _High betweenness centrality (0.054) - this node is a cross-community bridge._

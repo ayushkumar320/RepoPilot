@@ -240,24 +240,218 @@ The "3–7 day solo" budget is wildly optimistic. Realistic is **10–14 days**.
 
 ---
 
+---
+
+## Second-pass review additions (2026-06-14)
+
+A deeper audit after the first pass surfaced 11 more gaps. Same severity scheme.
+
+### M6. Failure modes catalog is thin; the architecture is hand-wavy on partial failures
+
+- [ ] **Status:** open
+
+**What's wrong.** [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) has a "Failure modes and cost design" table that covers 8 scenarios. The real-world surface is much wider and several common ones aren't covered:
+
+- **Repo has no Python files** (or only `__init__.py`). What does the system do? Currently undefined.
+- **Repo has Python 2 only syntax.** tree-sitter-python parses both, but type assumptions break.
+- **Tree-sitter unresolved dynamic calls** (decorator-rewritten signatures, `getattr`, metaclass magic). Currently logged as warnings — but the graph is now structurally incomplete and Lane C's "no error handling on this call" claim may be wrong.
+- **Postgres is down mid-indexing.** Indexing job retries? Fails the user request?
+- **Ollama service crashes mid-tour.** Verifier is gone — does the tour fail, or do we degrade to "all claims unverified"?
+- **pgvector returns zero results** for a Q&A query. Currently undefined behavior in Q&A.
+- **The user's repo URL is invalid / private / redirected / 404.** Currently undefined error UX.
+- **A chunk's source content has been deleted** (git rebase, force-push) between indexing and tour generation. `read_chunks` would fail; behavior undefined.
+- **Indexing pipeline partial failure** — chunks succeeded but graph builder errored. Currently undefined.
+
+**Where it lives.** [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) — failure modes table. [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 1 + Phase 4.
+
+**What to do.**
+1. Extend the failure modes table in docs/03 with the 9 scenarios above. Each gets a detection mechanism and a mitigation.
+2. Add a Phase 1 test: `test_repo_without_python_files_rejected_with_useful_message`.
+3. Add a Phase 4 test: `test_indexing_failure_renders_actionable_error_ux`.
+4. Define a typed `ArchaeologistError` enum and require every fail-edge in the graph to emit one.
+
+---
+
+### M7. Decision Archaeology was added as a capability but Phase 3 doesn't include building it
+
+- [ ] **Status:** open
+
+**What's wrong.** The elastic-intent refactor added Decision Archaeology to the capability library and the agent table in [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md). But [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) Phase 3 task list does not include building it — Phase 3 still describes "Cartographer → Flow Tracer → Teacher". Phase 5 doesn't include it either. So as written, Decision Archaeology is in the schema but never gets built.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) + [docs/05_PHASE_PROMPTS.md](05_PHASE_PROMPTS.md) — Phase 3 and Phase 5.
+
+**What to do.** Pick one:
+1. **Defer Decision Archaeology to v0.2.** Update docs/03 to mark it as "post-MVP, schema reserved" and remove it from the planner's active rules in v1. Cleanest path.
+2. **Include it in Phase 3.** Add task `packages/agents/build/decision_archaeology.py` with git-log + README + commit-message extraction. Add ~2 days to Phase 3 budget. Add eval set for decision fidelity.
+3. **Include it in Phase 5.** Move it out of "Learn" mental model and into the contribute-shaped phase. Add ~2 days to Phase 5.
+
+Recommendation: option 1 (defer to v0.2). The architecture stays elastic; the implementation surface stays narrow. Update docs/03's capability library description to flag Decision Archaeology as "schema-reserved, post-v0.1."
+
+---
+
+### S7. Auth, rate-limiting, and GitHub API token sourcing is undefined — Lane A breaks on day one
+
+- [ ] **Status:** open
+
+**What's wrong.** Lane A uses PyGithub to fetch open issues. Unauthenticated GitHub API requests are capped at **60 per hour per IP**. The first 60 users in an hour on launch day all share that quota. Authenticated requests get 5,000/hour but require a token. The docs are silent on:
+
+- Where the GitHub token comes from (server-shared PAT vs. user-supplied vs. OAuth).
+- Per-IP rate limiting on the FastAPI endpoints (mentioned briefly in Phase 6 but no spec).
+- How quota exhaustion surfaces to the user.
+
+**Where it lives.** [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) — `github_issues` tool. [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 2 + Phase 6.
+
+**What to do.**
+1. v1 default: **a server-side PAT in `.env`** (read-only scope: `public_repo`). Document that this is a shared resource and rate-limited. Cache aggressively — same repo + same hour = same cached issues.
+2. Specify a per-IP rate limit on `POST /tours` (e.g., 5 tours/IP/hour) using `slowapi`.
+3. When quota approaches exhaustion, Lane A degrades to a clear message ("we couldn't fetch issues — Lane A is paused for the next N minutes") rather than failing silently.
+4. Future: "bring your own PAT" — but for v1, server-side PAT is enough.
+
+---
+
+### S8. The "retrieval-path chip on every claim" claim is too broad
+
+- [ ] **Status:** open
+
+**What's wrong.** [docs/00_CLAUDE_BUILD_GUIDE.md](00_CLAUDE_BUILD_GUIDE.md) and [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) say every claim shows a retrieval path (`vector_search → graph_traverse · 2 hops`). But:
+
+- **Lane B claims** come from deterministic detectors (no retrieval). Their "path" is more like `lane_b:detector=untested_hot_code`.
+- **Lane C claims** come from pre-filtered structural patterns (no retrieval). Their "path" is `lane_c:pattern=swallow_except`.
+- **Cartographer claims** come from graph queries, not vector + graph traversal. Their "path" is `cartographer:hub_query`.
+
+The current "retrieval-path chip" framing only fits Q&A and (some) Flow Tracer claims.
+
+**Where it lives.** [docs/00_CLAUDE_BUILD_GUIDE.md](00_CLAUDE_BUILD_GUIDE.md) Trust surfaces, [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) Trust surfaces, [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) Phase 4.
+
+**What to do.** Rename to **"provenance chip"**. Every claim carries a `provenance` field on the SSE `claim` event with a typed source descriptor — one of `vector_then_graph`, `graph_only`, `deterministic_detector(name)`, `structural_pattern(name)`. The chip renders whichever applies. Update docs/03's `claim` event schema and the Phase 4 deliverables list. Trust is preserved; honesty is too.
+
+---
+
+### S9. No user-feedback mechanism in v1 — we'll learn nothing outside the eval set
+
+- [ ] **Status:** open
+
+**What's wrong.** The eval set is hand-labeled in `evals/`. After launch, real users will encounter cases that aren't in any eval set. With no feedback mechanism, we can't tell which sections worked vs didn't, which Q&A answers were trusted, which opportunities were acted on. Eval-set quality plateaus quickly without real signal.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 4 + Phase 6.
+
+**What to do.** Add a Phase 4 task: a tiny feedback affordance on every section — a quiet "did this help? 👍 / 👎 / explain" inline. Anonymous, opt-in, written to a `feedback` table with `(section_text, claim_ids, intent_profile_id, signal, freeform)`. No accounts. Surface aggregated counts to a maintainer-only debug page in Phase 6. Don't try to do anything clever with the data in v1 — just collect it.
+
+---
+
+### S10. Indexing edge cases (Python 2, `.pyi`, `.ipynb`, vendored deps, generated code) are unspecified
+
+- [ ] **Status:** open
+
+**What's wrong.** Real Python repos contain more than `.py` files written in Python 3:
+
+- **`.pyi` type stub files** — should we index them? Useful for understanding public surface; not executable.
+- **`.ipynb` Jupyter notebooks** — large repos like fastai have many. Currently undefined.
+- **Vendored dependencies** (`vendor/`, `third_party/`, `_vendor/`) — including them inflates the graph and pollutes Lane B with code the maintainers don't own.
+- **Generated code** (proto-generated, openapi-generated, alembic migrations) — high churn but not meaningful to a contributor.
+- **Python 2 syntax** (still in some older repos and CI compat shims) — tree-sitter parses it, but our type assumptions may break.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 1 ingestion.
+
+**What to do.** Add a Phase 1 sub-task: a default skip-list (configurable). `.pyi` indexed but tagged separately. `.ipynb` skipped in v1, noted in scope fence. `vendor/`, `third_party/`, `_vendor/` skipped by default. Generated-code detection via marker comments (e.g., `# Generated by`) skipped. Python 2 syntax detected (look for `print` statement, `except X, e:`) and warned; index anyway but tag.
+
+---
+
+### S11. Embedding model versioning + migration story is missing
+
+- [ ] **Status:** open
+
+**What's wrong.** Embeddings are stored in pgvector for every chunk. If Ollama bumps `nomic-embed-text` (or we switch models for a v0.2 quality boost), the stored embeddings are silently incompatible — new queries get embedded with one model, existing vectors are from another, retrieval quality silently degrades.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 1 persistence schema.
+
+**What to do.** Store the embedding model name + version on each row in `chunk_embeddings`. Indexing job records the current embedding model in the `repos` table. On Q&A, the query embedding is generated with the model that matches the stored vectors. A re-index trigger fires automatically when the configured model differs from the stored one.
+
+---
+
+### S12. Concurrent indexing of the same repo is a race condition
+
+- [ ] **Status:** open
+
+**What's wrong.** Two users paste the same repo URL within 90 seconds. The arq worker picks up both jobs. Both clone, both parse, both write to Postgres. Without a uniqueness constraint and a row-level lock, you get duplicate chunks, duplicate embeddings, an inconsistent graph adjacency, and possibly a deadlock.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 1 idempotency + arq job design.
+
+**What to do.** The arq job acquires a Postgres advisory lock keyed on `(repo_url, head_sha)` before doing any work. A second concurrent job for the same key short-circuits to "wait for existing indexing", polls the `repos.status` field, and returns the cached `repo_id` when the first one completes. Add `test_concurrent_indexing_same_repo_does_not_duplicate`.
+
+---
+
+### W5. Repo update detection on revisit is undefined
+
+- [ ] **Status:** open
+
+**What's wrong.** A user came to repo `X` last week; the system indexed `X` at SHA `abc123`. This week, `X` is at SHA `def456` (active project, 50 new commits). The user pastes the URL again. Do we re-index automatically, warn them about staleness, or silently use the old index?
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 1 idempotency, Phase 4 UX.
+
+**What to do.** On a repo revisit, the API does a lightweight `git ls-remote` (no clone) to get current HEAD. If it differs from `repos.head_sha`, the UI shows a small banner: *"This repo has new commits since we last indexed it. Re-index? (~90s)"* Re-indexing is opt-in. The "first impression" panel can stream from the cached index immediately while the user decides.
+
+---
+
+### W6. Production deployment story missing — Docker Compose is dev-only
+
+- [ ] **Status:** open
+
+**What's wrong.** [docs/02_TECH_STACK.md](02_TECH_STACK.md) and the build plan describe `docker compose up` for local dev. No story for hosting the v1 demo: Vercel/Railway/fly.io? Where does Postgres run? Where does Ollama run? Ollama notably **cannot easily run on serverless** because of the model weights.
+
+**Where it lives.** [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md) — Phase 6 ship.
+
+**What to do.** Add a Phase 6 task: explicit deployment topology doc. v0.1 baseline:
+- **Frontend** → Vercel (Next.js native; free tier).
+- **API + arq worker** → fly.io or Railway (small VM, ~$5/mo).
+- **Postgres + pgvector** → Neon or Supabase (free tier).
+- **Ollama (Verifier + Embeddings)** → on the same fly.io VM (need ≥ 4GB RAM for qwen2.5-coder:7b q4) OR a separate small VM.
+- **Redis** → Upstash (free tier).
+
+Total monthly cost estimate at idle: $5–15. Document this so reviewers know the demo is hostable, not just local.
+
+---
+
+### W7. Q&A conversation thread / multi-turn — currently each question is independent
+
+- [ ] **Status:** open
+
+**What's wrong.** The Q&A subgraph as designed treats each question as standalone. A user asking *"how does middleware work?"* then *"how does my middleware get registered?"* loses context — the second question's "my" can't refer to the first answer's content. Real users will ask sequential, building questions.
+
+**Where it lives.** [docs/03_ARCHITECTURE.md](03_ARCHITECTURE.md) — Q&A subgraph.
+
+**What to do.** Add a `qa_history: list[QAExchange]` field to `ArchaeologistState`. The Q&A prompt includes the last 3 exchanges (capped). The `IntentProfile` plus history plus the current question form the Q&A input. This is a small change but a real UX upgrade. Not v1-blocking, but worth doing post-Phase-4.
+
+---
+
 ## Application order
 
 Recommended order if applying in one pass:
 
 1. **M5** (beachhead) — trivial, blocks everything else
-2. **M3** (capability dependencies) — architectural; touches state schema
-3. **M1** (Verifier batching) — architectural; touches Verifier loop design
-4. **M2** (eval labeling time) + **M4** (Phase 4 budget) — schedule realism, can edit together
-5. **S1–S6** in any order — local edits
-6. **W1–W4** in any order — local edits
+2. **M7** (Decision Archaeology defer-or-build) — affects schema + Phase 3 budget; resolve early
+3. **M3** (capability dependencies) — architectural; touches state schema
+4. **M6** (failure modes catalog) — architectural; touches docs/03 failure table + Phase 1/4
+5. **M1** (Verifier batching) — architectural; touches Verifier loop design
+6. **M2** (eval labeling time) + **M4** (Phase 4 budget) — schedule realism, can edit together
+7. **S7** (auth/rate-limit/GH token) — Phase 0 LLMProvider + Phase 6; affects Phase 0 scope
+8. **S8** (provenance chip rename) — touches SSE schema and UI claims everywhere
+9. **S11** (embedding versioning) + **S12** (concurrent indexing) — both touch Phase 1 persistence; edit together
+10. **S1–S6, S9, S10** in any order — local edits
+11. **W1–W7** in any order — local edits
 
-Total estimated editing time: **60–90 minutes** for Must + Should; another 30 minutes for Worth.
+Total estimated editing time: **90–120 minutes** for Must + Should (now 13 items); another 45 minutes for Worth (now 7 items).
 
 ## Sign-off checklist (do not start Phase 0 until all checked)
 
-- [ ] All **M** items checked and committed
-- [ ] All **S** items either checked or explicitly deferred with a written reason
-- [ ] All eval datasets that block Phase 2/3 gates have been scoped (even if not yet labeled)
-- [ ] Per-tour token budget calculated and concurrency limit chosen
+- [ ] All **M** items (M1–M7) checked and committed
+- [ ] All **S** items (S1–S12) either checked or explicitly deferred with a written reason
+- [ ] All eval datasets that block Phase 2/3/5 gates have been scoped (even if not yet labeled)
+- [ ] Per-tour token budget calculated and concurrency limit chosen (S2)
+- [ ] GitHub token sourcing decided and `.env.example` updated (S7)
+- [ ] Embedding-model version column added to `chunk_embeddings` schema (S11)
+- [ ] Concurrent-indexing lock strategy decided (S12)
+- [ ] Failure modes table extended with the 9 new scenarios (M6)
+- [ ] Decision Archaeology status decided: built-in-v1 or deferred-to-v0.2 (M7)
 - [ ] CLAUDE.md updated if any of the above introduced new project-wide conventions
 - [ ] This document committed and pushed before Phase 0 PR is opened

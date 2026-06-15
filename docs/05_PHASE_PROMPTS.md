@@ -116,6 +116,58 @@ Per-PR Definition of Done from docs/00 applies.
 Do not start the next phase. Stop and report what was built, test results, the indexing time on httpx, and any deviations.
 ```
 
+### Phase 1 — as built (post-merge addendum)
+
+Phase 1 landed on `main` at commit `c4747e6` and CI went green at `0f170fa` (see "Three latent CI bugs" below). The deliverables match the prompt; the addendum below records the decisions made during the build so Phase 2 starts from the as-built reality, not the spec.
+
+**Decisions made (each chosen over a plausible alternative):**
+
+1. **Migrations: alembic, not hand-rolled `init.sql`.** `packages/ingestion/alembic.ini` + `migrations/env.py` use `Settings.postgres_dsn` so dev/CI agree. First revision `0001_ingestion_schema` creates `repos`, `chunks` (with `(repo_id, symbol)` and `(repo_id, file_path)` indexes), `chunk_embeddings (vector(768))` with the `ivfflat (vector_cosine_ops) WITH (lists = 100)` index, and `graph_adjacency`. Run via `make db-migrate`.
+2. **Embeddings go through `LLMProvider`, not direct `httpx`.** Phase 0's provider grew an `embed()` method (Ollama-only chain, separate `embedding_cache` SQLite table) + an `EmbeddingResponse` shape. Keeps the "one place for every LLM call" rule from `docs/00`.
+3. **Pipeline lives in `packages/ingestion/pipeline.py`; arq is a 50-line shell in `apps/api/jobs/index_repo.py`.** `index_repo()` is unit-testable without arq; `WorkerSettings.functions/on_startup/on_shutdown` are typed `ClassVar` to satisfy ruff `RUF012`.
+4. **Pipeline status enum: `indexed` / `already_indexed` / `stale` / `too_large`.** The `stale` branch lives in `revisit_status()` (cheap `git ls-remote`, no clone) and is what Phase 4's UI hits on URL paste.
+5. **Coverage gate is fast-lane-only.** `pyproject.toml [tool.coverage.run] omit` excludes `persist.py`, `pipeline.py`, `embed.py`, `summary.py`, `migrations/**`, `apps/api/jobs/**` — they are live-service orchestration exercised by the slow lane. Fast-lane coverage holds at 82% on the unit-testable layer; the slow lane is the gate for the rest.
+6. **Graph build uses Python's `ast`, not tree-sitter, for scope resolution.** tree-sitter remains the source of truth for **line spans**; `ast` is the right tool for binding `self.method()`, `import x as y`, and `from x import y as z`. Both run; neither replaces the other.
+7. **Slow tests are tagged `@pytest.mark.slow @pytest.mark.integration`.** The 90 s httpx gate lives there and is excluded from the fast CI lane per `docs/06` S6. Run via `make test-slow` after `make docker-up && make db-migrate`.
+
+**Settings additions** (in `repopilot_core.settings.Settings`):
+
+- `ingestion_clone_root: Path` — defaults to `.cache/clones`
+- `ingestion_max_repo_loc: int = 200_000` — enforced at the queue boundary
+- `ingestion_summary_concurrency: int = 8`
+- `ingestion_embed_batch_size: int = 32`
+- `ingestion_embed_concurrency: int = 4`
+
+**Three latent CI bugs (none caught by `make ci`):**
+
+| # | Bug | Fixed in |
+|---|---|---|
+| 1 | `uv sync --all-groups` failed on the pinned `uv 0.4.x` (flag landed in `uv 0.5`). | `8d5b749` (bump pin) |
+| 2 | `ruff format --check` (CI-only step) drifted on 11 files; `make ci` only runs `ruff check`. | `8d5b749` |
+| 3 | CI env `REPOPILOT_ENV: test` shadowed the `"development"` default that `test_settings_loads_from_env_example` asserts. Pydantic-settings reads process env first. | `0f170fa` (drop override) |
+
+These cost three CI cycles before the gate was actually exercised. **Lesson for future phases: `make ci` must mirror the CI workflow exactly.** Add `ruff format --check` to the `ci` target, and don't add env overrides in CI without a test that depends on them.
+
+**Test counts (commit `0f170fa`, CI green):**
+
+- 38 fast-lane tests pass (`make test`)
+- 2 slow-lane tests written, not run in CI (`test_indexing_under_90s`, `test_graph_known_call_chain_httpx`)
+- Coverage: 82.14% on the unit-testable layer (gate ≥ 80%)
+- mypy `--strict`: clean on 41 files
+- ruff `check` + `format --check`: clean
+
+**Slow-lane gate (still unrun as of writing):**
+
+The 90 s httpx index gate is a hard merge-blocker per `docs/04` Phase 1 spec but cannot run in CI (no Docker daemon, no Groq key, ~5 GB Ollama pull). Validate locally:
+
+```bash
+make docker-up        # Postgres+pgvector, Redis, Ollama (~5 min cold start)
+make db-migrate       # alembic upgrade head
+make test-slow        # runs the two @slow @integration tests
+```
+
+If the 90 s number drifts above budget on a real httpx index, do **not** start Phase 2 — the spine is built on top of these chunks and embeddings, and slow ingestion compounds with slow retrieval.
+
 ---
 
 ## Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine)
@@ -171,6 +223,82 @@ Per-PR Definition of Done from docs/00 applies, including: "retrieval-touching P
 
 Do not start the next phase. Stop and report what was built, test results, the full eval report JSON, and the LangSmith project URL.
 ```
+
+### Phase 2 — pre-build plan (decisions + build order)
+
+Layered on top of the prompt above. Reflects the as-built Phase 1 reality (`pipeline.PipelineResult`, `LLMProvider.embed()`, `chunks.content` column, JSONB `graph_adjacency`) so we don't rediscover them mid-phase.
+
+**Module layout** (proposed, no code yet):
+
+```
+packages/agents/src/repopilot_agents/
+├── tools/
+│   ├── vector_search.py        # pgvector <=> cosine k-NN -> ChunkHit[]
+│   ├── graph_traverse.py       # BFS over graph_adjacency JSONB -> Path[]
+│   ├── graph_query.py          # entry_points / hubs / layers / callers / callees
+│   ├── graph_metrics.py        # per-symbol pack (fan-in, fan-out, complexity, churn, has_tests)
+│   ├── read_chunks.py          # CodeRef[] -> ChunkContent[] (ONLY source-text returner)
+│   └── github_issues.py        # PyGithub + cache; Lane A dep, stub allowed in Phase 2
+├── qa/
+│   ├── graph.py                # LangGraph mini: search → traverse → judge → (expand|answer) → verifier
+│   ├── prompts.py              # goal-anchored Q&A templates (≤ 2000 input tokens)
+│   └── types.py                # ChunkHit, Path, ChunkContent, SufficiencyVerdict
+└── verifier/
+    └── grounding.py            # Claim -> read_chunks(refs) -> structured JSON verdict
+
+packages/evals/src/repopilot_evals/
+├── datasets/
+│   ├── httpx_qa_v1.jsonl              # 15 hand-labeled Q&A (10 standard + 3 multi-hop + 3 not-in-repo)
+│   ├── verifier_quality_v1.jsonl      # 30 (claim, chunks, expected_verdict) triples — docs/06 S5
+│   └── sampled_pr_v1.jsonl            # 5-item subset for PR-time eval (docs/06 S6)
+└── runners/
+    ├── grounding.py            # full eval; grounding accuracy + recall@k + hallucination rate
+    └── sampled.py              # PR-time subset, target ≤ 5 min wall clock
+```
+
+**Build order** (each step independently shippable, gates compound):
+
+1. `tools/read_chunks.py` (smallest, zero deps; reads `chunks.content` from Phase 1)
+2. `tools/vector_search.py` (pgvector k-NN over `chunk_embeddings`)
+3. `tools/graph_traverse.py` (BFS over `graph_adjacency` JSONB)
+4. `tools/graph_query.py` (entry_points / hubs / layers / callers / callees)
+5. `tools/graph_metrics.py` (per-symbol pack)
+6. `verifier/grounding.py` (Ollama JSON-mode prompt; parse-fail = reject)
+7. `qa/graph.py` (the LangGraph mini-graph composing 1–6)
+8. LangSmith `@traceable` wiring (conditional on `LANGSMITH_API_KEY`)
+9. `httpx_qa_v1.jsonl` labeling — **3–5 hrs of human work**; the gating bottleneck per `docs/06` M2
+10. `verifier_quality_v1.jsonl` labeling — **docs/06 S5**: without it, the 90 % grounding number is a function of two unknown error rates
+11. `evals/runners/grounding.py` + `sampled.py` + `.github/workflows/eval.yml` (PR-time sampled, full matrix on `main`)
+
+**Decisions to lock before coding** (defaults chosen; flip any of them now):
+
+| # | Decision | Default | Why |
+|---|---|---|---|
+| D1 | `read_chunks` source | `chunks.content` column | Indexed snapshot is immutable by design (idempotent on `(repo_url, head_sha)`); ~10× faster than re-reading source files. |
+| D2 | Tool API style | `async`, returns Pydantic models | Matches Phase 1 (`SQLAlchemy async`); LangGraph supports async nodes natively. |
+| D3 | Sufficiency judge model | Same as Q&A primary (`QA_PRIMARY` 70 B) | Per `docs/04`: "it has the context already." Fewer prompts, no extra quota burn. |
+| D4 | Verifier output format | Pydantic-validated JSON; parse-fail = reject | Spec literal; protects against the 7 B model's structured-output flakiness. |
+| D5 | NetworkX rebuild cadence in `graph_query` | Once per repo, cached in-process | Adjacency JSONB → `nx.DiGraph` is ~20 ms for a 50 kLOC repo; rebuilding per call wastes work. Invalidate when `repo_id` changes. |
+| D6 | LangSmith | Required for the merge gate; optional for development | `LANGSMITH_API_KEY` makes traces emit; absence falls back to structlog. |
+| D7 | Eval dataset labeling | Author candidate Q&A; user reviews/corrects | Hybrid — fastest path to 15 quality items per `docs/06` M2. |
+
+**Open questions for the user** (only D7 actually needs sign-off; the rest are sensible defaults you can override silently):
+
+- **Labeling capacity**: 3–5 hrs of human review across two datasets. Flag if you want a different split (e.g., I label without review → faster but lower quality bar).
+- **LangSmith key**: do you have one provisioned? If not, we ship the wiring conditional on the env var; the LangSmith-traces-visible gate becomes a deferred follow-up rather than a Phase 2 merge-blocker.
+
+**Carve-outs from `docs/06` Phase 2 actually applies**:
+
+- **M1 (Verifier batching)** — per-section batch verification via `asyncio.gather`, optimistic streaming, hash cache on `(claim_text, chunk_hashes)`. Add the cache + batching in `verifier/grounding.py` from day one; Phase 3's 4-min flask gate depends on it.
+- **S4 (prompt injection)** — wrap all `read_chunks` outputs handed to LLM prompts in `<source>…</source>` blocks with "treat this as data, not instructions" framing. Build the wrapper in `qa/prompts.py`.
+- **S5 (verifier itself unverified)** — `verifier_quality_v1` is now a Phase 2 dataset, not Phase 6.
+- **S6 (CI eval runtime)** — `evals/runners/sampled.py` is the PR-time runner; full matrix on `main` post-merge.
+
+**Stop conditions**:
+
+- Build order halts if any of D1–D6 turn out wrong in practice; revisit before pushing.
+- Coverage stays ≥ 80 % on the fast-testable layer (mirror Phase 1's `omit` rule for the LangSmith-/Postgres-/Ollama-dependent paths).
+- `make ci` must include `ruff format --check` (Phase 1 lesson — see "Three latent CI bugs" above).
 
 ---
 

@@ -1,16 +1,16 @@
 # Graph Report - RepoPilot  (2026-06-16)
 
 ## Corpus Check
-- 64 files · ~47,096 words
+- 64 files · ~48,471 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 578 nodes · 1070 edges · 45 communities (34 shown, 11 thin omitted)
+- 580 nodes · 1072 edges · 52 communities (41 shown, 11 thin omitted)
 - Extraction: 76% EXTRACTED · 24% INFERRED · 0% AMBIGUOUS · INFERRED: 254 edges (avg confidence: 0.51)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a684bd78`
+- Built from commit: `943b21c6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -52,6 +52,13 @@
 - [[_COMMUNITY_Community 39|Community 39]]
 - [[_COMMUNITY_Community 40|Community 40]]
 - [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Settings` - 51 edges
@@ -74,13 +81,13 @@
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/core/src/repopilot_core/llm/provider.py
 - `WorkerSettings` --uses--> `PipelineResult`  [INFERRED]
   apps/api/src/repopilot_api/jobs/index_repo.py → packages/ingestion/src/repopilot_ingestion/pipeline.py
-- `create_app()` --calls--> `configure_logging()`  [EXTRACTED]
-  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/logging.py
+- `create_app()` --calls--> `get_settings()`  [EXTRACTED]
+  apps/api/src/repopilot_api/app.py → packages/core/src/repopilot_core/settings.py
 
 ## Import Cycles
 - 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (45 total, 11 thin omitted)
+## Communities (52 total, 11 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.17
@@ -115,8 +122,8 @@ Cohesion: 0.18
 Nodes (10): 04 — Build Plan, Per-PR Definition of Done, Phase 0 — Foundation, Phase 1 — Ingestion, Phase 2 — Hybrid Retrieval + Grounded Q&A (THE SPINE), Phase 3 — Orchestration + Learn subgraph, Phase 4 — Experience, Phase 5 — Contribute mode (Iteration 1) (+2 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.22
-Nodes (8): 05 — Phase Prompts (paste-ready), Phase 0 prompt — Foundation, Phase 1 prompt — Ingestion, Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine), Phase 3 prompt — Orchestration + Learn subgraph, Phase 4 prompt — Experience (FastAPI + Next.js + synchronized code viewer), Phase 5 prompt — Contribute mode (Iteration 1), Phase 6 prompt — Harden and ship
+Cohesion: 0.18
+Nodes (10): 05 — Phase Prompts (paste-ready), Phase 0 prompt — Foundation, Phase 1 — as built (post-merge addendum), Phase 1 prompt — Ingestion, Phase 2 — pre-build plan (decisions + build order), Phase 2 prompt — Hybrid Retrieval + Grounded Q&A (the spine), Phase 3 prompt — Orchestration + Learn subgraph, Phase 4 prompt — Experience (FastAPI + Next.js + synchronized code viewer) (+2 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.29
@@ -127,20 +134,20 @@ Cohesion: 0.50
 Nodes (3): Constraints, Mandatory order of operations, What to return
 
 ### Community 16 - "Community 16"
-Cohesion: 0.08
-Nodes (52): AsyncClient, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age, Logical, agent-facing model identifiers. (+44 more)
+Cohesion: 0.10
+Nodes (48): AsyncClient, BaseSettings, Connection, EmbeddingResponse, ModelBinding, ModelId, ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age (+40 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.18
 Nodes (10): 00 — Claude Build Guide (Standing Context) *(the contract)*, 01 — Problem and Solution *(the thesis / "why")*, 02 — Tech Stack *(the toolbox — every choice + why + what was rejected)*, 03 — Architecture *(the blueprint — the keystone doc)*, 04 — Build Plan *(the schedule — 7 phases, each with a hard gate)*, 05 — Phase Prompts *(the script — paste-ready)*, How the doc set fits together, One-paragraph takeaway (+2 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.16
-Nodes (22): _backoff_delay(), Exponential backoff with full jitter. attempt=0 is the first retry., ProviderName, FakeClient, make_provider(), make_response(), Shared fixtures for the core package's tests., Test double for an LLM provider client. (+14 more)
+Cohesion: 0.11
+Nodes (28): _backoff_delay(), Exponential backoff with full jitter. attempt=0 is the first retry., ProviderName, Any, FakeClient, make_provider(), make_response(), Shared fixtures for the core package's tests. (+20 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.10
-Nodes (20): Any, EventDict, FastAPI, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., shutdown(), startup() (+12 more)
+Cohesion: 0.14
+Nodes (12): EventDict, FastAPI, Any, create_app(), FastAPI scaffold — health-check only in Phase 0., FastAPI app entrypoint. Endpoints are added in Phase 4., configure_logging(), _drop_chunk_content() (+4 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -159,16 +166,16 @@ Cohesion: 0.40
 Nodes (4): Quickstart (local dev), Repo layout, RepoPilot, Status
 
 ### Community 25 - "Community 25"
-Cohesion: 0.07
-Nodes (60): AsyncEngine, BaseSettings, CloneResult, EmbeddedChunk, arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, WorkerSettings, EmbeddingResponse, LLMProvider (+52 more)
+Cohesion: 0.23
+Nodes (18): CloneResult, LLMProvider, Single entrypoint to every LLM call in the system., ModuleSource, Chunk, LLMProvider, Path, Settings (+10 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.08
-Nodes (50): Node, Path, Path, Path, ParsedFile, ParsedSymbol, chunk_file(), _class_header_content() (+42 more)
+Nodes (49): Node, Path, Path, Path, ParsedFile, ParsedSymbol, chunk_file(), _class_header_content() (+41 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.09
-Nodes (25): MonkeyPatch, Path, clone_to_tempdir(), parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c (+17 more)
+Cohesion: 0.36
+Nodes (7): MonkeyPatch, Idempotency + staleness — exercised against a stubbed DB and stubbed clone.  The, When the remote HEAD has moved past the indexed SHA → status=stale., _StubEngine, test_revisit_unknown_repo_returns_stale(), test_revisit_with_advanced_remote_returns_stale_status(), test_revisit_with_matching_remote_returns_already_indexed()
 
 ### Community 37 - "Community 37"
 Cohesion: 0.15
@@ -186,6 +193,34 @@ Nodes (5): Animal, Dog, Fixture file the chunker tests assert against. Real Pyth
 Cohesion: 0.20
 Nodes (4): Alembic environment — uses Settings.postgres_dsn so dev + CI agree., SQLAlchemy schema for Phase 1 ingestion.  Tables:     repos              one row, Minimal pgvector type so alembic can emit `vector(N)` without importing     the, Vector
 
+### Community 45 - "Community 45"
+Cohesion: 0.14
+Nodes (13): Any, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, shutdown(), startup(), WorkerSettings (+5 more)
+
+### Community 46 - "Community 46"
+Cohesion: 0.18
+Nodes (15): AsyncEngine, EmbeddedChunk, Settings, known_head_sha(), make_engine(), persist_index(), PersistResult, Persist Phase 1 pipeline output to Postgres + pgvector.  The functions here are (+7 more)
+
+### Community 47 - "Community 47"
+Cohesion: 0.18
+Nodes (11): GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, remote_head_sha(), Phase 1 — clone -> parse -> chunk -> graph -> embed -> persist., _iter_python_files(), _path_to_module(), End-to-end Phase 1 pipeline orchestrator.  Wires: clone → parse → chunk → graph, Decide whether ``repo_url`` is already-current, stale, or unknown.      Cheap — (+3 more)
+
+### Community 48 - "Community 48"
+Cohesion: 0.17
+Nodes (12): Path, LLMProvider, clone_to_tempdir(), Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, index_repo(), Full ingestion pipeline. Idempotent on ``(repo_url, head_sha)``., Summarise every chunk concurrently, bounded by the configured semaphore., summarise_chunks() (+4 more)
+
+### Community 49 - "Community 49"
+Cohesion: 0.24
+Nodes (8): EmbeddingResponse, Embed ``text`` via Ollama (the only embeddings provider in v1).          Same ca, Provider-agnostic embedding shape., Chunk, LLMProvider, Settings, embed_chunks(), Embed every chunk; results are returned in the same order as ``chunks``.
+
+### Community 50 - "Community 50"
+Cohesion: 0.40
+Nodes (5): parse_github_url(), Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Pure-logic tests around URL parsing and the revisit/staleness contract.  The net, test_parse_github_url_accepts_canonical_forms(), test_parse_github_url_rejects_unsupported()
+
+### Community 51 - "Community 51"
+Cohesion: 0.50
+Nodes (3): Test 5 from the Phase 0 TDD checklist., `.env.example` shipped at the repo root must be a valid pydantic-settings source, test_settings_loads_from_env_example()
+
 ## Knowledge Gaps
 - **161 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `dev` (+156 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -194,12 +229,12 @@ Nodes (4): Alembic environment — uses Settings.postgres_dsn so dev + CI agree.
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Settings` connect `Community 25` to `Community 16`, `Community 18`, `Community 19`?**
-  _High betweenness centrality (0.082) - this node is a cross-community bridge._
-- **Why does `LLMProvider` connect `Community 25` to `Community 16`, `Community 18`, `Community 19`?**
+- **Why does `Settings` connect `Community 16` to `Community 45`, `Community 46`, `Community 48`, `Community 49`, `Community 18`, `Community 51`, `Community 25`?**
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
+- **Why does `LLMProvider` connect `Community 25` to `Community 45`, `Community 46`, `Community 16`, `Community 49`, `Community 18`, `Community 48`?**
   _High betweenness centrality (0.041) - this node is a cross-community bridge._
 - **Why does `_Resolver` connect `Community 38` to `Community 37`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
 - **Are the 46 inferred relationships involving `Settings` (e.g. with `AsyncClient` and `AsyncEngine`) actually correct?**
   _`Settings` has 46 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 35 inferred relationships involving `ModelId` (e.g. with `AsyncClient` and `Connection`) actually correct?**

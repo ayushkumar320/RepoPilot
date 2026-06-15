@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "docs/05_PHASE_PROMPTS.md": {
-    "mtime": 1781532090.0299065,
-    "ast_hash": "a80bfefc7126752dbc2f94b83cfe2dcc",
+    "mtime": 1781551890.049018,
+    "ast_hash": "5f30f05d76ec809800639f6ee479141e",
     "semantic_hash": ""
   },
   ".agents/rules/project.md": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/provider.py": {
-    "mtime": 1781533837.092049,
-    "ast_hash": "4909581e7568912dc4c278d715ae18cd",
+    "mtime": 1781551286.9271564,
+    "ast_hash": "8f8bd1264772279026f133514486cdf8",
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/logging.py": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1781533155.631864,
-    "ast_hash": "9ad8d1ec22b7fa775d9fe64233a6e791",
+    "mtime": 1781551385.349319,
+    "ast_hash": "a460166ac703de5355d9c9a80e334fc2",
     "semantic_hash": ""
   },
   ".pre-commit-config.yaml": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/chunk.py": {
-    "mtime": 1781550964.7772267,
-    "ast_hash": "c86a41832bc48aac5f2140921fe65b85",
+    "mtime": 1781551286.9251425,
+    "ast_hash": "2ddf47a0d6dae46f8b511f8c25a05a57",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/clone.py": {
@@ -255,8 +255,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/graph.py": {
-    "mtime": 1781550946.9307194,
-    "ast_hash": "2bbd210cf77188377d4d9689b64f9902",
+    "mtime": 1781551286.9254694,
+    "ast_hash": "6e450182e45a78f18979575be119af9e",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/migrations/__init__.py": {
@@ -270,8 +270,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/migrations/versions/0001_ingestion_schema.py": {
-    "mtime": 1781533532.8804822,
-    "ast_hash": "8e784828ebd04c65be2c481fb88af791",
+    "mtime": 1781551286.9253309,
+    "ast_hash": "485c9fbd5032d8bf313ac5f41fbe4121",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/migrations/versions/__init__.py": {
@@ -280,18 +280,18 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/parse.py": {
-    "mtime": 1781550895.3938172,
-    "ast_hash": "78d7c298a99308e70d12eb908b3330a2",
+    "mtime": 1781551286.925591,
+    "ast_hash": "e1978d306be83cd2c11f5ac4298e0e4d",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/persist.py": {
-    "mtime": 1781534051.0402424,
-    "ast_hash": "71f9c18d08a34be80ecffbd8f53d342d",
+    "mtime": 1781551286.9271522,
+    "ast_hash": "7232413366a14885e9a7b5846f44d3d5",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/pipeline.py": {
-    "mtime": 1781534051.0402474,
-    "ast_hash": "f6369f97d3d43b8c7ea8d20724d8ea91",
+    "mtime": 1781551286.9271603,
+    "ast_hash": "a2cd83014847d886931262a100786ef7",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/summary.py": {
@@ -305,13 +305,13 @@
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_chunk_boundaries.py": {
-    "mtime": 1781533978.5352433,
-    "ast_hash": "9495c46d6252f7d79e1ae919cebfe474",
+    "mtime": 1781551286.925311,
+    "ast_hash": "9bd27a2b252fcb5b08dbbb6737b63a70",
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_clone_and_urls.py": {
-    "mtime": 1781533995.1347866,
-    "ast_hash": "074741c356340e61cdb71716e25562e2",
+    "mtime": 1781551286.9250002,
+    "ast_hash": "1de73fa958edfad39ef004aea47ab9d7",
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_graph_adjacency.py": {
@@ -325,13 +325,13 @@
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_httpx_indexing.py": {
-    "mtime": 1781534051.0399795,
-    "ast_hash": "897e58e71e13a389de587a187a41bc81",
+    "mtime": 1781551286.9252927,
+    "ast_hash": "89ab85b237104a12bd00ff181271db4b",
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_pipeline_idempotency.py": {
-    "mtime": 1781534051.0401938,
-    "ast_hash": "c1ea072571dfed92e952bc741cbd6820",
+    "mtime": 1781551286.925011,
+    "ast_hash": "06af3eec1fcc9b0d8965429886b00168",
     "semantic_hash": ""
   }
 }

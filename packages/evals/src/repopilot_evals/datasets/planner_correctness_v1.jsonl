@@ -1,0 +1,1 @@
+{"input_profile": {"modality_weights": {"how_it_works": 0.8}, "focus_keywords": ["TODO"], "output_shape_preference": "narrative"}, "expected_active": ["cartographer", "teacher"], "expected_output_shape": "narrative", "expected_dependencies": {"teacher": ["cartographer"]}, "notes": "scaffold — see docs/03 § Capability Planner for the deterministic rules"}

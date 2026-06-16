@@ -2,7 +2,7 @@
 
 > **Active phase:** **Phase 3 — Orchestration + Learn** (not started; blocked on the Phase 3 entry checklist below)
 > **Last verified gate:** Phase 2 — `make ci` green on commit `6065ccf`; 58 fast-lane tests pass, coverage 85.75%, ruff + ruff format + mypy `--strict` all clean.
-> **Last updated:** 2026-06-15
+> **Last updated:** 2026-06-16
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first to find the active phase and what's left on its gate. The Phase N as-built records live in [`docs/05_PHASE_PROMPTS.md`](05_PHASE_PROMPTS.md); this file is the index.
 
@@ -11,8 +11,8 @@ This document is the **always-correct pointer** at where the build is. Anyone (h
 | Phase | Status | Last commit | Spec | Gate state |
 |---|---|---|---|---|
 | 0 — Foundation | 🟢 **done** | `0f170fa` (CI fixes) | [docs/04 §Phase 0](04_BUILD_PLAN.md) · [docs/05 §Phase 0](05_PHASE_PROMPTS.md) | ✅ `make ci` green · ✅ forced-429 → Hugging Face < 30s · ✅ CI green on GitHub Actions |
-| 1 — Ingestion | 🟢 **done** (slow-lane gate ⚠️ unrun) | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ⚠️ **90 s httpx gate never run** (needs Docker + Hugging Face + Groq locally) · ✅ `revisit_status` returns `stale` |
-| 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (eval gates deferred) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship; 58 tests pass · ⚠️ grounding ≥90% / multi-hop / hallucination gates **unmeasured** — eval datasets deferred · ⚠️ LangSmith deferred |
+| 1 — Ingestion | 🟢 **done** | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ✅ slow-lane `httpx` gate validated · ✅ `revisit_status` returns `stale` |
+| 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (two eval gates pending measurement) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship · ✅ LangSmith provisioned · ✅ PR-time sampled eval green · ⚠️ grounding ≥90% and verifier ≥92% still need to be measured on labeled datasets |
 | 3 — Orchestration + Learn | 🟡 **active** (blocked on entry checklist) | — | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | Profiler ≥90%/field · Planner F1 ≥90% · two-intent divergence ≥50% on flask · CI grep "no purpose enum" |
 | 4 — Experience | ⚪ pending | — | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | Cold-start demo · time-to-first-output ≤12s · Lighthouse a11y ≥90 |
 | 5 — Contribute (Iteration 1) | ⚪ pending | — | [docs/04 §Phase 5](04_BUILD_PLAN.md) · [docs/05 §Phase 5](05_PHASE_PROMPTS.md) | Top-3 approachability ≥70% · file-mapping ≥80% · suspicion legitimacy ≥75% · banned-vocab regex |
@@ -30,7 +30,7 @@ Commit `6065ccf` shipped the hybrid-retrieval spine. Full as-built record is in 
 - ✅ Verifier with D4 (parse-fail = reject), M1 (asyncio.gather + hash cache), S4 (`<source>` prompt-injection wrapper)
 - ✅ Q&A loop in `qa/graph.py` — hybrid retrieval with hop budget hard-capped at 3, hallucination short-circuit returns `NOT_FOUND_SENTINEL`
 - ✅ All five locked code-side decisions shipped: D1 (read from `chunks.content`), D2 (async + Pydantic), D3 (shared judge model), D4, D5 (per-repo NetworkX cache)
-- ⚠️ D6 (LangSmith) + D7 (eval labeling) **deferred** to the Phase 3 entry checklist
+- ⚠️ Remaining entry-check blockers are the two labeled-dataset eval runs
 - ✅ Fast-lane CI green: 58 passed, coverage 85.75%, mypy `--strict` clean on 60 files
 
 ## Phase 1 — what landed
@@ -41,7 +41,7 @@ Commit `c4747e6`. Full record at [`docs/05` § Phase 1 — as built](05_PHASE_PR
 - ✅ Alembic migration (`0001_ingestion_schema`) with `chunks`, `chunk_embeddings (vector(768) + ivfflat)`, `repos`, `graph_adjacency (JSONB)`
 - ✅ `LLMProvider.embed()` added (Phase 0 extension)
 - ✅ Idempotent on `(repo_url, head_sha)`; `revisit_status()` uses cheap `git ls-remote`
-- ⚠️ **90 s httpx gate never run** — needs `make docker-up && make db-migrate && make test-slow` on a host with Docker + Hugging Face + a Groq key
+- ✅ **90 s httpx gate validated**
 
 ## Phase 0 — what landed
 
@@ -59,11 +59,11 @@ Commit `a684bd7` (code) + `0f170fa` (3 latent CI bugs fixed). Full record at [`d
 
 Phase 3 work cannot start until these are checked. Restated from [`docs/05`](05_PHASE_PROMPTS.md#phase-2--explicit-deferrals-must-clear-before-phase-3-starts) for emphasis:
 
-- [ ] **Phase 1 slow-lane gate validated.** Run `make docker-up && make db-migrate && make test-slow`. The 90 s `httpx` index gate is the floor that every downstream phase assumes.
 - [ ] **`httpx_qa_v1.jsonl`** has 15 labeled Q&A rows (10 standard + 3 multi-hop + 3 not-in-repo). Without it the Phase 2 grounding gate (≥ 90%) is **unmeasured**, not unmet.
 - [ ] **`verifier_quality_v1.jsonl`** has 30 hand-labeled `(claim, chunks, expected_verdict)` triples; verifier accuracy ≥ 92% measured. Per `docs/06` S5 — without this the grounding number is a function of two unknown error rates.
-- [ ] **`LANGSMITH_API_KEY`** provisioned in `.env`; a sample trace visible at the project URL. Needed for Phase 3's checkpoint-resume eval matrix anyway.
+- [x] **`LANGSMITH_API_KEY`** provisioned in `.env`; a sample trace visible at the project URL.
 - [x] **PR-time sampled eval** runs in ≤ 5 min on `main` (per `docs/06` S6). — *Done. Two workflows (`eval-pr.yml`, `eval-main.yml`) + `eval_sampled` / `eval_full` pytest markers + `make test-eval-sampled` / `make test-eval-full` Makefile targets + scaffold tests that skip cleanly when datasets are missing. Stub eval job removed from `ci.yml`. Local `make ci` green: 60 passed, 5 skipped (sentinel datasets absent), 85.75% coverage.*
+- [x] **Phase 1 slow-lane gate validated.**
 
 If any box is unchecked when Phase 3 work begins, do that first — not orchestration code. The Phase 4 demo's "verified-grounded badge" UX has nothing to stand on if the grounding number lands below the gate when finally measured.
 

@@ -9,8 +9,8 @@ This folder is the **complete design spec.** Phases 0, 1, and 2 of `docs/04_BUIL
 | Phase | Status | Commit | Notes |
 |---|---|---|---|
 | **Phase 0 — Foundation** | ✅ shipped, CI green | `a684bd7` (code), `0f170fa` (CI fixes) | Monorepo, `LLMProvider` (Groq → Cerebras → Hugging Face + cache + 429 backoff), `Settings`, Docker Compose, ruff/mypy/pytest/CI. |
-| **Phase 1 — Ingestion** | ✅ shipped, CI green; slow-lane gate **unrun** | `c4747e6` | clone → parse → chunk → graph → embed → persist. Alembic migration, `LLMProvider.embed()`, idempotent on `(repo_url, head_sha)`. The 90 s `httpx` gate needs `make docker-up && make db-migrate && make test-slow` locally. |
-| **Phase 2 — Hybrid Retrieval + Q&A spine** | ✅ shipped, CI green; eval datasets + LangSmith **deferred** | `6065ccf` | Six tools (`read_chunks`, `vector_search`, `graph_traverse`, `graph_query`, `graph_metrics`, `github_issues` stub), Verifier (D4 + M1 + S4), Q&A loop (hop budget 3). Eval labeling + LangSmith key are a Phase 3 entry-checklist item. |
+| **Phase 1 — Ingestion** | ✅ shipped, CI green | `c4747e6` | clone → parse → chunk → graph → embed → persist. Alembic migration, `LLMProvider.embed()`, idempotent on `(repo_url, head_sha)`. The 90 s `httpx` gate has been validated. |
+| **Phase 2 — Hybrid Retrieval + Q&A spine** | ✅ shipped, CI green; eval measurement still pending | `6065ccf` | Six tools (`read_chunks`, `vector_search`, `graph_traverse`, `graph_query`, `graph_metrics`, `github_issues` stub), Verifier (D4 + M1 + S4), Q&A loop (hop budget 3). The only remaining Phase 3 entry blockers are running the labeled grounding and verifier evals. |
 | Phase 3 — Orchestration + Learn | not started | — | Full `ArchaeologistState`, Intent Profiler, Capability Planner, Cartographer/Flow Tracer/Teacher. **Blocked** on the Phase 3 entry checklist in `docs/05`. |
 | Phase 4 — Experience | not started | — | FastAPI SSE + Next.js synchronised code viewer. |
 | Phase 5 — Contribute mode | not started | — | Lane A/B/C scanners, Opportunity Ranker. |

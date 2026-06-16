@@ -3,7 +3,7 @@ name = "repopilot-evals"
 version = "0.0.1"
 description = "Eval datasets + runners that gate each phase."
 requires-python = ">=3.12,<3.14"
-dependencies = ["repopilot-core"]
+dependencies = ["repopilot-agents", "repopilot-core", "repopilot-ingestion", "sqlalchemy"]
 
 [build-system]
 requires = ["hatchling"]

@@ -1608,11 +1608,19 @@ name = "repopilot-evals"
 version = "0.0.1"
 source = { editable = "packages/evals" }
 dependencies = [
+    { name = "repopilot-agents" },
     { name = "repopilot-core" },
+    { name = "repopilot-ingestion" },
+    { name = "sqlalchemy" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "repopilot-core", editable = "packages/core" }]
+requires-dist = [
+    { name = "repopilot-agents", editable = "packages/agents" },
+    { name = "repopilot-core", editable = "packages/core" },
+    { name = "repopilot-ingestion", editable = "packages/ingestion" },
+    { name = "sqlalchemy" },
+]
 
 [[package]]
 name = "repopilot-ingestion"

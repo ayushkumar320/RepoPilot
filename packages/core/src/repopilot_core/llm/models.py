@@ -57,17 +57,14 @@ class ModelBinding:
 RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ModelId.INTENT_PROFILER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.CAPABILITY_PLANNER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.CARTOGRAPHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.FLOW_TRACER: (
@@ -76,12 +73,10 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.TEACHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_FALLBACK: (
@@ -90,7 +85,6 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.1-8b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.1-8B-Instruct"),
     ),
     # Verifier is the highest call-volume agent. We use Groq's qwen-coder for

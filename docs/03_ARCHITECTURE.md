@@ -728,6 +728,23 @@ LangSmith is the only paid-tier surface we use, and it's free for solo dev.
 
 ---
 
+## Eval harness vs. product runtime — a hard line
+
+The eval harness (`packages/evals/`) is **internal QA infrastructure**, not a user-facing feature. Two layers, do not confuse them:
+
+| Layer | Runs on | Inputs | Purpose |
+|---|---|---|---|
+| **Product runtime** | end users | any GitHub URL | ingest → graph → agents → guided tour |
+| **Eval harness** | developers / CI | fixed set of *labeled* repos (httpx in Phase 2; +fastapi, +flask in Phase 6) | grade whether the runtime did its job |
+
+The runtime is repo-agnostic — `index_repo()`, `answer_question()`, the verifier — none are bound to httpx; paste anything and the same code path runs. The harness is bound to specific repos because measuring accuracy requires hand-labeled ground truth (Q&A answer keys, verifier verdict labels), and labels can only exist where a human read the code.
+
+**Analogy:** the DMV exam route is fixed; your driver's license isn't. The harness is the exam; the runtime is the license.
+
+**Implication:** never feed a user's repo URL into the eval runner, and never expose `python -m repopilot_evals` to end users. If you ever want a *runtime self-check* on user repos, that's the Verifier flagging low-confidence claims — a different surface, not an eval.
+
+---
+
 ## Failure modes and cost design
 
 | Failure | Detection | Mitigation |

@@ -1,4 +1,4 @@
-.PHONY: help install lint typecheck test test-slow cov ci precommit fmt clean docker-up docker-down db-migrate
+.PHONY: help install lint typecheck test test-slow test-eval-sampled test-eval-full cov ci precommit fmt clean docker-up docker-down db-migrate
 
 help:
 	@echo "RepoPilot — common targets"
@@ -8,6 +8,8 @@ help:
 	@echo "  typecheck    mypy --strict on every package"
 	@echo "  test         pytest (fast lane — slow/integration markers skipped)"
 	@echo "  test-slow    pytest -m 'slow and integration' (needs docker-up + db-migrate)"
+	@echo "  test-eval-sampled  pytest -m eval_sampled (PR-time, ≤5 min, 1 repo + subset)"
+	@echo "  test-eval-full     pytest -m eval_full (main-time, ≤30 min, full matrix)"
 	@echo "  cov          pytest with coverage gate (80%)"
 	@echo "  ci           lint + typecheck + test (matches GitHub Actions)"
 	@echo "  precommit    run pre-commit on all files"
@@ -37,6 +39,18 @@ test:
 # Needs GROQ_API_KEY in .env (chunk summaries) and a warm Ollama model cache.
 test-slow:
 	uv run pytest -m "slow and integration" --no-cov -ra
+
+# Two-tier eval strategy (docs/06 S6).
+# Sampled (PR-time): 1 repo (httpx), subset of datasets, target ≤5 min.
+# Tests skip with helpful messages when their dataset file is absent so this
+# target stays green on a fresh checkout where Blockers 2/3 aren't done yet.
+test-eval-sampled:
+	uv run pytest -m eval_sampled --no-cov -ra
+
+# Full matrix (main-time, post-merge): fastapi/httpx/flask, all datasets,
+# target ≤30 min. Only invoked by .github/workflows/eval-main.yml.
+test-eval-full:
+	uv run pytest -m eval_full --no-cov -ra
 
 cov:
 	uv run pytest -m "not slow and not integration" --cov-fail-under=80

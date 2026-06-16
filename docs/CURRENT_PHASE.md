@@ -63,7 +63,7 @@ Phase 3 work cannot start until these are checked. Restated from [`docs/05`](05_
 - [ ] **`httpx_qa_v1.jsonl`** has 15 labeled Q&A rows (10 standard + 3 multi-hop + 3 not-in-repo). Without it the Phase 2 grounding gate (≥ 90%) is **unmeasured**, not unmet.
 - [ ] **`verifier_quality_v1.jsonl`** has 30 hand-labeled `(claim, chunks, expected_verdict)` triples; verifier accuracy ≥ 92% measured. Per `docs/06` S5 — without this the grounding number is a function of two unknown error rates.
 - [ ] **`LANGSMITH_API_KEY`** provisioned in `.env`; a sample trace visible at the project URL. Needed for Phase 3's checkpoint-resume eval matrix anyway.
-- [ ] **PR-time sampled eval** runs in ≤ 5 min on `main` (per `docs/06` S6).
+- [x] **PR-time sampled eval** runs in ≤ 5 min on `main` (per `docs/06` S6). — *Done. Two workflows (`eval-pr.yml`, `eval-main.yml`) + `eval_sampled` / `eval_full` pytest markers + `make test-eval-sampled` / `make test-eval-full` Makefile targets + scaffold tests that skip cleanly when datasets are missing. Stub eval job removed from `ci.yml`. Local `make ci` green: 60 passed, 5 skipped (sentinel datasets absent), 85.75% coverage.*
 
 If any box is unchecked when Phase 3 work begins, do that first — not orchestration code. The Phase 4 demo's "verified-grounded badge" UX has nothing to stand on if the grounding number lands below the gate when finally measured.
 

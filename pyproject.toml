@@ -113,6 +113,8 @@ asyncio_mode = "auto"
 markers = [
     "slow: opt-in slow tests (e.g., full httpx index) — skipped by default in CI fast lane.",
     "integration: requires live services (Postgres, Ollama, Redis).",
+    "eval_sampled: PR-time sampled eval — runs subset of datasets against one repo, ≤5 min budget. Skipped in fast lane; activated by `make test-eval-sampled` and the eval-pr workflow.",
+    "eval_full: main-branch full matrix eval — runs all datasets against fastapi/httpx/flask, ≤30 min budget. Activated by `make test-eval-full` and the eval-main workflow.",
 ]
 filterwarnings = [
     "error",

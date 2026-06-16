@@ -9,11 +9,27 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _find_repo_env() -> Path:
+    """Walk up from this file to the repo root and return the ``.env`` path.
+
+    Lets ``alembic`` / ``pytest`` / scripts invoked from any subdirectory
+    pick up the single repo-root ``.env`` instead of silently falling back
+    to defaults (which masked Neon connectivity behind a local-Postgres
+    fallback during Phase 3 entry checks).
+    """
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        candidate = parent / ".env"
+        if candidate.exists():
+            return candidate
+    return Path(".env")
+
+
 class Settings(BaseSettings):
     """Single source of runtime configuration."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_find_repo_env(),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,

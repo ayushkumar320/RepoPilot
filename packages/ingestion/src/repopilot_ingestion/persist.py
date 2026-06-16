@@ -48,10 +48,16 @@ class PersistResult:
 def make_engine(settings: Settings) -> AsyncEngine:
     """Build an async engine from ``Settings.postgres_dsn``.
 
-    The DSN in ``Settings`` already uses ``postgresql+psycopg`` so this is
-    just a thin wrapper. Callers should ``await engine.dispose()`` on shutdown.
+    Accepts a bare ``postgresql://`` DSN (e.g. a Neon connection string) and
+    rewrites it to ``postgresql+psycopg://`` so SQLAlchemy uses psycopg3's
+    async driver instead of defaulting to psycopg2.
     """
-    return create_async_engine(settings.postgres_dsn, future=True)
+    dsn = settings.postgres_dsn
+    if dsn.startswith("postgresql://"):
+        dsn = "postgresql+psycopg://" + dsn[len("postgresql://") :]
+    elif dsn.startswith("postgres://"):
+        dsn = "postgresql+psycopg://" + dsn[len("postgres://") :]
+    return create_async_engine(dsn, future=True)
 
 
 async def repo_already_indexed(engine: AsyncEngine, *, repo_url: str, head_sha: str) -> bool:

@@ -13,7 +13,15 @@ from repopilot_ingestion.db import metadata
 config = context.config
 
 # Override the URL with the app's central setting so we don't drift.
-config.set_main_option("sqlalchemy.url", get_settings().postgres_dsn)
+# Normalise bare ``postgresql://`` to ``postgresql+psycopg://`` so SQLAlchemy
+# uses psycopg3 (the project's chosen driver) instead of falling back to
+# psycopg2. Lets ``.env`` carry a standard Neon / libpq connection string.
+_dsn = get_settings().postgres_dsn
+if _dsn.startswith("postgresql://"):
+    _dsn = "postgresql+psycopg://" + _dsn[len("postgresql://") :]
+elif _dsn.startswith("postgres://"):
+    _dsn = "postgresql+psycopg://" + _dsn[len("postgres://") :]
+config.set_main_option("sqlalchemy.url", _dsn)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

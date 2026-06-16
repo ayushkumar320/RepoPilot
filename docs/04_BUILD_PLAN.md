@@ -15,7 +15,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 ## Phase 0 — Foundation
 
-**Goal.** A monorepo that builds, tests, and lints cleanly. `LLMProvider` works against Groq with cache, backoff, and Ollama fallback. CI is green.
+**Goal.** A monorepo that builds, tests, and lints cleanly. `LLMProvider` works against Groq with cache, backoff, and Hugging Face fallback. CI is green.
 
 **Task checklist**
 
@@ -34,42 +34,42 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 - [ ] `ruff` + `mypy --strict` + `pytest` + `pytest-asyncio` + `pytest-cov` configured per package.
 - [ ] `pre-commit` with hooks: ruff, mypy (touched files), gitleaks, end-of-file fixer, trailing whitespace.
 - [ ] GitHub Actions CI workflow: install → lint → typecheck → test → coverage gate (80%) → eval-runner stub.
-- [ ] `docker-compose.yml` for: Postgres 16 with `pgvector`, Redis 7, Ollama. Pulls `qwen2.5-coder:7b` and `nomic-embed-text` on first up.
+- [ ] `docker-compose.yml` for: Postgres 16 with `pgvector`, Redis 7, Hugging Face. Pulls `Qwen/Qwen2.5-Coder-7B-Instruct` and `nomic-ai/nomic-embed-text-v1.5` on first up.
 - [ ] `packages/core/llm/provider.py` — `LLMProvider` class:
   - Async interface: `async def generate(model: ModelId, messages: list[Message], **kwargs) -> Response`
   - Backed by Groq SDK
   - SQLite cache keyed on `sha256(model + canonical_json(messages) + kwargs)`
   - Exponential backoff w/ jitter on 429 (max 5 attempts)
-  - Provider fallback chain: Groq → Cerebras → Ollama (configurable per call)
+  - Provider fallback chain: Groq → Cerebras → Hugging Face (configurable per call)
   - Tracks `tokens_used` per model in a shared counter
 - [ ] `packages/core/llm/models.py` — `ModelId` enum mapping logical names ("intent_router", "cartographer", "verifier") to physical model strings. Agents only ever reference the logical name.
 - [ ] Unit tests for `LLMProvider`:
   - Cache hit avoids the API call
   - 429 retries the right number of times
-  - **Forced 429 storm falls back to Ollama and returns a response** (no test mocks the fallback away)
+  - **Forced 429 storm falls back to Hugging Face and returns a response** (no test mocks the fallback away)
   - Token counter increments correctly
 
 **Production-grade specifics**
 
 - `mypy --strict` from day one. No `Any` outside narrow boundary functions, each of which is annotated `# type: ignore[no-any-return]  # boundary: external SDK` with the reason.
 - Logging via `structlog` only. No `print()`. JSON renderer in production, dev renderer in tests.
-- Settings via `pydantic-settings`. `.env.example` checked in; `.env` git-ignored. `gitleaks` runs in pre-commit. **Required env vars:** `GROQ_API_KEY`, `GITHUB_TOKEN` (read-only `public_repo` scope; used by Lane A for 5,000 req/hr instead of 60), `DATABASE_URL`, `REDIS_URL`, `OLLAMA_URL`, `LANGSMITH_API_KEY` (optional), `VERIFIER_CONCURRENCY` (default 4), `MAX_TOURS_PER_IP_PER_HOUR` (default 5).
+- Settings via `pydantic-settings`. `.env.example` checked in; `.env` git-ignored. `gitleaks` runs in pre-commit. **Required env vars:** `GROQ_API_KEY`, `HUGGINGFACE_API_KEY`, `GITHUB_TOKEN` (read-only `public_repo` scope; used by Lane A for 5,000 req/hr instead of 60), `DATABASE_URL`, `REDIS_URL`, `LANGSMITH_API_KEY` (optional), `VERIFIER_CONCURRENCY` (default 4), `MAX_TOURS_PER_IP_PER_HOUR` (default 5).
 - Per-IP rate limit on `POST /tours` via `slowapi` middleware. Default 5 tours/IP/hour. When exceeded, returns 429 with body `{"error": "QUOTA_EXHAUSTED", "retry_after_seconds": N}`.
-- Docker Compose uses **named volumes** for postgres and ollama so pulls survive container restarts.
-- The Ollama service in compose preloads `qwen2.5-coder:7b` and `nomic-embed-text` via an `entrypoint` script — not lazily on first call (Phase 1 will need them ready).
+- Docker Compose uses **named volumes** for postgres so data survives container restarts.
+- The Hugging Face service in compose preloads `Qwen/Qwen2.5-Coder-7B-Instruct` and `nomic-ai/nomic-embed-text-v1.5` via an `entrypoint` script — not lazily on first call (Phase 1 will need them ready).
 
 **Quality gate**
 
 - [ ] `make ci` passes locally and in GitHub Actions.
 - [ ] Coverage ≥ 80% on `packages/core`.
-- [ ] **Forced-429 test**: with Groq mocked to return 429 indefinitely, `LLMProvider.generate(...)` returns a real response from Ollama within 30s.
+- [ ] **Forced-429 test**: with Groq mocked to return 429 indefinitely, `LLMProvider.generate(...)` returns a real response from Hugging Face within 30s.
 - [ ] `docker compose up -d` brings the full stack up clean on a fresh checkout in ≤ 90 s.
 
 ---
 
 ## Phase 1 — Ingestion
 
-**Goal.** Given a public GitHub URL, an arq worker clones, parses, chunks structurally, builds a NetworkX dependency graph, embeds chunks via Ollama nomic-embed-text, and persists everything to Postgres + pgvector. Idempotent on HEAD SHA.
+**Goal.** Given a public GitHub URL, an arq worker clones, parses, chunks structurally, builds a NetworkX dependency graph, embeds chunks via Hugging Face nomic-ai/nomic-embed-text-v1.5, and persists everything to Postgres + pgvector. Idempotent on HEAD SHA.
 
 **Task checklist**
 
@@ -81,7 +81,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
   - `imports`: file X imports symbol Y
   - `inherits`: class C extends class D
 - [ ] `packages/ingestion/summary.py` — `llama-3.1-8b-instant` chunk summaries via `LLMProvider`. Cached by `(SHA, file_path, chunk_id)`.
-- [ ] `packages/ingestion/embed.py` — Ollama `nomic-embed-text` embedder. Batched.
+- [ ] `packages/ingestion/embed.py` — Hugging Face `nomic-ai/nomic-embed-text-v1.5` embedder. Batched.
 - [ ] `packages/ingestion/persist.py` — write to Postgres:
   - `chunks` table: `id, repo_id, file_path, start_line, end_line, symbol, kind, summary, content`
   - `chunk_embeddings`: pgvector column, ivfflat index, **`embedding_model_name TEXT NOT NULL`** + **`embedding_model_version TEXT NOT NULL`** so future model bumps don't silently corrupt retrieval
@@ -106,7 +106,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 **Quality gate** — measured on `httpx` (≈ 50 kLOC):
 
-- [ ] Indexing completes in ≤ 90 s on a developer laptop with warm Ollama models.
+- [ ] Indexing completes in ≤ 90 s on a developer laptop with warm Hugging Face models.
 - [ ] **Line-span correctness**: on 20 randomly sampled chunks, `chunk.content == repo_file[start:end]` exactly (no off-by-one). Automated test.
 - [ ] **A known call chain exists as a graph path** — pick `httpx.Client.send → httpx.Client._send_single_request → httpx._transports.default.HTTPTransport.handle_request` and assert `nx.has_path(graph, ...)`.
 - [ ] Idempotent: re-running the job on the same HEAD SHA exits immediately with status `already_indexed`.
@@ -126,7 +126,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 - [ ] `packages/agents/tools/read_chunks.py` — read by `CodeRef`.
 - [ ] `packages/agents/tools/github_issues.py` — PyGithub with caching.
 - [ ] `packages/agents/qa/graph.py` — Q&A LangGraph mini-graph: `vector_search → graph_traverse → judge_sufficiency → (expand | answer) → verifier`.
-- [ ] `packages/agents/verifier/grounding.py` — for each `Claim`, fetch `read_chunks(claim.refs)`, ask qwen2.5-coder:7b: "Is this claim *fully supported by* these chunks? Yes/No + reason." Reject → objection appended.
+- [ ] `packages/agents/verifier/grounding.py` — for each `Claim`, fetch `read_chunks(claim.refs)`, ask Qwen/Qwen2.5-Coder-7B-Instruct: "Is this claim *fully supported by* these chunks? Yes/No + reason." Reject → objection appended.
 - [ ] LangSmith setup: `LANGCHAIN_TRACING_V2=true`, project name from env.
 - [ ] **Eval-labeling time: ~1.5 days.** Two datasets:
 - [ ] `packages/evals/datasets/httpx_qa_v1.jsonl` — 15 Q&A pairs over httpx. Each has `question`, `expected_refs[]`, `expected_answer_keywords[]`. Hand-labeled by reading the actual `httpx` source.
@@ -325,9 +325,9 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 - [ ] `make quickstart` script tested on a clean macOS and Linux VM.
 - [ ] **Deployment topology doc** (`docs/DEPLOY.md`) — explicit hosted-demo recipe so reviewers know the stack is hostable, not just local. v0.1 baseline:
   - **Frontend (Next.js)** → Vercel free tier.
-  - **API + arq worker** → fly.io or Railway (small VM, ~$5/mo). Note: Ollama cannot run on serverless because of the model weights.
+  - **API + arq worker** → fly.io or Railway (small VM, ~$5/mo). Note: Hugging Face cannot run on serverless because of the model weights.
   - **Postgres + pgvector** → Neon or Supabase free tier (verify the free tier has pgvector enabled).
-  - **Ollama (Verifier + embeddings)** → same fly.io VM as the API (needs ≥ 4 GB RAM for `qwen2.5-coder:7b` Q4) or a sibling small VM. The verifier latency budget assumes co-located Ollama; cross-region adds ~80–200 ms per claim.
+  - **Hugging Face (Verifier + embeddings)** → same fly.io VM as the API (needs ≥ 4 GB RAM for `Qwen/Qwen2.5-Coder-7B-Instruct` Q4) or a sibling small VM. The verifier latency budget assumes co-located Hugging Face; cross-region adds ~80–200 ms per claim.
   - **Redis** → Upstash free tier.
   - **Document monthly cost at idle (~$5–15) and the manual scale-down steps** if the free tier limits are hit.
 - [ ] Tag `v0.1.0`.

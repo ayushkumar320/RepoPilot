@@ -71,7 +71,7 @@ These are the features the rest of the doc set elaborates on. Each one is what m
 | 11 | **Q&A escape hatch, intent-aware** | At any point, ask anything. Answers are grounded with refs and framed through your captured `IntentProfile` — so "what does this function do?" gets a different framing depending on whether you said you're onboarding, contributing, evaluating, or auditing. | docs/03 (Q&A subgraph) |
 | 12 | **Trust surfaces** | "You said:" chip at the top of every tour (the raw intent + the parsed profile). Verified-grounded badges. Retrieval-path chips. Intent-match chips on every card. Considered-and-rejected trails when scanner lanes are active. You can always point at *why* the system is showing you this. | docs/00, docs/03 (Trust surfaces) |
 | 13 | **CTA-ended briefings** | When the output shape is `ranked_list` or `dossier`, every card ends in buttons appropriate to the audience framing: "Open files on GitHub", "Copy first step", "Copy probe script", "Open commit", "Copy comparison snippet". The product never trails off in prose. | docs/04 (Phase 4/5) |
-| 14 | **Free-tier survivable** | Whole stack runs on Groq free tier + local Ollama + Docker Compose. No paid APIs anywhere on the critical path. | docs/02 |
+| 14 | **Free-tier survivable** | Whole stack runs on Groq free tier + local Hugging Face + Docker Compose. No paid APIs anywhere on the critical path. | docs/02 |
 
 ### How the flow handles "hard-to-context-map" responses
 
@@ -381,7 +381,7 @@ We will be tempted to add each of these. We will not.
 - **No real-time multi-user editing.** Tours are generated once and cached. Re-generation is explicit.
 - **No code execution / sandboxing.** The system never runs the target repo's code. Static analysis only.
 - **No fine-tuning.** All models are off-the-shelf. The Verifier may be fine-tuned post-v0.1 as a stretch goal — not in v1.
-- **No paid-tier dependencies.** Groq free tier + Ollama local + free hosting. The whole stack is free-tier survivable.
+- **No paid-tier dependencies.** Groq free tier + Hugging Face local + free hosting. The whole stack is free-tier survivable.
 - **No "feature suggestions" lane in Contribute.** Lane D is deferred — except for suggestions explicitly grounded in the repo's own stated intent (TODOs, CONTRIBUTING.md, README planned-features).
 - **No HITL (human-in-the-loop) interrupts in v1.** Tours run to completion or error. Pause/edit/resume is a post-v0.1 enhancement.
 - **No session persistence in v1.** Tours are ephemeral — closing the tab loses the tour, and re-opening the app starts fresh. Re-pasting the same repo URL reuses the cached *index* (so indexing doesn't repeat) but generates a new tour. Shareable tour URLs and resumable sessions are on the post-v0.1 backlog.

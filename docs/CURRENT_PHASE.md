@@ -10,8 +10,8 @@ This document is the **always-correct pointer** at where the build is. Anyone (h
 
 | Phase | Status | Last commit | Spec | Gate state |
 |---|---|---|---|---|
-| 0 — Foundation | 🟢 **done** | `0f170fa` (CI fixes) | [docs/04 §Phase 0](04_BUILD_PLAN.md) · [docs/05 §Phase 0](05_PHASE_PROMPTS.md) | ✅ `make ci` green · ✅ forced-429 → Ollama < 30s · ✅ CI green on GitHub Actions |
-| 1 — Ingestion | 🟢 **done** (slow-lane gate ⚠️ unrun) | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ⚠️ **90 s httpx gate never run** (needs Docker + Ollama + Groq locally) · ✅ `revisit_status` returns `stale` |
+| 0 — Foundation | 🟢 **done** | `0f170fa` (CI fixes) | [docs/04 §Phase 0](04_BUILD_PLAN.md) · [docs/05 §Phase 0](05_PHASE_PROMPTS.md) | ✅ `make ci` green · ✅ forced-429 → Hugging Face < 30s · ✅ CI green on GitHub Actions |
+| 1 — Ingestion | 🟢 **done** (slow-lane gate ⚠️ unrun) | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ⚠️ **90 s httpx gate never run** (needs Docker + Hugging Face + Groq locally) · ✅ `revisit_status` returns `stale` |
 | 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (eval gates deferred) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship; 58 tests pass · ⚠️ grounding ≥90% / multi-hop / hallucination gates **unmeasured** — eval datasets deferred · ⚠️ LangSmith deferred |
 | 3 — Orchestration + Learn | 🟡 **active** (blocked on entry checklist) | — | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | Profiler ≥90%/field · Planner F1 ≥90% · two-intent divergence ≥50% on flask · CI grep "no purpose enum" |
 | 4 — Experience | ⚪ pending | — | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | Cold-start demo · time-to-first-output ≤12s · Lighthouse a11y ≥90 |
@@ -37,20 +37,20 @@ Commit `6065ccf` shipped the hybrid-retrieval spine. Full as-built record is in 
 
 Commit `c4747e6`. Full record at [`docs/05` § Phase 1 — as built](05_PHASE_PROMPTS.md#phase-1--as-built-post-merge-addendum). Headline:
 
-- ✅ Pipeline: clone → parse (tree-sitter) → chunk (AST-boundary) → graph (NetworkX) → embed (Ollama nomic-embed-text) → persist (Postgres + pgvector)
+- ✅ Pipeline: clone → parse (tree-sitter) → chunk (AST-boundary) → graph (NetworkX) → embed (sentence-transformers in-process, HF weights `nomic-ai/nomic-embed-text-v1.5`) → persist (Postgres + pgvector)
 - ✅ Alembic migration (`0001_ingestion_schema`) with `chunks`, `chunk_embeddings (vector(768) + ivfflat)`, `repos`, `graph_adjacency (JSONB)`
 - ✅ `LLMProvider.embed()` added (Phase 0 extension)
 - ✅ Idempotent on `(repo_url, head_sha)`; `revisit_status()` uses cheap `git ls-remote`
-- ⚠️ **90 s httpx gate never run** — needs `make docker-up && make db-migrate && make test-slow` on a host with Docker + Ollama + a Groq key
+- ⚠️ **90 s httpx gate never run** — needs `make docker-up && make db-migrate && make test-slow` on a host with Docker + Hugging Face + a Groq key
 
 ## Phase 0 — what landed
 
 Commit `a684bd7` (code) + `0f170fa` (3 latent CI bugs fixed). Full record at [`docs/05` § Phase 1 — as built ("Three latent CI bugs")](05_PHASE_PROMPTS.md#phase-1--as-built-post-merge-addendum). Headline:
 
 - ✅ Monorepo (`apps/`, `packages/`, `uv` workspace), ruff, mypy `--strict`, pytest, pre-commit, gitleaks, GitHub Actions
-- ✅ `LLMProvider` with cache + 429 backoff + Groq → Cerebras → Ollama fallback
-- ✅ Docker Compose: Postgres + pgvector, Redis, Ollama (with model preload)
-- ✅ All 5 TDD tests pass; forced-429 storm falls back to Ollama in < 30 s
+- ✅ `LLMProvider` with cache + 429 backoff + Groq → Cerebras → Hugging Face fallback
+- ✅ Docker Compose: Postgres + pgvector, Redis, Hugging Face (with model preload)
+- ✅ All 5 TDD tests pass; forced-429 storm falls back to Hugging Face in < 30 s
 - ✅ Phase 1 fold-in landed `make lint` running `ruff format --check` so CI-vs-local drift can't recur
 
 ---

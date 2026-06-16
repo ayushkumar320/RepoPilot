@@ -11,7 +11,7 @@ Each prompt is self-contained. They restate the exact quality gate as the Defini
 ```
 Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
-You are starting Phase 0 of Codebase Archaeologist. The goal of this phase is a monorepo that builds, tests, and lints cleanly, with a working LLMProvider (cache + backoff + Ollama fallback), CI green, and `docker compose up` bringing the stack up clean.
+You are starting Phase 0 of Codebase Archaeologist. The goal of this phase is a monorepo that builds, tests, and lints cleanly, with a working LLMProvider (cache + backoff + Hugging Face fallback), CI green, and `docker compose up` bringing the stack up clean.
 
 Deliverables
 - Monorepo:
@@ -25,10 +25,10 @@ Deliverables
 - `ruff`, `mypy --strict`, `pytest` + `pytest-asyncio` + `pytest-cov` configured per package.
 - `.pre-commit-config.yaml` with: ruff, mypy (touched files), gitleaks, end-of-file-fixer, trailing-whitespace.
 - `.github/workflows/ci.yml`: install → lint → typecheck → test → coverage gate (80%) → eval-runner stub job (no-op).
-- `docker-compose.yml` for Postgres 16 with pgvector, Redis 7, Ollama. Named volumes. The Ollama service preloads `qwen2.5-coder:7b` and `nomic-embed-text` via an entrypoint script.
+- `docker-compose.yml` for Postgres 16 with pgvector, Redis 7, Hugging Face. Named volumes. The Hugging Face service preloads `Qwen/Qwen2.5-Coder-7B-Instruct` and `nomic-ai/nomic-embed-text-v1.5` via an entrypoint script.
 - `packages/core/llm/`:
     - `models.py`: `ModelId` enum mapping logical names ("intent_router", "cartographer", "flow_tracer", "teacher", "qa_primary", "qa_fallback", "code_health", "verifier", "embeddings") to physical models per docs/02_TECH_STACK.md.
-    - `provider.py`: `LLMProvider` async class with `generate(model: ModelId, messages, **kwargs)`, SQLite cache keyed on sha256(model + canonical_json(messages) + kwargs), exponential backoff w/ jitter on 429 (max 5 attempts), provider fallback chain Groq → Cerebras → Ollama, per-model `tokens_used` counter.
+    - `provider.py`: `LLMProvider` async class with `generate(model: ModelId, messages, **kwargs)`, SQLite cache keyed on sha256(model + canonical_json(messages) + kwargs), exponential backoff w/ jitter on 429 (max 5 attempts), provider fallback chain Groq → Cerebras → Hugging Face, per-model `tokens_used` counter.
     - The class is the only place agents talk to LLMs. Re-exports go through `packages/core/llm/__init__.py`.
 - `packages/core/logging.py`: structlog setup, JSON renderer in prod, dev renderer in tests.
 - `packages/core/settings.py`: pydantic-settings; `.env.example` checked in.
@@ -36,7 +36,7 @@ Deliverables
 Tests to write FIRST (TDD)
 1. `test_llm_cache_hit_avoids_api_call` — second identical call hits cache; the underlying client is called exactly once.
 2. `test_llm_429_backoff_retries` — with the client raising 429 for N attempts and succeeding on attempt N+1, generate returns the response and the backoff sleeps are bounded.
-3. `test_llm_forced_429_storm_falls_back_to_ollama` — Groq mocked to return 429 indefinitely; generate returns a real (mocked-Ollama) response within 30s. THIS TEST IS THE GATE — do not mock the fallback away.
+3. `test_llm_forced_429_storm_falls_back_to_huggingface` — Groq mocked to return 429 indefinitely; generate returns a real (mocked-Hugging-Face) response within 30s. THIS TEST IS THE GATE — do not mock the fallback away.
 4. `test_llm_token_counter_increments` — `tokens_used[model]` increases by the response's token count after each call.
 5. `test_settings_loads_from_env_example` — `.env.example` is a valid settings source.
 
@@ -44,12 +44,12 @@ Implementation order
 - Layout + tooling + pre-commit + CI first.
 - Then `core/logging.py`, `core/settings.py`.
 - Then `core/llm/models.py`, `core/llm/provider.py` strictly test-first.
-- Last: docker-compose + Ollama entrypoint preload script.
+- Last: docker-compose + Hugging Face entrypoint preload script.
 
 Quality gate (Definition of Done — restate exactly)
 - `make ci` passes locally and in GitHub Actions.
 - Coverage ≥ 80% on `packages/core`.
-- Forced-429 test: with Groq mocked to 429 indefinitely, `LLMProvider.generate(...)` returns a real response from Ollama within 30s.
+- Forced-429 test: with Groq mocked to 429 indefinitely, `LLMProvider.generate(...)` returns a real response from Hugging Face within 30s.
 - `docker compose up -d` brings the full stack up clean on a fresh checkout in ≤ 90 s.
 
 Per-PR Definition of Done from docs/00 applies to every PR.
@@ -64,7 +64,7 @@ Do not start the next phase. Stop and report what was built, the test results (w
 ```
 Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
-You are starting Phase 1 of Codebase Archaeologist. The goal: given a public GitHub URL, an arq worker clones the repo, parses with tree-sitter, chunks structurally, builds a NetworkX dependency graph, embeds chunks via Ollama nomic-embed-text, and persists everything to Postgres + pgvector. Idempotent on HEAD SHA. Indexing ≤ 90 s on httpx.
+You are starting Phase 1 of Codebase Archaeologist. The goal: given a public GitHub URL, an arq worker clones the repo, parses with tree-sitter, chunks structurally, builds a NetworkX dependency graph, embeds chunks via Hugging Face nomic-ai/nomic-embed-text-v1.5, and persists everything to Postgres + pgvector. Idempotent on HEAD SHA. Indexing ≤ 90 s on httpx.
 
 Deliverables
 - `packages/ingestion/clone.py` — GitPython clone into tempdir; record HEAD SHA; cleanup on completion or failure.
@@ -80,7 +80,7 @@ Deliverables
     - `inherits`
     Unresolved dynamic patterns log warnings; do NOT invent edges.
 - `packages/ingestion/summary.py` — `llama-3.1-8b-instant` chunk summaries via the LLMProvider. Cached by `(head_sha, file_path, chunk_id)`. Bounded by asyncio.Semaphore tuned to Groq's per-minute rate.
-- `packages/ingestion/embed.py` — Ollama nomic-embed-text, batched, async.
+- `packages/ingestion/embed.py` — Hugging Face nomic-ai/nomic-embed-text-v1.5, batched, async.
 - `packages/ingestion/persist.py` — write to Postgres:
     - `chunks(id, repo_id, file_path, start_line, end_line, symbol, kind, summary, content)`
     - `chunk_embeddings(chunk_id, embedding vector(768))` with `ivfflat (embedding vector_cosine_ops) WITH (lists = 100)`
@@ -96,7 +96,7 @@ Tests to write FIRST (TDD)
 2. `test_chunk_content_matches_source` — 20 randomly sampled chunks satisfy `chunk.content == repo_file[start:end]` exactly.
 3. `test_graph_known_call_chain_httpx` — after indexing httpx, `nx.has_path(graph, "httpx.Client.send", "httpx._transports.default.HTTPTransport.handle_request")` (or the equivalent symbol IDs you adopt).
 4. `test_idempotent_reindex` — running the job twice on the same HEAD SHA: second invocation returns `already_indexed` without doing work.
-5. `test_indexing_under_90s` — `httpx` (≈ 50 kLOC) indexes in ≤ 90 s on the developer machine with warm Ollama models. (Tag as slow; opt-in in CI.)
+5. `test_indexing_under_90s` — `httpx` (≈ 50 kLOC) indexes in ≤ 90 s on the developer machine with warm Hugging Face models. (Tag as slow; opt-in in CI.)
 
 Implementation order
 - Postgres migrations first (alembic or hand-rolled), then `persist.py`.
@@ -106,7 +106,7 @@ Implementation order
 - arq job last; wires the pipeline.
 
 Quality gate (Definition of Done — restate exactly)
-- Indexing completes in ≤ 90 s on httpx with warm Ollama models.
+- Indexing completes in ≤ 90 s on httpx with warm Hugging Face models.
 - Line-span correctness: 20 random chunks pass content-equality.
 - A known call chain exists as a graph path (the httpx chain above).
 - Idempotent re-run exits immediately with `already_indexed`.
@@ -123,7 +123,7 @@ Phase 1 landed on `main` at commit `c4747e6` and CI went green at `0f170fa` (see
 **Decisions made (each chosen over a plausible alternative):**
 
 1. **Migrations: alembic, not hand-rolled `init.sql`.** `packages/ingestion/alembic.ini` + `migrations/env.py` use `Settings.postgres_dsn` so dev/CI agree. First revision `0001_ingestion_schema` creates `repos`, `chunks` (with `(repo_id, symbol)` and `(repo_id, file_path)` indexes), `chunk_embeddings (vector(768))` with the `ivfflat (vector_cosine_ops) WITH (lists = 100)` index, and `graph_adjacency`. Run via `make db-migrate`.
-2. **Embeddings go through `LLMProvider`, not direct `httpx`.** Phase 0's provider grew an `embed()` method (Ollama-only chain, separate `embedding_cache` SQLite table) + an `EmbeddingResponse` shape. Keeps the "one place for every LLM call" rule from `docs/00`.
+2. **Embeddings go through `LLMProvider`, not direct `httpx`.** Phase 0's provider grew an `embed()` method (Hugging Face-only chain, separate `embedding_cache` SQLite table) + an `EmbeddingResponse` shape. Keeps the "one place for every LLM call" rule from `docs/00`.
 3. **Pipeline lives in `packages/ingestion/pipeline.py`; arq is a 50-line shell in `apps/api/jobs/index_repo.py`.** `index_repo()` is unit-testable without arq; `WorkerSettings.functions/on_startup/on_shutdown` are typed `ClassVar` to satisfy ruff `RUF012`.
 4. **Pipeline status enum: `indexed` / `already_indexed` / `stale` / `too_large`.** The `stale` branch lives in `revisit_status()` (cheap `git ls-remote`, no clone) and is what Phase 4's UI hits on URL paste.
 5. **Coverage gate is fast-lane-only.** `pyproject.toml [tool.coverage.run] omit` excludes `persist.py`, `pipeline.py`, `embed.py`, `summary.py`, `migrations/**`, `apps/api/jobs/**` — they are live-service orchestration exercised by the slow lane. Fast-lane coverage holds at 82% on the unit-testable layer; the slow lane is the gate for the rest.
@@ -158,10 +158,10 @@ These cost three CI cycles before the gate was actually exercised. **Lesson for 
 
 **Slow-lane gate (still unrun as of writing):**
 
-The 90 s httpx index gate is a hard merge-blocker per `docs/04` Phase 1 spec but cannot run in CI (no Docker daemon, no Groq key, ~5 GB Ollama pull). Validate locally:
+The 90 s httpx index gate is a hard merge-blocker per `docs/04` Phase 1 spec but cannot run in CI (no Docker daemon, no Groq key, ~5 GB Hugging Face pull). Validate locally:
 
 ```bash
-make docker-up        # Postgres+pgvector, Redis, Ollama (~5 min cold start)
+make docker-up        # Postgres+pgvector, Redis, Hugging Face (~5 min cold start)
 make db-migrate       # alembic upgrade head
 make test-slow        # runs the two @slow @integration tests
 ```
@@ -190,7 +190,7 @@ Deliverables
     - Hop budget hard-counter: max 3 iterations of (search ↔ traverse ↔ judge) before forced answer.
     - The sufficiency judge is the SAME Q&A model (70B), called with its accumulated context.
 - Verifier in `packages/agents/verifier/grounding.py`:
-    - For each Claim, call `read_chunks(claim.refs)`, prompt `qwen2.5-coder:7b` with the structured rubric: "Is this claim FULLY supported by these chunks? JSON: {decision: 'supported'|'rejected', reason: string}".
+    - For each Claim, call `read_chunks(claim.refs)`, prompt `Qwen/Qwen2.5-Coder-7B-Instruct` with the structured rubric: "Is this claim FULLY supported by these chunks? JSON: {decision: 'supported'|'rejected', reason: string}".
     - Failure to parse the JSON = treat as rejection.
     - Rejection → append `VerifierObjection` to state.
 - LangSmith integration: `@traceable` on every node and tool. Project name from env. Run names include `repo_id` and question.
@@ -263,7 +263,7 @@ packages/evals/src/repopilot_evals/
 3. `tools/graph_traverse.py` (BFS over `graph_adjacency` JSONB)
 4. `tools/graph_query.py` (entry_points / hubs / layers / callers / callees)
 5. `tools/graph_metrics.py` (per-symbol pack)
-6. `verifier/grounding.py` (Ollama JSON-mode prompt; parse-fail = reject)
+6. `verifier/grounding.py` (Hugging Face JSON-mode prompt; parse-fail = reject)
 7. `qa/graph.py` (the LangGraph mini-graph composing 1–6)
 8. LangSmith `@traceable` wiring (conditional on `LANGSMITH_API_KEY`)
 9. `httpx_qa_v1.jsonl` labeling — **3–5 hrs of human work**; the gating bottleneck per `docs/06` M2
@@ -297,7 +297,7 @@ packages/evals/src/repopilot_evals/
 **Stop conditions**:
 
 - Build order halts if any of D1–D6 turn out wrong in practice; revisit before pushing.
-- Coverage stays ≥ 80 % on the fast-testable layer (mirror Phase 1's `omit` rule for the LangSmith-/Postgres-/Ollama-dependent paths).
+- Coverage stays ≥ 80 % on the fast-testable layer (mirror Phase 1's `omit` rule for the LangSmith-/Postgres-/Hugging Face-dependent paths).
 - `make ci` must include `ruff format --check` (Phase 1 lesson — see "Three latent CI bugs" above).
 
 ### Phase 2 — explicit deferrals (must clear before Phase 3 starts)
@@ -367,7 +367,7 @@ Phase 2 landed on `main` at commit `6065ccf`; CI was green on the same commit (n
 
 1. **`qa/graph.py` is intentionally not a LangGraph yet.** The Phase 2 spec leaves the door open, and shipping the control flow as plain async is much easier to debug. When Phase 3 introduces `ArchaeologistState`, the function decomposes naturally into nodes: each `await` is a node boundary, the `while hops < max_hops` loop becomes a conditional edge, and the final `verify_claims` is the terminal verifier sub-graph. **Do not** convert `qa/graph.py` to a LangGraph as a refactor — let Phase 3 do it as part of building `state.py`.
 2. **Claim ref-attribution in `_parse_claims` is a token-overlap heuristic**, not a real semantic match. False positives are harmless because the verifier checks each claim against its refs end-to-end. Phase 3 should replace this with a typed Claim emission path once Teacher is in.
-3. **`_parse_verdict` is regex-based** because Ollama's `qwen2.5-coder:7b` is not consistently strict-JSON. Groq's JSON mode would be cleaner but the verifier model is the local one and we don't have a strict-JSON mode there. If Phase 6 quality push wants tighter output, swap to `outlines` or `lm-format-enforcer` — both work with Ollama.
+3. **`_parse_verdict` is regex-based** because Hugging Face's `Qwen/Qwen2.5-Coder-7B-Instruct` is not consistently strict-JSON. Groq's JSON mode would be cleaner but the verifier model is the local one and we don't have a strict-JSON mode there. If Phase 6 quality push wants tighter output, swap to `outlines` or `lm-format-enforcer` — both work with Hugging Face.
 4. **`graph_query` excludes import/inherit edges from `entry_points`/`hubs`/`layers`.** Including them was tried and made every utility module look like a hub. The decision is recorded in `_call_subgraph`'s docstring.
 
 **Coverage scope tightened.** `pyproject.toml`'s `[tool.coverage.run] omit` grew to exclude the live-Postgres tools (`vector_search`, `read_chunks`, `graph_traverse`, `graph_metrics`, `_adjacency`). They are exercised by Phase 3's checkpoint-resume and Phase 6's full eval matrix; in the fast lane they would just inflate the gate. **Total fast-lane coverage: 85.75% on the unit-testable layer.** The four agents modules that *are* in the fast lane all scored ≥ 90% individually (Q&A 90, verifier 95, graph_query 94, types 100).
@@ -650,7 +650,7 @@ Deliverables
     - HONEST limitations section: Python only; public repos only; 200kLOC cap; known failure modes (dynamic dispatch, decorator-rewritten signatures, `getattr` polymorphism); free-tier quotas mean ~1k full tours/day max.
     - License + contributing notes.
 - `make quickstart` script verified on a clean macOS VM and a clean Ubuntu 22.04 VM.
-- `docs/DEPLOY.md` — hosted-demo recipe: Vercel (Next.js) + fly.io or Railway (API + arq + Ollama, ≥4 GB RAM for `qwen2.5-coder:7b` Q4) + Neon or Supabase (Postgres + pgvector) + Upstash (Redis). Note that Ollama cannot run on serverless. Document monthly idle cost (~$5–15) and the scale-down path if free-tier limits are hit.
+- `docs/DEPLOY.md` — hosted-demo recipe: Vercel (Next.js) + fly.io or Railway (API + arq + Hugging Face, ≥4 GB RAM for `Qwen/Qwen2.5-Coder-7B-Instruct` Q4) + Neon or Supabase (Postgres + pgvector) + Upstash (Redis). Note that Hugging Face cannot run on serverless. Document monthly idle cost (~$5–15) and the scale-down path if free-tier limits are hit.
 - Tag `v0.1.0` (do NOT push the tag without user approval).
 
 Tests to write FIRST (TDD)

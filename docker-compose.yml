@@ -28,25 +28,11 @@ services:
       timeout: 3s
       retries: 20
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_models:/root/.ollama
-      - ./infra/ollama/entrypoint.sh:/entrypoint.sh:ro
-    entrypoint: ["/bin/sh", "/entrypoint.sh"]
-    environment:
-      OLLAMA_KEEP_ALIVE: "24h"
-      OLLAMA_PRELOAD_MODELS: "qwen2.5-coder:7b nomic-embed-text"
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list | grep -q qwen2.5-coder"]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-      start_period: 120s
+# No Ollama service. v1 uses:
+#   - Groq → Cerebras → Hugging Face Inference Providers for chat completion
+#   - In-process sentence-transformers (HF weights) for embeddings
+# See packages/core/src/repopilot_core/llm/provider.py for the wiring.
 
 volumes:
   postgres_data:
   redis_data:
-  ollama_models:

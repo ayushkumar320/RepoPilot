@@ -10,10 +10,10 @@ Every choice below is paired with **why** and **what we rejected**. The constrai
 |---|---|---|---|
 | Judgment-heavy generation (Cartographer, Issue Triage, Teacher, Q&A) | **Groq `llama-3.3-70b-versatile`** | Free tier, fast inference (~250 tok/s), strong reasoning on long-context code questions. | OpenAI GPT-4o-mini (not free), Together.ai (slower free tier), Anthropic Claude Haiku via Bedrock (no free tier). |
 | Trace and explain code paths (Flow Tracer, Q&A fallback) | **Groq `qwen3-32b`** | Excellent at structured reasoning over code traces. Spreads load off the 70B quota. | Mixtral-8x7B (deprecated on Groq), DeepSeek-Coder-V2 (not on Groq). |
-| Cheap, high-volume work (Intent Profiler, Code Health, chunk summaries) | **Groq `llama-3.1-8b-instant`** | ≈ 14.4k RPD — by far the highest free quota. Sufficient for free-text intent profiling, classification, and structured summary tasks. Burns the cheap tier for the hot paths so the 70B isn't starved. | Groq Gemma2-9b (smaller context), local Ollama Llama3-8B (slower wall-clock on CPU laptops). |
-| Verification (highest call volume of any agent) | **Ollama `qwen2.5-coder:7b`** (local) | Runs on the developer's machine. No quota at all. Specifically tuned for code grounding tasks. Removes the single biggest risk to rate-limit survival — verifier traffic. | Groq for verifier (would burn 70B quota in minutes), GPT-3.5 (not free). |
-| Embeddings | **Ollama `nomic-embed-text`** (local) | 768-dim, fast on CPU, no API quota. Quality is competitive with OpenAI `text-embedding-3-small` on code search benchmarks. | OpenAI embeddings (not free), Cohere embed-v3 (paid), bge-small (lower quality on code). |
-| Provider abstraction | **Custom `LLMProvider`** with Groq → Cerebras → Ollama fallback, SQLite response cache, exponential backoff on 429. | Agents never import `groq`/`ollama` directly. One place to swap models, one place to cache, one place to handle 429s. Provider-level fallback means a single quota hit doesn't kill the user's session. | Direct SDK use (scattered fallback logic), LangChain LLM wrappers (opinionated and heavy), LiteLLM (additional dep when one file does the job). |
+| Cheap, high-volume work (Intent Profiler, Code Health, chunk summaries) | **Groq `llama-3.1-8b-instant`** | ≈ 14.4k RPD — by far the highest free quota. Sufficient for free-text intent profiling, classification, and structured summary tasks. Burns the cheap tier for the hot paths so the 70B isn't starved. | Groq Gemma2-9b (smaller context), in-process transformers (slower wall-clock on CPU laptops). |
+| Verification (highest call volume of any agent) | **Groq `qwen/qwen3-32b`** with **Hugging Face `Qwen/Qwen2.5-Coder-7B-Instruct`** as fallback | Code-tuned model on Groq's fastest tier; HF Inference Providers picks up when Groq quota is exhausted. No local daemon. | Hugging Face (rejected — requires Docker + 4GB RAM daemon; user explicitly wants no Hugging Face), OpenAI GPT-3.5 (not free). |
+| Embeddings | **`sentence-transformers` in-process with `nomic-ai/nomic-ai/nomic-embed-text-v1.5-v1.5`** (Hugging Face weights) | 768-dim — matches existing pgvector schema. Runs in the Python process; no daemon, no HTTP, no Docker. Weights download from huggingface.co on first use (~250MB). | Hugging Face (daemon-bound), OpenAI embeddings (not free), HF Inference API for embeddings (rate-limited free tier). |
+| Provider abstraction | **Custom `LLMProvider`** with Groq → Cerebras → Hugging Face Inference Providers fallback, SQLite response cache, exponential backoff on 429. Embeddings handled by a separate in-process `sentence-transformers` embedder field. | Agents never import provider SDKs directly. One place to swap models, one place to cache, one place to handle 429s. Provider-level fallback means a single quota hit doesn't kill the user's session. | Direct SDK use (scattered fallback logic), LangChain LLM wrappers (opinionated and heavy), LiteLLM (additional dep when one file does the job). |
 
 ### Per-agent model map
 
@@ -28,7 +28,7 @@ Every choice below is paired with **why** and **what we rejected**. The constrai
 | Suspicion (Lane C) | `qwen3-32b` | Needs careful epistemic language. |
 | Q&A primary | `llama-3.3-70b-versatile` | User-facing quality. |
 | Q&A fallback | `qwen3-32b` | When 70B is rate-limited. |
-| Verifier | `qwen2.5-coder:7b` (Ollama) | Highest call volume — must be local. |
+| Verifier | `qwen/qwen3-32b` (Groq) → `Qwen/Qwen2.5-Coder-7B-Instruct` (HF) | Highest call volume — fast on Groq, durable on HF when Groq quota burns. |
 | Chunk summaries (ingestion) | `llama-3.1-8b-instant` | Batch, cached, low-stakes. |
 
 ### Per-tour token budget (rough)
@@ -41,7 +41,7 @@ Estimated for a moderately complex `understand`-shaped tour on a 50kLOC repo. Nu
 | Cartographer | 70B | ~1.5k | ~1.5k | Reads graph_query results + chunk summaries. |
 | Flow Tracer | qwen3-32b | ~2.0k | ~1.5k | Reads traversal path + chunk content. |
 | Teacher | 70B | ~3.0k | ~2.0k | Reads all upstream Insight objects. |
-| Verifier (per claim) | qwen2.5-coder:7b (local) | ~500 | ~80 | × ~30 claims = ~17k tok, but local, so zero Groq cost. |
+| Verifier (per claim) | qwen/qwen3-32b (Groq) | ~500 | ~80 | × ~30 claims = ~17k tok on Groq's qwen tier; HF fallback when quota burns. |
 | Q&A (if used) | 70B | ~2.5k | ~1.0k | Per question. |
 
 **70B-specific math.** A single Learn-shaped tour costs **~8k tokens** on `llama-3.3-70b-versatile` (Cartographer + Teacher + 1 Q&A). Groq's 70B free tier is **6k TPM**, so one tour comfortably fits a minute. **Concurrency limit: 1 active 70B-heavy tour per Groq key.** A second concurrent tour triggers the 429-backoff-then-fallback chain. The `MAX_TOURS_PER_IP_PER_HOUR` rate-limit (default 5) protects against single-IP abuse; a server-wide semaphore on 70B calls protects against multi-IP contention.
@@ -53,10 +53,10 @@ Estimated for a moderately complex `understand`-shaped tour on a 50kLOC repo. Nu
 Groq limits are **per model**, not per account. As of writing: ≈ 30 RPM / 6k TPM / 1k RPD on `llama-3.3-70b-versatile`; `llama-3.1-8b-instant` gets ≈ 14.4k RPD. The architecture exploits this:
 
 1. **Spread across three models** so any one quota hit only affects part of the system.
-2. **Verifier is local Ollama.** This is the biggest single saving — verifying every claim against every chunk on Groq would blow the 70B quota in minutes.
+2. **Verifier uses Groq's qwen3-32b (not 70B).** Verifier traffic stays on Groq's mid-tier quota; the 70B is reserved for narrative agents. HF Inference Providers takes over when Groq's qwen-coder quota burns.
 3. **SQLite response cache.** Identical prompts return cached responses. Cuts repeat-query cost to zero, and protects against retry storms.
 4. **Exponential backoff with jitter** on 429, capped at 5 attempts.
-5. **Provider-level fallback chain.** Groq → Cerebras (free tier, similar models) → Ollama (local, slower but always available). A 429 storm degrades gracefully instead of failing the session.
+5. **Provider-level fallback chain.** Groq → Cerebras (free tier, similar models) → Hugging Face Inference Providers (OpenAI-compatible gateway). A 429 storm degrades gracefully instead of failing the session.
 6. **Prompt budget per node ≤ 2000 input tokens.** Enforced in CI. Past that, the architecture is wrong — chunk more aggressively or split the agent.
 
 ---
@@ -124,7 +124,7 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
 | Tests | **pytest + pytest-asyncio + pytest-cov** | Standard. 80% coverage gate. | unittest (verbose, less expressive). |
 | Pre-commit | **pre-commit** with ruff, mypy, gitleaks hooks | Bad code never reaches CI. | Husky-style git hooks (Python world standard is pre-commit). |
 | CI | **GitHub Actions** | Free for public repos. | CircleCI / GitLab CI (no equivalent free tier for our needs). |
-| Local services | **Docker Compose** (postgres+pgvector, redis, ollama) | One-command bringup is part of the demo. | Native installs per dev (onboarding hostile). |
+| Local services | **Docker Compose** (postgres+pgvector, redis) | One-command bringup is part of the demo. Embeddings run in-process via sentence-transformers; LLM via Groq/Cerebras/HF — no extra containers. | Native installs per dev (onboarding hostile). |
 | Secret scanning | **gitleaks** in pre-commit and CI | Catches a `.env` slip before it lands on origin. | TruffleHog (heavier), manual review (humans are not a security control). |
 
 ---
@@ -157,7 +157,7 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
             ▼                                      ▼                                         ▼
    ┌───────────────────┐                ┌─────────────────────┐                 ┌────────────────────────┐
    │   LangGraph       │                │  Tools (det.)       │                 │  LLMProvider           │
-   │   StateGraph      │                │  vector_search      │                 │  Groq → Cerebras → Ollama
+   │   StateGraph      │                │  vector_search      │                 │  Groq → Cerebras → Hugging Face
    │  ─ Intent Profiler│                │  graph_traverse     │                 │  SQLite cache          │
    │  ─ LEARN subgraph │ ──tool calls──►│  graph_query        │ ◄──reads from── │  Backoff on 429        │
    │  ─ CONTRIBUTE sub │                │  graph_metrics      │                 │  Per-model quota mgmt  │
@@ -169,15 +169,15 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
    ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
    │                            Postgres + pgvector                                               │
    │  chunks (with line spans, structural type)                                                   │
-   │  embeddings (nomic-embed-text, 768-d)                                                        │
+   │  embeddings (nomic-ai/nomic-embed-text-v1.5, 768-d)                                                        │
    │  graph_adjacency JSONB                                                                       │
    │  langgraph_checkpoints                                                                       │
    └──────────────────────────────────────────────────────────────────────────────────────────────┘
 
    ┌───────────────────┐   ┌──────────────────────────┐   ┌───────────────────────────────────────┐
-   │   Redis + arq     │   │   Ollama (local)         │   │   Groq API (free tier)                │
-   │   indexing jobs   │   │   qwen2.5-coder:7b (verif)│   │   llama-3.3-70b / qwen3-32b /         │
-   └───────────────────┘   │   nomic-embed-text (emb) │   │   llama-3.1-8b-instant                │
+   │   Redis + arq     │   │   Hugging Face (local)         │   │   Groq API (free tier)                │
+   │   indexing jobs   │   │   Qwen/Qwen2.5-Coder-7B-Instruct (verif)│   │   llama-3.3-70b / qwen3-32b /         │
+   └───────────────────┘   │   nomic-ai/nomic-embed-text-v1.5 (emb) │   │   llama-3.1-8b-instant                │
                            └──────────────────────────┘   └───────────────────────────────────────┘
                                                        
    ┌──────────────────────────┐    ┌──────────────────────────────────┐
@@ -188,4 +188,4 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
    └──────────────────────────┘
 ```
 
-The shape of the system reads top-to-bottom: browser streams tokens from FastAPI, which drives LangGraph over typed state, which calls deterministic tools that read from Postgres and a graph parsed by tree-sitter / NetworkX, with the LLMProvider hiding Groq/Ollama details and the Verifier running entirely on local Ollama to protect the Groq quota.
+The shape of the system reads top-to-bottom: browser streams tokens from FastAPI, which drives LangGraph over typed state, which calls deterministic tools that read from Postgres and a graph parsed by tree-sitter / NetworkX, with the LLMProvider hiding Groq/Hugging Face details and the Verifier running entirely on local Hugging Face to protect the Groq quota.

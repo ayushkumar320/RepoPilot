@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import httpx
 import pytest
 
 from repopilot_core.llm.models import ModelId, ProviderName
 from repopilot_core.llm.provider import (
+    EmbeddingResponse,
     LLMProvider,
     LLMResponse,
     Message,
@@ -32,7 +34,8 @@ def tmp_settings(tmp_path: Path) -> Settings:
         repopilot_env="test",
         groq_api_key="test-groq",
         cerebras_api_key="test-cerebras",
-        ollama_base_url="http://ollama.local",
+        huggingface_api_key="test-hf",
+        huggingface_embedding_model="sentence-transformers/all-MiniLM-L6-v2",
         llm_cache_path=tmp_path / "llm.sqlite",
         llm_max_429_retries=3,
         llm_backoff_base_seconds=0.0,
@@ -60,14 +63,57 @@ class FakeClient(_BaseClient):
         return head
 
 
+class FakeEmbedder(_BaseClient):
+    """Test double for the sentence-transformers in-process embedder.
+
+    Returns deterministic vectors based on text content so embeddings are
+    reproducible across runs without loading a real model.
+    """
+
+    provider = ProviderName.HUGGINGFACE
+
+    def __init__(self, dim: int = 768) -> None:
+        self._dim = dim
+        self.calls: list[str] = []
+
+    async def chat(self, binding, messages, kwargs):
+        raise NotImplementedError("FakeEmbedder does not support chat")
+
+    async def embed(self, binding: Any, text: str) -> EmbeddingResponse:
+        self.calls.append(text)
+        # Cheap deterministic vector from a hash; not semantically meaningful
+        # but stable across runs so cache hits work in tests.
+        import hashlib
+
+        digest = hashlib.sha256(text.encode("utf-8")).digest()
+        vector = [(b - 128) / 128.0 for b in digest]
+        # Pad / truncate to requested dim.
+        while len(vector) < self._dim:
+            vector.extend(vector[: self._dim - len(vector)])
+        vector = vector[: self._dim]
+        return EmbeddingResponse(
+            vector=vector,
+            model=ModelId.EMBEDDINGS,
+            provider=self.provider,
+            physical_model=binding.physical_model,
+        )
+
+
 def make_provider(
     settings: Settings,
     clients: dict[ProviderName, _BaseClient],
+    embedder: _BaseClient | None = None,
 ) -> LLMProvider:
     """Build an LLMProvider that uses the supplied fakes for every provider."""
     http = httpx.AsyncClient()
     cache = _SQLiteCache(settings.llm_cache_path)
-    return LLMProvider(settings=settings, http=http, cache=cache, clients=clients)
+    return LLMProvider(
+        settings=settings,
+        http=http,
+        cache=cache,
+        clients=clients,
+        embedder=embedder or FakeEmbedder(),
+    )
 
 
 def make_response(

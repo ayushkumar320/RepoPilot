@@ -44,8 +44,8 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot
       REDIS_URL: redis://localhost:6379/0
-      OLLAMA_URL: http://localhost:11434
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
       LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
       EVAL_MODE: full
 

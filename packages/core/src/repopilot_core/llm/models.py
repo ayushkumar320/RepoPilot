@@ -1,9 +1,13 @@
 """Logical model identifiers and their physical-model resolution per provider.
 
 Agents NEVER reference a physical model name. They ask for a `ModelId`; the
-provider resolves it to the concrete model on Groq / Cerebras / Ollama. This
-indirection is what makes the failover chain transparent — see
+provider resolves it to the concrete model on Groq / Cerebras / Hugging Face.
+This indirection is what makes the failover chain transparent — see
 `docs/02_TECH_STACK.md` and `docs/03_ARCHITECTURE.md` (Agent table).
+
+Provider fallback chain in v1:
+    Groq → Cerebras → Hugging Face (Inference Providers)
+Embeddings: sentence-transformers in-process (no HTTP, no daemon).
 """
 
 from __future__ import annotations
@@ -15,7 +19,7 @@ from enum import StrEnum
 class ProviderName(StrEnum):
     GROQ = "groq"
     CEREBRAS = "cerebras"
-    OLLAMA = "ollama"
+    HUGGINGFACE = "huggingface"
 
 
 class ModelId(StrEnum):
@@ -44,48 +48,59 @@ class ModelBinding:
 # Per-model resolution chain. The first entry is the preferred provider; the
 # remaining entries are tried in order on RateLimitError / connection failure.
 #
-# Cerebras has only two free-tier models in v1 (llama-3.3-70b, llama-3.1-8b);
-# missing Cerebras entries fall straight through to Ollama. For VERIFIER and
-# EMBEDDINGS the chain is Ollama-only — Groq doesn't host them.
+# Hugging Face's Inference Providers gateway (https://router.huggingface.co/v1)
+# is OpenAI-compatible and routes to underlying providers (Together, Replicate,
+# Cerebras, etc.). It is the universal final fallback for chat models.
+#
+# EMBEDDINGS uses sentence-transformers in-process; the binding's physical
+# model is the HF model id passed to `SentenceTransformer(...)`. No HTTP.
 RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ModelId.INTENT_PROFILER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.CAPABILITY_PLANNER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.CARTOGRAPHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.FLOW_TRACER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-32B-Instruct"),
     ),
     ModelId.TEACHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_FALLBACK: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-32B-Instruct"),
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.1-8b"),
-        ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.1-8B-Instruct"),
     ),
-    ModelId.VERIFIER: (ModelBinding(ProviderName.OLLAMA, "qwen2.5-coder:7b"),),
-    ModelId.EMBEDDINGS: (ModelBinding(ProviderName.OLLAMA, "nomic-embed-text"),),
+    # Verifier is the highest call-volume agent. We use Groq's qwen-coder for
+    # cost (fast) with HF as the durable fallback. No Ollama daemon required.
+    ModelId.VERIFIER: (
+        ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
+        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-7B-Instruct"),
+    ),
+    # Embeddings run in-process via sentence-transformers (HF model weights).
+    # physical_model is the HF model id passed to SentenceTransformer().
+    # nomic-embed-text-v1.5 is 768-dim, matches the existing pgvector schema.
+    ModelId.EMBEDDINGS: (ModelBinding(ProviderName.HUGGINGFACE, "nomic-ai/nomic-embed-text-v1.5"),),
 }

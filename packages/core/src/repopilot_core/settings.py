@@ -30,9 +30,18 @@ class Settings(BaseSettings):
     cerebras_api_key: str | None = None
     cerebras_base_url: str = "https://api.cerebras.ai/v1"
 
-    ollama_base_url: str = "http://localhost:11434"
-    ollama_verifier_model: str = "qwen2.5-coder:7b"
-    ollama_embeddings_model: str = "nomic-embed-text"
+    # Hugging Face Inference Providers (https://router.huggingface.co/v1) —
+    # OpenAI-compatible gateway that routes to underlying model providers
+    # (Cerebras, Together, Replicate, etc.). Token can be a free user token
+    # from huggingface.co/settings/tokens (read scope is sufficient).
+    huggingface_api_key: str | None = None
+    huggingface_base_url: str = "https://router.huggingface.co/v1"
+
+    # Sentence-transformers embedder. Runs in-process; no daemon, no HTTP.
+    # nomic-embed-text-v1.5 is 768-dim and matches the existing pgvector schema.
+    # On first use the model weights are downloaded from huggingface.co into
+    # the local `huggingface_hub` cache (~250MB).
+    huggingface_embedding_model: str = "nomic-ai/nomic-embed-text-v1.5"
 
     # ── LLM behaviour ────────────────────────────────────────────────────────
     llm_cache_path: Path = Field(default_factory=lambda: Path(".cache/llm.sqlite"))

@@ -8,7 +8,7 @@ This folder is the **complete design spec.** Phases 0, 1, and 2 of `docs/04_BUIL
 
 | Phase | Status | Commit | Notes |
 |---|---|---|---|
-| **Phase 0 — Foundation** | ✅ shipped, CI green | `a684bd7` (code), `0f170fa` (CI fixes) | Monorepo, `LLMProvider` (Groq → Cerebras → Ollama + cache + 429 backoff), `Settings`, Docker Compose, ruff/mypy/pytest/CI. |
+| **Phase 0 — Foundation** | ✅ shipped, CI green | `a684bd7` (code), `0f170fa` (CI fixes) | Monorepo, `LLMProvider` (Groq → Cerebras → Hugging Face + cache + 429 backoff), `Settings`, Docker Compose, ruff/mypy/pytest/CI. |
 | **Phase 1 — Ingestion** | ✅ shipped, CI green; slow-lane gate **unrun** | `c4747e6` | clone → parse → chunk → graph → embed → persist. Alembic migration, `LLMProvider.embed()`, idempotent on `(repo_url, head_sha)`. The 90 s `httpx` gate needs `make docker-up && make db-migrate && make test-slow` locally. |
 | **Phase 2 — Hybrid Retrieval + Q&A spine** | ✅ shipped, CI green; eval datasets + LangSmith **deferred** | `6065ccf` | Six tools (`read_chunks`, `vector_search`, `graph_traverse`, `graph_query`, `graph_metrics`, `github_issues` stub), Verifier (D4 + M1 + S4), Q&A loop (hop budget 3). Eval labeling + LangSmith key are a Phase 3 entry-checklist item. |
 | Phase 3 — Orchestration + Learn | not started | — | Full `ArchaeologistState`, Intent Profiler, Capability Planner, Cartographer/Flow Tracer/Teacher. **Blocked** on the Phase 3 entry checklist in `docs/05`. |
@@ -64,7 +64,7 @@ The "paste this at the top of every build session" condensation — the standing
 ### 02 — Tech Stack *(the toolbox — every choice + why + what was rejected)*
 
 Hard constraint: **the whole stack runs on a laptop with free-tier services only.**
-- **LLMs:** Groq `llama-3.3-70b` (judgment), `qwen3-32b` (tracing), `llama-3.1-8b-instant` (cheap/high-volume); local Ollama `qwen2.5-coder:7b` (verifier) + `nomic-embed-text` (embeddings). A custom `LLMProvider` hides all of this behind a Groq→Cerebras→Ollama fallback chain with a SQLite cache and 429 backoff. Includes the per-agent model map and Groq per-model quota survival strategy.
+- **LLMs:** Groq `llama-3.3-70b` (judgment), `qwen3-32b` (tracing + verifier), `llama-3.1-8b-instant` (cheap/high-volume); Hugging Face Inference Providers as the universal final fallback. **Embeddings run in-process via `sentence-transformers` (HF weights `nomic-ai/nomic-embed-text-v1.5`)** — no daemon, no Docker. A custom `LLMProvider` hides all of this behind a Groq→Cerebras→Hugging Face fallback chain with a SQLite cache and 429 backoff. Includes the per-agent model map and Groq per-model quota survival strategy.
 - **Orchestration:** LangGraph (typed StateGraph, Postgres checkpointing) + LangSmith.
 - **Code intelligence (deterministic, NO LLM):** tree-sitter, NetworkX, GitPython, PyGithub. This is the layer where "truthful" is *purchased* — the AST builds the graph, the LLM never invents it.
 - **Storage:** Postgres + pgvector; Redis + arq; SQLite cache.
@@ -84,7 +84,7 @@ The detailed engineering design:
 ### 04 — Build Plan *(the schedule — 7 phases, each with a hard gate)*
 
 Seven phases, each ending in a **working demo + a binary, measurable quality gate** (no gate pass = no ship):
-- **Phase 0 — Foundation:** monorepo, `LLMProvider` with cache/backoff/fallback, CI, Docker Compose. *Gate: forced-429 falls back to Ollama in <30s; stack up in ≤90s.*
+- **Phase 0 — Foundation:** monorepo, `LLMProvider` with cache/backoff/fallback, CI, Docker Compose. *Gate: forced-429 falls back to Hugging Face in <30s; stack up in ≤90s.*
 - **Phase 1 — Ingestion:** clone → tree-sitter parse → structural chunk → NetworkX graph → embed → persist; idempotent on HEAD SHA. *Gate (httpx): index ≤90s, exact line-spans, known call chain exists as a graph path.*
 - **Phase 2 — Hybrid Retrieval + Grounded Q&A (THE SPINE):** the 6 tools, Q&A mini-graph, verifier grounding loop, eval harness v1 in CI. *Gate: grounding ≥90%, multi-hop test, forced-hallucination test.*
 - **Phase 3 — Orchestration + Learn:** full `ArchaeologistState`, Intent Profiler + Capability Planner, Learn capabilities, verifier+actionability loop, checkpoint resume. *Gate: profiler ≥90%/field, planner F1 ≥90%, two intents on flask differ ≥50%, CI grep asserts no `if state.purpose ==`.*

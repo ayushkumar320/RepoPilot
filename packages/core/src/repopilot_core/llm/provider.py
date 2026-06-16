@@ -5,15 +5,19 @@ Responsibilities (Phase 0 deliverable per `docs/05_PHASE_PROMPTS.md`):
 * Resolve a logical `ModelId` to the right physical model on the right provider.
 * SQLite cache keyed on sha256(model + canonical_json(messages) + kwargs).
 * Exponential backoff with jitter on 429, max N attempts (config).
-* Provider fallback chain: Groq → Cerebras → Ollama. If the entire chain is
-  exhausted, raise `ProviderError`.
+* Provider fallback chain: Groq → Cerebras → Hugging Face (Inference Providers).
+  If the entire chain is exhausted, raise `ProviderError`.
 * Per-`ModelId` `tokens_used` counter, summed across providers.
 
 Design notes
 ------------
-The provider speaks OpenAI-compatible HTTP for Groq and Cerebras, and the
-native Ollama HTTP API. Both shapes are mapped to a unified `LLMResponse`
-internally so callers never branch on provider.
+The provider speaks OpenAI-compatible HTTP for Groq, Cerebras, and Hugging
+Face's Inference Providers gateway (https://router.huggingface.co/v1). The
+unified `LLMResponse` shape lets callers stay provider-agnostic.
+
+Embeddings run **in-process** via `sentence-transformers` (Hugging Face
+model weights, no daemon, no HTTP). This is the only embeddings backend in
+v1 — there is no Ollama anywhere.
 
 Tests in `packages/core/tests/test_llm_provider.py` cover the five Phase 0
 TDD gates. The forced-429-storm test exercises the real fallback chain end
@@ -302,25 +306,43 @@ class _OpenAICompatibleClient(_BaseClient):
         )
 
 
-class _OllamaClient(_BaseClient):
-    """Native Ollama API client."""
+class _SentenceTransformersEmbedder(_BaseClient):
+    """In-process embedder using sentence-transformers (Hugging Face weights).
 
-    provider = ProviderName.OLLAMA
+    No HTTP, no daemon, no Docker. Model weights are downloaded from
+    huggingface.co on first use into the local `huggingface_hub` cache.
+    `nomic-embed-text-v1.5` is 768-dim and matches the existing pgvector schema.
+    """
 
-    def __init__(self, http: httpx.AsyncClient, base_url: str) -> None:
-        self._http = http
-        self._base_url = base_url.rstrip("/")
+    provider = ProviderName.HUGGINGFACE
+
+    def __init__(self, model_name: str) -> None:
+        self._model_name = model_name
+        # Lazy-loaded on first use so module import stays cheap.
+        self._model: Any = None
+        self._load_lock = asyncio.Lock()
+
+    async def _ensure_loaded(self) -> Any:
+        if self._model is None:
+            async with self._load_lock:
+                if self._model is None:  # double-checked locking
+                    self._model = await asyncio.to_thread(self._load_model)
+        return self._model
+
+    def _load_model(self) -> Any:
+        # Import inside the method so a missing optional dep doesn't blow up
+        # import of repopilot_core.
+        from sentence_transformers import SentenceTransformer
+
+        return SentenceTransformer(self._model_name, trust_remote_code=True)
 
     async def embed(self, binding: ModelBinding, text: str) -> EmbeddingResponse:
-        body = {"model": binding.physical_model, "prompt": text}
-        resp = await self._http.post(f"{self._base_url}/api/embeddings", json=body)
-        if resp.status_code == 429:
-            raise RateLimitError("ollama returned 429 (embeddings)")
-        resp.raise_for_status()
-        data = resp.json()
-        vector = list(data.get("embedding") or [])
+        model = await self._ensure_loaded()
+        vector = await asyncio.to_thread(
+            lambda: model.encode(text, normalize_embeddings=True, convert_to_numpy=True).tolist()
+        )
         return EmbeddingResponse(
-            vector=vector,
+            vector=list(vector),
             model=ModelId.EMBEDDINGS,
             provider=self.provider,
             physical_model=binding.physical_model,
@@ -332,28 +354,7 @@ class _OllamaClient(_BaseClient):
         messages: Sequence[Message],
         kwargs: dict[str, Any],
     ) -> LLMResponse:
-        body: dict[str, Any] = {
-            "model": binding.physical_model,
-            "messages": [m.to_openai() for m in messages],
-            "stream": False,
-        }
-        options = {k: v for k, v in kwargs.items() if k not in {"stream"}}
-        if options:
-            body["options"] = options
-        resp = await self._http.post(f"{self._base_url}/api/chat", json=body)
-        if resp.status_code == 429:
-            raise RateLimitError("ollama returned 429")
-        resp.raise_for_status()
-        data = resp.json()
-        text = data.get("message", {}).get("content", "")
-        return LLMResponse(
-            text=text,
-            model=ModelId.INTENT_PROFILER,  # overwritten by caller
-            provider=self.provider,
-            physical_model=binding.physical_model,
-            prompt_tokens=int(data.get("prompt_eval_count", 0)),
-            completion_tokens=int(data.get("eval_count", 0)),
-        )
+        raise NotImplementedError("sentence-transformers embedder does not support chat completion")
 
 
 # ─── LLMProvider ────────────────────────────────────────────────────────────
@@ -367,6 +368,7 @@ class LLMProvider:
     http: httpx.AsyncClient
     cache: _SQLiteCache
     clients: dict[ProviderName, _BaseClient]
+    embedder: _BaseClient  # always sentence-transformers in v1
     tokens_used: dict[ModelId, int] = field(default_factory=lambda: defaultdict(int))
 
     # ── construction ───────────────────────────────────────────────────────
@@ -378,6 +380,7 @@ class LLMProvider:
         settings: Settings | None = None,
         http: httpx.AsyncClient | None = None,
         clients: dict[ProviderName, _BaseClient] | None = None,
+        embedder: _BaseClient | None = None,
     ) -> Self:
         """Default wiring used by the app. Tests pass `clients` for full control."""
         settings = settings or get_settings()
@@ -398,9 +401,29 @@ class LLMProvider:
                     settings.cerebras_base_url,
                     settings.cerebras_api_key,
                 )
-            clients[ProviderName.OLLAMA] = _OllamaClient(http, settings.ollama_base_url)
+            # Hugging Face Inference Providers (OpenAI-compatible gateway).
+            # The chat path uses HF for any model in the resolution chain whose
+            # provider is HUGGINGFACE. The embedding path is served separately
+            # by the in-process sentence-transformers embedder below.
+            if settings.huggingface_api_key:
+                clients[ProviderName.HUGGINGFACE] = _OpenAICompatibleClient(
+                    ProviderName.HUGGINGFACE,
+                    http,
+                    settings.huggingface_base_url,
+                    settings.huggingface_api_key,
+                )
         cache = _SQLiteCache(settings.llm_cache_path)
-        return cls(settings=settings, http=http, cache=cache, clients=clients)
+        # The embedder loads its model lazily on first call; constructing it
+        # is cheap. Tests can pass `embedder=` to override.
+        if embedder is None:
+            embedder = _SentenceTransformersEmbedder(settings.huggingface_embedding_model)
+        return cls(
+            settings=settings,
+            http=http,
+            cache=cache,
+            clients=clients,
+            embedder=embedder,
+        )
 
     async def aclose(self) -> None:
         with suppress(Exception):
@@ -463,11 +486,11 @@ class LLMProvider:
         ) from last_error
 
     async def embed(self, text: str, *, model: ModelId = ModelId.EMBEDDINGS) -> EmbeddingResponse:
-        """Embed ``text`` via Ollama (the only embeddings provider in v1).
+        """Embed ``text`` via the in-process sentence-transformers embedder.
 
-        Same cache + fallback story as :meth:`generate`, but the chain is
-        Ollama-only and the cache is a separate SQLite table keyed on
-        ``sha256(model + text)``.
+        No HTTP, no daemon, no Docker. Model weights are downloaded from
+        Hugging Face on first use into the local hub cache. Cached by
+        ``sha256(model + text)`` in SQLite.
         """
         canonical = json.dumps(
             {"model": model.value, "text": text}, sort_keys=True, separators=(",", ":")
@@ -482,34 +505,21 @@ class LLMProvider:
         chain = RESOLUTION.get(model)
         if not chain:
             raise ProviderError(f"no resolution chain for {model.value}")
+        # In v1 the chain has a single binding pointing at the in-process
+        # sentence-transformers embedder. We pass the binding through so the
+        # embedder knows which HF model id to load.
+        binding = chain[0]
+        embed_method = getattr(self.embedder, "embed", None)
+        if embed_method is None:
+            raise ProviderError("embedder does not support embed()")
+        try:
+            response: EmbeddingResponse = await embed_method(binding, text)
+        except (OSError, RuntimeError) as exc:
+            raise ProviderError(f"embedding failed for {model.value}: {exc!r}") from exc
 
-        last_error: Exception | None = None
-        for binding in chain:
-            client = self.clients.get(binding.provider)
-            if not isinstance(client, _OllamaClient):
-                continue
-            try:
-                response = await self._embed_with_429_retry(client, binding, text)
-            except RateLimitError as exc:
-                last_error = exc
-                continue
-            except (httpx.HTTPError, ConnectionError, OSError) as exc:
-                last_error = exc
-                log.warning(
-                    "llm.embed_transport_error",
-                    model=model.value,
-                    provider=binding.provider.value,
-                    error=str(exc),
-                )
-                continue
-
-            response.model = model
-            await self.cache.put_embedding(key, response)
-            return response
-
-        raise ProviderError(
-            f"all providers failed for {model.value}: {last_error!r}"
-        ) from last_error
+        response.model = model
+        await self.cache.put_embedding(key, response)
+        return response
 
     # ── helpers ────────────────────────────────────────────────────────────
 
@@ -540,27 +550,5 @@ class LLMProvider:
                     provider=binding.provider.value,
                     attempt=attempt,
                     delay=round(delay, 3),
-                )
-                await asyncio.sleep(delay)
-
-    async def _embed_with_429_retry(
-        self,
-        client: _OllamaClient,
-        binding: ModelBinding,
-        text: str,
-    ) -> EmbeddingResponse:
-        max_attempts = max(1, self.settings.llm_max_429_retries)
-        attempt = 0
-        while True:
-            try:
-                return await client.embed(binding, text)
-            except RateLimitError:
-                attempt += 1
-                if attempt >= max_attempts:
-                    raise
-                delay = _backoff_delay(
-                    attempt - 1,
-                    self.settings.llm_backoff_base_seconds,
-                    self.settings.llm_backoff_max_seconds,
                 )
                 await asyncio.sleep(delay)

@@ -4,9 +4,9 @@
 # The full Phase 2/3/5 matrix runs separately in eval-main.yml on push:main.
 #
 # Design:
-# - Uses Postgres+pgvector as a service container (no Ollama in CI — eval tests
-#   that strictly need local Ollama-only models skip with a clear message; tests
-#   that can use Groq fallback for the Verifier run against Groq).
+# - Uses Postgres+pgvector as a service container. No daemon dependencies:
+#   Verifier runs against Groq (with HF Inference Providers fallback), and
+#   embeddings run in-process via sentence-transformers.
 # - Skips cleanly if a required dataset file is missing (so this is green on a
 #   fresh repo where Blockers 2/3 in docs/CURRENT_PHASE.md aren't done yet).
 # - Skips on forks where secrets aren't available (LLM-bound tests detect missing
@@ -51,8 +51,8 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot
       REDIS_URL: redis://localhost:6379/0
-      OLLAMA_URL: http://localhost:11434
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
       LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
       EVAL_MODE: sampled
 

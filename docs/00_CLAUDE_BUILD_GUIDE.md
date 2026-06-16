@@ -130,9 +130,9 @@ All lanes emit the same `Opportunity` model so the ranker can compare them on eq
 | **LLM judgment** | Groq — `llama-3.3-70b-versatile` (Cartographer, Issue Triage, Teacher, Q&A primary) |
 | **LLM tracing** | Groq — `qwen3-32b` (Flow Tracer, Q&A fallback) |
 | **LLM cheap** | Groq — `llama-3.1-8b-instant` (Intent Profiler, Code Health scanner, chunk summaries) |
-| **Verifier** | Ollama — `qwen2.5-coder:7b` (local, unlimited — highest call volume agent) |
-| **Embeddings** | Ollama — `nomic-embed-text` (local) |
-| **LLM provider abstraction** | Custom `LLMProvider` with Groq → Cerebras → Ollama fallback, SQLite response cache, exponential backoff on 429. Agents NEVER import `groq`/`ollama` directly. |
+| **Verifier** | Hugging Face — `Qwen/Qwen2.5-Coder-7B-Instruct` (local, unlimited — highest call volume agent) |
+| **Embeddings** | Hugging Face — `nomic-ai/nomic-embed-text-v1.5` (local) |
+| **LLM provider abstraction** | Custom `LLMProvider` with Groq → Cerebras → Hugging Face fallback, SQLite response cache, exponential backoff on 429. Agents NEVER import provider SDKs directly. |
 | **Orchestration** | LangGraph — typed `StateGraph`, conditional edges, Postgres checkpointing |
 | **Observability** | LangSmith — tracing + evaluation datasets |
 | **Code intelligence** | tree-sitter + tree-sitter-python (structural chunking on function/class boundaries), NetworkX dependency graph (call/import/inheritance edges from AST — **parse the graph, never ask an LLM to invent it**), GitPython, PyGithub |
@@ -141,7 +141,7 @@ All lanes emit the same `Opportunity` model so the ranker can compare them on eq
 | **Frontend** | Next.js 15, TypeScript, Tailwind v4, shiki (synchronized code viewer — the key demo moment), mermaid (agent-emitted diagrams), Zustand |
 | **Quality** | ruff, mypy `--strict`, pytest + pytest-asyncio + pytest-cov (80% gate), pre-commit, GitHub Actions CI, Docker Compose, gitleaks |
 
-**Groq free-tier survival.** Limits are **per-model**: ≈ 30 RPM / 6k TPM / 1k RPD on the 70B; 8b-instant gets ≈ 14.4k RPD. Quota is deliberately **spread across models** — the Verifier (highest call volume) is local Ollama for that reason, and the Intent Profiler uses 8B precisely because it fires on every request. Any single agent monopolizing 70B is a bug.
+**Groq free-tier survival.** Limits are **per-model**: ≈ 30 RPM / 6k TPM / 1k RPD on the 70B; 8b-instant gets ≈ 14.4k RPD. Quota is deliberately **spread across models** — the Verifier (highest call volume) is local Hugging Face for that reason, and the Intent Profiler uses 8B precisely because it fires on every request. Any single agent monopolizing 70B is a bug.
 
 ---
 
@@ -159,7 +159,7 @@ All lanes emit the same `Opportunity` model so the ranker can compare them on eq
 | **Lane C — Suspicion** | qwen3-32b | (Optional, planner-activated.) Explains pre-filtered structural anomalies with guarded language. Detector subset filterable by `focus_keywords`. | `graph_metrics`, `read_chunks` |
 | **Decision Archaeology** | llama-3.3-70b-versatile | (Optional, planner-activated.) Extracts architectural decisions + rationale from `git log` + README + commit messages + import graph. Activated for evaluate-heavy or build-vs-buy-shaped intents. | `graph_query`, `graph_metrics`, `read_chunks`, GitPython |
 | **Q&A** | llama-3.3-70b-versatile (qwen3-32b fallback) | Hybrid retrieval loop with sufficiency judge, ≤3 hops. | `vector_search`, `graph_traverse`, `read_chunks` |
-| **Verifier** | qwen2.5-coder:7b (local Ollama) | Runs on **all** factual output. Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric. | `read_chunks` |
+| **Verifier** | qwen/qwen3-32b (Groq) → HF fallback | Runs on **all** factual output. Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric. | `read_chunks` |
 
 ---
 

@@ -2,7 +2,7 @@
 
 We monkey-patch the three I/O tools (``vector_search``, ``graph_traverse``,
 ``read_chunks``) and the verifier, so the test runs in the fast lane without
-Postgres or Ollama. The control flow — hop budget, sufficiency loop,
+Postgres. The control flow — hop budget, sufficiency loop,
 hallucination short-circuit — is what we're actually exercising.
 """
 

@@ -13,7 +13,7 @@ help:
 	@echo "  cov          pytest with coverage gate (80%)"
 	@echo "  ci           lint + typecheck + test (matches GitHub Actions)"
 	@echo "  precommit    run pre-commit on all files"
-	@echo "  docker-up    docker compose up -d (Postgres+pgvector, Redis, Ollama)"
+	@echo "  docker-up    docker compose up -d (Postgres+pgvector, Redis)"
 	@echo "  docker-down  docker compose down -v"
 	@echo "  db-migrate   alembic upgrade head (runs ingestion migrations)"
 
@@ -36,7 +36,8 @@ test:
 
 # Phase 1 slow lane — runs the 90s httpx index gate + the call-chain test.
 # Prereqs: `make docker-up` (waits for healthchecks) and `make db-migrate`.
-# Needs GROQ_API_KEY in .env (chunk summaries) and a warm Ollama model cache.
+# Needs GROQ_API_KEY in .env (chunk summaries). Sentence-transformers weights
+# download on first run into ~/.cache/huggingface (~250MB).
 test-slow:
 	uv run pytest -m "slow and integration" --no-cov -ra
 

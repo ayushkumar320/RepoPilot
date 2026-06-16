@@ -22,6 +22,6 @@ def test_settings_loads_from_env_example() -> None:
 
     # Known defaults from the example file:
     assert settings.repopilot_env == "development"
-    assert settings.ollama_base_url.startswith("http://localhost:")
+    assert settings.huggingface_base_url.startswith("https://router.huggingface.co/")
     assert settings.llm_max_429_retries == 5
-    assert settings.ollama_verifier_model == "qwen2.5-coder:7b"
+    assert settings.huggingface_embedding_model == "nomic-ai/nomic-embed-text-v1.5"

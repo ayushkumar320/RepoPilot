@@ -45,7 +45,7 @@ This is the design document. It is detailed by intent: getting the topology, sta
                       ▼                                   ▼
    ┌─────────────────────────────────────────────────────────────────────────┐
    │              VERIFIER LOOP (universal — wraps every capability)         │
-   │             qwen2.5-coder:7b (local Ollama)                             │
+   │             qwen/qwen3-32b (Groq) → HF fallback                             │
    │                                                                         │
    │   Per-claim grounding check against read_chunks                         │
    │   + Iteration-2 actionability rubric                                    │
@@ -98,7 +98,7 @@ A few topology notes the diagram alone doesn't show:
 | **Decision Archaeology** | `llama-3.3-70b-versatile` | **Schema-reserved, deferred to v0.2.** Will extract architectural decisions + rationale from `git log`, README, commit messages, and the import graph. The state schema and capability-library slot are reserved so v0.2 is a drop-in; the v1 planner does not activate it (the default plan for evaluate-heavy intents falls back to Cartographer + Lane B in `tradeoffs_visible_in_code` framing). | `graph_query`, `graph_metrics`, `read_chunks`, GitPython | `repo_id`, `intent_profile` | `decision_dossier[]` |
 | **Opportunity Ranker** | (deterministic, no LLM) | Combine Lane A/B/C outputs into a single ranked `opportunity_list`. Ranking weights read from `capability_plan.ranker_weights` (planner-derived from `intent_profile.modality_weights`). | (none) | A, B, C outputs, `capability_plan` | `opportunity_list[]` |
 | **Q&A** | `llama-3.3-70b-versatile` (qwen3-32b fallback) | **Universal — always-on, available throughout the lifecycle.** Hybrid retrieval loop with sufficiency judge, ≤ 3 hops. Reads `intent_profile` to frame the answer. Drives the synchronized code viewer like any tour claim. | `vector_search`, `graph_traverse`, `read_chunks` | `user_question`, `repo_id`, `intent_profile` | `draft_tour[]` (appended) |
-| **Verifier** | `qwen2.5-coder:7b` (Ollama) | **Universal.** Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric (goal-relevance against `intent_profile`). Wraps every generating capability. | `read_chunks` | `draft_tour[]` (latest section), `intent_profile` | `verifier_objections[]`, mutates `claim.status` |
+| **Verifier** | `Qwen/Qwen2.5-Coder-7B-Instruct` (Hugging Face) | **Universal.** Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric (goal-relevance against `intent_profile`). Wraps every generating capability. | `read_chunks` | `draft_tour[]` (latest section), `intent_profile` | `verifier_objections[]`, mutates `claim.status` |
 
 ---
 
@@ -571,17 +571,17 @@ Phase 6 security pass:
 
 ## Verifier batching and concurrency
 
-The Verifier is the single biggest performance risk in the design. `qwen2.5-coder:7b` on a typical M-series Mac runs ~10–15 tok/s. A 30-claim tour with ~500 tokens of context per verification call would take ~3 minutes of Verifier-only sequential latency. The Phase 3 gate (full Learn-shaped tour on flask < 4 minutes) is unreachable without the three mechanisms below.
+The Verifier is the single biggest performance risk in the design. `Qwen/Qwen2.5-Coder-7B-Instruct` on a typical M-series Mac runs ~10–15 tok/s. A 30-claim tour with ~500 tokens of context per verification call would take ~3 minutes of Verifier-only sequential latency. The Phase 3 gate (full Learn-shaped tour on flask < 4 minutes) is unreachable without the three mechanisms below.
 
 | Mechanism | What it does | Where it lives |
 |---|---|---|
-| **Per-section batch verification** | All claims in a section verify in parallel via `asyncio.gather` over Ollama (Ollama supports concurrent requests). A 6-claim section verifies in roughly the time of one claim. | `packages/agents/verifier/loop.py` — `verify_section()` fans out via asyncio with a bounded semaphore (default 8 concurrent). |
+| **Per-section batch verification** | All claims in a section verify in parallel via `asyncio.gather` over Hugging Face (Hugging Face supports concurrent requests). A 6-claim section verifies in roughly the time of one claim. | `packages/agents/verifier/loop.py` — `verify_section()` fans out via asyncio with a bounded semaphore (default 8 concurrent). |
 | **Streaming verification with optimistic display** | Claims stream to the UI with `status="unverified"` the moment the Teacher emits them. The verified-badge upgrades to `✓ grounded` when the Verifier's verdict lands. Verification of section N runs concurrently with generation of section N+1. | `packages/agents/verifier/loop.py` returns an async iterator of `(claim_id, verdict)` events that the SSE layer streams as `claim_verified` events. |
 | **Hash-based verifier cache** | Cache key = `sha256(claim_text + ordered chunk_hashes + rubric_version)`. Identical claim text + identical chunks → cached verdict, zero LLM call. Huge for re-runs, for the eval harness, and for retry loops. | SQLite table `verifier_cache(key, verdict, reason, created_at)`. Default TTL = 90 days. |
 
-**Concurrency limit math.** Ollama on a 16GB-RAM M-series Mac running `qwen2.5-coder:7b` at q4 sustains ~3–4 concurrent inference streams before throughput collapses. The default Verifier semaphore is `4`. Tunable via env var `VERIFIER_CONCURRENCY`.
+**Concurrency limit math.** Hugging Face on a 16GB-RAM M-series Mac running `Qwen/Qwen2.5-Coder-7B-Instruct` at q4 sustains ~3–4 concurrent inference streams before throughput collapses. The default Verifier semaphore is `4`. Tunable via env var `VERIFIER_CONCURRENCY`.
 
-**Failure mode.** If Ollama is overloaded or down, the Verifier loop catches the timeout and emits an `ArchaeologistError.VERIFIER_UNAVAILABLE` event. The tour continues with all claims rendered as `unverified` and a banner explaining the degradation. We do **not** silently promote claims to `verified` when the Verifier fails.
+**Failure mode.** If Hugging Face is overloaded or down, the Verifier loop catches the timeout and emits an `ArchaeologistError.VERIFIER_UNAVAILABLE` event. The tour continues with all claims rendered as `unverified` and a banner explaining the degradation. We do **not** silently promote claims to `verified` when the Verifier fails.
 
 **Phase 3 gate test (`test_verifier_per_section_concurrent`).** Generate 30 synthetic claims against fixture chunks; run the Verifier with concurrency=8; assert total wall-clock ≤ 1.5× a single-claim baseline. Without this test passing, the < 4 min Phase 3 gate is fiction.
 
@@ -732,7 +732,7 @@ LangSmith is the only paid-tier surface we use, and it's free for solo dev.
 
 | Failure | Detection | Mitigation |
 |---|---|---|
-| **Groq 429 storm** | provider returns 429 | Exponential backoff with jitter → Cerebras fallback → Ollama fallback. SQLite cache catches retries. |
+| **Groq 429 storm** | provider returns 429 | Exponential backoff with jitter → Cerebras fallback → Hugging Face fallback. SQLite cache catches retries. |
 | **Verifier rejects every claim** | objections > 50% of claims in a section | Source node has 2 retries; after that, claims render as `flagged` and ship. We never silently drop. |
 | **Infinite verifier ↔ source loop** | recursion_limit=15 | Hard ceiling. If hit, the run errors with a useful message and the partial tour is preserved via checkpoint. |
 | **Indexing too slow on big repos** | arq job exceeds 90s for 50kLOC | Phase 1 quality gate. Profiling task to chunk in parallel batches. |
@@ -744,7 +744,7 @@ LangSmith is the only paid-tier surface we use, and it's free for solo dev.
 | **Python 2-only syntax** | Detector scans for `print` statement, `except X, e:` | Index anyway, tag `python2_syntax=true` in `repos`, surface a soft warning at the top of the tour. |
 | **Unresolved dynamic calls (decorator-rewritten, `getattr`, metaclass)** | Graph builder logs unresolved warnings during indexing | Counted on `repos.unresolved_dynamic_count`; if > 10% of edges, surface a footnote in the Cartographer system map: "X% of calls couldn't be resolved statically — dynamic patterns aren't visible to this tour." Lane C suspicions avoid claims that depend on call-graph completeness. |
 | **Postgres unavailable mid-indexing** | arq job catches `OperationalError` | Job is retried by arq with exponential backoff (max 3); after that the job fails with `ArchaeologistError.PERSIST_FAILED` and the user sees a "we couldn't store the index — try again in a minute" message. |
-| **Ollama unavailable mid-tour** (Verifier or embeddings down) | Health check + per-call timeout | Verifier-only: tour degrades to "all claims stream as `unverified`" with a banner ("verification unavailable — claims are not double-checked"); embeddings: Q&A returns "search is degraded — try again shortly." |
+| **Hugging Face unavailable mid-tour** (Verifier or embeddings down) | Health check + per-call timeout | Verifier-only: tour degrades to "all claims stream as `unverified`" with a banner ("verification unavailable — claims are not double-checked"); embeddings: Q&A returns "search is degraded — try again shortly." |
 | **pgvector returns zero results** for a Q&A query | k-NN returns empty list | Q&A responds with "I couldn't find anything in this repo matching your question" — no invention. UI offers "did you mean to ask about [related symbol from graph]?". |
 | **Invalid / private / 404 / redirected repo URL** | clone errors at the GitPython layer | Job exits with `ArchaeologistError.REPO_UNAVAILABLE`; UI shows specific message ("private repo — v1 supports public only" vs "not found — check the URL" vs "redirected — use the canonical URL"). |
 | **Chunk content deleted between indexing and tour** (force-push, rebase, branch delete) | `read_chunks` returns empty or 404 from the chunk store | The claim that referenced the missing chunk is rendered as `flagged` with reason "source content no longer matches index"; UI suggests re-indexing. |

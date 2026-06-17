@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, is_dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +22,7 @@ REPORTS_DIR = Path(__file__).resolve().parents[4] / "eval-reports"
 
 
 def _now_stamp() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
 def _coerce(value: Any) -> Any:

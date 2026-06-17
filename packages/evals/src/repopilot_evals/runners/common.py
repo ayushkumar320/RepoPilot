@@ -30,7 +30,9 @@ def build_eval_context(settings: Settings | None = None) -> EvalContext:
     return EvalContext(settings=resolved, engine=engine, provider=provider)
 
 
-async def resolve_repo_id(engine: AsyncEngine, *, repo_slug: str, repo_id: str | None = None) -> str:
+async def resolve_repo_id(
+    engine: AsyncEngine, *, repo_slug: str, repo_id: str | None = None
+) -> str:
     if repo_id is not None:
         return repo_id
 

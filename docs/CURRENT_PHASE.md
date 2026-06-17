@@ -1,6 +1,6 @@
 # Current Build Phase
 
-> **Active phase:** **Phase 3 — Orchestration + Learn** (step 1 keystone landed: `ArchaeologistState` schema + validator tests)
+> **Active phase:** **Phase 3 — Orchestration + Learn** (steps 1–2 landed: `ArchaeologistState` schema + Intent Profiler)
 > **Last verified gate:** Phase 2 — `make ci` green on commit `6065ccf`; 58 fast-lane tests pass, coverage 85.75%, ruff + ruff format + mypy `--strict` all clean. Phase 2 entry datasets labeled and loader-validated. Working tree on 2026-06-17 carries pre-existing mypy/ruff debt in `packages/evals/` (unrelated to Phase 3; left over from the harness-reshape session).
 > **Last updated:** 2026-06-17
 
@@ -22,7 +22,15 @@ Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
 
 ---
 
-## Session 2026-06-17 — Phase 3 keystone landed (most recent)
+## Session 2026-06-17 — Phase 3 steps 1–2 landed (most recent)
+
+Step 2: Intent Profiler in `packages/agents/src/repopilot_agents/intent/profiler.py`. Single LLM call against `ModelId.INTENT_PROFILER`, JSON-only response, coerced into a `state.IntentProfile`. Parse-fail → minimal `IntentProfile(raw_text=…)` so the planner's inclusive-default fallthrough takes over instead of the system guessing.
+
+- ✅ **Schema-bounded coercion:** unknown `modality_weights` keys dropped silently; out-of-[0,1] weights clipped (preserves intent over rejection); unknown `output_shape_preference` coerced to `"unspecified"`; keywords lowercased / trimmed / capped at 6.
+- ✅ **9 unit tests pin the coercion contract** — clean parse, unknown keys, embedded-in-prose JSON, fallback on garbage, empty-input rejection, raw_text verbatim. mypy `--strict` clean; full agents fast lane now: **49 passed**.
+- ✅ **Aligned `IntentProfileEvalRow` to the state schema** — `expected_modality_weights` now keyed on the same `Modality` literal as state (`understand | change | evaluate | locate | compare`), and `expected_output_shape` matches state's `OutputShape` (`narrative | ranked_list | dossier | comparison_table | unspecified`). The scaffold row updated to match; this closes a latent drift between the harness scaffold and the schema we're now grading against.
+
+## Session 2026-06-17 — Phase 3 keystone landed
 
 Phase 3 step 1 from the kickoff outline is in: `packages/agents/src/repopilot_agents/state.py` holds the full Pydantic v2 schema from `docs/03_ARCHITECTURE.md` § "State schema", and `packages/agents/tests/test_state.py` pins the validators (19 tests, all green).
 

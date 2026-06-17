@@ -12,7 +12,6 @@ flags evals that require an ingested repo in Postgres (slow-lane gate dependency
 from __future__ import annotations
 
 from dataclasses import dataclass
-
 from pathlib import Path
 
 from repopilot_evals.datasets import (
@@ -92,4 +91,4 @@ def get_spec(name: str) -> EvalSpec:
     raise KeyError(f"unknown eval: {name!r}. Known: {[s.name for s in REGISTRY]}")
 
 
-__all__ = ["DATASETS_DIR", "EvalSpec", "REGISTRY", "get_spec"]
+__all__ = ["DATASETS_DIR", "REGISTRY", "EvalSpec", "get_spec"]

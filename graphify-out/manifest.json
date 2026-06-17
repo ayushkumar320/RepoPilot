@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1781621545.3583317,
-    "ast_hash": "6ea583229548299a949104ccdc151420",
+    "mtime": 1781666660.1771395,
+    "ast_hash": "eca8ffe27131c61c6fb2fd042dba36ee",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/datasets.py": {
-    "mtime": 1781620883.0113592,
-    "ast_hash": "64ef886092f7e7cefeea323f0d394e2a",
+    "mtime": 1781667103.3321974,
+    "ast_hash": "8e6b56b1f93df16a32670693e78b87e9",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/registry.py": {
@@ -487,6 +487,21 @@
   "packages/agents/tests/test_state.py": {
     "mtime": 1781666514.5229962,
     "ast_hash": "f490d023700c0281b10bba5695ec57e9",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/intent/__init__.py": {
+    "mtime": 1781667034.5471888,
+    "ast_hash": "1d176bed93a0fe84595093e229442b4e",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/intent/profiler.py": {
+    "mtime": 1781667259.4091015,
+    "ast_hash": "31f6f9aa68429dd6bffdaf29e3cdca33",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_intent_profiler.py": {
+    "mtime": 1781667304.599807,
+    "ast_hash": "2900135589903e64f12df4b1a765a133",
     "semantic_hash": ""
   }
 }

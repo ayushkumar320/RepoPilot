@@ -76,13 +76,15 @@ class IntentProfileEvalRow(BaseModel):
     """
 
     raw_text: str = Field(min_length=1)
-    expected_modality_weights: dict[str, float] = Field(default_factory=dict)
+    expected_modality_weights: dict[
+        Literal["understand", "change", "evaluate", "locate", "compare"], float
+    ] = Field(default_factory=dict)
     expected_focus_keywords: list[str] = Field(default_factory=list)
     expected_output_shape: Literal[
         "narrative",
-        "diagram_first",
-        "bulleted",
-        "code_first",
+        "ranked_list",
+        "dossier",
+        "comparison_table",
         "unspecified",
     ] = "unspecified"
     expected_audience_framing: str | None = None

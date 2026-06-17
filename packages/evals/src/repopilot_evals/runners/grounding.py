@@ -55,7 +55,9 @@ class GroundingEvalMetrics:
 
     @property
     def multi_hop_accuracy(self) -> float:
-        return self.multi_hop_correct / self.multi_hop_questions if self.multi_hop_questions else 0.0
+        return (
+            self.multi_hop_correct / self.multi_hop_questions if self.multi_hop_questions else 0.0
+        )
 
 
 def _contains_all_keywords(answer: str, keywords: list[str]) -> bool:

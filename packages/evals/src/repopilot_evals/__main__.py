@@ -26,7 +26,6 @@ from repopilot_evals.reports import find_latest_report, write_report
 from repopilot_evals.runners.grounding import GroundingEvalMetrics, run_grounding_eval
 from repopilot_evals.runners.verifier import VerifierEvalMetrics, run_verifier_eval
 
-
 # ── reporting helpers ──────────────────────────────────────────────────────
 
 
@@ -111,7 +110,9 @@ def _print_verifier(metrics: VerifierEvalMetrics, spec: EvalSpec) -> bool:
     if failures:
         print(f"\n  {len(failures)} failing row(s):")
         for case in failures:
-            print(f"    - expected={case.expected_verdict} actual={case.actual_verdict}: {case.claim}")
+            print(
+                f"    - expected={case.expected_verdict} actual={case.actual_verdict}: {case.claim}"
+            )
     return metrics.accuracy >= spec.gate
 
 

@@ -1,6 +1,6 @@
 # Current Build Phase
 
-> **Active phase:** **Phase 3 — Orchestration + Learn** (steps 1–2 landed: `ArchaeologistState` schema + Intent Profiler)
+> **Active phase:** **Phase 3 — Orchestration + Learn** (all 7 steps + the CI grep landed; 104 fast-lane tests green, mypy `--strict` clean. Awaiting paid-Groq accuracy measurements to convert gate to 🟢.)
 > **Last verified gate:** Phase 2 — `make ci` green on commit `6065ccf`; 58 fast-lane tests pass, coverage 85.75%, ruff + ruff format + mypy `--strict` all clean. Phase 2 entry datasets labeled and loader-validated. Working tree on 2026-06-17 carries pre-existing mypy/ruff debt in `packages/evals/` (unrelated to Phase 3; left over from the harness-reshape session).
 > **Last updated:** 2026-06-17
 
@@ -13,7 +13,7 @@ This document is the **always-correct pointer** at where the build is. Anyone (h
 | 0 — Foundation | 🟢 **done** | `0f170fa` (CI fixes) | [docs/04 §Phase 0](04_BUILD_PLAN.md) · [docs/05 §Phase 0](05_PHASE_PROMPTS.md) | ✅ `make ci` green · ✅ forced-429 → Hugging Face < 30s · ✅ CI green on GitHub Actions |
 | 1 — Ingestion | 🟢 **done** | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ✅ slow-lane `httpx` gate validated · ✅ `revisit_status` returns `stale` |
 | 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (real-LLM eval paused on free-tier quota) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship · ✅ LangSmith provisioned · ✅ PR-time sampled eval green · ✅ `httpx_qa_v1.jsonl` (16 rows) + `verifier_quality_v1.jsonl` (30 rows) labeled against real httpx source · ⚠️ grounding ≥90% / verifier ≥92% **unmeasured** under real LLM (datasets ready; runner wired; awaits paid Groq) |
-| 3 — Orchestration + Learn | 🟡 **active** (blocked on entry checklist) | — | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | Profiler ≥90%/field · Planner F1 ≥90% · two-intent divergence ≥50% on flask · CI grep "no purpose enum" |
+| 3 — Orchestration + Learn | 🟡 **active** (all steps coded; LLM-bound accuracy gates pending paid Groq) | — | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | Profiler ≥90%/field · Planner F1 ≥90% · two-intent divergence ≥50% on flask · ✅ CI grep "no purpose enum" |
 | 4 — Experience | ⚪ pending | — | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | Cold-start demo · time-to-first-output ≤12s · Lighthouse a11y ≥90 |
 | 5 — Contribute (Iteration 1) | ⚪ pending | — | [docs/04 §Phase 5](04_BUILD_PLAN.md) · [docs/05 §Phase 5](05_PHASE_PROMPTS.md) | Top-3 approachability ≥70% · file-mapping ≥80% · suspicion legitimacy ≥75% · banned-vocab regex |
 | 6 — Harden and ship | ⚪ pending | — | [docs/04 §Phase 6](04_BUILD_PLAN.md) · [docs/05 §Phase 6](05_PHASE_PROMPTS.md) | Full eval matrix green · gitleaks + audits clean · clean-VM quickstart ≤5min · `v0.1.0` tagged |
@@ -22,7 +22,21 @@ Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
 
 ---
 
-## Session 2026-06-17 — Phase 3 steps 1–2 landed (most recent)
+## Session 2026-06-17 — Phase 3 steps 3–7 + CI grep landed (most recent)
+
+The remaining Phase 3 kickoff outline now ships. Same session as steps 1–2 below; everything sits unstaged on top of `65a0a80`.
+
+- ✅ **Step 3 — Capability Planner** at `packages/agents/src/repopilot_agents/intent/planner.py`. Pure Python `plan(IntentProfile) → CapabilityPlan` per docs/03 § "The Capability Planner". Rules read continuous `modality_weights` + `raw_text` signals; inclusive default fires on the minimal profile so the planner never returns empty. 11 unit tests pin divergent profiles → divergent plans, dependency-DAG correctness, and shape inference.
+- ✅ **Step 4 — Goal-anchor helper** at `packages/agents/src/repopilot_agents/prompts/goal_anchor.py`. Single source of truth for the prompt header every generation node prepends — renders `intent_profile.raw_text` + planner-derived tilts + the Three Laws contract. **Snapshot test pins the exact rendered string** so any drift fails CI loudly. 8 tests.
+- ✅ **Step 5 — Verifier loop** at `packages/agents/src/repopilot_agents/verifier/loop.py`. Wraps Phase 2 grounding with the Iteration-2 actionability rubric (binary, goal-relevance against `intent_profile`). `verify_section_with_retries` retries the source node up to `MAX_SOURCE_RETRIES=2`; persistent failures are **flagged**, never silently dropped. 14 tests cover JSON parsing, section aggregation, retry recovery, and the flagged-not-dropped rule.
+- ✅ **Step 6 — Capability nodes** at `packages/agents/src/repopilot_agents/capabilities/`. Cartographer, Flow Tracer, Teacher. Each reads the deterministic tools, renders the goal anchor, asks for STRICT JSON, coerces into typed state objects. Iteration-2 contract enforced by the Pydantic validators in state.py (empty `so_what` → drop). 15 tests.
+- ✅ **Step 7 — LangGraph wiring** at `packages/agents/src/repopilot_agents/graph.py`. Full `StateGraph[ArchaeologistState]` with conditional edges on `capability_plan.active`. `RECURSION_LIMIT=15`. Q&A re-exported alongside (universal side channel — not wired into the main graph per docs/03). MemorySaver checkpointer plumbed for tests; AsyncPostgresSaver swap is a Phase 6 hardening pass. 6 wiring tests cover cold-start, confirmed-profile, conditional skip, and checkpointer plumbing.
+- ✅ **Step 8 — CI grep for "no purpose enum"** at `packages/agents/tests/test_no_purpose_enum.py`. Hard test fails when any source file matches `state.purpose`, `purpose_enum`, or `Purpose = Literal[`. Lifts the elasticity guarantee into CI per docs/03 § "State rules" #7.
+- ✅ **Agents fast lane: 104 passed, ruff + ruff format + mypy `--strict` all clean** across the 42 source files in `packages/agents/`. Total source-line coverage in the agents package crossed 65%.
+
+**Gate status.** The remaining 🟡 items are the **LLM-bound accuracy gates** (profiler ≥90%/field, planner F1 ≥90%, two-intent divergence ≥50% on flask, actionability ≥80%). All the harness scaffolding is in place; the labeled datasets need to be backfilled and a real-LLM run executed against paid Groq. Code is unblocked — datasets + paid quota are the only remaining blockers, same as the Phase 2 grounding/verifier numbers.
+
+## Session 2026-06-17 — Phase 3 steps 1–2 landed
 
 Step 2: Intent Profiler in `packages/agents/src/repopilot_agents/intent/profiler.py`. Single LLM call against `ModelId.INTENT_PROFILER`, JSON-only response, coerced into a `state.IntentProfile`. Parse-fail → minimal `IntentProfile(raw_text=…)` so the planner's inclusive-default fallthrough takes over instead of the system guessing.
 

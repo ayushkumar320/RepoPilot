@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any
@@ -38,21 +39,21 @@ class VerifierEvalMetrics:
 
 
 @contextmanager
-def _patched_read_chunks(row: VerifierEvalRow):
+def _patched_read_chunks(row: VerifierEvalRow) -> Iterator[None]:
     if not row.chunks:
         yield
         return
 
-    original = grounding_mod.read_chunks
+    original = grounding_mod.read_chunks  # type: ignore[attr-defined]
 
     async def _fake_read_chunks(refs: Any, *, engine: Any, repo_id: str) -> list[Any]:
         return row.chunks
 
-    grounding_mod.read_chunks = _fake_read_chunks
+    grounding_mod.read_chunks = _fake_read_chunks  # type: ignore[attr-defined]
     try:
         yield
     finally:
-        grounding_mod.read_chunks = original
+        grounding_mod.read_chunks = original  # type: ignore[attr-defined]
 
 
 async def run_verifier_eval(

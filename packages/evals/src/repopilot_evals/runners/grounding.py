@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, QAResult, answer_question
+from repopilot_agents.types import CodeRef
 from repopilot_core.settings import Settings
 from repopilot_evals.datasets import (
     GroundingEvalRow,
@@ -67,7 +68,7 @@ def _contains_all_keywords(answer: str, keywords: list[str]) -> bool:
     return all(keyword.lower() in lowered for keyword in keywords)
 
 
-def _has_expected_refs(result: QAResult, expected_refs: list[object]) -> bool:
+def _has_expected_refs(result: QAResult, expected_refs: list[CodeRef]) -> bool:
     if not expected_refs:
         return True
     actual = {

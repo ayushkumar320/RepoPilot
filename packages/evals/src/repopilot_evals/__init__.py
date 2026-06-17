@@ -27,5 +27,3 @@ __all__ = [
     "run_grounding_eval",
     "run_verifier_eval",
 ]
-
-__all__: list[str] = []

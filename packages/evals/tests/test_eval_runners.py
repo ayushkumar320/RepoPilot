@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -233,7 +234,7 @@ class _DummyContext:
         return None
 
 
-def _async_return(value: str):
+def _async_return(value: str) -> Callable[..., Awaitable[str]]:
     async def _inner(*args: object, **kwargs: object) -> str:
         return value
 

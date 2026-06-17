@@ -1,8 +1,8 @@
 # Current Build Phase
 
-> **Active phase:** **Phase 3 — Orchestration + Learn** (entry checklist green — only paid-LLM measurements deferred; safe to start Phase 3 code per the documented relaxation)
-> **Last verified gate:** Phase 2 — `make ci` green on commit `6065ccf`; 58 fast-lane tests pass, coverage 85.75%, ruff + ruff format + mypy `--strict` all clean. Phase 2 entry datasets labeled and loader-validated this session; harness evolved (registry / reports / CLI).
-> **Last updated:** 2026-06-16
+> **Active phase:** **Phase 3 — Orchestration + Learn** (step 1 keystone landed: `ArchaeologistState` schema + validator tests)
+> **Last verified gate:** Phase 2 — `make ci` green on commit `6065ccf`; 58 fast-lane tests pass, coverage 85.75%, ruff + ruff format + mypy `--strict` all clean. Phase 2 entry datasets labeled and loader-validated. Working tree on 2026-06-17 carries pre-existing mypy/ruff debt in `packages/evals/` (unrelated to Phase 3; left over from the harness-reshape session).
+> **Last updated:** 2026-06-17
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first to find the active phase and what's left on its gate. The Phase N as-built records live in [`docs/05_PHASE_PROMPTS.md`](05_PHASE_PROMPTS.md); this file is the index.
 
@@ -22,7 +22,16 @@ Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
 
 ---
 
-## Session 2026-06-16 — eval-harness evolution (most recent)
+## Session 2026-06-17 — Phase 3 keystone landed (most recent)
+
+Phase 3 step 1 from the kickoff outline is in: `packages/agents/src/repopilot_agents/state.py` holds the full Pydantic v2 schema from `docs/03_ARCHITECTURE.md` § "State schema", and `packages/agents/tests/test_state.py` pins the validators (19 tests, all green).
+
+- ✅ **`ArchaeologistState` + sub-models shipped:** `Claim`, `Insight`, `Opportunity`, `TourSection`, `VerifierObjection`, `ArchaeologistError`, `IntentProfile`, `CapabilityPlan`, `QAExchange`. Append-only collections use `Annotated[list[X], add]` so LangGraph's reducer wires the diffs.
+- ✅ **Validators do real work:** empty `Claim.refs` rejected, empty `Insight.so_what` / `Insight.goal_link` rejected, `Opportunity` Lane C without `confirm_before_pr` rejected (model-validator, fires even on the `None` default), modality weights outside [0,1] rejected, `CapabilityPlan.dependencies` referencing inactive capabilities rejected.
+- ✅ **mypy `--strict` clean** on the two new files; agents-package fast lane: 40 passed.
+- ⚠️ **Working-tree `make ci` is currently red on pre-existing `packages/evals/` debt** (mypy errors in `runners/grounding.py` + `runners/verifier.py`, plus a duplicate `__all__` in `__init__.py`) inherited from the harness-reshape session. These are not Phase 3 work and should be cleared before the Phase 3 entry gates are re-stamped.
+
+## Session 2026-06-16 — eval-harness evolution
 
 Phase 2's entry-checklist datasets landed, plus the harness itself was evolved from a Q&A-only shim into a registry-driven measurement layer ready for Phase 3+. No new commits yet (working tree).
 

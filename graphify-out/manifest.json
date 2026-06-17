@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "docs/03_ARCHITECTURE.md": {
-    "mtime": 1781600155.6095273,
-    "ast_hash": "f55c04eba8a78c7b48377c6306da3888",
+    "mtime": 1781621317.0137722,
+    "ast_hash": "a640eaee2e21aa37b1c5c3d56fd977cc",
     "semantic_hash": ""
   },
   "docs/04_BUILD_PLAN.md": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1781610117.8178053,
-    "ast_hash": "57dc707853b657918fac6d0a1621de22",
+    "mtime": 1781621545.3583317,
+    "ast_hash": "6ea583229548299a949104ccdc151420",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {
@@ -425,8 +425,8 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/__main__.py": {
-    "mtime": 1781621043.540178,
-    "ast_hash": "46a467a4eeb5fb2dc53ed80046548b7c",
+    "mtime": 1781666582.3431945,
+    "ast_hash": "827d7db2db6d3ba98bcba8038ccf2a20",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/datasets.py": {
@@ -435,13 +435,13 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/registry.py": {
-    "mtime": 1781621035.5028558,
-    "ast_hash": "36d5e45e32f47966513bf211ec655aaf",
+    "mtime": 1781666582.343648,
+    "ast_hash": "2d80462a1ce10e82225a6ac972bd2699",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/reports.py": {
-    "mtime": 1781621024.589818,
-    "ast_hash": "ff7e153461ce28b0d4c0419f4ecb831a",
+    "mtime": 1781666582.3440063,
+    "ast_hash": "4569154bf0050e233870f9a1cd318086",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/__init__.py": {
@@ -450,13 +450,13 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/common.py": {
-    "mtime": 1781610269.2667468,
-    "ast_hash": "2c164ab0ad9b73295cae33e6d2ec82ac",
+    "mtime": 1781666582.344236,
+    "ast_hash": "409bedd74f68d14f0621c3f81477ec4a",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/grounding.py": {
-    "mtime": 1781610428.934993,
-    "ast_hash": "1582978ef86e4bddaf77b1d73bef4329",
+    "mtime": 1781666582.3444498,
+    "ast_hash": "c688847e52ef53ab9147ba61724c5522",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/verifier.py": {
@@ -465,8 +465,8 @@
     "semantic_hash": ""
   },
   "packages/evals/tests/test_eval_runners.py": {
-    "mtime": 1781610369.1158886,
-    "ast_hash": "7eaf92bd299b1a80b387a5ef07949397",
+    "mtime": 1781666582.3447983,
+    "ast_hash": "a3aa3456e87a9bd6f6a3437da5486742",
     "semantic_hash": ""
   },
   ".github/workflows/eval-main.yml": {
@@ -477,6 +477,16 @@
   ".github/workflows/eval-pr.yml": {
     "mtime": 1781600403.9166565,
     "ast_hash": "b2e456873bb009ca0a970aff3f40584f",
+    "semantic_hash": ""
+  },
+  "packages/agents/src/repopilot_agents/state.py": {
+    "mtime": 1781666514.523022,
+    "ast_hash": "e3ba94c4d11eec372c56273164e74b00",
+    "semantic_hash": ""
+  },
+  "packages/agents/tests/test_state.py": {
+    "mtime": 1781666514.5229962,
+    "ast_hash": "f490d023700c0281b10bba5695ec57e9",
     "semantic_hash": ""
   }
 }

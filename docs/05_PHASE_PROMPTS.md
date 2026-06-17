@@ -471,7 +471,7 @@ Do not start the next phase. Stop and report what was built, all eval numbers, t
 ```
 Read CLAUDE.md (project-wide conventions), docs/00_CLAUDE_BUILD_GUIDE.md (standing build context), docs/03_ARCHITECTURE.md (design keystone), and docs/04_BUILD_PLAN.md (phase gates) before writing code. The four layer in that order — CLAUDE.md governs the whole project; docs/00 carries phase-agnostic build rules; docs/03 is the architectural source of truth; docs/04 has the phase-specific quality gates. The prompt body below is the phase-specific overlay.
 
-You are starting Phase 4 of Codebase Archaeologist. The goal: a user pastes a GitHub URL into the browser and watches a tour stream in. The synchronized code viewer is the centerpiece demo moment. Cold-start `docker compose up` to working demo on flask.
+You are starting Phase 4 of Codebase Archaeologist. The goal: a user pastes a GitHub URL into the browser and watches a tour stream in. The synchronized code viewer is the centerpiece demo moment. **Phase 4 runs on the metal — no Docker.** Postgres is Neon (or any reachable instance) via `POSTGRES_DSN`; Redis is whichever instance the dev box can reach via `REDIS_URL` (Upstash, fly.io, local). `docker compose up` is deferred to Phase 6 hardening; the Phase 4 cold-start gate is `uv sync` + `pnpm install` + `uvicorn` + `pnpm dev` reaching a working demo on flask.
 
 Deliverables
 - FastAPI endpoints in `apps/api/routes/`:
@@ -532,7 +532,7 @@ Implementation order
 - Playwright e2e is the integration gate.
 
 Quality gate (Definition of Done — restate exactly)
-- Cold-start demo: `docker compose up` → browser → paste `https://github.com/pallets/flask` → tour streams in. Works on a fresh checkout.
+- Cold-start demo (no Docker — deferred to Phase 6): on a fresh checkout, `uv sync` + `pnpm install` + `uv run uvicorn apps.api.main:app` + `pnpm --filter web dev` → browser → paste `https://github.com/pallets/flask` → tour streams in. Connection strings for Postgres + Redis live in `.env`.
 - Time-to-first-useful-output ≤ 12s (Playwright): from URL paste to elicitation rendered + first-impression streaming, or first tour claim.
 - Click-to-highlight works for 10 randomly chosen claims in the demo tour (Playwright + manual).
 - Verified-badge visible on ≥ 90% of demo-tour claims; verifier hover content present and accurate.

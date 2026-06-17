@@ -206,7 +206,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 > **Honest budget: 10–14 days. This is the longest phase.** The synchronized code viewer, the streaming SSE protocol with verified-badge upgrades, and the intent-edit re-plan flow are each their own subproject. If a prior phase was tight, do not borrow from this one.
 
-**Goal.** A user pastes a URL and watches a tour stream in. The synchronized code viewer is the centerpiece. `docker compose up` on a fresh checkout gets the full demo running.
+**Goal.** A user pastes a URL and watches a tour stream in. The synchronized code viewer is the centerpiece. **No Docker in Phase 4** — Postgres + Redis are reached via connection strings (`POSTGRES_DSN` → Neon; `REDIS_URL` → Upstash/local). The Phase 4 cold-start gate is `uv sync` + `pnpm install` + `uvicorn` + `pnpm dev` reaching a working demo. Docker Compose moves to Phase 6's quickstart story.
 
 **Task checklist**
 
@@ -252,7 +252,7 @@ The `Per-PR Definition of Done` (at the end of this file) applies to every PR wi
 
 **Quality gate**
 
-- [ ] **Cold-start demo**: `docker compose up` → open browser → paste `https://github.com/pallets/flask` → see a tour stream in. Full end-to-end on a fresh checkout.
+- [ ] **Cold-start demo (no Docker — deferred to Phase 6)**: on a fresh checkout, `uv sync` + `pnpm install` + `uv run uvicorn apps.api.main:app` (terminal 1) + `pnpm --filter web dev` (terminal 2) → open browser → paste `https://github.com/pallets/flask` → see a tour stream in. Connection strings for Postgres + Redis live in `.env`.
 - [ ] **Time-to-first-useful-output ≤ 12s**: from URL paste to either (a) elicitation rendered + first-impression paragraph streaming, or (b) the first tour claim. Measured via Playwright.
 - [ ] **Click a claim → exact-line highlight** works for 10 randomly-chosen claims in the demo tour (manual check + Playwright).
 - [ ] **Verified-badge visible** on ≥ 90% of demo-tour claims (the rest may legitimately be flagged); verifier hover content present and accurate.

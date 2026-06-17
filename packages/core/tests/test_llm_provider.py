@@ -82,12 +82,15 @@ def test_backoff_delay_is_bounded() -> None:
 
 
 async def test_llm_forced_429_storm_falls_back_to_huggingface(tmp_settings) -> None:  # type: ignore[no-untyped-def]
-    """Groq is 429ing indefinitely; Cerebras is 429ing indefinitely.
-    The provider must reach Hugging Face and return a real response.
+    """Groq is 429ing indefinitely. The provider must reach Hugging Face
+    and return a real response.
 
-    The fallback chain code is NOT bypassed — each upstream provider exhausts
-    its retry budget before the chain advances. The forced-429 budget is
-    `llm_max_429_retries` per provider.
+    Note: the v1 RESOLUTION chain for ``INTENT_PROFILER`` is Groq → HF
+    (the Cerebras tier was removed in the 2026-06-16 harness session —
+    the available Cerebras free-tier models didn't match the llama
+    bindings). The Cerebras client is still wired in here so that the
+    test continues to exercise the "skip a configured provider that
+    isn't in the per-model chain" branch.
     """
     groq = FakeClient(
         ProviderName.GROQ,
@@ -127,10 +130,12 @@ async def test_llm_forced_429_storm_falls_back_to_huggingface(tmp_settings) -> N
     assert response.cached is False
     assert elapsed < 30.0, f"took {elapsed:.2f}s — gate is <30s"
 
-    # Each upstream provider must have been *tried* up to its retry budget
-    # before the chain advanced — we don't allow a shortcut.
+    # Each provider actually in the INTENT_PROFILER chain must have been
+    # tried up to its retry budget before the chain advanced — we don't
+    # allow a shortcut. Cerebras is not in the chain so it must NOT be
+    # called.
     assert len(groq.calls) == tmp_settings.llm_max_429_retries
-    assert len(cerebras.calls) == tmp_settings.llm_max_429_retries
+    assert len(cerebras.calls) == 0
     assert len(hf.calls) == 1
 
 

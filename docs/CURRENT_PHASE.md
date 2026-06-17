@@ -2,7 +2,7 @@
 
 > **Active phase:** **Phase 4 — Experience** (FastAPI + Next.js + synchronized code viewer; the gate is a working demo on flask reached via locally-run API + web app talking to Neon Postgres + Upstash/local Redis via connection strings — **Docker is deferred to Phase 6**, see the note below the ladder).
 > **Last verified gate:** Phase 3 — agents fast lane **104 passed**, `ruff` + `ruff format` + `mypy --strict` all clean across 42 source files; CI grep "no purpose enum" enforced. Real-LLM accuracy gates (Profiler ≥90%/field, Planner F1 ≥90%, two-intent divergence ≥50% on flask, actionability ≥80%) carry the same documented relaxation Phase 2's grounding/verifier numbers did — code is unblocked, only labeled datasets + paid Groq run between us and a measured ✅.
-> **Last updated:** 2026-06-17
+> **Last updated:** 2026-06-18
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first to find the active phase and what's left on its gate. The Phase N as-built records live in [`docs/05_PHASE_PROMPTS.md`](05_PHASE_PROMPTS.md); this file is the index.
 
@@ -14,13 +14,54 @@ This document is the **always-correct pointer** at where the build is. Anyone (h
 | 1 — Ingestion | 🟢 **done** | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ✅ slow-lane `httpx` gate validated · ✅ `revisit_status` returns `stale` |
 | 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (real-LLM eval paused on free-tier quota) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship · ✅ LangSmith provisioned · ✅ PR-time sampled eval green · ✅ `httpx_qa_v1.jsonl` (16 rows) + `verifier_quality_v1.jsonl` (30 rows) labeled against real httpx source · ⚠️ grounding ≥90% / verifier ≥92% **unmeasured** under real LLM (datasets ready; runner wired; awaits paid Groq) |
 | 3 — Orchestration + Learn | 🟢 **done** (real-LLM accuracy gates paused on free-tier quota — same relaxation as Phase 2) | — *(working tree on `65a0a80`; commit pending)* | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | ✅ ArchaeologistState schema · ✅ Intent Profiler · ✅ Capability Planner · ✅ goal-anchor helper · ✅ verifier loop (actionability + retry → flagged) · ✅ Cartographer / Flow Tracer / Teacher · ✅ full StateGraph with `recursion_limit=15` · ✅ CI grep "no purpose enum" · ⚠️ Profiler ≥90%/field, Planner F1 ≥90%, two-intent divergence ≥50% on flask, actionability ≥80% **unmeasured** under real LLM (harness wired; datasets need labeling and paid Groq) |
-| 4 — Experience | 🟡 **active** (entry from a clean slate — no code yet) | — | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | Demo on flask reachable from a locally-run API + web app (Postgres/Redis via connection strings — Docker deferred to Phase 6) · time-to-first-useful-output ≤ 12s (Playwright) · click-to-highlight on 10 random claims · verified-badge on ≥ 90% of demo-tour claims · retrieval-path chip on every claim/Q&A · Q&A drives the code viewer · Lighthouse a11y ≥ 90 · SSE survives 5 min idle |
+| 4 — Experience | 🟡 **active** (API + web implemented; live gate still unverified) | — *(working tree, uncommitted)* | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | Demo on flask reachable from a locally-run API + web app (Postgres/Redis via connection strings — Docker deferred to Phase 6) · time-to-first-useful-output ≤ 12s (Playwright) · click-to-highlight on 10 random claims · verified-badge on ≥ 90% of demo-tour claims · retrieval-path chip on every claim/Q&A · Q&A drives the code viewer · Lighthouse a11y ≥ 90 · SSE survives 5 min idle |
 | 5 — Contribute (Iteration 1) | ⚪ pending | — | [docs/04 §Phase 5](04_BUILD_PLAN.md) · [docs/05 §Phase 5](05_PHASE_PROMPTS.md) | Top-3 approachability ≥70% · file-mapping ≥80% · suspicion legitimacy ≥75% · banned-vocab regex |
 | 6 — Harden and ship | ⚪ pending | — | [docs/04 §Phase 6](04_BUILD_PLAN.md) · [docs/05 §Phase 6](05_PHASE_PROMPTS.md) | Full eval matrix green · gitleaks + audits clean · clean-VM quickstart ≤5min · `v0.1.0` tagged |
 
 Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
 
 ---
+
+## Session 2026-06-18 — Phase 4 scaffold became a working product slice
+
+Phase 4 is no longer a blank slate. The API contract, live-ish backend service layer, and Next.js frontend experience are now in the working tree; the remaining work is the **live flask gate verification** and the hardening/e2e checks.
+
+- ✅ **FastAPI Phase 4 route surface shipped** in `apps/api/src/repopilot_api/app.py`:
+  - `POST /repos`
+  - `GET /repos/{repo_id}/status`
+  - `GET /repos/{repo_id}/first-impression`
+  - `POST /tours`
+  - `GET /tours/{tour_id}/stream`
+  - `POST /tours/{tour_id}/ask`
+  - `GET /chunks/{chunk_id}`
+- ✅ **Typed API contract + SSE event schema shipped** in `apps/api/src/repopilot_api/models.py` and `apps/api/src/repopilot_api/sse.py`. Event frames now carry `v: 1` and round-trip under test.
+- ✅ **Live service layer replaced the in-memory-only stub** in `apps/api/src/repopilot_api/services.py`:
+  - repo enqueue/status now check indexed snapshots and can kick off indexing
+  - first-impression stream now summarizes the indexed graph snapshot
+  - tours are built from deterministic graph/chunk reads over the indexed repo
+  - ask-anything returns grounded refs from the snapshot
+  - chunk fetch decodes a ref-shaped chunk id and reads exact source from `chunks.content`
+- ✅ **API contract tests added and passing** in `apps/api/tests/test_phase4_contract.py`.
+- ✅ **`apps/web/` is now a real Next.js 15 app**, not just a package stub:
+  - landing/input + immediate pre-context capture
+  - parallel first-impression streaming
+  - tour stream panel + synchronized code viewer
+  - claim click → code selection
+  - Mermaid block rendering
+  - ask-anything flow that reuses the same viewer-selection path
+- ✅ **Typed frontend client and state layer shipped**:
+  - `apps/web/src/lib/api/generated.ts`
+  - `apps/web/src/lib/tour-store.ts`
+  - store tests in `apps/web/src/lib/tour-store.test.ts`
+- ✅ **Local verification completed on the machine for the code slice**:
+  - `./.venv/bin/ruff check apps/api/src/repopilot_api apps/api/tests`
+  - `./.venv/bin/mypy apps/api/src/repopilot_api`
+  - `./.venv/bin/pytest --no-cov apps/api/tests/test_phase4_contract.py apps/api/tests/test_health.py`
+  - `npm run typecheck` in `apps/web`
+  - `npm run build` in `apps/web`
+  - `npm run test:store` in `apps/web`
+
+**What is still explicitly not done:** the live `flask` demo gate, Playwright click-to-highlight, 5-minute SSE idle survival, Lighthouse accessibility audit, and the badge / retrieval-path correctness checks on a real indexed run. Phase 4 stays 🟡 until those pass.
 
 ## Session 2026-06-17 — Phase 3 steps 3–7 + CI grep landed (most recent)
 
@@ -123,11 +164,11 @@ Phase 3's seven kickoff-outline steps + the elasticity CI grep shipped in one se
 
 ## Phase 4 — entry checklist (the active block)
 
-Phase 4 work cannot start until these are checked. Restated from [`docs/05` § Phase 4 prompt](05_PHASE_PROMPTS.md#phase-4-prompt--experience-fastapi--nextjs--synchronized-code-viewer) for emphasis:
+Phase 4 is in progress. The boxes below show what is still blocking the **actual gate run**.
 
 - [ ] **`flask` indexed into Neon** at the snapshot the demo will run against. Without a real index, none of the SSE / tour endpoints can be exercised end-to-end and the "time-to-first-useful-output ≤ 12 s" gate is unmeasurable.
-- [ ] **`apps/web/` Next.js 15 scaffold** with App Router + RSC compiles cleanly under `pnpm` (or `npm`) on a fresh checkout. Today the scaffold has `package.json` only.
-- [ ] **`apps/api/` FastAPI scaffold** with `uv run uvicorn …` running. Today only the placeholder skeleton exists.
+- [x] **`apps/web/` Next.js 15 scaffold** with App Router + RSC compiles cleanly under `npm`. The scaffold has been replaced with the actual Phase 4 UI and `npm run typecheck` + `npm run build` now pass locally.
+- [x] **`apps/api/` FastAPI scaffold** with `uv run uvicorn …` shape in place. The placeholder skeleton has been replaced by the Phase 4 route surface and contract-tested SSE/API endpoints.
 - [ ] **`POSTGRES_DSN` (Neon) and `REDIS_URL` reachable from the dev box.** Phase 4 is run "on the metal" — the API + web app start with `uv run uvicorn …` and `pnpm dev`, and read every infra dep from a connection string in `.env`. **Docker is deferred to Phase 6 hardening**; nothing in the Phase 4 gate requires a `docker compose up`.
 - [ ] **`LANGSMITH_API_KEY` still provisioned** (carried over from Phase 2). The retrieval-path chip cross-check uses LangSmith traces.
 
@@ -139,13 +180,13 @@ If any box is unchecked when Phase 4 work begins, fix that first — the gates d
 
 When the checklist above is green, read [`docs/05` § Phase 4 prompt](05_PHASE_PROMPTS.md#phase-4-prompt--experience-fastapi--nextjs--synchronized-code-viewer) and ship in this order (the prompt's "Implementation order" section is authoritative; this is the at-a-glance):
 
-1. **FastAPI endpoints + SSE event shape** (`apps/api/routes/`) — `POST /repos`, `GET /repos/{id}/status`, `POST /tours`, `GET /tours/{id}/stream`, `POST /tours/{id}/ask`, `GET /chunks/{id}`. SSE events carry `v: 1` and the eight event types in the prompt; heartbeats every 15 s. **Contract tests first** (pytest + httpx ASGI client + sse-starlette).
-2. **TS client generated from OpenAPI** → `apps/web/lib/api/`. Lets the frontend type-check the contract instead of hand-rolling it.
-3. **Static URL-input page** → routes immediately to pre-context capture (LEARN vs CONTRIBUTE chip strip). Indexing runs **in parallel** in the background; the user never stares at a progress bar with nothing to do.
-4. **Tour view: streamed text panel (left)**, then **synchronized shiki code viewer (right)**, then the **click-to-highlight link** between them. Zustand store keeps `sections`, `claims by id`, `selected claim`, `code viewer file/range`. Verified-badge UI + retrieval-path chip on every claim.
-5. **Mermaid renderer** for `diagram` events.
-6. **"Ask anything" input** that auto-opens the first ref of the first claim of the answer in the code viewer (same `claim` event handler as the tour).
-7. **Playwright e2e gate** — paste `https://github.com/pallets/flask` → wait for `ready` → start tour → click 5 claims → assert code viewer highlights the correct lines. Plus the 5-minute SSE idle test and the Lighthouse audit script (fails on < 90).
+1. ✅ **FastAPI endpoints + SSE event shape** — implemented and contract-tested.
+2. ✅ **Typed frontend API client** — implemented in `apps/web/src/lib/api/generated.ts` (checked in, hand-maintained rather than generated from OpenAPI for now).
+3. ✅ **Static URL-input + immediate pre-context capture** — implemented in the Phase 4 frontend.
+4. ✅ **Tour view + synchronized code viewer + claim click path** — implemented in the Phase 4 frontend/state layer.
+5. ✅ **Mermaid renderer** — implemented as a streamed Mermaid block surface.
+6. ✅ **"Ask anything" input** — implemented; answer claims reuse the same viewer-selection path.
+7. [ ] **Playwright e2e gate + 5-minute SSE idle test + Lighthouse audit** — still outstanding. This is the next major stop point.
 
 Phase 4 has **no new schema, no new agent code** — it consumes Phase 3's `ArchaeologistState` + `build_graph()`. The risk surface is the frontend ergonomics + SSE plumbing, not the model.
 

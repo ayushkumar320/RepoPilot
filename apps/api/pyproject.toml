@@ -6,6 +6,7 @@ requires-python = ">=3.12,<3.14"
 dependencies = [
     "repopilot-core",
     "repopilot-ingestion",
+    "repopilot-agents",
     "fastapi>=0.115,<0.116",
     "starlette<0.42",
     "uvicorn[standard]>=0.30",

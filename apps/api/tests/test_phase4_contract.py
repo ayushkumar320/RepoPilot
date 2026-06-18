@@ -10,6 +10,7 @@ from repopilot_agents.state import Claim, IntentProfile
 from repopilot_agents.types import CodeRef
 from repopilot_api import create_app
 from repopilot_api.models import (
+    BaseTourEvent,
     ChunkPayload,
     QAAnswerResponse,
     RepoStatus,
@@ -20,7 +21,7 @@ from repopilot_api.models import (
     TourSectionStartEvent,
 )
 from repopilot_api.services import AppServices, RepoRecord, TourRecord
-from repopilot_api.sse import format_sse_event
+from repopilot_api.sse import format_sse_comment, format_sse_event
 
 
 class FakeRepoService:
@@ -47,7 +48,7 @@ class FakeRepoService:
     async def get(self, repo_id: str) -> RepoRecord:
         return self.records[repo_id]
 
-    async def first_impression_stream(self, repo_id: str) -> AsyncIterator[TourEvent]:
+    async def first_impression_stream(self, repo_id: str) -> AsyncIterator[BaseTourEvent]:
         assert repo_id in self.records
         yield TourFirstImpressionEvent(text="Flask looks routing-heavy.")
 
@@ -97,7 +98,7 @@ class FakeTourService:
     async def get(self, tour_id: str) -> TourRecord:
         return self.records[tour_id]
 
-    async def stream(self, tour_id: str) -> AsyncIterator[TourEvent]:
+    async def stream(self, tour_id: str) -> AsyncIterator[BaseTourEvent]:
         assert tour_id in self.records
         yield TourSectionStartEvent(order=0, title="Entry points")
 
@@ -256,6 +257,12 @@ def test_sse_event_round_trips_through_parser() -> None:
 
     assert parsed == event
     assert parsed.event == "section_start"
+
+
+def test_sse_comment_frame_is_valid_heartbeat() -> None:
+    frame = format_sse_comment()
+
+    assert frame == ": heartbeat\n\n"
 
 
 @pytest.mark.parametrize(

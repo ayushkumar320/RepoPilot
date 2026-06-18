@@ -21,6 +21,7 @@ from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.types import CodeRef
 from repopilot_api.models import (
+    BaseTourEvent,
     ChunkPayload,
     QAAnswerResponse,
     RepoStatus,
@@ -91,7 +92,7 @@ class RepoService(Protocol):
 
     async def get(self, repo_id: str) -> RepoRecord: ...
 
-    def first_impression_stream(self, repo_id: str) -> AsyncIterator[TourEventType]: ...
+    def first_impression_stream(self, repo_id: str) -> AsyncIterator[BaseTourEvent]: ...
 
 
 class TourService(Protocol):
@@ -99,7 +100,7 @@ class TourService(Protocol):
 
     async def get(self, tour_id: str) -> TourRecord: ...
 
-    def stream(self, tour_id: str) -> AsyncIterator[TourEventType]: ...
+    def stream(self, tour_id: str) -> AsyncIterator[BaseTourEvent]: ...
 
     async def ask(self, tour_id: str, question: str) -> QAAnswerResponse: ...
 

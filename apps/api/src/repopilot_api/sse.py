@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
+from collections.abc import AsyncIterator
 
 from repopilot_api.models import BaseTourEvent, event_payload
 
@@ -13,4 +15,25 @@ def format_sse_event(event: BaseTourEvent) -> str:
     return f"event: {event_name}\ndata: {json.dumps(payload, separators=(',', ':'))}\n\n"
 
 
-__all__ = ["format_sse_event"]
+def format_sse_comment(comment: str = "heartbeat") -> str:
+    return f": {comment}\n\n"
+
+
+async def with_heartbeats(
+    source: AsyncIterator[BaseTourEvent],
+    *,
+    interval_seconds: float = 15.0,
+) -> AsyncIterator[str]:
+    iterator = source.__aiter__()
+    while True:
+        try:
+            event = await asyncio.wait_for(iterator.__anext__(), timeout=interval_seconds)
+        except TimeoutError:
+            yield format_sse_comment()
+            continue
+        except StopAsyncIteration:
+            break
+        yield format_sse_event(event)
+
+
+__all__ = ["format_sse_comment", "format_sse_event", "with_heartbeats"]

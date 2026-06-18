@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse
 
 from repopilot_api.models import (
     AskTourRequest,
+    BaseTourEvent,
     ChunkPayload,
     CreateRepoRequest,
     CreateRepoResponse,
@@ -20,7 +21,7 @@ from repopilot_api.models import (
     RepoStatusResponse,
 )
 from repopilot_api.services import AppServices, close_live_services, create_live_services
-from repopilot_api.sse import format_sse_event
+from repopilot_api.sse import with_heartbeats
 from repopilot_core.logging import configure_logging
 from repopilot_core.settings import get_settings
 
@@ -76,15 +77,15 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
 
     @app.get("/repos/{repo_id}/first-impression")
     async def repo_first_impression(repo_id: str) -> StreamingResponse:
-        async def event_generator() -> AsyncIterator[str]:
+        async def event_source() -> AsyncIterator[BaseTourEvent]:
             try:
                 async for event in get_services().repos.first_impression_stream(repo_id):
-                    yield format_sse_event(event)
+                    yield event
             except KeyError as exc:
                 raise HTTPException(status_code=404, detail="repo not found") from exc
 
         return StreamingResponse(
-            event_generator(),
+            with_heartbeats(event_source()),
             media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
         )
@@ -99,15 +100,15 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
 
     @app.get("/tours/{tour_id}/stream")
     async def stream_tour(tour_id: str) -> StreamingResponse:
-        async def event_generator() -> AsyncIterator[str]:
+        async def event_source() -> AsyncIterator[BaseTourEvent]:
             try:
                 async for event in get_services().tours.stream(tour_id):
-                    yield format_sse_event(event)
+                    yield event
             except KeyError as exc:
                 raise HTTPException(status_code=404, detail="tour not found") from exc
 
         return StreamingResponse(
-            event_generator(),
+            with_heartbeats(event_source()),
             media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
         )

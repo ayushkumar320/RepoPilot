@@ -157,6 +157,37 @@ async def test_llm_chain_exhausted_raises_provider_error(tmp_settings) -> None: 
         await provider.generate(ModelId.INTENT_PROFILER, _msgs())
 
 
+async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    groq = FakeClient(ProviderName.GROQ, [RateLimitError("storm")] * 50)
+    hf = FakeClient(
+        ProviderName.HUGGINGFACE,
+        [
+            make_response(
+                provider=ProviderName.HUGGINGFACE,
+                physical_model="meta-llama/Llama-3.3-70B-Instruct",
+                text="fallback-ok",
+            )
+        ],
+    )
+    provider = make_provider(
+        tmp_settings,
+        {
+            ProviderName.GROQ: groq,
+            ProviderName.HUGGINGFACE: hf,
+        },
+    )
+
+    response = await provider.generate(
+        ModelId.INTENT_PROFILER,
+        _msgs(),
+        retry_429_attempts=1,
+    )
+
+    assert response.text == "fallback-ok"
+    assert len(groq.calls) == 1
+    assert len(hf.calls) == 1
+
+
 # ─── Test 4 — tokens_used counter increments ───────────────────────────────
 
 

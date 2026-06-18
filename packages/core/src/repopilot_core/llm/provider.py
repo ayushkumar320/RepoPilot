@@ -435,6 +435,7 @@ class LLMProvider:
         self,
         model: ModelId,
         messages: Sequence[Message],
+        retry_429_attempts: int | None = None,
         **kwargs: Any,
     ) -> LLMResponse:
         """Generate a completion. Hits cache first; otherwise walks the fallback chain."""
@@ -456,7 +457,13 @@ class LLMProvider:
                 log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
                 continue
             try:
-                response = await self._call_with_429_retry(client, binding, messages, kwargs)
+                response = await self._call_with_429_retry(
+                    client,
+                    binding,
+                    messages,
+                    kwargs,
+                    max_attempts=retry_429_attempts,
+                )
             except RateLimitError as exc:
                 last_error = exc
                 log.warning(
@@ -529,9 +536,11 @@ class LLMProvider:
         binding: ModelBinding,
         messages: Sequence[Message],
         kwargs: dict[str, Any],
+        *,
+        max_attempts: int | None = None,
     ) -> LLMResponse:
         """Per-binding 429 retry loop with exponential backoff + jitter."""
-        max_attempts = max(1, self.settings.llm_max_429_retries)
+        max_attempts = max(1, max_attempts or self.settings.llm_max_429_retries)
         attempt = 0
         while True:
             try:

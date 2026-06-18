@@ -21,7 +21,7 @@ from repopilot_api.models import (
     TourFirstImpressionEvent,
     TourSectionStartEvent,
 )
-from repopilot_api.services import AppServices, RepoRecord, TourRecord
+from repopilot_api.services import AppServices, RepoNotReadyError, RepoRecord, TourRecord
 from repopilot_api.sse import format_sse_comment, format_sse_event, with_heartbeats
 
 
@@ -55,7 +55,8 @@ class FakeRepoService:
 
 
 class FakeTourService:
-    def __init__(self) -> None:
+    def __init__(self, repo_service: FakeRepoService) -> None:
+        self.repo_service = repo_service
         claim = Claim(
             text="Flask exposes a Flask app object.",
             refs=[
@@ -86,6 +87,10 @@ class FakeTourService:
         self.claim = claim
 
     async def create(self, repo_id: str, intent_profile: IntentProfile) -> TourRecord:
+        if repo_id == "repo-indexing":
+            raise RepoNotReadyError(repo_id, "indexing")
+        if repo_id not in self.repo_service.records:
+            raise KeyError(repo_id)
         record = TourRecord(
             tour_id="tour-new",
             repo_id=repo_id,
@@ -139,9 +144,10 @@ class FakeChunkService:
 
 @pytest.fixture
 def app_services() -> AppServices:
+    repos = FakeRepoService()
     return AppServices(
-        repos=FakeRepoService(),
-        tours=FakeTourService(),
+        repos=repos,
+        tours=FakeTourService(repos),
         chunks=FakeChunkService(),
     )
 
@@ -197,6 +203,47 @@ async def test_post_tours_returns_stream_url(api_client: AsyncClient) -> None:
     assert response.json() == {
         "tour_id": "tour-new",
         "stream_url": "/tours/tour-new/stream",
+    }
+
+
+@pytest.mark.asyncio
+async def test_post_tours_returns_404_for_unknown_repo(api_client: AsyncClient) -> None:
+    response = await api_client.post(
+        "/tours",
+        json={
+            "repo_id": "{{repoId}}",
+            "intent_profile": {
+                "raw_text": "Help me learn Flask",
+                "modality_weights": {"understand": 1.0},
+            },
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "repo not found"}
+
+
+@pytest.mark.asyncio
+async def test_post_tours_returns_409_when_repo_not_ready(api_client: AsyncClient) -> None:
+    response = await api_client.post(
+        "/tours",
+        json={
+            "repo_id": "repo-indexing",
+            "intent_profile": {
+                "raw_text": "Help me learn Flask",
+                "modality_weights": {"understand": 1.0},
+            },
+        },
+    )
+
+    assert response.status_code == 409
+    assert response.json() == {
+        "detail": {
+            "code": "REPO_NOT_READY",
+            "message": "repo must finish indexing before a tour can be created",
+            "repo_id": "repo-indexing",
+            "status": "indexing",
+        }
     }
 
 

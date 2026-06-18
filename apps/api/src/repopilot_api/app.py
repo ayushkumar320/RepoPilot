@@ -22,7 +22,12 @@ from repopilot_api.models import (
     QAAnswerResponse,
     RepoStatusResponse,
 )
-from repopilot_api.services import AppServices, close_live_services, create_live_services
+from repopilot_api.services import (
+    AppServices,
+    RepoNotReadyError,
+    close_live_services,
+    create_live_services,
+)
 from repopilot_api.sse import with_heartbeats
 from repopilot_core.logging import configure_logging
 from repopilot_core.settings import get_settings
@@ -102,7 +107,20 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
 
     @app.post("/tours", response_model=CreateTourResponse, status_code=201)
     async def create_tour(request: CreateTourRequest) -> CreateTourResponse:
-        record = await get_services().tours.create(request.repo_id, request.intent_profile)
+        try:
+            record = await get_services().tours.create(request.repo_id, request.intent_profile)
+        except RepoNotReadyError as exc:
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "code": "REPO_NOT_READY",
+                    "message": "repo must finish indexing before a tour can be created",
+                    "repo_id": exc.repo_id,
+                    "status": exc.status,
+                },
+            ) from exc
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="repo not found") from exc
         return CreateTourResponse(
             tour_id=record.tour_id,
             stream_url=f"/tours/{record.tour_id}/stream",

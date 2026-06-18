@@ -118,6 +118,15 @@ class ChunkService(Protocol):
     async def get(self, chunk_id: str) -> ChunkPayload: ...
 
 
+class RepoNotReadyError(Exception):
+    """Raised when a tour is requested before a repo has an indexed snapshot."""
+
+    def __init__(self, repo_id: str, status: RepoStatus) -> None:
+        self.repo_id = repo_id
+        self.status = status
+        super().__init__(f"repo {repo_id!r} is not ready for tours; status={status!r}")
+
+
 @dataclass(slots=True)
 class AppServices:
     repos: RepoService
@@ -328,7 +337,7 @@ class LiveTourService:
         repo = await self.repos.get(repo_id)
         snapshot_repo_id = repo.indexed_repo_id
         if snapshot_repo_id is None:
-            raise KeyError(repo_id)
+            raise RepoNotReadyError(repo_id, repo.status)
         record = TourRecord(
             tour_id=f"tour-{uuid4().hex[:8]}",
             repo_id=repo_id,

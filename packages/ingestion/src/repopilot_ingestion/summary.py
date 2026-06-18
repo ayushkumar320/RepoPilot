@@ -58,18 +58,27 @@ async def summarise_chunks(
     failed chunk to ``"unknown"`` instead of aborting the whole pipeline.
     """
     sem = asyncio.Semaphore(max(1, settings.ingestion_summary_concurrency))
+    circuit_open = False
+    circuit_lock = asyncio.Lock()
 
     async def one(chunk: Chunk) -> SummarisedChunk:
+        nonlocal circuit_open
         async with sem:
+            async with circuit_lock:
+                if circuit_open:
+                    return SummarisedChunk(chunk=chunk, summary="unknown")
             try:
                 response = await provider.generate(
                     ModelId.CODE_HEALTH,
                     _prompt(chunk),
+                    retry_429_attempts=1,
                     temperature=0.0,
                     max_tokens=120,
                 )
                 summary = response.text.strip() or "unknown"
             except ProviderError as exc:
+                async with circuit_lock:
+                    circuit_open = True
                 log.warning(
                     "summary.chunk_fallback_unknown",
                     file_path=chunk.file_path,

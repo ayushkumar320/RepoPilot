@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 def _find_repo_env() -> Path:
@@ -43,7 +44,7 @@ class Settings(BaseSettings):
     # ── Environment ──────────────────────────────────────────────────────────
     repopilot_env: str = "development"
     repopilot_log_level: str = "INFO"
-    repopilot_web_origins: list[str] = Field(
+    repopilot_web_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://127.0.0.1:3000", "http://localhost:3000"]
     )
 

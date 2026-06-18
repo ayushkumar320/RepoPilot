@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import cast
@@ -33,6 +34,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[dict[str, AppServices]]:
         resolved = services or await create_live_services()
+        app.state.services = resolved
         try:
             yield {"services": resolved}
         finally:
@@ -60,7 +62,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         record = await get_services().repos.enqueue(request.repo_url)
         return CreateRepoResponse(repo_id=record.repo_id, status=record.status)
 
-    @app.get("/repos/{repo_id}/status", response_model=RepoStatusResponse)
+    @app.get("/repos/{repo_id:path}/status", response_model=RepoStatusResponse)
     async def repo_status(repo_id: str) -> RepoStatusResponse:
         try:
             record = await get_services().repos.get(repo_id)
@@ -75,7 +77,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             commits_behind_estimate=record.commits_behind_estimate,
         )
 
-    @app.get("/repos/{repo_id}/first-impression")
+    @app.get("/repos/{repo_id:path}/first-impression")
     async def repo_first_impression(repo_id: str) -> StreamingResponse:
         async def event_source() -> AsyncIterator[BaseTourEvent]:
             try:
@@ -126,6 +128,20 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             return await get_services().chunks.get(chunk_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail="chunk not found") from exc
+
+    if settings.repopilot_env != "production":
+
+        @app.get("/__dev/sse-idle")
+        async def dev_sse_idle() -> StreamingResponse:
+            async def idle_source() -> AsyncIterator[BaseTourEvent]:
+                event: BaseTourEvent = await asyncio.Future()
+                yield event
+
+            return StreamingResponse(
+                with_heartbeats(idle_source(), interval_seconds=5.0),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+            )
 
     return app
 

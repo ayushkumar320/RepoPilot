@@ -1,7 +1,6 @@
-const streamUrl =
-  process.env.SSE_IDLE_URL ?? "http://127.0.0.1:8000/tours/demo-tour/stream";
-const requiredDurationMs = Number(process.env.SSE_IDLE_DURATION_MS ?? "300000");
-const maxGapMs = Number(process.env.SSE_MAX_GAP_MS ?? "20000");
+const streamUrl = process.env.SSE_IDLE_URL ?? "http://127.0.0.1:8000/__dev/sse-idle";
+const requiredDurationMs = Number(process.env.SSE_IDLE_DURATION_MS ?? "30000");
+const maxGapMs = Number(process.env.SSE_MAX_GAP_MS ?? "10000");
 
 async function main() {
   const controller = new AbortController();

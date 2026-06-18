@@ -25,14 +25,18 @@ async def with_heartbeats(
     interval_seconds: float = 15.0,
 ) -> AsyncIterator[str]:
     iterator = source.__aiter__()
+    pending_event: asyncio.Future[BaseTourEvent] | None = None
     while True:
+        if pending_event is None:
+            pending_event = asyncio.ensure_future(iterator.__anext__())
         try:
-            event = await asyncio.wait_for(iterator.__anext__(), timeout=interval_seconds)
+            event = await asyncio.wait_for(asyncio.shield(pending_event), timeout=interval_seconds)
         except TimeoutError:
             yield format_sse_comment()
             continue
         except StopAsyncIteration:
             break
+        pending_event = None
         yield format_sse_event(event)
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 
@@ -21,7 +22,7 @@ from repopilot_api.models import (
     TourSectionStartEvent,
 )
 from repopilot_api.services import AppServices, RepoRecord, TourRecord
-from repopilot_api.sse import format_sse_comment, format_sse_event
+from repopilot_api.sse import format_sse_comment, format_sse_event, with_heartbeats
 
 
 class FakeRepoService:
@@ -263,6 +264,25 @@ def test_sse_comment_frame_is_valid_heartbeat() -> None:
     frame = format_sse_comment()
 
     assert frame == ": heartbeat\n\n"
+
+
+@pytest.mark.asyncio
+async def test_with_heartbeats_keeps_idle_stream_alive_until_event_arrives() -> None:
+    async def delayed_event() -> AsyncIterator[BaseTourEvent]:
+        await asyncio.sleep(0.05)
+        yield TourSectionStartEvent(order=0, title="Delayed section")
+
+    stream = with_heartbeats(delayed_event(), interval_seconds=0.01)
+
+    frames: list[str] = []
+    for _ in range(8):
+        frame = await anext(stream)
+        frames.append(frame)
+        if "event: section_start" in frame:
+            break
+
+    assert frames[:2] == [": heartbeat\n\n", ": heartbeat\n\n"]
+    assert any("event: section_start" in frame for frame in frames)
 
 
 @pytest.mark.parametrize(

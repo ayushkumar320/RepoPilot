@@ -6,6 +6,7 @@ import asyncio
 import base64
 import json
 import re
+from urllib.parse import quote, unquote
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -47,7 +48,15 @@ from repopilot_ingestion.pipeline import index_repo, revisit_status
 
 def repo_slug(repo_url: str) -> str:
     owner, name = parse_github_url(repo_url)
-    return f"{owner}/{name}"
+    return quote(f"{owner}/{name}", safe="")
+
+
+def decode_repo_slug(repo_id: str) -> str:
+    return unquote(repo_id)
+
+
+def normalize_repo_id(repo_id: str) -> str:
+    return quote(decode_repo_slug(repo_id), safe="")
 
 
 @dataclass(slots=True)
@@ -161,13 +170,14 @@ class LiveRepoService:
         return record
 
     async def get(self, repo_id: str) -> RepoRecord:
-        record = self.records.get(repo_id)
+        normalized_repo_id = normalize_repo_id(repo_id)
+        record = self.records.get(normalized_repo_id)
         if record is not None:
             return record
-        loaded = await self._load_record_from_db(repo_id)
+        loaded = await self._load_record_from_db(normalized_repo_id)
         if loaded is None:
-            raise KeyError(repo_id)
-        self.records[repo_id] = loaded
+            raise KeyError(normalized_repo_id)
+        self.records[normalized_repo_id] = loaded
         return loaded
 
     async def _index(self, slug: str, repo_url: str) -> None:
@@ -199,6 +209,7 @@ class LiveRepoService:
         *,
         repo_url: str | None = None,
     ) -> RepoRecord | None:
+        normalized_repo_id = normalize_repo_id(repo_id)
         engine = make_engine(self.runtime.settings)
         try:
             resolved_url = repo_url
@@ -207,7 +218,9 @@ class LiveRepoService:
                     row = (
                         await conn.execute(
                             select(repos_table.c.url)
-                            .where(repos_table.c.id.like(f"{repo_id}@%"))
+                            .where(
+                                repos_table.c.id.like(f"{decode_repo_slug(normalized_repo_id)}@%")
+                            )
                             .order_by(repos_table.c.indexed_at.desc())
                             .limit(1)
                         )
@@ -220,7 +233,7 @@ class LiveRepoService:
             indexed_repo_id = await self._latest_repo_snapshot_id(engine, resolved_url)
             if status.status == "already_indexed":
                 return RepoRecord(
-                    repo_id=repo_id,
+                    repo_id=normalized_repo_id,
                     repo_url=resolved_url,
                     status="ready",
                     progress=100,
@@ -232,7 +245,7 @@ class LiveRepoService:
                 )
             if status.status == "stale" and indexed_repo_id is not None:
                 return RepoRecord(
-                    repo_id=repo_id,
+                    repo_id=normalized_repo_id,
                     repo_url=resolved_url,
                     status="stale",
                     progress=100,

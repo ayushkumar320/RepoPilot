@@ -175,7 +175,9 @@ class LiveRepoService:
         record.progress = 15
         record.first_impression = "Cloning the repository and building a structural snapshot."
         try:
-            result = await index_repo(repo_url, provider=self.runtime.provider, settings=self.runtime.settings)
+            result = await index_repo(
+                repo_url, provider=self.runtime.provider, settings=self.runtime.settings
+            )
             record.progress = 100
             record.indexed_sha = result.head_sha
             record.remote_sha = result.head_sha
@@ -288,7 +290,10 @@ class LiveRepoService:
 
     async def first_impression(self, repo_id: str) -> str:
         record = await self.get(repo_id)
-        return record.first_impression or "Indexing has started; first structural signals will appear shortly."
+        return (
+            record.first_impression
+            or "Indexing has started; first structural signals will appear shortly."
+        )
 
     async def _first_impression_events(self, repo_id: str) -> AsyncIterator[TourEventType]:
         text = await self.first_impression(repo_id)
@@ -328,7 +333,9 @@ class LiveTourService:
         try:
             snapshot = await load_snapshot(engine, record.snapshot_repo_id)
             hubs = await graph_query("hubs", engine=engine, repo_id=snapshot.repo_id, top_n=4)
-            entry_points = await graph_query("entry_points", engine=engine, repo_id=snapshot.repo_id, top_n=4)
+            entry_points = await graph_query(
+                "entry_points", engine=engine, repo_id=snapshot.repo_id, top_n=4
+            )
             layers = await graph_query("layers", engine=engine, repo_id=snapshot.repo_id, top_n=6)
 
             entry_claims = await build_claims_for_symbols(

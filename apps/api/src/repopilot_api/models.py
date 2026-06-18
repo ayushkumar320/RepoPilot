@@ -93,6 +93,7 @@ class TourClaimEvent(BaseTourEvent):
     verifier_note: str | None = None
     retrieval_path: list[str] = Field(default_factory=list)
 
+
 class TourDiagramEvent(BaseTourEvent):
     event: Literal["diagram"] = "diagram"
     mermaid: str = Field(min_length=1)

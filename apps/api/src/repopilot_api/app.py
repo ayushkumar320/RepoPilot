@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from typing import cast
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from repopilot_api.models import (
@@ -46,6 +47,13 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         version="0.0.1",
         docs_url="/docs" if settings.repopilot_env != "production" else None,
         lifespan=lifespan,
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.repopilot_web_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
     if services is not None:
         app.state.services = services

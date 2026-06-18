@@ -110,6 +110,7 @@ export default function RepoPilotApp() {
   const [featureText, setFeatureText] = useState("");
   const [askPrompt, setAskPrompt] = useState("");
   const [busy, setBusy] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [stage, setStage] = useState<"capture" | "tour">("capture");
   const [store, setStore] = useState<TourStoreState>(initialTourStoreState);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
@@ -153,6 +154,7 @@ export default function RepoPilotApp() {
 
   const submitRepo = async () => {
     setBusy(true);
+    setErrorMessage(null);
     try {
       const created = await api.createRepo(repoUrl);
       setRepoId(created.repo_id);
@@ -165,6 +167,8 @@ export default function RepoPilotApp() {
           { status: created.status, progress: 5 },
         ),
       );
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to reach the API.");
     } finally {
       setBusy(false);
     }
@@ -175,16 +179,20 @@ export default function RepoPilotApp() {
       return;
     }
     setBusy(true);
+    setErrorMessage(null);
     try {
       const created = await api.createTour(repoId, profile);
       setTourId(created.tour_id);
       setStage("tour");
       router.push(`/?tour=${created.tour_id}&repo=${encodeURIComponent(repoId)}`);
       const response = await fetch(api.tourStreamUrl(created.tour_id), { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) {
-        return;
+        throw new Error("Tour stream did not return a readable response.");
       }
       let buffer = "";
       while (true) {
@@ -201,6 +209,9 @@ export default function RepoPilotApp() {
           }
         }
       }
+    } catch (error) {
+      setStage("capture");
+      setErrorMessage(error instanceof Error ? error.message : "Unable to start the tour.");
     } finally {
       setBusy(false);
     }
@@ -220,18 +231,23 @@ export default function RepoPilotApp() {
     if (!tourId || !repoId || !askPrompt.trim()) {
       return;
     }
-    const answer = await api.askTour(tourId, askPrompt.trim());
-    const claims: ClaimEvent[] = answer.claims.map((claim) => ({
-      ...claim,
-      event: "claim",
-      v: 1,
-    }));
-    setStore((current) => appendAnswerAsSection(current, askPrompt.trim(), answer.answer, claims, repoId));
-    const first = answer.claims[0];
-    if (first) {
-      setStore((current) => selectClaim(current, first.id));
+    setErrorMessage(null);
+    try {
+      const answer = await api.askTour(tourId, askPrompt.trim());
+      const claims: ClaimEvent[] = answer.claims.map((claim) => ({
+        ...claim,
+        event: "claim",
+        v: 1,
+      }));
+      setStore((current) => appendAnswerAsSection(current, askPrompt.trim(), answer.answer, claims, repoId));
+      const first = answer.claims[0];
+      if (first) {
+        setStore((current) => selectClaim(current, first.id));
+      }
+      setAskPrompt("");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to ask the snapshot right now.");
     }
-    setAskPrompt("");
   };
 
   const viewerLines = useMemo(() => {
@@ -406,6 +422,11 @@ export default function RepoPilotApp() {
                   ? "• cached index available, re-index recommended"
                   : null}
               </p>
+              {errorMessage ? (
+                <p className="meta-copy" style={{ color: "#ff8b8b", marginTop: 12 }}>
+                  {errorMessage}
+                </p>
+              ) : null}
             </div>
 
             <div className="button-row">
@@ -494,6 +515,11 @@ export default function RepoPilotApp() {
 
             <div className="panel">
               <p className="eyebrow">Ask Anything</p>
+              {errorMessage ? (
+                <p className="meta-copy" style={{ color: "#ff8b8b", marginBottom: 12 }}>
+                  {errorMessage}
+                </p>
+              ) : null}
               <div className="ask-form">
                 <input
                   className="ask-input"

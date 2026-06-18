@@ -1,0 +1,229 @@
+{
+  "info": {
+    "_postman_id": "8ef4a3ef-ff0b-4b3e-8eb3-21f2f0f9a4d1",
+    "name": "RepoPilot API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection for testing the RepoPilot backend independently from the frontend."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "repoUrl",
+      "value": "https://github.com/pallets/flask"
+    },
+    {
+      "key": "repoId",
+      "value": ""
+    },
+    {
+      "key": "tourId",
+      "value": ""
+    },
+    {
+      "key": "chunkId",
+      "value": "chunk-123"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Repo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status is 202', function () {",
+              "  pm.response.to.have.status(202);",
+              "});",
+              "const data = pm.response.json();",
+              "if (data.repo_id) {",
+              "  pm.collectionVariables.set('repoId', data.repo_id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"repo_url\": \"{{repoUrl}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/repos",
+          "host": ["{{baseUrl}}"],
+          "path": ["repos"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Repo Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/repos/{{repoId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["repos", "{{repoId}}", "status"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "First Impression Stream",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/event-stream"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/repos/{{repoId}}/first-impression",
+          "host": ["{{baseUrl}}"],
+          "path": ["repos", "{{repoId}}", "first-impression"]
+        },
+        "description": "SSE endpoint. In Postman, use Send and inspect the streamed response body."
+      },
+      "response": []
+    },
+    {
+      "name": "Create Tour",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status is 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "const data = pm.response.json();",
+              "if (data.tour_id) {",
+              "  pm.collectionVariables.set('tourId', data.tour_id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"repo_id\": \"{{repoId}}\",\n  \"intent_profile\": {\n    \"raw_text\": \"Help me learn Flask\",\n    \"modality_weights\": {\n      \"understand\": 1\n    },\n    \"focus_keywords\": [\"routing\"],\n    \"audience_framing\": \"casual contributor\",\n    \"output_shape_preference\": \"narrative\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tours",
+          "host": ["{{baseUrl}}"],
+          "path": ["tours"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Tour Stream",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/event-stream"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tours/{{tourId}}/stream",
+          "host": ["{{baseUrl}}"],
+          "path": ["tours", "{{tourId}}", "stream"]
+        },
+        "description": "SSE endpoint. In Postman, use Send and inspect the streamed response body."
+      },
+      "response": []
+    },
+    {
+      "name": "Ask Tour",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Where should I start if I care about routing?\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tours/{{tourId}}/ask",
+          "host": ["{{baseUrl}}"],
+          "path": ["tours", "{{tourId}}", "ask"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Chunk",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/chunks/{{chunkId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["chunks", "{{chunkId}}"]
+        },
+        "description": "Replace {{chunkId}} with a real chunk id returned by your running backend if needed."
+      },
+      "response": []
+    },
+    {
+      "name": "Dev SSE Idle",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/event-stream"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/__dev/sse-idle",
+          "host": ["{{baseUrl}}"],
+          "path": ["__dev", "sse-idle"]
+        },
+        "description": "Development-only SSE endpoint for confirming event-stream behavior."
+      },
+      "response": []
+    }
+  ]
+}

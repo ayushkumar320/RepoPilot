@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,6 +25,11 @@ def _find_repo_env() -> Path:
     return Path(".env")
 
 
+def _split_csv(value: str) -> list[str]:
+    """Parse a comma-separated env var into a cleaned list."""
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 class Settings(BaseSettings):
     """Single source of runtime configuration."""
 
@@ -38,6 +43,9 @@ class Settings(BaseSettings):
     # ── Environment ──────────────────────────────────────────────────────────
     repopilot_env: str = "development"
     repopilot_log_level: str = "INFO"
+    repopilot_web_origins: list[str] = Field(
+        default_factory=lambda: ["http://127.0.0.1:3000", "http://localhost:3000"]
+    )
 
     # ── LLM providers ────────────────────────────────────────────────────────
     groq_api_key: str | None = None
@@ -83,6 +91,13 @@ class Settings(BaseSettings):
     # ── LangSmith (optional) ─────────────────────────────────────────────────
     langsmith_api_key: str | None = None
     langsmith_project: str = "repopilot-dev"
+
+    @field_validator("repopilot_web_origins", mode="before")
+    @classmethod
+    def _coerce_web_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            return _split_csv(value)
+        return value
 
 
 @lru_cache(maxsize=1)

@@ -81,6 +81,26 @@ REGISTRY: tuple[EvalSpec, ...] = (
         needs_llm=False,
         needs_indexed_repo=False,
     ),
+    EvalSpec(
+        name="opportunity_quality",
+        phase=5,
+        dataset="opportunity_quality_v1.jsonl",
+        gate=0.75,
+        headline_metric="suspicion_legitimacy",
+        description="Phase 5 opportunity quality — approachable top issues, legitimate Lane C suspicions, honest rejected reasons.",
+        needs_llm=True,
+        needs_indexed_repo=True,
+    ),
+    EvalSpec(
+        name="file_mapping",
+        phase=5,
+        dataset="file_mapping_v1.jsonl",
+        gate=0.80,
+        headline_metric="file_overlap",
+        description="Phase 5 file mapping — predicted files_to_touch overlap hand-labeled expected files.",
+        needs_llm=False,
+        needs_indexed_repo=False,
+    ),
 )
 
 

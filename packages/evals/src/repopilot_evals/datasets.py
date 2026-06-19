@@ -27,6 +27,29 @@ class VerifierEvalRow(BaseModel):
     chunks: list[ChunkContent] = Field(default_factory=list)
 
 
+class OpportunityQualityEvalRow(BaseModel):
+    """One labeled Phase 5 opportunity-quality row."""
+
+    repo: str = Field(min_length=1)
+    lane: Literal["A_issue", "B_quality", "C_suspicion", "D_feature"]
+    title: str = Field(min_length=1)
+    evidence_refs: list[CodeRef] = Field(default_factory=list)
+    is_approachable: bool | None = None
+    is_legit: bool | None = None
+    rejected_reasons_honest: bool | None = None
+    notes: str | None = None
+
+
+class FileMappingEvalRow(BaseModel):
+    """Expected files for one Phase 5 opportunity."""
+
+    repo: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    predicted_files_to_touch: list[str] = Field(default_factory=list)
+    expected_files_to_touch: list[str] = Field(min_length=1)
+    notes: str | None = None
+
+
 def dataset_path(name: str) -> Path:
     return DATASETS_DIR / name
 
@@ -54,6 +77,14 @@ def load_intent_dataset(path: Path) -> list[IntentProfileEvalRow]:
 
 def load_planner_dataset(path: Path) -> list[PlannerEvalRow]:
     return [PlannerEvalRow.model_validate(row) for row in load_jsonl_rows(path)]
+
+
+def load_opportunity_quality_dataset(path: Path) -> list[OpportunityQualityEvalRow]:
+    return [OpportunityQualityEvalRow.model_validate(row) for row in load_jsonl_rows(path)]
+
+
+def load_file_mapping_dataset(path: Path) -> list[FileMappingEvalRow]:
+    return [FileMappingEvalRow.model_validate(row) for row in load_jsonl_rows(path)]
 
 
 def load_verifier_dataset(path: Path) -> list[VerifierEvalRow]:
@@ -116,14 +147,18 @@ def take_rows[T](rows: list[T], limit: int | None) -> list[T]:
 
 __all__ = [
     "DATASETS_DIR",
+    "FileMappingEvalRow",
     "GroundingEvalRow",
     "IntentProfileEvalRow",
+    "OpportunityQualityEvalRow",
     "PlannerEvalRow",
     "VerifierEvalRow",
     "dataset_path",
+    "load_file_mapping_dataset",
     "load_grounding_dataset",
     "load_intent_dataset",
     "load_jsonl_rows",
+    "load_opportunity_quality_dataset",
     "load_planner_dataset",
     "load_verifier_dataset",
     "take_rows",

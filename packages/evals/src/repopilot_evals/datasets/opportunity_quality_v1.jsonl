@@ -1,0 +1,1 @@
+{"repo":"scaffold","lane":"C_suspicion","title":"Scaffold row - replace during Phase 5 labeling","evidence_refs":[{"file_path":"pkg/example.py","start_line":1,"end_line":1,"symbol":"pkg.example"}],"is_approachable":null,"is_legit":null,"rejected_reasons_honest":null,"notes":"Scaffold only; Phase 5 gate requires hand-labeled fastapi/httpx/flask rows."}

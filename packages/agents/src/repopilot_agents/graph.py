@@ -30,6 +30,10 @@ from repopilot_agents.capabilities import (
     run_flow_tracer,
     run_teacher,
 )
+from repopilot_agents.contribute import rank_opportunities
+from repopilot_agents.contribute.lane_a_triage import run_lane_a_triage
+from repopilot_agents.contribute.lane_b_quality import run_lane_b_quality
+from repopilot_agents.contribute.lane_c_suspicion import run_lane_c_suspicion
 from repopilot_agents.intent.planner import plan as plan_intent
 from repopilot_agents.intent.profiler import profile_intent
 from repopilot_agents.state import ArchaeologistState, IntentProfile
@@ -133,6 +137,34 @@ async def _teacher_node(
     )
 
 
+async def _lane_a_node(state: ArchaeologistState) -> dict[str, Any]:
+    if state.intent_profile is None:
+        raise RuntimeError("lane_a_issue_triage requires intent_profile")
+    # Production Lane A will fetch issues and graph metrics from tools. The
+    # testable core is wired here now; empty inputs make the node a no-op
+    # until the live GitHub fetcher is enabled.
+    return run_lane_a_triage([], metrics_by_symbol={}, profile=state.intent_profile)
+
+
+async def _lane_b_node(state: ArchaeologistState) -> dict[str, Any]:
+    if state.intent_profile is None:
+        raise RuntimeError("lane_b_code_health requires intent_profile")
+    return run_lane_b_quality([], profile=state.intent_profile)
+
+
+async def _lane_c_node(state: ArchaeologistState) -> dict[str, Any]:
+    if state.intent_profile is None:
+        raise RuntimeError("lane_c_suspicion requires intent_profile")
+    return run_lane_c_suspicion([], profile=state.intent_profile)
+
+
+def _ranker_node(state: ArchaeologistState) -> dict[str, Any]:
+    if state.capability_plan is None:
+        return {}
+    ranked = rank_opportunities(state.opportunity_list, plan=state.capability_plan)
+    return {"ranked_opportunity_list": ranked}
+
+
 # ─── Conditional routing ────────────────────────────────────────────────
 
 
@@ -149,6 +181,12 @@ def _route_after_planner(state: ArchaeologistState) -> list[str]:  # type: ignor
         targets.append("cartographer")
     if "flow_tracer" in active:
         targets.append("flow_tracer")
+    if "lane_a_issue_triage" in active:
+        targets.append("lane_a_issue_triage")
+    if "lane_b_code_health" in active:
+        targets.append("lane_b_code_health")
+    if "lane_c_suspicion" in active:
+        targets.append("lane_c_suspicion")
     if not targets:
         # No generation capability planned (rare — the inclusive default
         # always activates cartographer). Fall straight through to the
@@ -164,6 +202,16 @@ def _route_after_generation(state: ArchaeologistState) -> str:
     if state.capability_plan is None:
         return END
     return "teacher" if "teacher" in state.capability_plan.active else END
+
+
+def _route_after_contribute(state: ArchaeologistState) -> str:
+    if state.capability_plan is None:
+        return END
+    return "opportunity_ranker" if state.opportunity_list else _route_after_generation(state)
+
+
+def _route_after_ranker(state: ArchaeologistState) -> str:
+    return _route_after_generation(state)
 
 
 # ─── Public builders ────────────────────────────────────────────────────
@@ -197,10 +245,23 @@ def build_graph(
     async def teacher(state: ArchaeologistState) -> dict[str, Any]:
         return await _teacher_node(state, provider=provider)
 
+    async def lane_a(state: ArchaeologistState) -> dict[str, Any]:
+        return await _lane_a_node(state)
+
+    async def lane_b(state: ArchaeologistState) -> dict[str, Any]:
+        return await _lane_b_node(state)
+
+    async def lane_c(state: ArchaeologistState) -> dict[str, Any]:
+        return await _lane_c_node(state)
+
     graph.add_node("intent_profiler", profiler)
     graph.add_node("capability_planner", planner)
     graph.add_node("cartographer", cartographer)
     graph.add_node("flow_tracer", flow_tracer)
+    graph.add_node("lane_a_issue_triage", lane_a)
+    graph.add_node("lane_b_code_health", lane_b)
+    graph.add_node("lane_c_suspicion", lane_c)
+    graph.add_node("opportunity_ranker", _ranker_node)
     graph.add_node("teacher", teacher)
 
     graph.add_edge(START, "intent_profiler")
@@ -213,7 +274,14 @@ def build_graph(
         ),
         # Mapped names = node names; LangGraph fans out to all returned
         # values, then waits for them all before the next step.
-        ["cartographer", "flow_tracer", "teacher"],
+        [
+            "cartographer",
+            "flow_tracer",
+            "lane_a_issue_triage",
+            "lane_b_code_health",
+            "lane_c_suspicion",
+            "teacher",
+        ],
     )
     graph.add_conditional_edges(
         "cartographer",
@@ -223,6 +291,17 @@ def build_graph(
     graph.add_conditional_edges(
         "flow_tracer",
         _route_after_generation,
+        ["teacher", END],
+    )
+    for lane_node in ("lane_a_issue_triage", "lane_b_code_health", "lane_c_suspicion"):
+        graph.add_conditional_edges(
+            lane_node,
+            _route_after_contribute,
+            ["opportunity_ranker", "teacher", END],
+        )
+    graph.add_conditional_edges(
+        "opportunity_ranker",
+        _route_after_ranker,
         ["teacher", END],
     )
     graph.add_edge("teacher", END)

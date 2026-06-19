@@ -1,0 +1,1 @@
+{"repo":"scaffold","title":"Scaffold row - replace during Phase 5 labeling","predicted_files_to_touch":["pkg/example.py"],"expected_files_to_touch":["pkg/example.py"],"notes":"Scaffold only; Phase 5 gate requires 20 hand-labeled opportunities."}

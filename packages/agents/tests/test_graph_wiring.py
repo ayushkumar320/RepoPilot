@@ -22,6 +22,7 @@ from repopilot_agents.state import (
     CodeRef,
     Insight,
     IntentProfile,
+    Opportunity,
     TourSection,
 )
 from repopilot_core.llm.provider import LLMProvider
@@ -73,6 +74,22 @@ def _section(sym: str = "pkg.foo") -> TourSection:
         order=0,
         claims=[Claim(text="x", refs=[_ref(sym)])],
     )
+
+
+def _opportunity(lane: str = "B_quality") -> Opportunity:
+    payload: dict[str, Any] = {
+        "lane": lane,
+        "title": f"{lane} opportunity",
+        "evidence_refs": [_ref()],
+        "why_this_matters": "matters",
+        "blast_radius": "isolated",
+        "difficulty": "S",
+        "suggested_first_step": "open the file",
+        "files_to_touch": ["pkg/foo.py"],
+    }
+    if lane == "C_suspicion":
+        payload["confirm_before_pr"] = "to_confirm: reproduce first"
+    return Opportunity.model_validate(payload)
 
 
 # ─── Wiring smoke tests ─────────────────────────────────────────────────
@@ -230,6 +247,66 @@ def test_build_graph_accepts_checkpointer(fake_engine: Any) -> None:
     )
     # Compiled object has an invoke / ainvoke surface — confirm typed.
     assert hasattr(compiled, "ainvoke")
+
+
+@pytest.mark.asyncio
+async def test_contribute_lanes_converge_on_ranker_then_teacher(
+    monkeypatch: pytest.MonkeyPatch,
+    fake_engine: Any,
+) -> None:
+    async def fake_teacher(**kwargs: Any) -> dict[str, Any]:
+        return {"draft_tour": [_section()]}
+
+    def fake_lane_a(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        opp = _opportunity("A_issue")
+        return {"triaged_issues": [opp], "opportunity_list": [opp]}
+
+    def fake_lane_b(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        return {"opportunity_list": [_opportunity("B_quality")]}
+
+    def fake_lane_c(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        return {"opportunity_list": [_opportunity("C_suspicion")]}
+
+    monkeypatch.setattr(graph_mod, "run_teacher", fake_teacher)
+    monkeypatch.setattr(graph_mod, "run_lane_a_triage", fake_lane_a)
+    monkeypatch.setattr(graph_mod, "run_lane_b_quality", fake_lane_b)
+    monkeypatch.setattr(graph_mod, "run_lane_c_suspicion", fake_lane_c)
+
+    compiled = build_graph(
+        provider=cast(LLMProvider, _NullProvider()),
+        engine=fake_engine,
+    )
+    profile = IntentProfile(raw_text="find me a first PR and hunt fragility")
+    plan = CapabilityPlan(
+        active=[
+            "lane_a_issue_triage",
+            "lane_b_code_health",
+            "lane_c_suspicion",
+            "teacher",
+        ],
+        dependencies={
+            "teacher": [
+                "lane_a_issue_triage",
+                "lane_b_code_health",
+                "lane_c_suspicion",
+            ]
+        },
+        output_shape="ranked_list",
+        ranker_weights={"A": 0.6, "B": 0.3, "C": 0.1},
+    )
+    start = ArchaeologistState(
+        repo_id="r1",
+        repo_url="https://example.com/r1",
+        intent_profile=profile,
+        capability_plan=plan,
+    )
+
+    final = await compiled.ainvoke(start, config={"recursion_limit": RECURSION_LIMIT})
+
+    assert len(final["opportunity_list"]) == 3
+    assert len(final["ranked_opportunity_list"]) == 3
+    assert final["ranked_opportunity_list"][0].lane == "A_issue"
+    assert len(final["draft_tour"]) == 1
 
 
 def test_answer_question_is_re_exported() -> None:

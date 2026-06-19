@@ -77,6 +77,14 @@ Lane = Literal["A_issue", "B_quality", "C_suspicion", "D_feature"]
 Difficulty = Literal["S", "M", "L"]
 
 
+class RejectedItem(BaseModel):
+    """A Lane A candidate shown for transparency after being ranked down."""
+
+    title: str = Field(min_length=1)
+    reason: str = Field(min_length=1)
+    evidence_refs: list[CodeRef] = Field(default_factory=list)
+
+
 class Opportunity(BaseModel):
     """One unified shape across all scanner lanes."""
 
@@ -90,6 +98,11 @@ class Opportunity(BaseModel):
     files_to_touch: list[str] = Field(default_factory=list)
     nearest_tests: list[str] = Field(default_factory=list)
     confirm_before_pr: str | None = None
+    mergeability: float = Field(default=0.5, ge=0.0, le=1.0)
+    approachability: float = Field(default=0.5, ge=0.0, le=1.0)
+    evidence_strength: float = Field(default=0.5, ge=0.0, le=1.0)
+    intent_match: str | None = None
+    considered_and_rejected: list[RejectedItem] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _lane_c_requires_confirm(self) -> Opportunity:
@@ -241,6 +254,7 @@ class ArchaeologistState(BaseModel):
     traced_flows: Annotated[list[Insight], add] = Field(default_factory=list)
     triaged_issues: Annotated[list[Opportunity], add] = Field(default_factory=list)
     opportunity_list: Annotated[list[Opportunity], add] = Field(default_factory=list)
+    ranked_opportunity_list: list[Opportunity] = Field(default_factory=list)
     decision_dossier: Annotated[list[Insight], add] = Field(default_factory=list)
 
     # — output —
@@ -271,6 +285,7 @@ __all__ = [
     "Opportunity",
     "OutputShape",
     "QAExchange",
+    "RejectedItem",
     "TourSection",
     "VerifierObjection",
 ]

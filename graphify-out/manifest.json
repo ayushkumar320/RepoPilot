@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1781532405.293394,
-    "ast_hash": "455d40e45544cacd67c6354c00258fdf",
+    "mtime": 1781839610.9745102,
+    "ast_hash": "d05ffa7283a9df296978bd9aff7db7e0",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1781750060.3005288,
-    "ast_hash": "64f21ad4d3105daed8ced9683b6c4583",
+    "mtime": 1781839419.6415875,
+    "ast_hash": "35db04db1a2a861c17d06c77c1ff012a",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {

@@ -1,41 +1,412 @@
 # RepoPilot
 
-Paste a public Python GitHub repo URL → get a **purpose-driven, grounded onboarding tour** powered by a multi-agent LLM pipeline whose every claim cites the exact `file:line` it came from.
+RepoPilot is a purpose-driven codebase onboarding tool for public Python repositories. A user pastes a GitHub URL, explains what they are trying to do, and gets a grounded tour of the codebase where every factual claim is tied back to concrete `file:line` references.
 
-> **Spec-first project.** The design lives in [`docs/`](docs/) and is queryable via [Graphify](graphify-out/). Code is being built phase-by-phase against the gates in [`docs/04_BUILD_PLAN.md`](docs/04_BUILD_PLAN.md). The pointer to the active phase is [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md).
+The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
-## Quickstart (local dev)
+> Current status: Phase 5 implementation has started. Phase 4's API/web product slice is in place, but the real large-repo `flask` live-demo gate is still pending because indexing/tour generation depends on external provider capacity. See [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md).
 
-Prerequisites: `uv` (≥ 0.4), Docker, Make, Git.
+## What It Does
+
+RepoPilot turns a repository into a purpose-aware map:
+
+- Clones and indexes a public Python GitHub repository.
+- Parses Python with tree-sitter and builds a deterministic code graph with NetworkX.
+- Chunks source at structural boundaries and stores exact source spans in Postgres.
+- Embeds chunks into pgvector for semantic retrieval.
+- Captures the user's free-text intent and converts it into an `IntentProfile`.
+- Plans which agent capabilities should run using deterministic planner rules.
+- Generates guided tours, Q&A answers, and contribute-mode opportunities.
+- Verifies factual claims against retrieved source before showing them.
+- Streams results through a FastAPI SSE API into a Next.js synchronized code viewer.
+
+RepoPilot is not a general chatbot over code. The LLM never invents the call graph; deterministic parsing and graph tools provide the facts, and generation is wrapped by a verifier.
+
+## Current Build State
+
+| Area | Status |
+|---|---|
+| Foundation | Monorepo, settings, LLM provider, lint/type/test tooling, Docker services |
+| Ingestion | Clone → parse → chunk → graph → embed → persist |
+| Q&A spine | Hybrid vector + graph retrieval with verifier loop |
+| Orchestration | Intent profiler, deterministic capability planner, LangGraph state graph |
+| Experience | FastAPI + Next.js product slice, SSE streams, code viewer scaffolding |
+| Contribute mode | First Phase 5 scaffold landed: Lane A/B/C cores, ranker, eval registration |
+| Ship hardening | Pending |
+
+The exact phase pointer lives in [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md). The full build plan lives in [docs/04_BUILD_PLAN.md](docs/04_BUILD_PLAN.md).
+
+## Architecture At A Glance
+
+```mermaid
+flowchart TB
+    user["User<br/>repo URL + free-text intent"]
+    web["Next.js Web App<br/>intent capture + tour UI + code viewer"]
+    api["FastAPI API<br/>repos, tours, chunks, SSE"]
+    worker["Indexing / Runtime Services"]
+    db[("Postgres + pgvector<br/>repos, chunks, embeddings, graph adjacency")]
+    redis[("Redis<br/>background job coordination")]
+    cache[("SQLite LLM cache")]
+    graph["NetworkX Code Graph<br/>imports, calls, inheritance"]
+    agents["LangGraph Agents<br/>planner + capabilities + verifier"]
+    llm["LLMProvider<br/>Groq -> Cerebras -> Hugging Face"]
+
+    user --> web
+    web --> api
+    api --> worker
+    worker --> db
+    worker --> redis
+    worker --> graph
+    graph --> db
+    api --> agents
+    agents --> db
+    agents --> graph
+    agents --> cache
+    agents --> llm
+    api -- "SSE events" --> web
+```
+
+## Runtime Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Web App
+    participant A as FastAPI
+    participant I as Ingestion Pipeline
+    participant DB as Postgres/pgvector
+    participant G as LangGraph Agents
+    participant V as Verifier
+
+    U->>W: Paste GitHub URL
+    W->>A: POST /repos
+    A->>I: enqueue indexing
+    I->>DB: persist chunks, embeddings, graph adjacency
+    W->>U: Ask "What brings you to this repo?"
+    U->>W: Free-text intent
+    W->>A: POST /tours with intent profile
+    A->>G: run planned capabilities
+    G->>DB: read chunks / vector hits / graph facts
+    G->>V: verify claims against source refs
+    V-->>G: verified or flagged claims
+    G-->>A: tour sections and claim events
+    A-->>W: SSE stream
+    W-->>U: Tour + synchronized exact-line code viewer
+```
+
+## Agent Graph
+
+The agent system uses one shared `ArchaeologistState`. The generic intent layer always runs first; the capability planner then activates whichever capabilities match the user's stated intent.
+
+```mermaid
+flowchart LR
+    intent["Intent Profiler<br/>free text -> IntentProfile"]
+    planner["Capability Planner<br/>deterministic rules"]
+
+    carto["Cartographer<br/>system map"]
+    flow["Flow Tracer<br/>end-to-end paths"]
+    laneA["Lane A<br/>issue triage"]
+    laneB["Lane B<br/>code health"]
+    laneC["Lane C<br/>guarded suspicions"]
+    ranker["Opportunity Ranker<br/>deterministic"]
+    teacher["Teacher<br/>briefing / tour"]
+    verifier["Verifier Loop<br/>grounding + actionability"]
+    qa["Q&A Subgraph<br/>always available"]
+
+    intent --> planner
+    planner --> carto
+    planner --> flow
+    planner --> laneA
+    planner --> laneB
+    planner --> laneC
+    laneA --> ranker
+    laneB --> ranker
+    laneC --> ranker
+    carto --> teacher
+    flow --> teacher
+    ranker --> teacher
+    teacher --> verifier
+    qa --> verifier
+```
+
+### Graph Connections That Matter
+
+RepoPilot has two important graph layers:
+
+1. The **code graph** built from the target repository.
+2. The **Graphify knowledge graph** built over this RepoPilot repo itself.
+
+The target-repo code graph powers product behavior:
+
+```mermaid
+flowchart TB
+    clone["Git clone"]
+    parse["tree-sitter parse"]
+    chunks["Structural chunks<br/>functions/classes/modules"]
+    refs["CodeRef spans<br/>file_path:start-end:symbol"]
+    nx["NetworkX graph"]
+    embed["Sentence-transformer embeddings"]
+    pgchunks[("chunks table")]
+    pgemb[("chunk_embeddings<br/>pgvector")]
+    pggraph[("graph_adjacency<br/>JSONB")]
+
+    clone --> parse
+    parse --> chunks
+    chunks --> refs
+    refs --> pgchunks
+    chunks --> embed
+    embed --> pgemb
+    parse --> nx
+    nx --> pggraph
+
+    pgchunks --> tools["Agent tools<br/>read_chunks / graph_query / graph_metrics"]
+    pgemb --> tools
+    pggraph --> tools
+```
+
+The six deterministic tools are the boundary between facts and language:
+
+```mermaid
+flowchart LR
+    source[("Indexed repo snapshot")]
+    read["read_chunks<br/>exact source"]
+    vector["vector_search<br/>semantic candidates"]
+    traverse["graph_traverse<br/>bounded graph paths"]
+    query["graph_query<br/>hubs, entry points, layers"]
+    metrics["graph_metrics<br/>fan-in, fan-out, complexity, tests"]
+    issues["github_issues<br/>Phase 5 live fetch"]
+    agents["Agents"]
+
+    source --> read --> agents
+    source --> vector --> agents
+    source --> traverse --> agents
+    source --> query --> agents
+    source --> metrics --> agents
+    issues --> agents
+```
+
+The Graphify repo graph is for contributors and AI agents working on RepoPilot:
 
 ```bash
-# 1. Install workspace
-uv sync
-
-# 2. Bring up Postgres + pgvector, Redis, Ollama (model preload happens automatically)
-docker compose up -d
-
-# 3. Run the full CI suite locally
-make ci
+graphify query "how does the verifier connect to Q&A?"
+graphify explain "Capability Planner"
+graphify path "IntentProfile" "Opportunity Ranker"
 ```
 
-Phase-by-phase build instructions live in [`docs/05_PHASE_PROMPTS.md`](docs/05_PHASE_PROMPTS.md). Start every build session by reading [`CLAUDE.md`](CLAUDE.md) and [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md).
+Graphify artifacts live in [graphify-out/](graphify-out/). After major code or architecture changes, run:
 
-## Repo layout
-
-```
-apps/
-  api/        FastAPI app (endpoints come online in Phase 4)
-  web/        Next.js 15 app (Phase 4)
-packages/
-  core/       shared settings, logging, LLMProvider (the only place agents talk to LLMs)
-  ingestion/  tree-sitter + NetworkX + pgvector indexing pipeline (Phase 1)
-  agents/     LangGraph nodes + capability library (Phase 2+)
-  evals/      datasets + runners gating each phase
-docs/         single source of truth for the design — read these before coding
-graphify-out/ knowledge graph over code + docs (`graphify query "..."`)
+```bash
+graphify update .
 ```
 
-## Status
+## Repository Structure
 
-See [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md) for the live phase pointer.
+```text
+.
+├── apps/
+│   ├── api/                  # FastAPI app, route models, services, SSE
+│   └── web/                  # Next.js 15 app and browser tests
+├── packages/
+│   ├── core/                 # settings, logging, LLMProvider, model bindings
+│   ├── ingestion/            # clone, parse, chunk, graph, embed, persist
+│   ├── agents/               # LangGraph state, tools, capabilities, verifier, contribute mode
+│   └── evals/                # eval registry, datasets, runners, reports
+├── infra/
+│   └── postgres/             # pgvector init SQL
+├── docs/                     # design source of truth and phase gates
+├── graphify-out/             # committed knowledge graph over this repo
+├── docker-compose.yml        # Postgres + pgvector, Redis
+├── Makefile                  # common dev/test commands
+└── pyproject.toml            # uv workspace + Python quality config
+```
+
+### Key Source Areas
+
+| Path | Purpose |
+|---|---|
+| `packages/core/src/repopilot_core/settings.py` | Runtime configuration from `.env` |
+| `packages/core/src/repopilot_core/llm/provider.py` | Provider fallback, caching, and 429 handling |
+| `packages/ingestion/src/repopilot_ingestion/pipeline.py` | End-to-end indexing pipeline |
+| `packages/agents/src/repopilot_agents/state.py` | Shared Pydantic state contract |
+| `packages/agents/src/repopilot_agents/graph.py` | Main LangGraph wiring |
+| `packages/agents/src/repopilot_agents/tools/` | Deterministic tool layer |
+| `packages/agents/src/repopilot_agents/verifier/` | Grounding and actionability checks |
+| `packages/agents/src/repopilot_agents/contribute/` | Phase 5 Lane A/B/C and ranker scaffolding |
+| `apps/api/src/repopilot_api/app.py` | FastAPI routes and SSE endpoints |
+| `apps/web/src/components/repopilot-app.tsx` | Main web experience |
+
+## API Surface
+
+The Phase 4 API exposes:
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `POST` | `/repos` | Enqueue repo indexing |
+| `GET` | `/repos/{repo_id}/status` | Poll indexing/readiness state |
+| `GET` | `/repos/{repo_id}/first-impression` | SSE first-impression stream |
+| `POST` | `/tours` | Create a tour for a ready repo |
+| `GET` | `/tours/{tour_id}/stream` | SSE tour stream |
+| `POST` | `/tours/{tour_id}/ask` | Ask a grounded follow-up question |
+| `GET` | `/chunks/{chunk_id}` | Fetch exact source for the code viewer |
+
+In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.
+
+## Setup Your Own Local Instance
+
+### Prerequisites
+
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/)
+- Node.js 20+
+- npm
+- Docker Desktop or Docker Engine
+- Git
+- Optional but useful: `graphify`
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/ayushkumar320/RepoPilot.git
+cd RepoPilot
+uv sync --all-packages --all-groups
+cd apps/web
+npm install
+cd ../..
+```
+
+### 2. Create `.env`
+
+For local Docker-backed Postgres and Redis:
+
+```bash
+cat > .env <<'EOF'
+REPOPILOT_ENV=development
+POSTGRES_DSN=postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot
+REDIS_URL=redis://localhost:6379/0
+REPOPILOT_WEB_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
+
+# At least one chat provider is needed for real generation.
+GROQ_API_KEY=
+CEREBRAS_API_KEY=
+HUGGINGFACE_API_KEY=
+
+# Needed for live Phase 5 GitHub issue fetching once enabled.
+GITHUB_PAT=
+
+# Optional tracing.
+LANGSMITH_API_KEY=
+LANGSMITH_PROJECT=repopilot-dev
+EOF
+```
+
+Notes:
+
+- Embeddings use `nomic-ai/nomic-embed-text-v1.5` through sentence-transformers and download on first use.
+- Groq/Cerebras/Hugging Face keys are optional for many unit tests, but real tours and live evals need provider capacity.
+- `GITHUB_PAT` is optional today; Phase 5 live issue fetching will need it for reliable GitHub API access.
+
+### 3. Start data services
+
+```bash
+make docker-up
+make db-migrate
+```
+
+This starts:
+
+- Postgres 16 with pgvector on port `5432`
+- Redis on port `6379`
+
+### 4. Run the API
+
+```bash
+uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
+```
+
+### 5. Run the web app
+
+In a second terminal:
+
+```bash
+cd apps/web
+npm run dev
+```
+
+Open `http://127.0.0.1:3000`.
+
+### 6. Run checks
+
+```bash
+make lint
+make typecheck
+make test
+```
+
+Useful targeted checks:
+
+```bash
+uv run python -m repopilot_evals status
+cd apps/web && npm run typecheck
+cd apps/web && npm run test:e2e
+cd apps/web && npm run test:lighthouse
+```
+
+## Development Workflow
+
+Common commands:
+
+```bash
+make install          # uv sync --all-packages --all-groups
+make lint             # ruff check + format check
+make fmt              # format and ruff --fix
+make typecheck        # mypy packages apps
+make test             # fast pytest lane
+make ci               # lint + typecheck + coverage
+make test-slow        # integration/slow tests, needs services and provider keys
+make docker-down      # stop and remove local service volumes
+```
+
+When changing architecture or adding modules, refresh the committed Graphify graph:
+
+```bash
+graphify update .
+git add graphify-out/graph.json graphify-out/manifest.json
+```
+
+## Design Principles
+
+RepoPilot follows a few hard rules:
+
+- **Truthful over fluent:** claims need `CodeRef` source spans.
+- **No stat dumps:** metrics become actionable `Insight` objects with consequences.
+- **Intent first:** every downstream capability reads the user's stated purpose.
+- **Deterministic facts, LLM narration:** parsing, graph construction, retrieval, and metrics are tool-driven.
+- **Verifier wrapped:** unsupported claims are flagged, not silently shipped.
+- **No fixed purpose enum:** there is no `learn/contribute/audit` branch; planner rules read continuous intent weights and raw-text signals.
+
+## Documentation Map
+
+| File | Why read it |
+|---|---|
+| [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
+| [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md) | Always-current build status |
+| [docs/00_CLAUDE_BUILD_GUIDE.md](docs/00_CLAUDE_BUILD_GUIDE.md) | Standing build context |
+| [docs/01_PROBLEM_AND_SOLUTION.md](docs/01_PROBLEM_AND_SOLUTION.md) | Product thesis |
+| [docs/02_TECH_STACK.md](docs/02_TECH_STACK.md) | Stack choices and tradeoffs |
+| [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
+| [docs/04_BUILD_PLAN.md](docs/04_BUILD_PLAN.md) | Phase-by-phase gates |
+| [docs/05_PHASE_PROMPTS.md](docs/05_PHASE_PROMPTS.md) | Paste-ready implementation prompts |
+
+## Known Limitations
+
+- Python-only target repos for v1.
+- Public GitHub repos only.
+- Large live repo demos depend on external model/provider quotas.
+- Phase 5 live GitHub issue fetching and full detector plumbing are not complete yet.
+- Phase 5 eval datasets are currently scaffolded; real hand-labeled rows are still needed.
+- Docker Compose is for local data services; the Phase 4 app dev flow runs API/web directly.
+
+## License
+
+Proprietary. See [pyproject.toml](pyproject.toml).

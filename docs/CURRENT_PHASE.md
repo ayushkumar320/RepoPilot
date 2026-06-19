@@ -1,8 +1,8 @@
 # Current Build Phase
 
-> **Active phase:** **Phase 4 — Experience** (FastAPI + Next.js + synchronized code viewer; repo code and gate tooling are in place, but the full live `flask` demo still depends on external model/provider capacity during large-repo indexing — **Docker is deferred to Phase 6**, see the note below the ladder).
-> **Last verified gate:** Phase 3 — agents fast lane **104 passed**, `ruff` + `ruff format` + `mypy --strict` all clean across 42 source files; CI grep "no purpose enum" enforced. Real-LLM accuracy gates (Profiler ≥90%/field, Planner F1 ≥90%, two-intent divergence ≥50% on flask, actionability ≥80%) carry the same documented relaxation Phase 2's grounding/verifier numbers did — code is unblocked, only labeled datasets + paid Groq run between us and a measured ✅.
-> **Last updated:** 2026-06-18 (later)
+> **Active implementation phase:** **Phase 5 — Contribute (Iteration 1)** has started with the first scaffold slice in `ee0039c`. Phase 4 remains code-side green but **live-gate pending**: the full `flask` demo still depends on external model/provider capacity during large-repo indexing.
+> **Last verified gate:** Phase 3 — agents fast lane **104 passed**, `ruff` + `ruff format` + `mypy --strict` all clean across 42 source files; CI grep "no purpose enum" enforced. Phase 4 code-side gates are green, but its real live `flask` demo gate is still unverified.
+> **Last updated:** 2026-06-19
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first to find the active phase and what's left on its gate. The Phase N as-built records live in [`docs/05_PHASE_PROMPTS.md`](05_PHASE_PROMPTS.md); this file is the index.
 
@@ -14,11 +14,38 @@ This document is the **always-correct pointer** at where the build is. Anyone (h
 | 1 — Ingestion | 🟢 **done** | `c4747e6` | [docs/04 §Phase 1](04_BUILD_PLAN.md) · [docs/05 §Phase 1](05_PHASE_PROMPTS.md) | ✅ fast-lane CI green · ✅ slow-lane `httpx` gate validated · ✅ `revisit_status` returns `stale` |
 | 2 — Hybrid Retrieval + Q&A (the spine) | 🟢 **done** (real-LLM eval paused on free-tier quota) | `6065ccf` | [docs/04 §Phase 2](04_BUILD_PLAN.md) · [docs/05 §Phase 2](05_PHASE_PROMPTS.md) | ✅ tools + verifier + Q&A loop ship · ✅ LangSmith provisioned · ✅ PR-time sampled eval green · ✅ `httpx_qa_v1.jsonl` (16 rows) + `verifier_quality_v1.jsonl` (30 rows) labeled against real httpx source · ⚠️ grounding ≥90% / verifier ≥92% **unmeasured** under real LLM (datasets ready; runner wired; awaits paid Groq) |
 | 3 — Orchestration + Learn | 🟢 **done** (real-LLM accuracy gates paused on free-tier quota — same relaxation as Phase 2) | — *(working tree on `65a0a80`; commit pending)* | [docs/04 §Phase 3](04_BUILD_PLAN.md) · [docs/05 §Phase 3](05_PHASE_PROMPTS.md) | ✅ ArchaeologistState schema · ✅ Intent Profiler · ✅ Capability Planner · ✅ goal-anchor helper · ✅ verifier loop (actionability + retry → flagged) · ✅ Cartographer / Flow Tracer / Teacher · ✅ full StateGraph with `recursion_limit=15` · ✅ CI grep "no purpose enum" · ⚠️ Profiler ≥90%/field, Planner F1 ≥90%, two-intent divergence ≥50% on flask, actionability ≥80% **unmeasured** under real LLM (harness wired; datasets need labeling and paid Groq) |
-| 4 — Experience | 🟡 **active** (API + web implemented; code-side gates green; full live `flask` demo still blocked by external provider limits) | — *(working tree, uncommitted)* | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | ✅ API + web product slice running locally · ✅ `npm run test:e2e` green (mocked API contract) · ✅ `npm run test:lighthouse` green (a11y 100) · ✅ `npm run test:sse-idle` green (30 s idle heartbeat gate) · ⚠️ live large-repo `flask` indexing/tour completion still depends on external model/provider quota |
-| 5 — Contribute (Iteration 1) | ⚪ pending | — | [docs/04 §Phase 5](04_BUILD_PLAN.md) · [docs/05 §Phase 5](05_PHASE_PROMPTS.md) | Top-3 approachability ≥70% · file-mapping ≥80% · suspicion legitimacy ≥75% · banned-vocab regex |
+| 4 — Experience | 🟡 **live-gate pending** (API + web implemented; code-side gates green; full live `flask` demo still blocked by external provider limits) | — | [docs/04 §Phase 4](04_BUILD_PLAN.md) · [docs/05 §Phase 4](05_PHASE_PROMPTS.md) | ✅ API + web product slice running locally · ✅ `npm run test:e2e` green (mocked API contract) · ✅ `npm run test:lighthouse` green (a11y 100) · ✅ `npm run test:sse-idle` green (30 s idle heartbeat gate) · ⚠️ live large-repo `flask` indexing/tour completion still depends on external model/provider quota |
+| 5 — Contribute (Iteration 1) | 🟡 **active** (first scaffold slice landed; gates unmeasured) | `ee0039c` | [docs/04 §Phase 5](04_BUILD_PLAN.md) · [docs/05 §Phase 5](05_PHASE_PROMPTS.md) | ✅ Lane A/B/C core scaffolds · ✅ deterministic ranker · ✅ LangGraph lane fan-out → ranker → teacher wiring · ✅ Phase 5 evals registered with scaffold datasets · ⚠️ live GitHub fetch, real detectors, frontend CTAs, labeled datasets, and quality gates still pending |
 | 6 — Harden and ship | ⚪ pending | — | [docs/04 §Phase 6](04_BUILD_PLAN.md) · [docs/05 §Phase 6](05_PHASE_PROMPTS.md) | Full eval matrix green · gitleaks + audits clean · clean-VM quickstart ≤5min · `v0.1.0` tagged |
 
 Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
+
+---
+
+## Session 2026-06-19 — Phase 5 scaffold started and pushed
+
+Commit `ee0039c` starts Phase 5 without claiming the Phase 5 gate is complete. It establishes the typed and deterministic spine for Contribute mode while leaving the live scanners, UI cards, and labeled eval gates for follow-up.
+
+- ✅ **Contribute package added** under `packages/agents/src/repopilot_agents/contribute/`:
+  - Lane A issue-triage core: graph-backed approachability scoring and considered-and-rejected trail shape.
+  - Lane B quality core: deterministic candidate-to-opportunity transformation, including entry-point exclusion for dead-code candidates.
+  - Lane C suspicion core: guarded-language denylist and required `to_confirm` / `confirm_before_pr` path.
+  - Deterministic opportunity ranker using planner-derived lane weights.
+  - Briefing helper that surfaces ranker rationale and intent-match text.
+- ✅ **State schema extended** in `packages/agents/src/repopilot_agents/state.py` with ranker scores, `intent_match`, `RejectedItem`, `considered_and_rejected`, and `ranked_opportunity_list`.
+- ✅ **LangGraph wiring extended** in `packages/agents/src/repopilot_agents/graph.py`: Lane A/B/C can fan out from the planner, converge through `opportunity_ranker`, then continue to Teacher.
+- ✅ **Phase 5 eval surfaces registered**:
+  - `opportunity_quality` (Phase 5, scaffold dataset present, unmeasured)
+  - `file_mapping` (Phase 5, scaffold dataset present, unmeasured)
+- ✅ **Targeted verification passed before commit**:
+  - `uv run pytest --no-cov packages/agents/tests/test_contribute.py packages/agents/tests/test_graph_wiring.py packages/evals/tests/test_evals_imports.py packages/evals/tests/test_eval_runners.py`
+  - `uv run mypy packages/agents/src/repopilot_agents packages/agents/tests/test_contribute.py packages/evals/src/repopilot_evals`
+  - `uv run ruff check packages/agents/src/repopilot_agents packages/agents/tests/test_contribute.py packages/agents/tests/test_graph_wiring.py packages/evals/src/repopilot_evals`
+  - `uv run ruff format --check packages/agents/src/repopilot_agents packages/agents/tests/test_contribute.py packages/agents/tests/test_graph_wiring.py packages/evals/src/repopilot_evals`
+
+**What remains for Phase 5:** implement live `github_issues` fetching/caching, wire real indexed-repo detector inputs into Lane B/C, add Teacher LLM briefing generation through the verifier, build frontend Opportunity cards with CTAs, replace scaffold eval rows with labeled fastapi/httpx/flask datasets, and run the Phase 5 quality gates.
+
+**Important carry-forward:** Phase 4 is still not formally gate-complete until the real `flask` live demo path reaches indexed/tour-ready state without provider exhaustion and the true live-demo measurements are checked.
 
 ---
 

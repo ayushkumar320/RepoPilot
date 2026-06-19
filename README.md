@@ -47,7 +47,7 @@ flowchart TB
     db[("Postgres + pgvector<br/>repos, chunks, embeddings, graph adjacency")]
     redis[("Redis<br/>background job coordination")]
     cache[("SQLite LLM cache")]
-    graph["NetworkX Code Graph<br/>imports, calls, inheritance"]
+    codeGraph["NetworkX Code Graph<br/>imports, calls, inheritance"]
     agents["LangGraph Agents<br/>planner + capabilities + verifier"]
     llm["LLMProvider<br/>Groq -> Cerebras -> Hugging Face"]
 
@@ -56,11 +56,11 @@ flowchart TB
     api --> worker
     worker --> db
     worker --> redis
-    worker --> graph
-    graph --> db
+    worker --> codeGraph
+    codeGraph --> db
     api --> agents
     agents --> db
-    agents --> graph
+    agents --> codeGraph
     agents --> cache
     agents --> llm
     api -- "SSE events" --> web

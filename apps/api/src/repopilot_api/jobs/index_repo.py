@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any, ClassVar
 
 import structlog
+from arq.connections import RedisSettings
 
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import get_settings
@@ -18,6 +19,15 @@ from repopilot_ingestion.pipeline import PipelineResult
 from repopilot_ingestion.pipeline import index_repo as _index_repo
 
 log = structlog.get_logger(__name__)
+
+
+def _redis_settings_from_url() -> RedisSettings:
+    """Build arq RedisSettings from Settings.redis_url.
+
+    Without this, arq falls back to localhost:6379 and silently ignores the
+    URL configured for the rest of the app.
+    """
+    return RedisSettings.from_dsn(get_settings().redis_url)
 
 
 async def startup(ctx: dict[str, Any]) -> None:
@@ -57,3 +67,4 @@ class WorkerSettings:
     functions: ClassVar[list[Any]] = [index_repo]
     on_startup: ClassVar[Any] = startup
     on_shutdown: ClassVar[Any] = shutdown
+    redis_settings: ClassVar[RedisSettings] = _redis_settings_from_url()

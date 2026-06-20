@@ -371,7 +371,7 @@ async def test_live_tour_ask_uses_rag_answer_question(
     repos = FakeRepoService()
     service = LiveTourService(
         runtime=Runtime(settings=Settings(), provider=cast(Any, object())),
-        repos=repos,
+        repos=cast(Any, repos),
     )
     service.records["tour-rag"] = TourRecord(
         tour_id="tour-rag",

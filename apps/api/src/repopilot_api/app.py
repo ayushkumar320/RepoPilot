@@ -148,10 +148,12 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         except KeyError as exc:
             raise HTTPException(status_code=404, detail="tour not found") from exc
 
-    @app.get("/chunks/{chunk_id}", response_model=ChunkPayload)
+    @app.get("/chunks/{chunk_id:path}", response_model=ChunkPayload)
     async def get_chunk(chunk_id: str) -> ChunkPayload:
         try:
             return await get_services().chunks.get(chunk_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         except KeyError as exc:
             raise HTTPException(status_code=404, detail="chunk not found") from exc
 

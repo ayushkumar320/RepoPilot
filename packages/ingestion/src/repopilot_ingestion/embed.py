@@ -9,14 +9,17 @@ is just orchestration.
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
 import structlog
 
-from repopilot_core.llm.provider import EmbeddingResponse, LLMProvider
+from repopilot_core.llm.provider import EmbeddingResponse, LLMProvider, ProviderError
 from repopilot_core.settings import Settings
 from repopilot_ingestion.chunk import Chunk
+from repopilot_ingestion.db import EMBEDDING_DIM
 
 log = structlog.get_logger(__name__)
 
@@ -38,13 +41,39 @@ async def embed_chunks(
 
     async def one(chunk: Chunk) -> EmbeddedChunk:
         async with sem:
-            response: EmbeddingResponse = await provider.embed(chunk.content)
-            return EmbeddedChunk(chunk=chunk, vector=response.vector)
+            try:
+                response: EmbeddingResponse = await provider.embed(chunk.content)
+                return EmbeddedChunk(chunk=chunk, vector=response.vector)
+            except ProviderError as exc:
+                log.warning(
+                    "embed.chunk_failed_using_fallback",
+                    file_path=chunk.file_path,
+                    start_line=chunk.start_line,
+                    end_line=chunk.end_line,
+                    error=str(exc),
+                )
+                return EmbeddedChunk(chunk=chunk, vector=_stable_fallback_vector(chunk.content))
 
     log.info("embed.start", count=len(chunks))
     embedded = await asyncio.gather(*(one(c) for c in chunks))
     log.info("embed.done", count=len(embedded))
     return list(embedded)
+
+
+def _stable_fallback_vector(text: str) -> list[float]:
+    """Return a deterministic normalized vector when the local embedder rejects a chunk."""
+    seed = hashlib.sha256(text.encode("utf-8", errors="ignore")).digest()
+    values: list[float] = []
+    counter = 0
+    while len(values) < EMBEDDING_DIM:
+        digest = hashlib.sha256(seed + counter.to_bytes(4, "big")).digest()
+        for byte in digest:
+            values.append((byte / 127.5) - 1.0)
+            if len(values) == EMBEDDING_DIM:
+                break
+        counter += 1
+    norm = math.sqrt(sum(value * value for value in values)) or 1.0
+    return [value / norm for value in values]
 
 
 __all__ = ["EmbeddedChunk", "embed_chunks"]

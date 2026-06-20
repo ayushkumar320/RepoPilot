@@ -158,7 +158,7 @@ export const api = {
     });
   },
   getChunk(chunkId: string): Promise<ChunkPayload> {
-    return http(`/chunks/${chunkId}`);
+    return http(`/chunks/${encodeURIComponent(chunkId)}`);
   },
   firstImpressionUrl(repoId: string): string {
     return `${API_BASE}/repos/${repoId}/first-impression`;

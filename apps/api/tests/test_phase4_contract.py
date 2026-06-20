@@ -3,12 +3,15 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from typing import Any, cast
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from repopilot_agents.qa import QAResult
 from repopilot_agents.state import Claim, IntentProfile
 from repopilot_agents.types import CodeRef
+from repopilot_agents.verifier.grounding import Claim as QAClaim
 from repopilot_api import create_app
 from repopilot_api.models import (
     BaseTourEvent,
@@ -21,8 +24,18 @@ from repopilot_api.models import (
     TourFirstImpressionEvent,
     TourSectionStartEvent,
 )
-from repopilot_api.services import AppServices, RepoNotReadyError, RepoRecord, TourRecord
+from repopilot_api.services import (
+    AppServices,
+    LiveTourService,
+    RepoNotReadyError,
+    RepoRecord,
+    Runtime,
+    TourRecord,
+    decode_chunk_id,
+    encode_chunk_id,
+)
 from repopilot_api.sse import format_sse_comment, format_sse_event, with_heartbeats
+from repopilot_core.settings import Settings
 
 
 class FakeRepoService:
@@ -311,6 +324,88 @@ def test_sse_comment_frame_is_valid_heartbeat() -> None:
     frame = format_sse_comment()
 
     assert frame == ": heartbeat\n\n"
+
+
+def test_deterministic_qa_result_accepts_grounding_claims() -> None:
+    ref = CodeRef(file_path="src/app.py", start_line=1, end_line=2, symbol="app")
+    claim = QAClaim(text="`app` is relevant.", refs=[ref], status="verified")
+
+    result = QAResult(
+        question="Where do I start?",
+        answer="Start with `app`.",
+        claims=[claim],
+        objections=[],
+        retrieval_path=["deterministic_text_overlap"],
+    )
+
+    assert result.claims[0].refs[0].file_path == "src/app.py"
+
+
+@pytest.mark.asyncio
+async def test_live_tour_ask_uses_rag_answer_question(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, str]] = []
+
+    async def fake_answer_question(
+        question: str,
+        *,
+        engine: Any,
+        provider: Any,
+        repo_id: str,
+        k: int = 8,
+        max_hops: int = 3,
+    ) -> QAResult:
+        calls.append({"question": question, "repo_id": repo_id, "k": str(k)})
+        ref = CodeRef(file_path="app.py", start_line=1, end_line=20, symbol="app")
+        return QAResult(
+            question=question,
+            answer="RAG used vector search over indexed chunks.",
+            claims=[QAClaim(text="The answer came from retrieved chunks.", refs=[ref])],
+            objections=[],
+            retrieval_path=["vector_search:k=8:hits=1"],
+            hops=max_hops,
+        )
+
+    monkeypatch.setattr("repopilot_api.services.answer_question", fake_answer_question)
+    repos = FakeRepoService()
+    service = LiveTourService(
+        runtime=Runtime(settings=Settings(), provider=cast(Any, object())),
+        repos=repos,
+    )
+    service.records["tour-rag"] = TourRecord(
+        tour_id="tour-rag",
+        repo_id="repo-123",
+        created_at=datetime(2026, 6, 18, tzinfo=UTC),
+        intent_profile=IntentProfile(raw_text="Am I using RAG?"),
+        snapshot_repo_id="repo-123@abc",
+    )
+
+    response = await service.ask("tour-rag", "is rag getting used here?")
+
+    assert calls == [
+        {
+            "question": "is rag getting used here?",
+            "repo_id": "repo-123@abc",
+            "k": "8",
+        }
+    ]
+    assert response.retrieval_path == ["vector_search:k=8:hits=1"]
+
+
+def test_chunk_id_codec_accepts_browser_base64url_without_padding() -> None:
+    ref = CodeRef(file_path="src/app.py", start_line=1, end_line=2, symbol="app")
+    chunk_id = encode_chunk_id("owner/repo@abc", ref).rstrip("=")
+
+    repo_id, decoded = decode_chunk_id(chunk_id)
+
+    assert repo_id == "owner/repo@abc"
+    assert decoded == ref
+
+
+def test_chunk_id_decode_rejects_placeholder() -> None:
+    with pytest.raises(ValueError, match="invalid chunk id"):
+        decode_chunk_id("chunk-123")
 
 
 @pytest.mark.asyncio

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import binascii
 import json
 import re
 from collections.abc import AsyncIterator, Sequence
@@ -16,11 +17,13 @@ from uuid import uuid4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from repopilot_agents.qa import QAResult
-from repopilot_agents.state import Claim, IntentProfile
+from repopilot_agents.qa import QAResult, answer_question
+from repopilot_agents.state import Claim as StateClaim
+from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.types import CodeRef
+from repopilot_agents.verifier.grounding import Claim as QAClaim
 from repopilot_api.models import (
     BaseTourEvent,
     ChunkPayload,
@@ -92,7 +95,7 @@ class TourSectionData:
 
 @dataclass(slots=True)
 class SectionClaimData:
-    claim: Claim
+    claim: StateClaim
     retrieval_path: list[str]
 
 
@@ -194,10 +197,12 @@ class LiveRepoService:
         record.status = "indexing"
         record.progress = 15
         record.first_impression = "Cloning the repository and building a structural snapshot."
+        progress_task = asyncio.create_task(self._advance_progress(record))
         try:
             result = await index_repo(
                 repo_url, provider=self.runtime.provider, settings=self.runtime.settings
             )
+            progress_task.cancel()
             record.progress = 100
             record.indexed_sha = result.head_sha
             record.remote_sha = result.head_sha
@@ -208,9 +213,18 @@ class LiveRepoService:
             )
             record.status = "ready"
         except Exception as exc:
+            progress_task.cancel()
             record.status = "error"
             record.progress = None
             record.error = str(exc)
+
+    async def _advance_progress(self, record: RepoRecord) -> None:
+        while record.status == "indexing":
+            await asyncio.sleep(10)
+            if record.progress is None:
+                record.progress = 15
+            elif record.progress < 90:
+                record.progress += 5
 
     async def _load_record_from_db(
         self,
@@ -446,11 +460,20 @@ class LiveTourService:
         record = await self.get(tour_id)
         engine = make_engine(self.runtime.settings)
         try:
-            result = await answer_deterministically(
-                engine=engine,
-                snapshot_repo_id=record.snapshot_repo_id,
-                question=question,
-            )
+            try:
+                result = await answer_question(
+                    question,
+                    engine=engine,
+                    provider=self.runtime.provider,
+                    repo_id=record.snapshot_repo_id,
+                )
+            except Exception as exc:
+                result = await answer_deterministically(
+                    engine=engine,
+                    snapshot_repo_id=record.snapshot_repo_id,
+                    question=question,
+                    fallback_reason=str(exc),
+                )
         finally:
             await engine.dispose()
         return QAAnswerResponse(
@@ -541,7 +564,7 @@ async def build_claims_for_symbols(
         if chunk is None:
             continue
         first_line = chunk.content.strip().splitlines()[0] if chunk.content.strip() else symbol
-        claim = Claim(
+        claim = StateClaim(
             text=(
                 f"`{symbol}` is worth reading early because it anchors a real code path in "
                 f"`{chunk.ref.file_path}` and begins with `{first_line[:72]}`."
@@ -618,14 +641,20 @@ def encode_chunk_id(repo_id: str, ref: CodeRef) -> str:
 
 
 def decode_chunk_id(chunk_id: str) -> tuple[str, CodeRef]:
-    payload = json.loads(base64.urlsafe_b64decode(chunk_id.encode("ascii")).decode("utf-8"))
-    repo_id = str(payload["repo_id"])
-    ref = CodeRef(
-        file_path=str(payload["file_path"]),
-        start_line=int(payload["start_line"]),
-        end_line=int(payload["end_line"]),
-        symbol=None if payload.get("symbol") is None else str(payload["symbol"]),
-    )
+    padded = chunk_id + "=" * (-len(chunk_id) % 4)
+    try:
+        payload = json.loads(base64.urlsafe_b64decode(padded.encode("ascii")).decode("utf-8"))
+        repo_id = str(payload["repo_id"])
+        ref = CodeRef(
+            file_path=str(payload["file_path"]),
+            start_line=int(payload["start_line"]),
+            end_line=int(payload["end_line"]),
+            symbol=None if payload.get("symbol") is None else str(payload["symbol"]),
+        )
+    except (binascii.Error, KeyError, UnicodeDecodeError, ValueError, TypeError) as exc:
+        raise ValueError(
+            "invalid chunk id; use a chunk id emitted by a tour or ask claim"
+        ) from exc
     return repo_id, ref
 
 
@@ -634,6 +663,7 @@ async def answer_deterministically(
     engine: AsyncEngine,
     snapshot_repo_id: str,
     question: str,
+    fallback_reason: str | None = None,
 ) -> QAResult:
     tokens = {token.lower() for token in re.findall(r"[A-Za-z_][A-Za-z0-9_]+", question)}
     async with engine.connect() as conn:
@@ -666,16 +696,19 @@ async def answer_deterministically(
     scored.sort(key=lambda item: (-item[0], item[1].file_path, item[1].start_line))
     top = scored[:3]
     if not top:
+        retrieval_path = ["deterministic_text_overlap"]
+        if fallback_reason:
+            retrieval_path.insert(0, f"rag_fallback:{fallback_reason[:160]}")
         return QAResult(
             question=question,
             answer="I couldn't find a strong match in the indexed snapshot yet. Try asking about a concrete symbol or file.",
             claims=[],
             objections=[],
             hops=0,
-            retrieval_path=["deterministic_text_overlap"],
+            retrieval_path=retrieval_path,
         )
     claims = [
-        Claim(
+        QAClaim(
             text=(
                 f"`{ref.symbol}` in `{ref.file_path}` looks relevant because it overlaps with your question "
                 f"and is summarized as {summary or 'an implementation chunk worth reading directly'}."
@@ -687,13 +720,16 @@ async def answer_deterministically(
         for _, ref, summary, _ in top
     ]
     answer = "Start with " + ", ".join(f"`{claim.refs[0].symbol}`" for claim in claims) + "."
+    retrieval_path = ["deterministic_text_overlap"]
+    if fallback_reason:
+        retrieval_path.insert(0, f"rag_fallback:{fallback_reason[:160]}")
     return QAResult(
         question=question,
         answer=answer,
         claims=claims,
         objections=[],
         hops=0,
-        retrieval_path=["deterministic_text_overlap"],
+        retrieval_path=retrieval_path,
     )
 
 

@@ -321,6 +321,7 @@ class _SentenceTransformersEmbedder(_BaseClient):
         # Lazy-loaded on first use so module import stays cheap.
         self._model: Any = None
         self._load_lock = asyncio.Lock()
+        self._encode_lock = asyncio.Lock()
 
     async def _ensure_loaded(self) -> Any:
         if self._model is None:
@@ -338,9 +339,14 @@ class _SentenceTransformersEmbedder(_BaseClient):
 
     async def embed(self, binding: ModelBinding, text: str) -> EmbeddingResponse:
         model = await self._ensure_loaded()
-        vector = await asyncio.to_thread(
-            lambda: model.encode(text, normalize_embeddings=True, convert_to_numpy=True).tolist()
-        )
+        async with self._encode_lock:
+            vector = await asyncio.to_thread(
+                lambda: model.encode(
+                    text,
+                    normalize_embeddings=True,
+                    convert_to_numpy=True,
+                ).tolist()
+            )
         return EmbeddingResponse(
             vector=list(vector),
             model=ModelId.EMBEDDINGS,

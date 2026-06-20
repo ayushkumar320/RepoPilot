@@ -14,12 +14,12 @@ The distinguishing bet: **before analyzing anything, the system captures pre-con
 
 | Want to understand… | Read |
 |---|---|
+| Where the build is right now | [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md) |
+| The 7-phase retrieval-quality plan | [`docs/RAG_PLAN.md`](docs/RAG_PLAN.md) |
+| The active phase's spec, gate, stop conditions | [`docs/rag/`](docs/rag/) |
 | The problem & the five principles | [`docs/01_PROBLEM_AND_SOLUTION.md`](docs/01_PROBLEM_AND_SOLUTION.md) |
-| Standing build context (paste at session start) | [`docs/00_CLAUDE_BUILD_GUIDE.md`](docs/00_CLAUDE_BUILD_GUIDE.md) |
 | Tech stack & why each choice | [`docs/02_TECH_STACK.md`](docs/02_TECH_STACK.md) |
 | Agent topology, state schema, tools, verifier | [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) |
-| Phase-by-phase build plan | [`docs/04_BUILD_PLAN.md`](docs/04_BUILD_PLAN.md) |
-| Per-phase prompts | [`docs/05_PHASE_PROMPTS.md`](docs/05_PHASE_PROMPTS.md) |
 
 **Prefer the Graphify graph over reading these raw** — see §3.
 

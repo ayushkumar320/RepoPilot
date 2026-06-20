@@ -652,9 +652,7 @@ def decode_chunk_id(chunk_id: str) -> tuple[str, CodeRef]:
             symbol=None if payload.get("symbol") is None else str(payload["symbol"]),
         )
     except (binascii.Error, KeyError, UnicodeDecodeError, ValueError, TypeError) as exc:
-        raise ValueError(
-            "invalid chunk id; use a chunk id emitted by a tour or ask claim"
-        ) from exc
+        raise ValueError("invalid chunk id; use a chunk id emitted by a tour or ask claim") from exc
     return repo_id, ref
 
 

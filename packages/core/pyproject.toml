@@ -12,6 +12,10 @@ dependencies = [
     # Embeddings run in-process via sentence-transformers (HF model weights).
     # No Ollama, no daemon. First call downloads weights into the HF hub cache.
     "sentence-transformers>=3.0",
+    # torch arrives transitively via sentence-transformers; declared explicitly
+    # so the root [tool.uv.sources] CPU-index override binds (we never use a GPU,
+    # and the default Linux wheel drags in heavy NVIDIA CUDA wheels).
+    "torch>=2.0",
     "huggingface-hub>=0.24",
     # Embedding model nomic-ai/nomic-embed-text-v1.5 ships with remote code
     # that we trust on first load; einops is its hard dep for matrix ops.

@@ -1,5 +1,7 @@
 # RAG Phase 0 — Baseline & Measurement
 
+> **How to run this:** [`00_EXECUTION_RUNBOOK.md`](00_EXECUTION_RUNBOOK.md) is the step-by-step.
+
 > Without this phase, every later phase ships on vibes.
 
 ## 1. Goal

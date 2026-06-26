@@ -32,7 +32,7 @@ Each phase is independently shippable; each unlocks the next. The diagram on the
 
 | # | Phase | Stage in target pipeline | Headline gate | New deps |
 |---|---|---|---|---|
-| **0** | [Baseline & Measurement](rag/00_BASELINE_AND_MEASUREMENT.md) | (measurement spine) | A baseline number exists for every metric we will improve later | `ragas` or hand-rolled (TBD in phase) |
+| **0** | [Baseline & Measurement](rag/00_BASELINE_AND_MEASUREMENT.md) · [runbook](rag/00_EXECUTION_RUNBOOK.md) | (measurement spine) | A baseline number exists for every metric we will improve later | `ragas` or hand-rolled (TBD in phase) |
 | **1** | [Recall lift](rag/01_RECALL_LIFT.md) | Hybrid Retrieval (dense side) + Candidate Pool | recall@10 ≥ baseline + 5 pp | none |
 | **2** | [Query Understanding](rag/02_QUERY_UNDERSTANDING.md) | Query Understanding | recall@10 lift ≥ 5 pp over Phase 1 on multi-hop questions | none (uses existing 8B model) |
 | **3** | [BM25 Hybrid](rag/03_HYBRID_RETRIEVAL_BM25.md) | Hybrid Retrieval (sparse side) | recall@10 lift ≥ 5 pp on rare-symbol / proper-noun queries | none (Postgres FTS built-in) |

@@ -48,11 +48,11 @@ Ask RepoPilot to index each repo (like you did in Postman):
 
 ```bash
 curl -X POST http://localhost:8000/repos -H "Content-Type: application/json" \
-  -d '{"url": "https://github.com/encode/httpx"}'
+  -d '{"repo_url": "https://github.com/encode/httpx"}'
 curl -X POST http://localhost:8000/repos -H "Content-Type: application/json" \
-  -d '{"url": "https://github.com/pallets/flask"}'
+  -d '{"repo_url": "https://github.com/pallets/flask"}'
 curl -X POST http://localhost:8000/repos -H "Content-Type: application/json" \
-  -d '{"url": "https://github.com/fastapi/fastapi"}'
+  -d '{"repo_url": "https://github.com/fastapi/fastapi"}'
 ```
 
 Poll `GET /repos/{id}/status` until each says **ready**. Grab a coffee.

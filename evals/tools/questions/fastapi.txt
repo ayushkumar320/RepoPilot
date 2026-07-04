@@ -1,0 +1,16 @@
+# fastapi_qa_v1 seed questions — 9 single-hop + 4 multi-hop + 2 not-in-repo (!)
+How does FastAPI validate a request body against a Pydantic model?
+Where does FastAPI resolve path parameters from the URL?
+How does the Depends() dependency get evaluated for a route?
+Where does FastAPI generate the OpenAPI schema?
+How are response models serialized before returning to the client?
+Where does FastAPI handle HTTPException raised in a route?
+How does FastAPI register a router with a prefix?
+Where is the request body read and parsed from the ASGI receive channel?
+How does FastAPI decide a route's status code?
+How does a request flow from the ASGI app through routing to the endpoint function?
+How do nested dependencies with yield get torn down after the response?
+How does dependency caching work across a single request?
+How does FastAPI combine path, query, and body parameters into one endpoint signature?
+!How does FastAPI's built-in rate limiter throttle requests?
+!Where does FastAPI implement GraphQL resolvers?

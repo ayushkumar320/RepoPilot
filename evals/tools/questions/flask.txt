@@ -1,0 +1,21 @@
+# flask_qa_v1 seed questions — 12 single-hop + 5 multi-hop + 3 not-in-repo (!)
+How does Flask route a URL to its view function?
+Where does Flask create the application context?
+How does Flask load configuration from an object?
+Where is the request object made available to view code?
+How does Flask handle a 404 error by default?
+Where are Jinja templates rendered in Flask?
+How does Flask register a blueprint on the app?
+Where does Flask parse cookie data from the request?
+How is the session serialized and signed?
+Where does Flask decide the response mimetype?
+How does the flask run CLI command start the dev server?
+Where are before_request callbacks invoked?
+How does a request travel from WSGI entry to the view function and back to a response?
+How do blueprints interact with url_for to build endpoint names?
+How does the app context relate to the request context during a request?
+How does Flask's test client construct a fake request environment through to dispatch?
+How does error handling propagate from a view exception to a rendered error response?
+!How does Flask integrate with Redis for session storage?
+!Where does Flask implement WebSocket support?
+!How does Flask's built-in admin dashboard authenticate users?

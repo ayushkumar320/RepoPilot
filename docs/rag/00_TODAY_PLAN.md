@@ -26,8 +26,8 @@ Step 4 is the only part that truly needs *you*. Everything else is copy-paste-wa
 Three things must be running, each in its own terminal:
 
 ```bash
-# terminal 1 — the API
-uv run uvicorn repopilot_api.app:app --reload
+# terminal 1 — the API (no --reload: reloads wipe in-memory repo records → "repo not found")
+uv run uvicorn repopilot_api.app:app
 
 # terminal 2 — the background worker (does the indexing)
 uv run arq repopilot_api.jobs.index_repo.WorkerSettings

@@ -5,11 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from sqlalchemy import desc, select
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.db import repos as repos_table
+from repopilot_ingestion.persist import make_engine
 
 
 @dataclass(slots=True)
@@ -25,7 +26,7 @@ class EvalContext:
 
 def build_eval_context(settings: Settings | None = None) -> EvalContext:
     resolved = settings or get_settings()
-    engine = create_async_engine(resolved.postgres_dsn, pool_pre_ping=True)
+    engine = make_engine(resolved)
     provider = LLMProvider.build(settings=resolved)
     return EvalContext(settings=resolved, engine=engine, provider=provider)
 

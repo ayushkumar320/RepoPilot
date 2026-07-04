@@ -57,7 +57,9 @@ def make_engine(settings: Settings) -> AsyncEngine:
         dsn = "postgresql+psycopg://" + dsn[len("postgresql://") :]
     elif dsn.startswith("postgres://"):
         dsn = "postgresql+psycopg://" + dsn[len("postgres://") :]
-    return create_async_engine(dsn, future=True)
+    # Neon's pooler drops idle connections; pre-ping recycles dead ones
+    # instead of failing mid-transaction with an SSL EOF.
+    return create_async_engine(dsn, future=True, pool_pre_ping=True, pool_recycle=300)
 
 
 async def repo_already_indexed(engine: AsyncEngine, *, repo_url: str, head_sha: str) -> bool:

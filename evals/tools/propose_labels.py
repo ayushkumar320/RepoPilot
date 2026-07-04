@@ -30,6 +30,14 @@ from repopilot_agents.tools.vector_search import vector_search
 from repopilot_evals.runners.common import build_eval_context, resolve_repo_id
 
 CANDIDATE_K = 6
+# Over-fetch so source files survive after dropping test/example/doc hits,
+# which dominate raw vector search but are never valid gold labels.
+FETCH_K = 150
+NOISE_PREFIXES = ("tests/", "test/", "examples/", "docs/", "docs_src/", "scripts/")
+
+
+def _is_noise(file_path: str) -> bool:
+    return file_path.startswith(NOISE_PREFIXES)
 
 
 def _load_questions(questions_path: Path) -> list[str]:
@@ -51,8 +59,9 @@ async def propose(repo: str, questions_path: Path, out_path: Path) -> None:
             if not not_in_repo:
                 hits = await vector_search(
                     question, engine=ctx.engine, provider=ctx.provider,
-                    repo_id=repo_id, k=CANDIDATE_K,
+                    repo_id=repo_id, k=FETCH_K,
                 )
+                hits = [h for h in hits if not _is_noise(h.ref.file_path)][:CANDIDATE_K]
                 candidates = [
                     {
                         "file_path": h.ref.file_path,

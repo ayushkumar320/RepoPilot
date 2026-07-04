@@ -783,5 +783,10 @@
     "mtime": 1783177121.9024029,
     "ast_hash": "237029c74d09b331eedec0e5fbb7a0d4",
     "semantic_hash": ""
+  },
+  "docs/rag/00_TODAY_PLAN.md": {
+    "mtime": 1783177320.8292365,
+    "ast_hash": "e7bced0ff78fc1b8e1e729ab37e16007",
+    "semantic_hash": ""
   }
 }

@@ -1,0 +1,196 @@
+{
+  "mrr": 0.3681318681318681,
+  "recall@5": 0.3333333333333333,
+  "recall@10": 0.38461538461538464,
+  "recall@20": 0.38461538461538464,
+  "ndcg@5": 0.31540065227647796,
+  "ndcg@10": 0.3394662279699527,
+  "per_question": {
+    "recall@10": [
+      0.3333333333333333,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0,
+      1.0,
+      0.3333333333333333,
+      0.0,
+      0.3333333333333333
+    ],
+    "ndcg@5": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0,
+      0.6309297535714575,
+      0.46927872602275644,
+      0.0,
+      0.0
+    ],
+    "mrr": [
+      0.14285714285714285,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0,
+      0.5,
+      1.0,
+      0.0,
+      0.14285714285714285
+    ]
+  },
+  "grounding_accuracy": 0.5625,
+  "hallucination_rate": 0.0,
+  "keyword_accuracy": 0.3125,
+  "grounding_cases": [
+    {
+      "question": "How does httpx.Client.send dispatch a Request through the transport layer?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 1
+    },
+    {
+      "question": "Where is timeout configuration merged into a Request before it is dispatched?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How is the Authorization header constructed for HTTP Basic authentication?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 2
+    },
+    {
+      "question": "How is the connection pool sized via max_connections and max_keepalive_connections?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does the GZipDecoder decode gzipped response bodies?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does Client enforce a maximum redirect limit while following redirects?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "Where are HTTP status codes classified as informational, success, redirect, or error?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "Where does httpx provide a Zstandard decoder for zstd-encoded responses?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0
+    },
+    {
+      "question": "Where is the SSL context created for outgoing TLS connections?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How is a Proxy URL plus optional auth represented in the configuration model?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0
+    },
+    {
+      "question": "Trace what happens between Client.send and the underlying httpcore.Request being dispatched by the connection pool.",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does DigestAuth handle a 401 challenge and produce a follow-up request with credentials?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does the client merge its default timeout into per-request extensions before a request is sent?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "Does httpx automatically rotate AWS IAM credentials retrieved from EC2 instance metadata?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "Where does httpx implement a Django ORM connection pool backed by SQLAlchemy?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "What file defines the React component tree for the httpx documentation site?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3
+    }
+  ],
+  "verifier_accuracy": 0.6,
+  "latency_p50_ms": 535.1020829984918,
+  "latency_p95_ms": 1410.7237909993273,
+  "total": 13,
+  "repo": "httpx",
+  "dataset": "httpx_qa_v1.jsonl",
+  "phase": 0,
+  "generated_at": "2026-07-04T17:04:43.938533+00:00"
+}

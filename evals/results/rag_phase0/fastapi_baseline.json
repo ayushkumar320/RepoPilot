@@ -1,0 +1,77 @@
+{
+  "mrr": 0.16666666666666666,
+  "recall@5": 0.1111111111111111,
+  "recall@10": 0.1111111111111111,
+  "recall@20": 0.1111111111111111,
+  "ndcg@5": 0.09869397032195508,
+  "ndcg@10": 0.09869397032195508,
+  "per_question": {
+    "recall@10": [
+      0.0,
+      0.0,
+      0.3333333333333333
+    ],
+    "ndcg@5": [
+      0.0,
+      0.0,
+      0.2960819109658652
+    ],
+    "mrr": [
+      0.0,
+      0.0,
+      0.5
+    ]
+  },
+  "grounding_accuracy": 0.6,
+  "hallucination_rate": 0.0,
+  "keyword_accuracy": 0.4,
+  "grounding_cases": [
+    {
+      "question": "Where does FastAPI generate the OpenAPI schema?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does a request flow from the ASGI app through routing to the endpoint function?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "How does dependency caching work across a single request?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0
+    },
+    {
+      "question": "How does FastAPI's built-in rate limiter throttle requests?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3
+    },
+    {
+      "question": "Where does FastAPI implement GraphQL resolvers?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3
+    }
+  ],
+  "latency_p50_ms": 403.15999999802443,
+  "latency_p95_ms": 847.0211660023779,
+  "total": 3,
+  "repo": "fastapi",
+  "dataset": "fastapi_qa_v1.jsonl",
+  "phase": 0,
+  "generated_at": "2026-07-04T17:23:22.953316+00:00"
+}

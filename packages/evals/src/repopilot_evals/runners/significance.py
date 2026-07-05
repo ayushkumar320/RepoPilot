@@ -63,9 +63,7 @@ def paired_bootstrap(
     deltas = [a - b for b, a in zip(before, after, strict=True)]
     n = len(deltas)
     rng = random.Random(seed)
-    resampled_means = sorted(
-        mean(rng.choices(deltas, k=n)) for _ in range(n_resamples)
-    )
+    resampled_means = sorted(mean(rng.choices(deltas, k=n)) for _ in range(n_resamples))
     lo_idx = int((alpha / 2) * n_resamples)
     hi_idx = min(int((1 - alpha / 2) * n_resamples), n_resamples - 1)
     ci_low = resampled_means[lo_idx]

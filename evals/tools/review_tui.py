@@ -90,7 +90,9 @@ def review(candidates_path: Path, out_path: Path | None) -> None:
         row = rows[idx]
         show_row(idx, len(rows), row)
         while True:
-            key = input("  [a]ccept  [r]eject  [k]eep-not-in-repo  [s]kip  [q]uit > ").strip().lower()
+            key = (
+                input("  [a]ccept  [r]eject  [k]eep-not-in-repo  [s]kip  [q]uit > ").strip().lower()
+            )
             if key == "a":
                 accept_row(row)
                 break
@@ -115,26 +117,34 @@ def review(candidates_path: Path, out_path: Path | None) -> None:
 
     save(candidates_path, rows)
     accepted = [r for r in rows if r.get("reviewed") and not r.get("rejected")]
-    print(f"\nreview complete: {len(accepted)} accepted, "
-          f"{sum(1 for r in rows if r.get('rejected'))} rejected")
+    print(
+        f"\nreview complete: {len(accepted)} accepted, "
+        f"{sum(1 for r in rows if r.get('rejected'))} rejected"
+    )
 
     if out_path and accepted:
         with out_path.open("w", encoding="utf-8") as fh:
             for row in accepted:
-                fh.write(json.dumps({
-                    "question": row["question"],
-                    "expected_refs": row["expected_refs"],
-                    "expected_answer_keywords": row["expected_answer_keywords"],
-                    "not_in_repo": row["not_in_repo"],
-                }) + "\n")
+                fh.write(
+                    json.dumps(
+                        {
+                            "question": row["question"],
+                            "expected_refs": row["expected_refs"],
+                            "expected_answer_keywords": row["expected_answer_keywords"],
+                            "not_in_repo": row["not_in_repo"],
+                        }
+                    )
+                    + "\n"
+                )
         print(f"exported {len(accepted)} rows → {out_path}")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidates", type=Path, required=True)
-    parser.add_argument("--out", type=Path, default=None,
-                        help="export accepted rows in GroundingEvalRow schema")
+    parser.add_argument(
+        "--out", type=Path, default=None, help="export accepted rows in GroundingEvalRow schema"
+    )
     args = parser.parse_args()
     review(args.candidates, args.out)
     return 0

@@ -58,8 +58,11 @@ async def propose(repo: str, questions_path: Path, out_path: Path) -> None:
             candidates: list[dict[str, object]] = []
             if not not_in_repo:
                 hits = await vector_search(
-                    question, engine=ctx.engine, provider=ctx.provider,
-                    repo_id=repo_id, k=FETCH_K,
+                    question,
+                    engine=ctx.engine,
+                    provider=ctx.provider,
+                    repo_id=repo_id,
+                    k=FETCH_K,
                 )
                 hits = [h for h in hits if not _is_noise(h.ref.file_path)][:CANDIDATE_K]
                 candidates = [

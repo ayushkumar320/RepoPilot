@@ -101,7 +101,9 @@ class RetrievalEvalMetrics:
         return out
 
 
-def score_case(question: str, hits: list[ChunkHit], expected: list[CodeRef], ks: tuple[int, ...]) -> RetrievalCaseResult:
+def score_case(
+    question: str, hits: list[ChunkHit], expected: list[CodeRef], ks: tuple[int, ...]
+) -> RetrievalCaseResult:
     rels = relevance_vector([h.ref for h in hits], expected)
     n = len(expected)
     return RetrievalCaseResult(

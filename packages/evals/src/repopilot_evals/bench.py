@@ -42,14 +42,14 @@ def results_dir(phase: int) -> Path:
     return root / "evals" / "results" / f"rag_phase{phase}"
 
 
-async def bench_repo(repo: str, *, phase: int, skip_llm: bool, sample: int | None) -> dict[str, object]:
+async def bench_repo(
+    repo: str, *, phase: int, skip_llm: bool, sample: int | None
+) -> dict[str, object]:
     dataset = REPO_DATASETS[repo]
     print(f"[bench] phase {phase} · repo {repo} · dataset {dataset}")
 
     print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
-    retrieval = await run_retrieval_eval(
-        dataset_name=dataset, repo_slug=repo, sample_limit=sample
-    )
+    retrieval = await run_retrieval_eval(dataset_name=dataset, repo_slug=repo, sample_limit=sample)
     metrics: dict[str, object] = dict(retrieval.as_dict())
     metrics["per_question"] = {
         "recall@10": [c.recall[10] for c in retrieval.cases],
@@ -74,9 +74,7 @@ async def bench_repo(repo: str, *, phase: int, skip_llm: bool, sample: int | Non
             metrics["verifier_accuracy"] = verifier.accuracy
 
         print("[bench] latency p50/p95…")
-        latency = await run_latency_eval(
-            dataset_name=dataset, repo_slug=repo, sample_limit=sample
-        )
+        latency = await run_latency_eval(dataset_name=dataset, repo_slug=repo, sample_limit=sample)
         metrics.update(latency.as_dict())
         metrics.pop("total", None)
         metrics["total"] = retrieval.total
@@ -169,12 +167,24 @@ def main() -> int:
     path = write_repo_result(args.phase, args.repo, metrics)
     print(f"[bench] wrote {path}")
     for key in (
-        "recall@5", "recall@10", "recall@20", "ndcg@5", "ndcg@10", "mrr",
-        "grounding_accuracy", "hallucination_rate", "verifier_accuracy",
-        "latency_p50_ms", "latency_p95_ms",
+        "recall@5",
+        "recall@10",
+        "recall@20",
+        "ndcg@5",
+        "ndcg@10",
+        "mrr",
+        "grounding_accuracy",
+        "hallucination_rate",
+        "verifier_accuracy",
+        "latency_p50_ms",
+        "latency_p95_ms",
     ):
         if key in metrics:
-            print(f"  {key:<22} {metrics[key]:.4f}" if isinstance(metrics[key], float) else f"  {key:<22} {metrics[key]}")
+            print(
+                f"  {key:<22} {metrics[key]:.4f}"
+                if isinstance(metrics[key], float)
+                else f"  {key:<22} {metrics[key]}"
+            )
     return 0
 
 

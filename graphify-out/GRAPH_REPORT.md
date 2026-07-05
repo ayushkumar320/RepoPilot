@@ -1,16 +1,16 @@
 # Graph Report - CodebaseArchiologist  (2026-07-05)
 
 ## Corpus Check
-- 160 files · ~94,098 words
+- 160 files · ~94,123 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1663 nodes · 3592 edges · 129 communities (96 shown, 33 thin omitted)
+- 1663 nodes · 3592 edges · 128 communities (95 shown, 33 thin omitted)
 - Extraction: 75% EXTRACTED · 25% INFERRED · 0% AMBIGUOUS · INFERRED: 896 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8e7d0d62`
+- Built from commit: `04599b8d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -134,7 +134,6 @@
 - [[_COMMUNITY_Groq|Groq]]
 - [[_COMMUNITY_LangGraph|LangGraph]]
 - [[_COMMUNITY_Ollama|Ollama]]
-- [[_COMMUNITY_test_no_purpose_enum.py|test_no_purpose_enum.py]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `LLMProvider` - 100 edges
@@ -163,7 +162,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (129 total, 33 thin omitted)
+## Communities (128 total, 33 thin omitted)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.08
@@ -470,8 +469,8 @@ Cohesion: 0.32
 Nodes (7): build_opportunity_briefing(), IntentProfile, ranker_rationale(), Teacher-facing briefing helpers for Phase 5 opportunity cards., Attach the UI-visible Phase 5 briefing surfaces without reranking., Plain-English explanation of planner-derived ranker weights., test_briefing_surfaces_intent_match_and_rationale()
 
 ### Community 81 - "Community 81"
-Cohesion: 0.43
-Nodes (7): accept_row(), load(), main(), Terminal review loop for candidate eval labels (Phase 0, Option A).  Walks every, review(), save(), show_row()
+Cohesion: 0.24
+Nodes (10): accept_row(), load(), main(), Terminal review loop for candidate eval labels (Phase 0, Option A).  Walks every, review(), save(), show_row(), _iter_source_files() (+2 more)
 
 ### Community 82 - "Community 82"
 Cohesion: 0.16
@@ -509,10 +508,6 @@ Nodes (3): Constraints, Mandatory order of operations, What to return
 Cohesion: 0.20
 Nodes (7): ProviderName, Logical model identifiers and their physical-model resolution per provider.  Age, AsyncClient, Default wiring used by the app. Tests pass `clients` for full control., End-to-end with a real httpx client and respx mocks for the HTTP layer.      Thi, test_real_httpx_429_path(), Self
 
-### Community 132 - "test_no_purpose_enum.py"
-Cohesion: 0.67
-Nodes (3): _iter_source_files(), Hard CI rule: nothing in the source tree may branch on a ``purpose`` enum.  Phas, test_no_purpose_enum_in_source_tree()
-
 ## Knowledge Gaps
 - **274 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `type` (+269 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -525,7 +520,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.147) - this node is a cross-community bridge._
 - **Why does `Settings` connect `Community 10` to `Community 12`, `Community 13`, `Community 15`, `Community 18`, `Community 25`, `Community 26`, `Community 30`, `Community 32`, `Community 33`, `Community 36`, `Community 45`, `Community 50`, `Community 51`, `Community 53`, `Community 58`, `Community 76`, `Community 78`, `Community 84`, `Community 96`?**
   _High betweenness centrality (0.068) - this node is a cross-community bridge._
-- **Why does `Path` connect `Community 26` to `Community 33`, `test_no_purpose_enum.py`, `Community 69`, `Community 39`, `Community 71`, `Community 12`, `Community 77`, `Community 78`, `Community 13`, `Community 45`, `Community 81`, `Community 50`, `Community 85`, `Community 58`, `Community 60`, `Community 31`?**
+- **Why does `Path` connect `Community 26` to `Community 33`, `Community 69`, `Community 39`, `Community 71`, `Community 12`, `Community 77`, `Community 78`, `Community 13`, `Community 45`, `Community 81`, `Community 50`, `Community 85`, `Community 58`, `Community 60`, `Community 31`?**
   _High betweenness centrality (0.043) - this node is a cross-community bridge._
 - **Are the 70 inferred relationships involving `LLMProvider` (e.g. with `WorkerSettings` and `AppServices`) actually correct?**
   _`LLMProvider` has 70 INFERRED edges - model-reasoned connections that need verification._

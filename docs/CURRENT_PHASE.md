@@ -65,7 +65,7 @@ Although the product-build phase docs are removed, the **code** they produced is
 
 ## How to advance the phase
 
-1. Read [`RAG_PLAN.md`](RAG_PLAN.md), then the active phase's doc, then the day schedule in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md).
+1. Read [`RAG_PLAN.md`](RAG_PLAN.md), then the active phase's doc, then the day schedule in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md). To hand the phase to a coding agent, use the ready-made build prompt in [`docs/build/`](build/README.md).
 2. Implement; produce a measured `_after.json`.
 3. If the gate passes: update **this file** in the same commit (flip status, update "Last verified gate"). Run `/graph-update`.
 4. If the gate fails: stop. Either iterate within the same phase, or document the stop condition met in the phase doc and consult before advancing.

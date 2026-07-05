@@ -8,9 +8,10 @@ The product slice (clone → index → retrieve → answer → verify) ships end
 
 Read these in order if you're picking up cold:
 
-1. [`CURRENT_PHASE.md`](CURRENT_PHASE.md) — which phase is active, what's blocking it.
+1. [`CURRENT_PHASE.md`](CURRENT_PHASE.md) — which phase is active, what's blocking it. (Phase 0 🟢 done; Phase 1 🟡 active.)
 2. [`RAG_PLAN.md`](RAG_PLAN.md) — the 7-phase plan, measurement spine, Definition of Done.
-3. The active phase's doc in [`rag/`](rag/).
+3. [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md) — the 2-day schedule for shipping Phases 1–6.
+4. The active phase's spec doc in [`rag/`](rag/).
 
 ## Doc layout
 
@@ -23,7 +24,9 @@ docs/
 ├── 02_TECH_STACK.md                tech choices + rationale (still true)
 ├── 03_ARCHITECTURE.md              agents, state, tools, verifier (still true)
 └── rag/
-    ├── 00_BASELINE_AND_MEASUREMENT.md     measurement spine; must run first
+    ├── 00_BASELINE_AND_MEASUREMENT.md     measurement spine (🟢 done — baseline committed)
+    ├── 00_TODAY_PLAN.md                   the 2-day ship plan driving Phases 1–6
+    ├── RISKS.md                           cross-phase risk register
     ├── 01_RECALL_LIFT.md                  bigger pool + metadata filters
     ├── 02_QUERY_UNDERSTANDING.md          rewriting + multi-query + extraction
     ├── 03_HYBRID_RETRIEVAL_BM25.md        sparse + dense fusion
@@ -35,6 +38,8 @@ docs/
 ## What was removed
 
 The original product-build planning docs (`00_CLAUDE_BUILD_GUIDE.md`, `04_BUILD_PLAN.md`, `05_PHASE_PROMPTS.md`) are gone. They drove the build through Phases 0–5 of the product; that work shipped and they're no longer load-bearing. Git history retains them.
+
+`rag/00_EXECUTION_RUNBOOK.md` was removed on 2026-07-05 after RAG Phase 0 shipped — it was the step-by-step guide for a now-completed phase, and its plain-language twin (`00_TODAY_PLAN.md`) has been repurposed as the 2-day ship plan for Phases 1–6. Git history retains it.
 
 ## Per-doc summaries
 

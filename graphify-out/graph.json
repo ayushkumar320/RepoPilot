@@ -313,7 +313,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_models_qaanswerresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "qaanswerresponse"
     },
     {
@@ -323,7 +323,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_models_chunkpayload",
-      "community": 12,
+      "community": 10,
       "norm_label": "chunkpayload"
     },
     {
@@ -523,7 +523,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_reporecord",
-      "community": 32,
+      "community": 10,
       "norm_label": "reporecord"
     },
     {
@@ -583,7 +583,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_reposervice_enqueue",
-      "community": 32,
+      "community": 10,
       "norm_label": ".enqueue()"
     },
     {
@@ -593,7 +593,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_reposervice_get",
-      "community": 32,
+      "community": 10,
       "norm_label": ".get()"
     },
     {
@@ -743,7 +743,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_appservices",
-      "community": 30,
+      "community": 10,
       "norm_label": "appservices"
     },
     {
@@ -1233,7 +1233,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_fakereposervice",
-      "community": 32,
+      "community": 10,
       "norm_label": "fakereposervice"
     },
     {
@@ -1243,7 +1243,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_fakereposervice_init",
-      "community": 32,
+      "community": 10,
       "norm_label": ".__init__()"
     },
     {
@@ -1253,7 +1253,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_fakereposervice_enqueue",
-      "community": 32,
+      "community": 10,
       "norm_label": ".enqueue()"
     },
     {
@@ -1263,7 +1263,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_fakereposervice_get",
-      "community": 32,
+      "community": 10,
       "norm_label": ".get()"
     },
     {
@@ -1363,7 +1363,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_fakechunkservice",
-      "community": 12,
+      "community": 10,
       "norm_label": "fakechunkservice"
     },
     {
@@ -1393,7 +1393,7 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "apps_api_tests_test_phase4_contract_app_services",
-      "community": 32,
+      "community": 10,
       "norm_label": "app_services()"
     },
     {
@@ -2723,7 +2723,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "evals_tools_propose_labels",
-      "community": 92,
+      "community": 58,
       "norm_label": "propose_labels.py"
     },
     {
@@ -2733,7 +2733,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_is_noise",
-      "community": 92,
+      "community": 58,
       "norm_label": "_is_noise()"
     },
     {
@@ -2743,7 +2743,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_load_questions",
-      "community": 92,
+      "community": 58,
       "norm_label": "_load_questions()"
     },
     {
@@ -2753,7 +2753,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_propose",
-      "community": 92,
+      "community": 58,
       "norm_label": "propose()"
     },
     {
@@ -2763,7 +2763,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_main",
-      "community": 92,
+      "community": 58,
       "norm_label": "main()"
     },
     {
@@ -2773,7 +2773,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_rationale_1",
-      "community": 92,
+      "community": 58,
       "norm_label": "propose candidate labels for a qa eval dataset (phase 0, option a).  mechanical"
     },
     {
@@ -2926,7 +2926,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_extract_json_list",
-      "community": 27,
+      "community": 77,
       "norm_label": "extract_json_list()"
     },
     {
@@ -3016,7 +3016,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_rationale_24",
-      "community": 27,
+      "community": 77,
       "norm_label": "pull the first json array out of ``raw`` and return it as a list of     dicts. r"
     },
     {
@@ -3046,7 +3046,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer",
-      "community": 82,
+      "community": 38,
       "norm_label": "cartographer.py"
     },
     {
@@ -3056,7 +3056,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_fact_bundle",
-      "community": 82,
+      "community": 38,
       "norm_label": "_fact_bundle()"
     },
     {
@@ -3066,7 +3066,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_refs_for_symbols",
-      "community": 82,
+      "community": 38,
       "norm_label": "_refs_for_symbols()"
     },
     {
@@ -3076,7 +3076,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_py_coderef",
-      "community": 82,
+      "community": 38,
       "norm_label": "coderef"
     },
     {
@@ -3086,7 +3086,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_resolve_refs",
-      "community": 82,
+      "community": 38,
       "norm_label": "_resolve_refs()"
     },
     {
@@ -3096,7 +3096,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_py_asyncengine",
-      "community": 82,
+      "community": 38,
       "norm_label": "asyncengine"
     },
     {
@@ -3106,7 +3106,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_run_cartographer",
-      "community": 27,
+      "community": 38,
       "norm_label": "run_cartographer()"
     },
     {
@@ -3116,7 +3116,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_py_intentprofile",
-      "community": 27,
+      "community": 38,
       "norm_label": "intentprofile"
     },
     {
@@ -3126,7 +3126,7 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_build_fact_bundle_for_test",
-      "community": 82,
+      "community": 38,
       "norm_label": "_build_fact_bundle_for_test()"
     },
     {
@@ -3136,7 +3136,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_rationale_1",
-      "community": 82,
+      "community": 38,
       "norm_label": "cartographer \u2014 produces ``system_map`` insights from the call graph.  the cartog"
     },
     {
@@ -3146,7 +3146,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_rationale_61",
-      "community": 82,
+      "community": 38,
       "norm_label": "render the fact bundle as a compact text block.      we deliberately avoid prose"
     },
     {
@@ -3156,7 +3156,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_rationale_95",
-      "community": 82,
+      "community": 38,
       "norm_label": "resolve each symbol's coderef from graph_metrics's underlying lookup.      the m"
     },
     {
@@ -3166,7 +3166,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_cartographer_rationale_125",
-      "community": 27,
+      "community": 38,
       "norm_label": "run the cartographer once.      returns the state diff for the langgraph reducer"
     },
     {
@@ -3396,7 +3396,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing",
-      "community": 87,
+      "community": 80,
       "norm_label": "briefing.py"
     },
     {
@@ -3406,7 +3406,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_ranker_rationale",
-      "community": 87,
+      "community": 80,
       "norm_label": "ranker_rationale()"
     },
     {
@@ -3416,7 +3416,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_py_intentprofile",
-      "community": 87,
+      "community": 80,
       "norm_label": "intentprofile"
     },
     {
@@ -3426,7 +3426,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_build_opportunity_briefing",
-      "community": 87,
+      "community": 80,
       "norm_label": "build_opportunity_briefing()"
     },
     {
@@ -3436,7 +3436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_rationale_1",
-      "community": 87,
+      "community": 80,
       "norm_label": "teacher-facing briefing helpers for phase 5 opportunity cards."
     },
     {
@@ -3446,7 +3446,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_rationale_9",
-      "community": 87,
+      "community": 80,
       "norm_label": "plain-english explanation of planner-derived ranker weights."
     },
     {
@@ -3456,7 +3456,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_rationale_26",
-      "community": 87,
+      "community": 80,
       "norm_label": "attach the ui-visible phase 5 briefing surfaces without reranking."
     },
     {
@@ -3566,7 +3566,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality",
-      "community": 86,
+      "community": 68,
       "norm_label": "lane_b_quality.py"
     },
     {
@@ -3576,7 +3576,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_qualitycandidate",
-      "community": 86,
+      "community": 68,
       "norm_label": "qualitycandidate"
     },
     {
@@ -3586,7 +3586,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_difficulty",
-      "community": 86,
+      "community": 68,
       "norm_label": "_difficulty()"
     },
     {
@@ -3596,7 +3596,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_detect_quality_opportunities",
-      "community": 86,
+      "community": 68,
       "norm_label": "detect_quality_opportunities()"
     },
     {
@@ -3606,7 +3606,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_py_intentprofile",
-      "community": 86,
+      "community": 68,
       "norm_label": "intentprofile"
     },
     {
@@ -3616,7 +3616,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_run_lane_b_quality",
-      "community": 86,
+      "community": 68,
       "norm_label": "run_lane_b_quality()"
     },
     {
@@ -3626,7 +3626,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_rationale_1",
-      "community": 86,
+      "community": 68,
       "norm_label": "lane b \u2014 deterministic code-health opportunities."
     },
     {
@@ -3636,7 +3636,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_rationale_33",
-      "community": 86,
+      "community": 68,
       "norm_label": "transform deterministic detector hits into unified opportunities."
     },
     {
@@ -3646,7 +3646,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion",
-      "community": 62,
+      "community": 57,
       "norm_label": "lane_c_suspicion.py"
     },
     {
@@ -3656,7 +3656,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_lane_c_language_violation",
-      "community": 62,
+      "community": 57,
       "norm_label": "lane_c_language_violation()"
     },
     {
@@ -3666,7 +3666,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_matches_focus",
-      "community": 62,
+      "community": 57,
       "norm_label": "_matches_focus()"
     },
     {
@@ -3676,7 +3676,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_py_coderef",
-      "community": 62,
+      "community": 57,
       "norm_label": "coderef"
     },
     {
@@ -3686,7 +3686,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_py_intentprofile",
-      "community": 62,
+      "community": 57,
       "norm_label": "intentprofile"
     },
     {
@@ -3696,7 +3696,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_run_lane_c_suspicion",
-      "community": 62,
+      "community": 57,
       "norm_label": "run_lane_c_suspicion()"
     },
     {
@@ -3706,7 +3706,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_rationale_1",
-      "community": 62,
+      "community": 57,
       "norm_label": "lane c \u2014 guarded structural suspicions."
     },
     {
@@ -3716,7 +3716,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_rationale_16",
-      "community": 62,
+      "community": 57,
       "norm_label": "return the banned phrase when lane c language is too certain."
     },
     {
@@ -3726,7 +3726,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_c_suspicion_rationale_34",
-      "community": 62,
+      "community": 57,
       "norm_label": "build guarded suspicion opportunities from deterministic candidates.      phase"
     },
     {
@@ -3736,7 +3736,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker",
-      "community": 24,
+      "community": 62,
       "norm_label": "ranker.py"
     },
     {
@@ -3746,7 +3746,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_lane_weight",
-      "community": 24,
+      "community": 62,
       "norm_label": "_lane_weight()"
     },
     {
@@ -3756,7 +3756,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_opportunity_score",
-      "community": 24,
+      "community": 62,
       "norm_label": "opportunity_score()"
     },
     {
@@ -3766,7 +3766,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_rank_opportunities",
-      "community": 24,
+      "community": 62,
       "norm_label": "rank_opportunities()"
     },
     {
@@ -3776,7 +3776,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_rationale_1",
-      "community": 24,
+      "community": 62,
       "norm_label": "deterministic phase 5 opportunity ranker."
     },
     {
@@ -3786,7 +3786,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_rationale_21",
-      "community": 24,
+      "community": 62,
       "norm_label": "compute a deterministic weighted score for one opportunity."
     },
     {
@@ -3796,7 +3796,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_ranker_rationale_33",
-      "community": 24,
+      "community": 62,
       "norm_label": "return opportunities in stable best-first order. no llm reranking."
     },
     {
@@ -3816,7 +3816,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_graph_intent_profiler_node",
-      "community": 74,
+      "community": 15,
       "norm_label": "_intent_profiler_node()"
     },
     {
@@ -3826,7 +3826,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_graph_py_intentprofile",
-      "community": 74,
+      "community": 15,
       "norm_label": "intentprofile"
     },
     {
@@ -3996,7 +3996,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_graph_rationale_59",
-      "community": 74,
+      "community": 15,
       "norm_label": "if the state already carries a confirmed profile (the chip strip     case), skip"
     },
     {
@@ -4216,7 +4216,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler",
-      "community": 57,
+      "community": 64,
       "norm_label": "profiler.py"
     },
     {
@@ -4226,7 +4226,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_parse_json",
-      "community": 57,
+      "community": 64,
       "norm_label": "_parse_json()"
     },
     {
@@ -4236,7 +4236,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_py_any",
-      "community": 57,
+      "community": 64,
       "norm_label": "any"
     },
     {
@@ -4246,7 +4246,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_coerce_modality_weights",
-      "community": 57,
+      "community": 64,
       "norm_label": "_coerce_modality_weights()"
     },
     {
@@ -4256,7 +4256,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_coerce_keywords",
-      "community": 57,
+      "community": 64,
       "norm_label": "_coerce_keywords()"
     },
     {
@@ -4266,7 +4266,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_coerce_output_shape",
-      "community": 57,
+      "community": 64,
       "norm_label": "_coerce_output_shape()"
     },
     {
@@ -4276,7 +4276,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_py_outputshape",
-      "community": 57,
+      "community": 64,
       "norm_label": "outputshape"
     },
     {
@@ -4286,7 +4286,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_coerce_optional_str",
-      "community": 57,
+      "community": 64,
       "norm_label": "_coerce_optional_str()"
     },
     {
@@ -4296,7 +4296,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_fallback_profile",
-      "community": 57,
+      "community": 64,
       "norm_label": "_fallback_profile()"
     },
     {
@@ -4306,7 +4306,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_py_intentprofile",
-      "community": 57,
+      "community": 64,
       "norm_label": "intentprofile"
     },
     {
@@ -4316,7 +4316,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_profile_intent",
-      "community": 16,
+      "community": 15,
       "norm_label": "profile_intent()"
     },
     {
@@ -4326,7 +4326,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_rationale_1",
-      "community": 57,
+      "community": 64,
       "norm_label": "intent profiler \u2014 free-text intent \u2192 structured ``intentprofile``.  the profiler"
     },
     {
@@ -4336,7 +4336,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_rationale_73",
-      "community": 57,
+      "community": 64,
       "norm_label": "drop unknown modality keys; coerce values into the unit interval.      drift-tol"
     },
     {
@@ -4346,7 +4346,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_rationale_120",
-      "community": 57,
+      "community": 64,
       "norm_label": "the minimal-but-valid profile used when the llm fails us.      matches the \"inte"
     },
     {
@@ -4356,7 +4356,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_profiler_rationale_135",
-      "community": 16,
+      "community": 15,
       "norm_label": "run the profiler once on ``raw_text``.      returns a draft ``intentprofile``. t"
     },
     {
@@ -4756,7 +4756,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state",
-      "community": 48,
+      "community": 86,
       "norm_label": "state.py"
     },
     {
@@ -4796,7 +4796,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_insight",
-      "community": 48,
+      "community": 75,
       "norm_label": "insight"
     },
     {
@@ -4806,7 +4806,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rejecteditem",
-      "community": 82,
+      "community": 86,
       "norm_label": "rejecteditem"
     },
     {
@@ -4816,7 +4816,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_opportunity",
-      "community": 24,
+      "community": 62,
       "norm_label": "opportunity"
     },
     {
@@ -4826,7 +4826,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_opportunity_lane_c_requires_confirm",
-      "community": 24,
+      "community": 62,
       "norm_label": "._lane_c_requires_confirm()"
     },
     {
@@ -4836,7 +4836,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_toursection",
-      "community": 68,
+      "community": 27,
       "norm_label": "toursection"
     },
     {
@@ -4846,7 +4846,7 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_archaeologisterror",
-      "community": 48,
+      "community": 86,
       "norm_label": "archaeologisterror"
     },
     {
@@ -4856,7 +4856,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_verifierobjection",
-      "community": 48,
+      "community": 12,
       "norm_label": "verifierobjection"
     },
     {
@@ -4896,7 +4896,7 @@
       "source_location": "L195",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_capabilityplan",
-      "community": 80,
+      "community": 75,
       "norm_label": "capabilityplan"
     },
     {
@@ -4906,7 +4906,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_capabilityplan_deps_subset_of_active",
-      "community": 80,
+      "community": 75,
       "norm_label": "._deps_subset_of_active()"
     },
     {
@@ -4916,7 +4916,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_py_capabilityname",
-      "community": 80,
+      "community": 75,
       "norm_label": "capabilityname"
     },
     {
@@ -4926,7 +4926,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "validationinfo",
-      "community": 80,
+      "community": 75,
       "norm_label": "validationinfo"
     },
     {
@@ -4956,7 +4956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_1",
-      "community": 48,
+      "community": 86,
       "norm_label": "``archaeologiststate`` and the pydantic v2 schema it composes.  this is the phas"
     },
     {
@@ -4976,7 +4976,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_65",
-      "community": 48,
+      "community": 75,
       "norm_label": "iteration-2 output shape \u2014 no stat dumps reach the teacher."
     },
     {
@@ -4986,7 +4986,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_81",
-      "community": 82,
+      "community": 86,
       "norm_label": "a lane a candidate shown for transparency after being ranked down."
     },
     {
@@ -4996,7 +4996,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_89",
-      "community": 24,
+      "community": 62,
       "norm_label": "one unified shape across all scanner lanes."
     },
     {
@@ -5006,7 +5006,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_130",
-      "community": 48,
+      "community": 86,
       "norm_label": "every fail-edge in the graph emits one of these."
     },
     {
@@ -5026,7 +5026,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_rationale_196",
-      "community": 80,
+      "community": 75,
       "norm_label": "deterministic planner output. verifiable in ci."
     },
     {
@@ -5076,7 +5076,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency",
-      "community": 64,
+      "community": 54,
       "norm_label": "_adjacency.py"
     },
     {
@@ -5086,7 +5086,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_load_graph",
-      "community": 64,
+      "community": 54,
       "norm_label": "load_graph()"
     },
     {
@@ -5096,7 +5096,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_py_asyncengine",
-      "community": 64,
+      "community": 54,
       "norm_label": "asyncengine"
     },
     {
@@ -5106,7 +5106,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_py_digraph",
-      "community": 64,
+      "community": 54,
       "norm_label": "digraph"
     },
     {
@@ -5116,7 +5116,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_invalidate",
-      "community": 64,
+      "community": 54,
       "norm_label": "invalidate()"
     },
     {
@@ -5126,7 +5126,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_reset_cache",
-      "community": 64,
+      "community": 54,
       "norm_label": "reset_cache()"
     },
     {
@@ -5136,7 +5136,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_rationale_1",
-      "community": 64,
+      "community": 54,
       "norm_label": "shared loader/cache for the per-repo networkx graph.  per phase 2 decision **d5*"
     },
     {
@@ -5146,7 +5146,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_rationale_28",
-      "community": 64,
+      "community": 54,
       "norm_label": "return the cached networkx graph for ``repo_id``; build it on miss."
     },
     {
@@ -5156,7 +5156,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_rationale_65",
-      "community": 64,
+      "community": 54,
       "norm_label": "drop the cached graph for ``repo_id``. call when re-indexing."
     },
     {
@@ -5166,7 +5166,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_adjacency_rationale_70",
-      "community": 64,
+      "community": 54,
       "norm_label": "test helper \u2014 clear all cached graphs."
     },
     {
@@ -5236,7 +5236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics",
-      "community": 64,
+      "community": 54,
       "norm_label": "graph_metrics.py"
     },
     {
@@ -5246,7 +5246,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_graph_metrics",
-      "community": 64,
+      "community": 54,
       "norm_label": "graph_metrics()"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_py_asyncengine",
-      "community": 64,
+      "community": 54,
       "norm_label": "asyncengine"
     },
     {
@@ -5266,7 +5266,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_chunk_content",
-      "community": 64,
+      "community": 54,
       "norm_label": "_chunk_content()"
     },
     {
@@ -5276,7 +5276,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_cyclomatic",
-      "community": 64,
+      "community": 54,
       "norm_label": "_cyclomatic()"
     },
     {
@@ -5286,7 +5286,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_has_tests",
-      "community": 64,
+      "community": 54,
       "norm_label": "_has_tests()"
     },
     {
@@ -5296,7 +5296,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_rationale_1",
-      "community": 64,
+      "community": 54,
       "norm_label": "``graph_metrics`` \u2014 per-symbol metric pack used by cartographer, lanes a/b/c.  f"
     },
     {
@@ -5306,7 +5306,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_rationale_33",
-      "community": 64,
+      "community": 54,
       "norm_label": "return the metric pack for ``symbol``. missing symbol \u2192 zeroed pack."
     },
     {
@@ -5316,7 +5316,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_rationale_71",
-      "community": 64,
+      "community": 54,
       "norm_label": "mccabe complexity over a chunk: 1 + #(branch nodes).      branch nodes are ``if`"
     },
     {
@@ -5326,7 +5326,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_metrics_rationale_96",
-      "community": 64,
+      "community": 54,
       "norm_label": "cheap heuristic: does any chunk in a test file mention this symbol?"
     },
     {
@@ -5336,7 +5336,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query",
-      "community": 82,
+      "community": 35,
       "norm_label": "graph_query.py"
     },
     {
@@ -5346,7 +5346,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_graph_query",
-      "community": 82,
+      "community": 35,
       "norm_label": "graph_query()"
     },
     {
@@ -5356,7 +5356,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "querykind",
-      "community": 82,
+      "community": 35,
       "norm_label": "querykind"
     },
     {
@@ -5366,7 +5366,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_py_asyncengine",
-      "community": 82,
+      "community": 35,
       "norm_label": "asyncengine"
     },
     {
@@ -5376,7 +5376,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_call_subgraph",
-      "community": 82,
+      "community": 35,
       "norm_label": "_call_subgraph()"
     },
     {
@@ -5386,7 +5386,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "community": 82,
+      "community": 35,
       "norm_label": "digraph"
     },
     {
@@ -5396,7 +5396,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_entry_points",
-      "community": 82,
+      "community": 35,
       "norm_label": "_entry_points()"
     },
     {
@@ -5406,7 +5406,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_hubs",
-      "community": 82,
+      "community": 35,
       "norm_label": "_hubs()"
     },
     {
@@ -5416,7 +5416,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_layers",
-      "community": 82,
+      "community": 35,
       "norm_label": "_layers()"
     },
     {
@@ -5426,7 +5426,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_neighbours",
-      "community": 82,
+      "community": 35,
       "norm_label": "_neighbours()"
     },
     {
@@ -5436,7 +5436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_rationale_1",
-      "community": 82,
+      "community": 35,
       "norm_label": "``graph_query`` \u2014 structural queries against the per-repo networkx graph.  five"
     },
     {
@@ -5446,7 +5446,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_rationale_43",
-      "community": 82,
+      "community": 35,
       "norm_label": "run one of the five structural queries against the cached graph."
     },
     {
@@ -5586,7 +5586,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_vector_search",
-      "community": 102,
+      "community": 25,
       "norm_label": "vector_search.py"
     },
     {
@@ -5596,7 +5596,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_vector_search_vector_search",
-      "community": 102,
+      "community": 25,
       "norm_label": "vector_search()"
     },
     {
@@ -5606,7 +5606,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_vector_search_py_asyncengine",
-      "community": 102,
+      "community": 25,
       "norm_label": "asyncengine"
     },
     {
@@ -5616,7 +5616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_vector_search_rationale_1",
-      "community": 102,
+      "community": 25,
       "norm_label": "``vector_search`` \u2014 pgvector cosine k-nn over indexed chunks.  embeds the query"
     },
     {
@@ -5626,7 +5626,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_vector_search_rationale_36",
-      "community": 102,
+      "community": 25,
       "norm_label": "return the top-``k`` chunks for ``query`` in ``repo_id``."
     },
     {
@@ -5676,7 +5676,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_types_chunkhit",
-      "community": 102,
+      "community": 25,
       "norm_label": "chunkhit"
     },
     {
@@ -5716,7 +5716,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_types_graphqueryresult",
-      "community": 82,
+      "community": 35,
       "norm_label": "graphqueryresult"
     },
     {
@@ -5756,7 +5756,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_types_rationale_47",
-      "community": 102,
+      "community": 25,
       "norm_label": "result of ``vector_search``: a chunk with retrieval metadata."
     },
     {
@@ -5786,7 +5786,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_types_rationale_78",
-      "community": 82,
+      "community": 35,
       "norm_label": "result of ``graph_query``: one row of an entry-points / hubs / layers query."
     },
     {
@@ -6126,7 +6126,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_actionabilityverdict",
-      "community": 67,
+      "community": 12,
       "norm_label": "actionabilityverdict"
     },
     {
@@ -6136,7 +6136,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_parse_actionability",
-      "community": 67,
+      "community": 34,
       "norm_label": "_parse_actionability()"
     },
     {
@@ -6596,7 +6596,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_stubresponse",
-      "community": 93,
+      "community": 27,
       "norm_label": "_stubresponse"
     },
     {
@@ -6606,7 +6606,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_stubresponse_total_tokens",
-      "community": 93,
+      "community": 27,
       "norm_label": ".total_tokens()"
     },
     {
@@ -6636,7 +6636,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_scriptedprovider_generate",
-      "community": 93,
+      "community": 27,
       "norm_label": ".generate()"
     },
     {
@@ -6646,7 +6646,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_py_any",
-      "community": 93,
+      "community": 27,
       "norm_label": "any"
     },
     {
@@ -6686,7 +6686,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_test_extract_json_list_handles_code_fences",
-      "community": 27,
+      "community": 77,
       "norm_label": "test_extract_json_list_handles_code_fences()"
     },
     {
@@ -6696,7 +6696,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_test_extract_json_list_returns_empty_on_garbage",
-      "community": 27,
+      "community": 77,
       "norm_label": "test_extract_json_list_returns_empty_on_garbage()"
     },
     {
@@ -6706,7 +6706,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_test_extract_json_list_drops_non_dict_entries",
-      "community": 27,
+      "community": 77,
       "norm_label": "test_extract_json_list_drops_non_dict_entries()"
     },
     {
@@ -6896,7 +6896,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute",
-      "community": 35,
+      "community": 57,
       "norm_label": "test_contribute.py"
     },
     {
@@ -6906,7 +6906,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_ref",
-      "community": 35,
+      "community": 57,
       "norm_label": "_ref()"
     },
     {
@@ -6916,7 +6916,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_py_coderef",
-      "community": 35,
+      "community": 57,
       "norm_label": "coderef"
     },
     {
@@ -6926,7 +6926,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_profile",
-      "community": 35,
+      "community": 57,
       "norm_label": "_profile()"
     },
     {
@@ -6936,7 +6936,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_py_intentprofile",
-      "community": 35,
+      "community": 57,
       "norm_label": "intentprofile"
     },
     {
@@ -6946,7 +6946,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_metrics",
-      "community": 35,
+      "community": 82,
       "norm_label": "_metrics()"
     },
     {
@@ -6956,7 +6956,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_opp",
-      "community": 35,
+      "community": 62,
       "norm_label": "_opp()"
     },
     {
@@ -6966,7 +6966,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_lane_c_banned_vocabulary_rejected",
-      "community": 62,
+      "community": 57,
       "norm_label": "test_lane_c_banned_vocabulary_rejected()"
     },
     {
@@ -6976,7 +6976,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_lane_c_outputs_guarded_confirm_steps",
-      "community": 35,
+      "community": 57,
       "norm_label": "test_lane_c_outputs_guarded_confirm_steps()"
     },
     {
@@ -6986,7 +6986,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_lane_a_approachability_uses_graph_not_labels",
-      "community": 35,
+      "community": 82,
       "norm_label": "test_lane_a_approachability_uses_graph_not_labels()"
     },
     {
@@ -6996,7 +6996,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_lane_b_dead_code_excludes_entry_points",
-      "community": 35,
+      "community": 68,
       "norm_label": "test_lane_b_dead_code_excludes_entry_points()"
     },
     {
@@ -7006,7 +7006,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_ranker_deterministic",
-      "community": 35,
+      "community": 62,
       "norm_label": "test_ranker_deterministic()"
     },
     {
@@ -7016,7 +7016,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_ranker_respects_planner_weights",
-      "community": 35,
+      "community": 62,
       "norm_label": "test_ranker_respects_planner_weights()"
     },
     {
@@ -7026,7 +7026,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_test_briefing_surfaces_intent_match_and_rationale",
-      "community": 35,
+      "community": 80,
       "norm_label": "test_briefing_surfaces_intent_match_and_rationale()"
     },
     {
@@ -7036,7 +7036,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_contribute_rationale_1",
-      "community": 35,
+      "community": 57,
       "norm_label": "phase 5 contribute-mode unit tests."
     },
     {
@@ -7166,7 +7166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_graph_query.py"
     },
     {
@@ -7176,7 +7176,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_prime_cache",
-      "community": 82,
+      "community": 35,
       "norm_label": "_prime_cache()"
     },
     {
@@ -7186,7 +7186,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_entry_points",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_entry_points()"
     },
     {
@@ -7196,7 +7196,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_hubs_ranked_by_fan_in",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_hubs_ranked_by_fan_in()"
     },
     {
@@ -7206,7 +7206,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_callers_of_c",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_callers_of_c()"
     },
     {
@@ -7216,7 +7216,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_callees_of_a",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_callees_of_a()"
     },
     {
@@ -7226,7 +7226,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_callers_requires_symbol",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_callers_requires_symbol()"
     },
     {
@@ -7236,7 +7236,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_test_layers_returns_one_row_per_node",
-      "community": 82,
+      "community": 35,
       "norm_label": "test_layers_returns_one_row_per_node()"
     },
     {
@@ -7246,7 +7246,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_query_rationale_1",
-      "community": 82,
+      "community": 35,
       "norm_label": "tests for ``graph_query``: entry points, hubs, callers/callees, layers.  exercis"
     },
     {
@@ -7256,7 +7256,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_graph_wiring.py"
     },
     {
@@ -7266,7 +7266,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_stubresponse",
-      "community": 68,
+      "community": 74,
       "norm_label": "_stubresponse"
     },
     {
@@ -7276,7 +7276,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_stubresponse_total_tokens",
-      "community": 68,
+      "community": 74,
       "norm_label": ".total_tokens()"
     },
     {
@@ -7286,7 +7286,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_nullprovider",
-      "community": 68,
+      "community": 74,
       "norm_label": "_nullprovider"
     },
     {
@@ -7296,7 +7296,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_nullprovider_generate",
-      "community": 68,
+      "community": 74,
       "norm_label": ".generate()"
     },
     {
@@ -7306,7 +7306,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_any",
-      "community": 68,
+      "community": 74,
       "norm_label": "any"
     },
     {
@@ -7316,7 +7316,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_fake_engine",
-      "community": 68,
+      "community": 74,
       "norm_label": "fake_engine()"
     },
     {
@@ -7326,7 +7326,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_ref",
-      "community": 68,
+      "community": 74,
       "norm_label": "_ref()"
     },
     {
@@ -7336,7 +7336,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_coderef",
-      "community": 68,
+      "community": 74,
       "norm_label": "coderef"
     },
     {
@@ -7346,7 +7346,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_insight",
-      "community": 68,
+      "community": 74,
       "norm_label": "_insight()"
     },
     {
@@ -7356,7 +7356,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_section",
-      "community": 68,
+      "community": 74,
       "norm_label": "_section()"
     },
     {
@@ -7366,7 +7366,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_toursection",
-      "community": 68,
+      "community": 74,
       "norm_label": "toursection"
     },
     {
@@ -7376,7 +7376,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_opportunity",
-      "community": 68,
+      "community": 74,
       "norm_label": "_opportunity()"
     },
     {
@@ -7386,7 +7386,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_recursion_limit_is_pinned_at_fifteen",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_recursion_limit_is_pinned_at_fifteen()"
     },
     {
@@ -7396,7 +7396,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_full_graph_runs_intent_then_cartographer_then_teacher",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_full_graph_runs_intent_then_cartographer_then_teacher()"
     },
     {
@@ -7406,7 +7406,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_monkeypatch",
-      "community": 68,
+      "community": 74,
       "norm_label": "monkeypatch"
     },
     {
@@ -7416,7 +7416,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_graph_runs_profiler_and_planner_for_cold_start",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_graph_runs_profiler_and_planner_for_cold_start()"
     },
     {
@@ -7426,7 +7426,7 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_router_skips_flow_tracer_when_not_active",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_router_skips_flow_tracer_when_not_active()"
     },
     {
@@ -7436,7 +7436,7 @@
       "source_location": "L237",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_build_graph_accepts_checkpointer",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_build_graph_accepts_checkpointer()"
     },
     {
@@ -7446,7 +7446,7 @@
       "source_location": "L253",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_contribute_lanes_converge_on_ranker_then_teacher",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_contribute_lanes_converge_on_ranker_then_teacher()"
     },
     {
@@ -7456,7 +7456,7 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_test_answer_question_is_re_exported",
-      "community": 68,
+      "community": 74,
       "norm_label": "test_answer_question_is_re_exported()"
     },
     {
@@ -7466,7 +7466,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_rationale_1",
-      "community": 68,
+      "community": 74,
       "norm_label": "end-to-end langgraph wiring tests.  mock the per-node bodies so the graph runs i"
     },
     {
@@ -7476,7 +7476,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_rationale_107",
-      "community": 68,
+      "community": 74,
       "norm_label": "confirmed-profile path: profile + plan are already set, so the     profiler is a"
     },
     {
@@ -7486,7 +7486,7 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_rationale_159",
-      "community": 68,
+      "community": 74,
       "norm_label": "cold-start path: no profile, no plan. the profiler must run, the     planner mus"
     },
     {
@@ -7496,7 +7496,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_rationale_238",
-      "community": 68,
+      "community": 74,
       "norm_label": "smoke test for the checkpointer plumbing \u2014 pass memorysaver and     confirm comp"
     },
     {
@@ -7506,7 +7506,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_intent_profiler.py"
     },
     {
@@ -7516,7 +7516,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_stubresponse",
-      "community": 16,
+      "community": 15,
       "norm_label": "stubresponse"
     },
     {
@@ -7526,7 +7526,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_stubresponse_total_tokens",
-      "community": 16,
+      "community": 15,
       "norm_label": ".total_tokens()"
     },
     {
@@ -7536,7 +7536,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_fakeprovider",
-      "community": 16,
+      "community": 15,
       "norm_label": "fakeprovider"
     },
     {
@@ -7546,7 +7546,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_fakeprovider_init",
-      "community": 16,
+      "community": 15,
       "norm_label": ".__init__()"
     },
     {
@@ -7556,7 +7556,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_fakeprovider_generate",
-      "community": 16,
+      "community": 15,
       "norm_label": ".generate()"
     },
     {
@@ -7566,7 +7566,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_py_any",
-      "community": 16,
+      "community": 15,
       "norm_label": "any"
     },
     {
@@ -7576,7 +7576,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_parses_a_clean_response",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_parses_a_clean_response()"
     },
     {
@@ -7586,7 +7586,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_drops_unknown_modality_keys",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_drops_unknown_modality_keys()"
     },
     {
@@ -7596,7 +7596,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_coerces_unknown_output_shape_to_unspecified",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_coerces_unknown_output_shape_to_unspecified()"
     },
     {
@@ -7606,7 +7606,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_falls_back_on_unparseable_response",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_falls_back_on_unparseable_response()"
     },
     {
@@ -7616,7 +7616,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_extracts_json_embedded_in_prose",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_extracts_json_embedded_in_prose()"
     },
     {
@@ -7626,7 +7626,7 @@
       "source_location": "L131",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_lowercases_and_trims_keywords",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_lowercases_and_trims_keywords()"
     },
     {
@@ -7636,7 +7636,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_caps_keywords_at_six",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_caps_keywords_at_six()"
     },
     {
@@ -7646,7 +7646,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_rejects_empty_input",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_rejects_empty_input()"
     },
     {
@@ -7656,7 +7656,7 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_test_profiler_preserves_raw_text_verbatim",
-      "community": 16,
+      "community": 15,
       "norm_label": "test_profiler_preserves_raw_text_verbatim()"
     },
     {
@@ -7666,7 +7666,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_rationale_1",
-      "community": 16,
+      "community": 15,
       "norm_label": "unit tests for the intent profiler.  the end-to-end accuracy gate (\u2265 90% per fie"
     },
     {
@@ -7676,7 +7676,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_agents_tests_test_intent_profiler_rationale_32",
-      "community": 16,
+      "community": 15,
       "norm_label": "minimal llmprovider double \u2014 queues canned responses."
     },
     {
@@ -8176,7 +8176,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "packages_agents_tests_test_state_test_plan_rejects_dependency_on_inactive_capability",
-      "community": 80,
+      "community": 75,
       "norm_label": "test_plan_rejects_dependency_on_inactive_capability()"
     },
     {
@@ -8186,7 +8186,7 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "packages_agents_tests_test_state_test_plan_rejects_dependency_for_inactive_capability",
-      "community": 80,
+      "community": 75,
       "norm_label": "test_plan_rejects_dependency_for_inactive_capability()"
     },
     {
@@ -8196,7 +8196,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "packages_agents_tests_test_state_test_plan_requires_at_least_one_active_capability",
-      "community": 80,
+      "community": 75,
       "norm_label": "test_plan_requires_at_least_one_active_capability()"
     },
     {
@@ -8206,7 +8206,7 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "packages_agents_tests_test_state_test_plan_accepts_valid_dependencies",
-      "community": 80,
+      "community": 75,
       "norm_label": "test_plan_accepts_valid_dependencies()"
     },
     {
@@ -8226,7 +8226,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "packages_agents_tests_test_state_test_state_accepts_full_intent_layer",
-      "community": 80,
+      "community": 75,
       "norm_label": "test_state_accepts_full_intent_layer()"
     },
     {
@@ -8486,7 +8486,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_verifier_loop.py"
     },
     {
@@ -8496,7 +8496,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_ref",
-      "community": 67,
+      "community": 34,
       "norm_label": "_ref()"
     },
     {
@@ -8506,7 +8506,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_py_coderef",
-      "community": 67,
+      "community": 34,
       "norm_label": "coderef"
     },
     {
@@ -8516,7 +8516,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_claim",
-      "community": 67,
+      "community": 34,
       "norm_label": "_claim()"
     },
     {
@@ -8526,7 +8526,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_section",
-      "community": 67,
+      "community": 34,
       "norm_label": "_section()"
     },
     {
@@ -8536,7 +8536,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_py_toursection",
-      "community": 67,
+      "community": 34,
       "norm_label": "toursection"
     },
     {
@@ -8546,7 +8546,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_stubresponse",
-      "community": 67,
+      "community": 12,
       "norm_label": "_stubresponse"
     },
     {
@@ -8556,7 +8556,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_stubresponse_total_tokens",
-      "community": 67,
+      "community": 12,
       "norm_label": ".total_tokens()"
     },
     {
@@ -8566,7 +8566,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_scriptedprovider",
-      "community": 67,
+      "community": 34,
       "norm_label": "_scriptedprovider"
     },
     {
@@ -8576,7 +8576,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_scriptedprovider_init",
-      "community": 67,
+      "community": 34,
       "norm_label": ".__init__()"
     },
     {
@@ -8586,7 +8586,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_scriptedprovider_generate",
-      "community": 67,
+      "community": 34,
       "norm_label": ".generate()"
     },
     {
@@ -8596,7 +8596,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_py_any",
-      "community": 67,
+      "community": 34,
       "norm_label": "any"
     },
     {
@@ -8606,7 +8606,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_patch_read_chunks",
-      "community": 67,
+      "community": 87,
       "norm_label": "_patch_read_chunks()"
     },
     {
@@ -8616,7 +8616,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_py_monkeypatch",
-      "community": 67,
+      "community": 87,
       "norm_label": "monkeypatch"
     },
     {
@@ -8626,7 +8626,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_engine",
-      "community": 67,
+      "community": 34,
       "norm_label": "engine()"
     },
     {
@@ -8636,7 +8636,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_parse_actionability_accepts_clean_json",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_parse_actionability_accepts_clean_json()"
     },
     {
@@ -8646,7 +8646,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_parse_actionability_returns_none_on_garbage",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_parse_actionability_returns_none_on_garbage()"
     },
     {
@@ -8656,7 +8656,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_parse_actionability_returns_none_on_invalid_verdict",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_parse_actionability_returns_none_on_invalid_verdict()"
     },
     {
@@ -8666,7 +8666,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_parse_actionability_extracts_json_from_prose",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_parse_actionability_extracts_json_from_prose()"
     },
     {
@@ -8676,7 +8676,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_verify_section_passes_when_grounded_and_actionable",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_verify_section_passes_when_grounded_and_actionable()"
     },
     {
@@ -8686,7 +8686,7 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_verify_section_rejects_ungrounded_and_skips_actionability",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_verify_section_rejects_ungrounded_and_skips_actionability()"
     },
     {
@@ -8696,7 +8696,7 @@
       "source_location": "L179",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_verify_section_rejects_off_goal_claim",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_verify_section_rejects_off_goal_claim()"
     },
     {
@@ -8716,7 +8716,7 @@
       "source_location": "L220",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_retries_then_flags_when_source_cannot_recover",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_retries_then_flags_when_source_cannot_recover()"
     },
     {
@@ -8736,7 +8736,7 @@
       "source_location": "L298",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_no_retry_callback_flags_immediately",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_no_retry_callback_flags_immediately()"
     },
     {
@@ -8746,7 +8746,7 @@
       "source_location": "L325",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_actionability_parse_fail_marks_not_actionable",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_actionability_parse_fail_marks_not_actionable()"
     },
     {
@@ -8756,7 +8756,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_actionability_verdict_model_round_trip",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_actionability_verdict_model_round_trip()"
     },
     {
@@ -8766,7 +8766,7 @@
       "source_location": "L348",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_test_loop_module_re_exports_retries_constant",
-      "community": 67,
+      "community": 34,
       "norm_label": "test_loop_module_re_exports_retries_constant()"
     },
     {
@@ -8776,7 +8776,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_rationale_1",
-      "community": 67,
+      "community": 34,
       "norm_label": "verifier-loop tests: actionability rubric + retry budget + flagging.  the ground"
     },
     {
@@ -8786,7 +8786,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_rationale_58",
-      "community": 67,
+      "community": 34,
       "norm_label": "queues responses keyed on which prompt is being graded.      the verifier loop i"
     },
     {
@@ -8796,7 +8796,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "packages_agents_tests_test_verifier_loop_rationale_88",
-      "community": 67,
+      "community": 87,
       "norm_label": "bypass db-backed ``read_chunks`` \u2014 grounding loops over them but     the bodies"
     },
     {
@@ -8819,7 +8819,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_init",
-      "community": 33,
+      "community": 45,
       "norm_label": "__init__.py"
     },
     {
@@ -8829,7 +8829,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_init_rationale_1",
-      "community": 33,
+      "community": 45,
       "norm_label": "shared core: settings, logging, and the llmprovider abstraction."
     },
     {
@@ -8859,7 +8859,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_models",
-      "community": 50,
+      "community": 96,
       "norm_label": "models.py"
     },
     {
@@ -8869,7 +8869,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_models_providername",
-      "community": 50,
+      "community": 96,
       "norm_label": "providername"
     },
     {
@@ -8909,7 +8909,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_models_rationale_1",
-      "community": 50,
+      "community": 96,
       "norm_label": "logical model identifiers and their physical-model resolution per provider.  age"
     },
     {
@@ -8949,7 +8949,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_providererror",
-      "community": 50,
+      "community": 45,
       "norm_label": "providererror"
     },
     {
@@ -8999,7 +8999,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_llmresponse",
-      "community": 76,
+      "community": 50,
       "norm_label": "llmresponse"
     },
     {
@@ -9009,7 +9009,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_llmresponse_total_tokens",
-      "community": 76,
+      "community": 50,
       "norm_label": ".total_tokens()"
     },
     {
@@ -9139,7 +9139,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_backoff_delay",
-      "community": 133,
+      "community": 76,
       "norm_label": "_backoff_delay()"
     },
     {
@@ -9269,7 +9269,7 @@
       "source_location": "L370",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_llmprovider",
-      "community": 16,
+      "community": 15,
       "norm_label": "llmprovider"
     },
     {
@@ -9299,7 +9299,7 @@
       "source_location": "L434",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_llmprovider_aclose",
-      "community": 16,
+      "community": 15,
       "norm_label": ".aclose()"
     },
     {
@@ -9349,7 +9349,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_rationale_55",
-      "community": 50,
+      "community": 45,
       "norm_label": "all providers in the fallback chain failed."
     },
     {
@@ -9369,7 +9369,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_rationale_73",
-      "community": 76,
+      "community": 50,
       "norm_label": "provider-agnostic response shape."
     },
     {
@@ -9399,7 +9399,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_rationale_236",
-      "community": 133,
+      "community": 76,
       "norm_label": "exponential backoff with full jitter. attempt=0 is the first retry."
     },
     {
@@ -9439,7 +9439,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_rationale_371",
-      "community": 16,
+      "community": 15,
       "norm_label": "single entrypoint to every llm call in the system."
     },
     {
@@ -9569,7 +9569,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings",
-      "community": 33,
+      "community": 45,
       "norm_label": "settings.py"
     },
     {
@@ -9579,7 +9579,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_find_repo_env",
-      "community": 33,
+      "community": 26,
       "norm_label": "_find_repo_env()"
     },
     {
@@ -9589,7 +9589,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_split_csv",
-      "community": 33,
+      "community": 45,
       "norm_label": "_split_csv()"
     },
     {
@@ -9599,7 +9599,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_settings",
-      "community": 32,
+      "community": 10,
       "norm_label": "settings"
     },
     {
@@ -9609,7 +9609,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "basesettings",
-      "community": 32,
+      "community": 10,
       "norm_label": "basesettings"
     },
     {
@@ -9619,7 +9619,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_settings_coerce_web_origins",
-      "community": 33,
+      "community": 45,
       "norm_label": "._coerce_web_origins()"
     },
     {
@@ -9639,7 +9639,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_rationale_1",
-      "community": 33,
+      "community": 45,
       "norm_label": "application settings, loaded from environment / `.env` via pydantic-settings."
     },
     {
@@ -9649,7 +9649,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_rationale_14",
-      "community": 33,
+      "community": 26,
       "norm_label": "walk up from this file to the repo root and return the ``.env`` path.      lets"
     },
     {
@@ -9659,7 +9659,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_rationale_30",
-      "community": 33,
+      "community": 45,
       "norm_label": "parse a comma-separated env var into a cleaned list."
     },
     {
@@ -9669,7 +9669,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_settings_rationale_35",
-      "community": 32,
+      "community": 10,
       "norm_label": "single source of runtime configuration."
     },
     {
@@ -9739,7 +9739,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_fakeclient_init",
-      "community": 50,
+      "community": 96,
       "norm_label": ".__init__()"
     },
     {
@@ -9749,7 +9749,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_fakeclient_chat",
-      "community": 76,
+      "community": 50,
       "norm_label": ".chat()"
     },
     {
@@ -10009,7 +10009,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "packages_core_tests_test_llm_provider_test_backoff_delay_is_bounded",
-      "community": 133,
+      "community": 76,
       "norm_label": "test_backoff_delay_is_bounded()"
     },
     {
@@ -10069,7 +10069,7 @@
       "source_location": "L243",
       "_origin": "ast",
       "id": "packages_core_tests_test_llm_provider_test_real_httpx_429_path",
-      "community": 18,
+      "community": 96,
       "norm_label": "test_real_httpx_429_path()"
     },
     {
@@ -10109,7 +10109,7 @@
       "source_location": "L244",
       "_origin": "ast",
       "id": "packages_core_tests_test_llm_provider_rationale_244",
-      "community": 18,
+      "community": 96,
       "norm_label": "end-to-end with a real httpx client and respx mocks for the http layer.      thi"
     },
     {
@@ -10202,7 +10202,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_main_grounding_markdown",
-      "community": 53,
+      "community": 59,
       "norm_label": "_grounding_markdown()"
     },
     {
@@ -10512,7 +10512,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_datasets_load_verifier_dataset",
-      "community": 26,
+      "community": 78,
       "norm_label": "load_verifier_dataset()"
     },
     {
@@ -10542,7 +10542,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_datasets_take_rows",
-      "community": 58,
+      "community": 51,
       "norm_label": "take_rows()"
     },
     {
@@ -10552,7 +10552,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "t",
-      "community": 58,
+      "community": 51,
       "norm_label": "t"
     },
     {
@@ -10632,7 +10632,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_registry_evalspec_dataset_path",
-      "community": 59,
+      "community": 26,
       "norm_label": ".dataset_path()"
     },
     {
@@ -10772,7 +10772,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_init",
-      "community": 46,
+      "community": 53,
       "norm_label": "__init__.py"
     },
     {
@@ -10782,7 +10782,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_init_rationale_1",
-      "community": 46,
+      "community": 53,
       "norm_label": "eval runners for the phase gates."
     },
     {
@@ -11072,7 +11072,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_latency_run_latency_eval",
-      "community": 58,
+      "community": 51,
       "norm_label": "run_latency_eval()"
     },
     {
@@ -11102,7 +11102,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval",
-      "community": 38,
+      "community": 25,
       "norm_label": "retrieval.py"
     },
     {
@@ -11142,7 +11142,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_recall_at_k",
-      "community": 38,
+      "community": 25,
       "norm_label": "recall_at_k()"
     },
     {
@@ -11152,7 +11152,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_ndcg_at_k",
-      "community": 38,
+      "community": 25,
       "norm_label": "ndcg_at_k()"
     },
     {
@@ -11162,7 +11162,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_mrr",
-      "community": 38,
+      "community": 25,
       "norm_label": "mrr()"
     },
     {
@@ -11172,7 +11172,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalcaseresult",
-      "community": 38,
+      "community": 25,
       "norm_label": "retrievalcaseresult"
     },
     {
@@ -11182,7 +11182,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalevalmetrics",
-      "community": 88,
+      "community": 25,
       "norm_label": "retrievalevalmetrics"
     },
     {
@@ -11192,7 +11192,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalevalmetrics_mean_recall",
-      "community": 88,
+      "community": 25,
       "norm_label": ".mean_recall()"
     },
     {
@@ -11202,7 +11202,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalevalmetrics_mean_ndcg",
-      "community": 88,
+      "community": 25,
       "norm_label": ".mean_ndcg()"
     },
     {
@@ -11212,7 +11212,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalevalmetrics_mean_mrr",
-      "community": 88,
+      "community": 25,
       "norm_label": ".mean_mrr()"
     },
     {
@@ -11222,7 +11222,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_retrievalevalmetrics_as_dict",
-      "community": 88,
+      "community": 25,
       "norm_label": ".as_dict()"
     },
     {
@@ -11232,7 +11232,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_score_case",
-      "community": 38,
+      "community": 25,
       "norm_label": "score_case()"
     },
     {
@@ -11242,7 +11242,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_run_retrieval_eval",
-      "community": 38,
+      "community": 25,
       "norm_label": "run_retrieval_eval()"
     },
     {
@@ -11252,7 +11252,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_rationale_1",
-      "community": 38,
+      "community": 25,
       "norm_label": "pure-retrieval metrics: recall@k, ndcg@k, mrr over a labeled qa dataset.  runs t"
     },
     {
@@ -11532,7 +11532,7 @@
       "source_location": "L218",
       "_origin": "ast",
       "id": "packages_evals_tests_test_eval_runners_dummyprovider",
-      "community": 53,
+      "community": 69,
       "norm_label": "_dummyprovider"
     },
     {
@@ -11542,7 +11542,7 @@
       "source_location": "L219",
       "_origin": "ast",
       "id": "packages_evals_tests_test_eval_runners_dummyprovider_aclose",
-      "community": 53,
+      "community": 69,
       "norm_label": ".aclose()"
     },
     {
@@ -11552,7 +11552,7 @@
       "source_location": "L223",
       "_origin": "ast",
       "id": "packages_evals_tests_test_eval_runners_dummyengine",
-      "community": 53,
+      "community": 69,
       "norm_label": "_dummyengine"
     },
     {
@@ -11562,7 +11562,7 @@
       "source_location": "L224",
       "_origin": "ast",
       "id": "packages_evals_tests_test_eval_runners_dummyengine_dispose",
-      "community": 53,
+      "community": 69,
       "norm_label": ".dispose()"
     },
     {
@@ -11582,7 +11582,7 @@
       "source_location": "L229",
       "_origin": "ast",
       "id": "packages_evals_tests_test_eval_runners_dummycontext_init",
-      "community": 53,
+      "community": 69,
       "norm_label": ".__init__()"
     },
     {
@@ -11742,7 +11742,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics",
-      "community": 38,
+      "community": 25,
       "norm_label": "testmetrics"
     },
     {
@@ -11752,7 +11752,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_perfect_recall",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_perfect_recall()"
     },
     {
@@ -11762,7 +11762,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_partial_recall",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_partial_recall()"
     },
     {
@@ -11772,7 +11772,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_no_expected_is_perfect",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_no_expected_is_perfect()"
     },
     {
@@ -11782,7 +11782,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_ndcg_ideal_ranking_is_one",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_ndcg_ideal_ranking_is_one()"
     },
     {
@@ -11792,7 +11792,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_ndcg_penalizes_low_positions",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_ndcg_penalizes_low_positions()"
     },
     {
@@ -11802,7 +11802,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testmetrics_test_mrr_first_hit_position",
-      "community": 38,
+      "community": 25,
       "norm_label": ".test_mrr_first_hit_position()"
     },
     {
@@ -11812,7 +11812,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testscorecase",
-      "community": 102,
+      "community": 25,
       "norm_label": "testscorecase"
     },
     {
@@ -11822,7 +11822,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "packages_evals_tests_test_retrieval_metrics_testscorecase_test_end_to_end",
-      "community": 102,
+      "community": 25,
       "norm_label": ".test_end_to_end()"
     },
     {
@@ -11965,7 +11965,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_chunk_chunk",
-      "community": 34,
+      "community": 45,
       "norm_label": "chunk"
     },
     {
@@ -12045,7 +12045,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_chunk_rationale_29",
-      "community": 34,
+      "community": 45,
       "norm_label": "one indexable unit of source. line numbers are 1-based, inclusive."
     },
     {
@@ -12205,7 +12205,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_db",
-      "community": 65,
+      "community": 45,
       "norm_label": "db.py"
     },
     {
@@ -12245,7 +12245,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_db_rationale_1",
-      "community": 65,
+      "community": 45,
       "norm_label": "sqlalchemy schema for phase 1 ingestion.  tables:     repos              one row"
     },
     {
@@ -12415,7 +12415,7 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver",
-      "community": 64,
+      "community": 54,
       "norm_label": "_resolver"
     },
     {
@@ -12425,7 +12425,7 @@
       "source_location": "L164",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_init",
-      "community": 64,
+      "community": 54,
       "norm_label": ".__init__()"
     },
     {
@@ -12435,7 +12435,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_current_qual",
-      "community": 64,
+      "community": 54,
       "norm_label": ".current_qual()"
     },
     {
@@ -12445,7 +12445,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_in_method",
-      "community": 64,
+      "community": 54,
       "norm_label": ".in_method()"
     },
     {
@@ -12455,7 +12455,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_import",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_import()"
     },
     {
@@ -12465,7 +12465,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "import",
-      "community": 64,
+      "community": 54,
       "norm_label": "import"
     },
     {
@@ -12475,7 +12475,7 @@
       "source_location": "L192",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_importfrom",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_importfrom()"
     },
     {
@@ -12485,7 +12485,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "importfrom",
-      "community": 64,
+      "community": 54,
       "norm_label": "importfrom"
     },
     {
@@ -12495,7 +12495,7 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_classdef",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_classdef()"
     },
     {
@@ -12505,7 +12505,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "classdef",
-      "community": 64,
+      "community": 54,
       "norm_label": "classdef"
     },
     {
@@ -12515,7 +12515,7 @@
       "source_location": "L225",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_functiondef",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_functiondef()"
     },
     {
@@ -12525,7 +12525,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "functiondef",
-      "community": 64,
+      "community": 54,
       "norm_label": "functiondef"
     },
     {
@@ -12535,7 +12535,7 @@
       "source_location": "L228",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_asyncfunctiondef",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_asyncfunctiondef()"
     },
     {
@@ -12545,7 +12545,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "asyncfunctiondef",
-      "community": 64,
+      "community": 54,
       "norm_label": "asyncfunctiondef"
     },
     {
@@ -12555,7 +12555,7 @@
       "source_location": "L231",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_function_like",
-      "community": 64,
+      "community": 54,
       "norm_label": "._visit_function_like()"
     },
     {
@@ -12565,7 +12565,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_visit_call",
-      "community": 64,
+      "community": 54,
       "norm_label": ".visit_call()"
     },
     {
@@ -12575,7 +12575,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "call",
-      "community": 64,
+      "community": 54,
       "norm_label": "call"
     },
     {
@@ -12585,7 +12585,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_resolve_name",
-      "community": 64,
+      "community": 54,
       "norm_label": "._resolve_name()"
     },
     {
@@ -12595,7 +12595,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "ast",
-      "community": 64,
+      "community": 54,
       "norm_label": "ast"
     },
     {
@@ -12605,7 +12605,7 @@
       "source_location": "L269",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_resolver_resolve_call",
-      "community": 64,
+      "community": 54,
       "norm_label": "._resolve_call()"
     },
     {
@@ -12655,7 +12655,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_rationale_153",
-      "community": 64,
+      "community": 54,
       "norm_label": "walk one module and emit edges into typed lists.      scope tracking is minimal"
     },
     {
@@ -12665,7 +12665,7 @@
       "source_location": "L253",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_graph_rationale_253",
-      "community": 64,
+      "community": 54,
       "norm_label": "resolve an ``ast.name`` or ``ast.attribute`` to a dotted qualified name."
     },
     {
@@ -12685,7 +12685,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_migrations_env",
-      "community": 65,
+      "community": 45,
       "norm_label": "env.py"
     },
     {
@@ -12695,7 +12695,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_migrations_env_run_migrations_offline",
-      "community": 65,
+      "community": 45,
       "norm_label": "run_migrations_offline()"
     },
     {
@@ -12705,7 +12705,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_migrations_env_run_migrations_online",
-      "community": 65,
+      "community": 45,
       "norm_label": "run_migrations_online()"
     },
     {
@@ -12715,7 +12715,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_migrations_env_rationale_1",
-      "community": 65,
+      "community": 45,
       "norm_label": "alembic environment \u2014 uses settings.postgres_dsn so dev + ci agree."
     },
     {
@@ -12765,7 +12765,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse",
-      "community": 31,
+      "community": 16,
       "norm_label": "parse.py"
     },
     {
@@ -12775,7 +12775,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_importedge",
-      "community": 31,
+      "community": 16,
       "norm_label": "importedge"
     },
     {
@@ -12785,7 +12785,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_parsedsymbol",
-      "community": 31,
+      "community": 16,
       "norm_label": "parsedsymbol"
     },
     {
@@ -12815,7 +12815,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_text",
-      "community": 31,
+      "community": 16,
       "norm_label": "_text()"
     },
     {
@@ -12825,7 +12825,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "node",
-      "community": 31,
+      "community": 16,
       "norm_label": "node"
     },
     {
@@ -12835,7 +12835,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_line_span",
-      "community": 31,
+      "community": 16,
       "norm_label": "_line_span()"
     },
     {
@@ -12845,7 +12845,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_extract_imports",
-      "community": 31,
+      "community": 16,
       "norm_label": "_extract_imports()"
     },
     {
@@ -12855,7 +12855,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_walk_dotted_aliases",
-      "community": 31,
+      "community": 16,
       "norm_label": "_walk_dotted_aliases()"
     },
     {
@@ -12865,7 +12865,7 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_parse_from_import",
-      "community": 31,
+      "community": 16,
       "norm_label": "_parse_from_import()"
     },
     {
@@ -12875,7 +12875,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_extract_symbols",
-      "community": 31,
+      "community": 16,
       "norm_label": "_extract_symbols()"
     },
     {
@@ -12885,7 +12885,7 @@
       "source_location": "L223",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_iter_block_children",
-      "community": 31,
+      "community": 16,
       "norm_label": "_iter_block_children()"
     },
     {
@@ -12895,7 +12895,7 @@
       "source_location": "L239",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_strip_decorator",
-      "community": 31,
+      "community": 16,
       "norm_label": "_strip_decorator()"
     },
     {
@@ -12905,7 +12905,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_first_docstring",
-      "community": 31,
+      "community": 16,
       "norm_label": "_first_docstring()"
     },
     {
@@ -12915,7 +12915,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_class_base_names",
-      "community": 31,
+      "community": 16,
       "norm_label": "_class_base_names()"
     },
     {
@@ -12925,7 +12925,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_class_method_names",
-      "community": 31,
+      "community": 16,
       "norm_label": "_class_method_names()"
     },
     {
@@ -12935,7 +12935,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_1",
-      "community": 31,
+      "community": 16,
       "norm_label": "tree-sitter parser \u2192 typed ``parsedfile`` with function/class spans.  phase 1 on"
     },
     {
@@ -12945,7 +12945,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_34",
-      "community": 31,
+      "community": 16,
       "norm_label": "one ``import`` or ``from ... import ...`` line.      ``module`` is the dotted module"
     },
     {
@@ -12955,7 +12955,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_47",
-      "community": 31,
+      "community": 16,
       "norm_label": "a function, class, or method definition with exact line spans (1-based)."
     },
     {
@@ -12965,7 +12965,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_97",
-      "community": 31,
+      "community": 16,
       "norm_label": "convert tree-sitter's 0-based rows to inclusive 1-based line numbers."
     },
     {
@@ -12975,7 +12975,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_116",
-      "community": 31,
+      "community": 16,
       "norm_label": "yield ``(dotted_module, alias_or_none)`` pairs from an ``import`` node."
     },
     {
@@ -12985,7 +12985,7 @@
       "source_location": "L224",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_224",
-      "community": 31,
+      "community": 16,
       "norm_label": "iterate the statements of a module or a class/function body block.      for modu"
     },
     {
@@ -12995,7 +12995,7 @@
       "source_location": "L240",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_parse_rationale_240",
-      "community": 31,
+      "community": 16,
       "norm_label": "return the underlying ``function_definition`` from a (possibly decorated) node."
     },
     {
@@ -13215,7 +13215,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary",
-      "community": 34,
+      "community": 45,
       "norm_label": "summary.py"
     },
     {
@@ -13225,7 +13225,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_summarisedchunk",
-      "community": 34,
+      "community": 45,
       "norm_label": "summarisedchunk"
     },
     {
@@ -13235,7 +13235,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_prompt",
-      "community": 34,
+      "community": 45,
       "norm_label": "_prompt()"
     },
     {
@@ -13245,7 +13245,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_summarise_chunks",
-      "community": 34,
+      "community": 45,
       "norm_label": "summarise_chunks()"
     },
     {
@@ -13255,7 +13255,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_rationale_1",
-      "community": 34,
+      "community": 45,
       "norm_label": "chunk summaries via ``llama-3.1-8b-instant`` (modelid.code_health).  cached at t"
     },
     {
@@ -13265,7 +13265,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_rationale_54",
-      "community": 34,
+      "community": 45,
       "norm_label": "summarise every chunk concurrently, bounded by the configured semaphore.      in"
     },
     {
@@ -13835,7 +13835,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary",
-      "community": 34,
+      "community": 45,
       "norm_label": "test_summary.py"
     },
     {
@@ -13845,7 +13845,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_failingprovider",
-      "community": 34,
+      "community": 45,
       "norm_label": "failingprovider"
     },
     {
@@ -13855,7 +13855,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_failingprovider_init",
-      "community": 34,
+      "community": 45,
       "norm_label": ".__init__()"
     },
     {
@@ -13865,7 +13865,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_failingprovider_generate",
-      "community": 34,
+      "community": 45,
       "norm_label": ".generate()"
     },
     {
@@ -13875,7 +13875,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_py_any",
-      "community": 34,
+      "community": 45,
       "norm_label": "any"
     },
     {
@@ -13885,7 +13885,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_chunk",
-      "community": 34,
+      "community": 45,
       "norm_label": "_chunk()"
     },
     {
@@ -13895,7 +13895,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_test_summarise_chunks_opens_circuit_after_provider_failure",
-      "community": 34,
+      "community": 45,
       "norm_label": "test_summarise_chunks_opens_circuit_after_provider_failure()"
     },
     {
@@ -15045,27 +15045,27 @@
       "label": "RAG phase ladder",
       "file_type": "document",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L31",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "docs_current_phase_rag_phase_ladder",
       "community": 22,
       "norm_label": "rag phase ladder"
     },
     {
-      "label": "RAG Phase 0 \u2014 entry checklist",
+      "label": "RAG Phase 1 \u2014 entry state",
       "file_type": "document",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L47",
+      "source_location": "L39",
       "_origin": "ast",
-      "id": "docs_current_phase_rag_phase_0_entry_checklist",
+      "id": "docs_current_phase_rag_phase_1_entry_state",
       "community": 22,
-      "norm_label": "rag phase 0 \u2014 entry checklist"
+      "norm_label": "rag phase 1 \u2014 entry state"
     },
     {
       "label": "What's still load-bearing from the previous product build",
       "file_type": "document",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L60",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "docs_current_phase_what_s_still_load_bearing_from_the_previous_product_build",
       "community": 22,
@@ -15075,7 +15075,7 @@
       "label": "How to advance the phase",
       "file_type": "document",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L77",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "docs_current_phase_how_to_advance_the_phase",
       "community": 22,
@@ -15235,7 +15235,7 @@
       "label": "Doc layout",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L15",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "docs_readme_doc_layout",
       "community": 17,
@@ -15245,7 +15245,7 @@
       "label": "What was removed",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L35",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "docs_readme_what_was_removed",
       "community": 17,
@@ -15255,7 +15255,7 @@
       "label": "Per-doc summaries",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L39",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "docs_readme_per_doc_summaries",
       "community": 17,
@@ -15265,7 +15265,7 @@
       "label": "01 \u2014 Problem and Solution",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L41",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "docs_readme_01_problem_and_solution",
       "community": 17,
@@ -15275,7 +15275,7 @@
       "label": "02 \u2014 Tech Stack",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L45",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "docs_readme_02_tech_stack",
       "community": 17,
@@ -15285,7 +15285,7 @@
       "label": "03 \u2014 Architecture",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L49",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "docs_readme_03_architecture",
       "community": 17,
@@ -15295,7 +15295,7 @@
       "label": "RAG_PLAN",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L53",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "docs_readme_rag_plan",
       "community": 17,
@@ -15305,7 +15305,7 @@
       "label": "rag/00\u201306",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L57",
+      "source_location": "L62",
       "_origin": "ast",
       "id": "docs_readme_rag_00_06",
       "community": 17,
@@ -15315,7 +15315,7 @@
       "label": "One-paragraph takeaway",
       "file_type": "document",
       "source_file": "docs/README.md",
-      "source_location": "L61",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "docs_readme_one_paragraph_takeaway",
       "community": 17,
@@ -15422,254 +15422,14 @@
       "norm_label": "open questions to resolve before starting"
     },
     {
-      "label": "00_EXECUTION_RUNBOOK.md",
+      "label": "As-built record (Phase 0 closed 2026-07-04)",
       "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L1",
+      "source_file": "docs/rag/00_BASELINE_AND_MEASUREMENT.md",
+      "source_location": "L120",
       "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook",
-      "community": 21,
-      "norm_label": "00_execution_runbook.md"
-    },
-    {
-      "label": "RAG Phase 0 \u2014 Execution Runbook",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "community": 15,
-      "norm_label": "rag phase 0 \u2014 execution runbook"
-    },
-    {
-      "label": "Pre-flight (do this once, ~10 min)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L12",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_pre_flight_do_this_once_10_min",
-      "community": 15,
-      "norm_label": "pre-flight (do this once, ~10 min)"
-    },
-    {
-      "label": "Stage 1 \u2014 Index the three repos (~15 min wall clock, mostly waiting)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L27",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_1_index_the_three_repos_15_min_wall_clock_mostly_waiting",
-      "community": 15,
-      "norm_label": "stage 1 \u2014 index the three repos (~15 min wall clock, mostly waiting)"
-    },
-    {
-      "label": "Stage 2 \u2014 Propose candidate labels (~2 min, I generate, you wait)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L79",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_2_propose_candidate_labels_2_min_i_generate_you_wait",
-      "community": 15,
-      "norm_label": "stage 2 \u2014 propose candidate labels (~2 min, i generate, you wait)"
-    },
-    {
-      "label": "Stage 3 \u2014 Review labels in the TUI (~75 min \u2014 the focused-work part)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L102",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "community": 15,
-      "norm_label": "stage 3 \u2014 review labels in the tui (~75 min \u2014 the focused-work part)"
-    },
-    {
-      "label": "The decision rules",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L125",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_the_decision_rules",
-      "community": 15,
-      "norm_label": "the decision rules"
-    },
-    {
-      "label": "Pacing guide",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L136",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_pacing_guide",
-      "community": 15,
-      "norm_label": "pacing guide"
-    },
-    {
-      "label": "Adversarial rows (~15 min)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L151",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_adversarial_rows_15_min",
-      "community": 15,
-      "norm_label": "adversarial rows (~15 min)"
-    },
-    {
-      "label": "Repeat for the other two",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L174",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_repeat_for_the_other_two",
-      "community": 15,
-      "norm_label": "repeat for the other two"
-    },
-    {
-      "label": "Stage 4 \u2014 Run the bench (~30 min wall clock, mostly waiting)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L192",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_4_run_the_bench_30_min_wall_clock_mostly_waiting",
-      "community": 15,
-      "norm_label": "stage 4 \u2014 run the bench (~30 min wall clock, mostly waiting)"
-    },
-    {
-      "label": "What `bench.py` does per row",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L222",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_what_bench_py_does_per_row",
-      "community": 15,
-      "norm_label": "what `bench.py` does per row"
-    },
-    {
-      "label": "Quota safety",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L239",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_quota_safety",
-      "community": 15,
-      "norm_label": "quota safety"
-    },
-    {
-      "label": "Quota estimate",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L245",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_quota_estimate",
-      "community": 15,
-      "norm_label": "quota estimate"
-    },
-    {
-      "label": "Stage 5 \u2014 Spot-check + audit (~30 min)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L253",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_5_spot_check_audit_30_min",
-      "community": 15,
-      "norm_label": "stage 5 \u2014 spot-check + audit (~30 min)"
-    },
-    {
-      "label": "5a. Read the baseline file",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L257",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_5a_read_the_baseline_file",
-      "community": 15,
-      "norm_label": "5a. read the baseline file"
-    },
-    {
-      "label": "5b. Audit the existing 16-row `httpx_qa_v1.jsonl`",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L289",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_5b_audit_the_existing_16_row_httpx_qa_v1_jsonl",
-      "community": 15,
-      "norm_label": "5b. audit the existing 16-row `httpx_qa_v1.jsonl`"
-    },
-    {
-      "label": "Stage 6 \u2014 Commit the baseline (~5 min)",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L312",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_stage_6_commit_the_baseline_5_min",
-      "community": 15,
-      "norm_label": "stage 6 \u2014 commit the baseline (~5 min)"
-    },
-    {
-      "label": "Troubleshooting",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L343",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_troubleshooting",
-      "community": 15,
-      "norm_label": "troubleshooting"
-    },
-    {
-      "label": "\"Worker crashed mid-indexing\"",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L345",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_worker_crashed_mid_indexing",
-      "community": 15,
-      "norm_label": "\"worker crashed mid-indexing\""
-    },
-    {
-      "label": "\"Bench keeps stalling on Groq 429\"",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L349",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_bench_keeps_stalling_on_groq_429",
-      "community": 15,
-      "norm_label": "\"bench keeps stalling on groq 429\""
-    },
-    {
-      "label": "\"TUI is too slow \u2014 I want to just edit JSONL by hand\"",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L353",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_tui_is_too_slow_i_want_to_just_edit_jsonl_by_hand",
-      "community": 15,
-      "norm_label": "\"tui is too slow \u2014 i want to just edit jsonl by hand\""
-    },
-    {
-      "label": "\"I want to skip flask + fastapi for now\"",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L357",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_i_want_to_skip_flask_fastapi_for_now",
-      "community": 15,
-      "norm_label": "\"i want to skip flask + fastapi for now\""
-    },
-    {
-      "label": "\"What if my numbers are way worse than the docs suggested?\"",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L361",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_what_if_my_numbers_are_way_worse_than_the_docs_suggested",
-      "community": 15,
-      "norm_label": "\"what if my numbers are way worse than the docs suggested?\""
-    },
-    {
-      "label": "After Phase 0",
-      "file_type": "document",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L367",
-      "_origin": "ast",
-      "id": "docs_rag_00_execution_runbook_after_phase_0",
-      "community": 15,
-      "norm_label": "after phase 0"
+      "id": "docs_rag_00_baseline_and_measurement_as_built_record_phase_0_closed_2026_07_04",
+      "community": 73,
+      "norm_label": "as-built record (phase 0 closed 2026-07-04)"
     },
     {
       "label": "00_TODAY_PLAN.md",
@@ -15682,104 +15442,154 @@
       "norm_label": "00_today_plan.md"
     },
     {
-      "label": "Finish Phase 0 Today \u2014 The Simple Plan",
+      "label": "Ship the RAG Upgrade in 2 Days \u2014 The Plan",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "community": 54,
-      "norm_label": "finish phase 0 today \u2014 the simple plan"
+      "id": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "community": 24,
+      "norm_label": "ship the rag upgrade in 2 days \u2014 the plan"
     },
     {
-      "label": "The day at a glance",
+      "label": "Where we actually are (verified 2026-07-05)",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L9",
+      "source_location": "L13",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_the_day_at_a_glance",
-      "community": 54,
-      "norm_label": "the day at a glance"
+      "id": "docs_rag_00_today_plan_where_we_actually_are_verified_2026_07_05",
+      "community": 24,
+      "norm_label": "where we actually are (verified 2026-07-05)"
     },
     {
-      "label": "Step 1 \u2014 Start the machines (10 min)",
+      "label": "Day 1 \u2014 Close the books, then recall",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L24",
+      "source_location": "L26",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_1_start_the_machines_10_min",
-      "community": 54,
-      "norm_label": "step 1 \u2014 start the machines (10 min)"
+      "id": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
+      "community": 24,
+      "norm_label": "day 1 \u2014 close the books, then recall"
     },
     {
-      "label": "Step 2 \u2014 Feed it the 3 repos (15 min)",
+      "label": "D1.1 \u2014 Close Phase 0 (30 min)",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L45",
+      "source_location": "L28",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_2_feed_it_the_3_repos_15_min",
-      "community": 54,
-      "norm_label": "step 2 \u2014 feed it the 3 repos (15 min)"
+      "id": "docs_rag_00_today_plan_d1_1_close_phase_0_30_min",
+      "community": 24,
+      "norm_label": "d1.1 \u2014 close phase 0 (30 min)"
     },
     {
-      "label": "Step 3 \u2014 Generate the answer-key drafts (2 min)",
+      "label": "D1.2 \u2014 Phase 1: Recall Lift (~3 h) \u2014 **must ship**",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d1_2_phase_1_recall_lift_3_h_must_ship",
+      "community": 24,
+      "norm_label": "d1.2 \u2014 phase 1: recall lift (~3 h) \u2014 **must ship**"
+    },
+    {
+      "label": "D1.3 \u2014 Phase 2: Query Understanding (timebox **2 h**, cut line 18:00) \u2014 polish",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d1_3_phase_2_query_understanding_timebox_2_h_cut_line_18_00_polish",
+      "community": 24,
+      "norm_label": "d1.3 \u2014 phase 2: query understanding (timebox **2 h**, cut line 18:00) \u2014 polish"
+    },
+    {
+      "label": "D1.4 \u2014 Phase 3: BM25 Hybrid (start today, finish by D2 morning) \u2014 **must ship**",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d1_4_phase_3_bm25_hybrid_start_today_finish_by_d2_morning_must_ship",
+      "community": 24,
+      "norm_label": "d1.4 \u2014 phase 3: bm25 hybrid (start today, finish by d2 morning) \u2014 **must ship**"
+    },
+    {
+      "label": "Day 2 \u2014 Precision, then ship",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "community": 24,
+      "norm_label": "day 2 \u2014 precision, then ship"
+    },
+    {
+      "label": "D2.1 \u2014 Phase 3 finish (~2 h) \u2014 **must ship**",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d2_1_phase_3_finish_2_h_must_ship",
+      "community": 24,
+      "norm_label": "d2.1 \u2014 phase 3 finish (~2 h) \u2014 **must ship**"
+    },
+    {
+      "label": "D2.2 \u2014 Phase 4: Reranking (~3 h) \u2014 **must ship**",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d2_2_phase_4_reranking_3_h_must_ship",
+      "community": 24,
+      "norm_label": "d2.2 \u2014 phase 4: reranking (~3 h) \u2014 **must ship**"
+    },
+    {
+      "label": "D2.3 \u2014 Phase 5: Context Compression (timebox **90 min**) \u2014 polish",
+      "file_type": "document",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "docs_rag_00_today_plan_d2_3_phase_5_context_compression_timebox_90_min_polish",
+      "community": 24,
+      "norm_label": "d2.3 \u2014 phase 5: context compression (timebox **90 min**) \u2014 polish"
+    },
+    {
+      "label": "D2.4 \u2014 Phase 6: Ingestion Enrichment (timebox **90 min**, incl. re-index wait) \u2014 polish",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
       "source_location": "L64",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_3_generate_the_answer_key_drafts_2_min",
-      "community": 54,
-      "norm_label": "step 3 \u2014 generate the answer-key drafts (2 min)"
+      "id": "docs_rag_00_today_plan_d2_4_phase_6_ingestion_enrichment_timebox_90_min_incl_re_index_wait_polish",
+      "community": 24,
+      "norm_label": "d2.4 \u2014 phase 6: ingestion enrichment (timebox **90 min**, incl. re-index wait) \u2014 polish"
     },
     {
-      "label": "Step 4 \u2014 Grade the answer keys (~75 min, the real work)",
+      "label": "D2.5 \u2014 Ship (~1 h, non-negotiable \u2014 steal from 5/6 if needed)",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L82",
+      "source_location": "L67",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_4_grade_the_answer_keys_75_min_the_real_work",
-      "community": 54,
-      "norm_label": "step 4 \u2014 grade the answer keys (~75 min, the real work)"
+      "id": "docs_rag_00_today_plan_d2_5_ship_1_h_non_negotiable_steal_from_5_6_if_needed",
+      "community": 24,
+      "norm_label": "d2.5 \u2014 ship (~1 h, non-negotiable \u2014 steal from 5/6 if needed)"
     },
     {
-      "label": "Step 5 \u2014 Run the exam (30 min, mostly waiting)",
+      "label": "Standing rules for both days",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L110",
+      "source_location": "L79",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_5_run_the_exam_30_min_mostly_waiting",
-      "community": 54,
-      "norm_label": "step 5 \u2014 run the exam (30 min, mostly waiting)"
+      "id": "docs_rag_00_today_plan_standing_rules_for_both_days",
+      "community": 24,
+      "norm_label": "standing rules for both days"
     },
     {
-      "label": "Step 6 \u2014 Save the report card (10 min)",
+      "label": "If it all goes wrong",
       "file_type": "document",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L132",
+      "source_location": "L86",
       "_origin": "ast",
-      "id": "docs_rag_00_today_plan_step_6_save_the_report_card_10_min",
-      "community": 54,
-      "norm_label": "step 6 \u2014 save the report card (10 min)"
-    },
-    {
-      "label": "If something goes wrong",
-      "file_type": "document",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L145",
-      "_origin": "ast",
-      "id": "docs_rag_00_today_plan_if_something_goes_wrong",
-      "community": 54,
-      "norm_label": "if something goes wrong"
-    },
-    {
-      "label": "What \"done today\" buys us",
-      "file_type": "document",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L157",
-      "_origin": "ast",
-      "id": "docs_rag_00_today_plan_what_done_today_buys_us",
-      "community": 54,
-      "norm_label": "what \"done today\" buys us"
+      "id": "docs_rag_00_today_plan_if_it_all_goes_wrong",
+      "community": 24,
+      "norm_label": "if it all goes wrong"
     },
     {
       "label": "01_RECALL_LIFT.md",
@@ -52271,16 +52081,6 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L19",
-      "weight": 1.0,
-      "source": "docs_current_phase",
-      "target": "docs_01_problem_and_solution",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
       "source_file": "docs/RAG_PLAN.md",
       "source_location": "L7",
       "weight": 1.0,
@@ -52491,16 +52291,6 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L20",
-      "weight": 1.0,
-      "source": "docs_current_phase",
-      "target": "docs_02_tech_stack",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
       "source_file": "docs/RAG_PLAN.md",
       "source_location": "L7",
       "weight": 1.0,
@@ -52626,16 +52416,6 @@
       "weight": 1.0,
       "source": "docs_03_architecture",
       "target": "docs_03_architecture_03_architecture",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L21",
-      "weight": 1.0,
-      "source": "docs_current_phase",
-      "target": "docs_03_architecture",
       "confidence_score": 1.0
     },
     {
@@ -52902,7 +52682,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L35",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_00_baseline_and_measurement",
@@ -52912,7 +52692,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L36",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "docs_current_phase",
+      "target": "docs_rag_00_today_plan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CURRENT_PHASE.md",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_01_recall_lift",
@@ -52922,7 +52712,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L37",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_02_query_understanding",
@@ -52932,7 +52722,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_03_hybrid_retrieval_bm25",
@@ -52942,7 +52732,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L39",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_04_reranking",
@@ -52952,7 +52742,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L40",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_05_context_compression",
@@ -52962,7 +52752,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L41",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_06_ingestion_enrichment",
@@ -52976,16 +52766,6 @@
       "weight": 1.0,
       "source": "docs_current_phase",
       "target": "docs_rag_plan",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L139",
-      "weight": 1.0,
-      "source": "docs_rag_00_today_plan",
-      "target": "docs_current_phase",
       "confidence_score": 1.0
     },
     {
@@ -53012,7 +52792,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L77",
+      "source_location": "L66",
       "weight": 1.0,
       "source": "docs_current_phase_current_build_phase",
       "target": "docs_current_phase_how_to_advance_the_phase",
@@ -53022,17 +52802,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L47",
+      "source_location": "L39",
       "weight": 1.0,
       "source": "docs_current_phase_current_build_phase",
-      "target": "docs_current_phase_rag_phase_0_entry_checklist",
+      "target": "docs_current_phase_rag_phase_1_entry_state",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L31",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "docs_current_phase_current_build_phase",
       "target": "docs_current_phase_rag_phase_ladder",
@@ -53052,10 +52832,20 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/CURRENT_PHASE.md",
-      "source_location": "L60",
+      "source_location": "L50",
       "weight": 1.0,
       "source": "docs_current_phase_current_build_phase",
       "target": "docs_current_phase_what_s_still_load_bearing_from_the_previous_product_build",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "docs_rag_00_today_plan",
+      "target": "docs_rag_plan",
       "confidence_score": 1.0
     },
     {
@@ -53066,16 +52856,6 @@
       "weight": 1.0,
       "source": "docs_rag_plan",
       "target": "docs_rag_00_baseline_and_measurement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/RAG_PLAN.md",
-      "source_location": "L35",
-      "weight": 1.0,
-      "source": "docs_rag_plan",
-      "target": "docs_rag_00_execution_runbook",
       "confidence_score": 1.0
     },
     {
@@ -53269,6 +53049,16 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/README.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "docs_readme",
+      "target": "docs_rag_00_today_plan",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
@@ -53282,7 +53072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
       "target": "docs_readme_doc_layout",
@@ -53292,7 +53082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L61",
+      "source_location": "L66",
       "weight": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
       "target": "docs_readme_one_paragraph_takeaway",
@@ -53302,7 +53092,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L39",
+      "source_location": "L44",
       "weight": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
       "target": "docs_readme_per_doc_summaries",
@@ -53312,7 +53102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L35",
+      "source_location": "L38",
       "weight": 1.0,
       "source": "docs_readme_repopilot_documentation_set_overview",
       "target": "docs_readme_what_was_removed",
@@ -53332,7 +53122,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L41",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "docs_readme_per_doc_summaries",
       "target": "docs_readme_01_problem_and_solution",
@@ -53342,7 +53132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L45",
+      "source_location": "L50",
       "weight": 1.0,
       "source": "docs_readme_per_doc_summaries",
       "target": "docs_readme_02_tech_stack",
@@ -53352,7 +53142,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L49",
+      "source_location": "L54",
       "weight": 1.0,
       "source": "docs_readme_per_doc_summaries",
       "target": "docs_readme_03_architecture",
@@ -53362,7 +53152,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L57",
+      "source_location": "L62",
       "weight": 1.0,
       "source": "docs_readme_per_doc_summaries",
       "target": "docs_readme_rag_00_06",
@@ -53372,7 +53162,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/README.md",
-      "source_location": "L53",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "docs_readme_per_doc_summaries",
       "target": "docs_readme_rag_plan",
@@ -53386,16 +53176,6 @@
       "weight": 1.0,
       "source": "docs_rag_00_baseline_and_measurement",
       "target": "docs_rag_00_baseline_and_measurement_rag_phase_0_baseline_measurement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_BASELINE_AND_MEASUREMENT.md",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "docs_rag_00_baseline_and_measurement",
-      "target": "docs_rag_00_execution_runbook",
       "confidence_score": 1.0
     },
     {
@@ -53462,6 +53242,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_BASELINE_AND_MEASUREMENT.md",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "docs_rag_00_baseline_and_measurement_rag_phase_0_baseline_measurement",
+      "target": "docs_rag_00_baseline_and_measurement_as_built_record_phase_0_closed_2026_07_04",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_BASELINE_AND_MEASUREMENT.md",
       "source_location": "L104",
       "weight": 1.0,
       "source": "docs_rag_00_baseline_and_measurement_rag_phase_0_baseline_measurement",
@@ -53481,301 +53271,141 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
       "source_location": "L1",
       "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
+      "source": "docs_rag_00_today_plan",
+      "target": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
       "confidence_score": 1.0
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L371",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L34",
       "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook",
+      "source": "docs_rag_00_today_plan",
       "target": "docs_rag_01_recall_lift",
       "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L3",
+      "source_location": "L26",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan",
-      "target": "docs_rag_00_execution_runbook",
+      "source": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "target": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L367",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L52",
       "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_after_phase_0",
+      "source": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "target": "docs_rag_00_today_plan_day_2_precision_then_ship",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L12",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L86",
       "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_pre_flight_do_this_once_10_min",
+      "source": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "target": "docs_rag_00_today_plan_if_it_all_goes_wrong",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L27",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_1_index_the_three_repos_15_min_wall_clock_mostly_waiting",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
       "source_location": "L79",
       "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_2_propose_candidate_labels_2_min_i_generate_you_wait",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L102",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L192",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_4_run_the_bench_30_min_wall_clock_mostly_waiting",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L253",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_5_spot_check_audit_30_min",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L312",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_stage_6_commit_the_baseline_5_min",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L343",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_rag_phase_0_execution_runbook",
-      "target": "docs_rag_00_execution_runbook_troubleshooting",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L151",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "target": "docs_rag_00_execution_runbook_adversarial_rows_15_min",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L136",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "target": "docs_rag_00_execution_runbook_pacing_guide",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L174",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "target": "docs_rag_00_execution_runbook_repeat_for_the_other_two",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L125",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_3_review_labels_in_the_tui_75_min_the_focused_work_part",
-      "target": "docs_rag_00_execution_runbook_the_decision_rules",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L245",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_4_run_the_bench_30_min_wall_clock_mostly_waiting",
-      "target": "docs_rag_00_execution_runbook_quota_estimate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L239",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_4_run_the_bench_30_min_wall_clock_mostly_waiting",
-      "target": "docs_rag_00_execution_runbook_quota_safety",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L222",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_4_run_the_bench_30_min_wall_clock_mostly_waiting",
-      "target": "docs_rag_00_execution_runbook_what_bench_py_does_per_row",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L257",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_5_spot_check_audit_30_min",
-      "target": "docs_rag_00_execution_runbook_5a_read_the_baseline_file",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L289",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_stage_5_spot_check_audit_30_min",
-      "target": "docs_rag_00_execution_runbook_5b_audit_the_existing_16_row_httpx_qa_v1_jsonl",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L349",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_troubleshooting",
-      "target": "docs_rag_00_execution_runbook_bench_keeps_stalling_on_groq_429",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L357",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_troubleshooting",
-      "target": "docs_rag_00_execution_runbook_i_want_to_skip_flask_fastapi_for_now",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L353",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_troubleshooting",
-      "target": "docs_rag_00_execution_runbook_tui_is_too_slow_i_want_to_just_edit_jsonl_by_hand",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L361",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_troubleshooting",
-      "target": "docs_rag_00_execution_runbook_what_if_my_numbers_are_way_worse_than_the_docs_suggested",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_EXECUTION_RUNBOOK.md",
-      "source_location": "L345",
-      "weight": 1.0,
-      "source": "docs_rag_00_execution_runbook_troubleshooting",
-      "target": "docs_rag_00_execution_runbook_worker_crashed_mid_indexing",
+      "source": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "target": "docs_rag_00_today_plan_standing_rules_for_both_days",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L1",
+      "source_location": "L13",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan",
-      "target": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
+      "source": "docs_rag_00_today_plan_ship_the_rag_upgrade_in_2_days_the_plan",
+      "target": "docs_rag_00_today_plan_where_we_actually_are_verified_2026_07_05",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L145",
+      "source_location": "L28",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_if_something_goes_wrong",
+      "source": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
+      "target": "docs_rag_00_today_plan_d1_1_close_phase_0_30_min",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L24",
+      "source_location": "L33",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_1_start_the_machines_10_min",
+      "source": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
+      "target": "docs_rag_00_today_plan_d1_2_phase_1_recall_lift_3_h_must_ship",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L45",
+      "source_location": "L40",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_2_feed_it_the_3_repos_15_min",
+      "source": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
+      "target": "docs_rag_00_today_plan_d1_3_phase_2_query_understanding_timebox_2_h_cut_line_18_00_polish",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "docs_rag_00_today_plan_day_1_close_the_books_then_recall",
+      "target": "docs_rag_00_today_plan_d1_4_phase_3_bm25_hybrid_start_today_finish_by_d2_morning_must_ship",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "target": "docs_rag_00_today_plan_d2_1_phase_3_finish_2_h_must_ship",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "target": "docs_rag_00_today_plan_d2_2_phase_4_reranking_3_h_must_ship",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/rag/00_TODAY_PLAN.md",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "target": "docs_rag_00_today_plan_d2_3_phase_5_context_compression_timebox_90_min_polish",
       "confidence_score": 1.0
     },
     {
@@ -53784,58 +53414,18 @@
       "source_file": "docs/rag/00_TODAY_PLAN.md",
       "source_location": "L64",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_3_generate_the_answer_key_drafts_2_min",
+      "source": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "target": "docs_rag_00_today_plan_d2_4_phase_6_ingestion_enrichment_timebox_90_min_incl_re_index_wait_polish",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L82",
+      "source_location": "L67",
       "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_4_grade_the_answer_keys_75_min_the_real_work",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L110",
-      "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_5_run_the_exam_30_min_mostly_waiting",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L132",
-      "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_step_6_save_the_report_card_10_min",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_the_day_at_a_glance",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/rag/00_TODAY_PLAN.md",
-      "source_location": "L157",
-      "weight": 1.0,
-      "source": "docs_rag_00_today_plan_finish_phase_0_today_the_simple_plan",
-      "target": "docs_rag_00_today_plan_what_done_today_buys_us",
+      "source": "docs_rag_00_today_plan_day_2_precision_then_ship",
+      "target": "docs_rag_00_today_plan_d2_5_ship_1_h_non_negotiable_steal_from_5_6_if_needed",
       "confidence_score": 1.0
     },
     {
@@ -54680,5 +54270,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1e6f03c178ea2727dee38578dc14d992e4760874"
+  "built_at_commit": "8e7d0d62e6841abd3284042337cf983cb7b78633"
 }

@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "docs/README.md": {
-    "mtime": 1781957372.4630563,
-    "ast_hash": "a439f0002fb609ce250603c5e8a0c79b",
+    "mtime": 1783227138.3867126,
+    "ast_hash": "5a8ad5369cd62e24539e00b5d5e15b6c",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/__init__.py": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1781957372.4627604,
-    "ast_hash": "8af18fae2f205fb3059c2085f5ed5f0e",
+    "mtime": 1783227101.4903312,
+    "ast_hash": "9e2a8d6c051519178ae1205f5da85079",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {
@@ -690,13 +690,13 @@
     "semantic_hash": ""
   },
   "docs/RAG_PLAN.md": {
-    "mtime": 1782551029.092466,
-    "ast_hash": "fe73dfb8cf58d278dec770c1003219e8",
+    "mtime": 1783227111.0466092,
+    "ast_hash": "f1386863fd1e96c4647f0e1fed88ea18",
     "semantic_hash": ""
   },
   "docs/rag/00_BASELINE_AND_MEASUREMENT.md": {
-    "mtime": 1782551029.0926924,
-    "ast_hash": "6f1b3a7507a2304b1ebd26cd595f7c5a",
+    "mtime": 1783227162.085247,
+    "ast_hash": "25e36f7f512006d5572af4c1f60bae7b",
     "semantic_hash": ""
   },
   "docs/rag/01_RECALL_LIFT.md": {
@@ -732,11 +732,6 @@
   "docs/rag/RISKS.md": {
     "mtime": 1781958348.8394117,
     "ast_hash": "ba21af8cc0cff0ca279cf785a238b2af",
-    "semantic_hash": ""
-  },
-  "docs/rag/00_EXECUTION_RUNBOOK.md": {
-    "mtime": 1782551029.0928073,
-    "ast_hash": "3d0102ce92bb71f0d7cb62ae91be8939",
     "semantic_hash": ""
   },
   "evals/tools/propose_labels.py": {
@@ -785,8 +780,8 @@
     "semantic_hash": ""
   },
   "docs/rag/00_TODAY_PLAN.md": {
-    "mtime": 1783179108.8119273,
-    "ast_hash": "d551169e51c6fae75842a0d3795091c3",
+    "mtime": 1783226908.0871646,
+    "ast_hash": "90653c97629ce97e42e1706b9d4f089d",
     "semantic_hash": ""
   },
   "apps/api/pyproject.toml": {
@@ -817,6 +812,26 @@
   "pyproject.toml": {
     "mtime": 1781930118.1856997,
     "ast_hash": "9250ed13baa91bba79bdafa259763be2",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase0/baseline.json": {
+    "mtime": 1783185818.8606234,
+    "ast_hash": "162dfe65b050ca9fe71812f8f85247cc",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase0/fastapi_baseline.json": {
+    "mtime": 1783185802.9556775,
+    "ast_hash": "8ec9eb32a1e3b1eced624d1789c3cd34",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase0/flask_baseline.json": {
+    "mtime": 1783185408.801955,
+    "ast_hash": "288837624050b79ae306a42fb94a6f8c",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase0/httpx_baseline.json": {
+    "mtime": 1783184683.9422634,
+    "ast_hash": "545e96168a28b2e68e20e59ee218e883",
     "semantic_hash": ""
   }
 }

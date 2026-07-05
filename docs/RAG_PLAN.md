@@ -32,7 +32,7 @@ Each phase is independently shippable; each unlocks the next. The diagram on the
 
 | # | Phase | Stage in target pipeline | Headline gate | New deps |
 |---|---|---|---|---|
-| **0** | [Baseline & Measurement](rag/00_BASELINE_AND_MEASUREMENT.md) · [runbook](rag/00_EXECUTION_RUNBOOK.md) | (measurement spine) | A baseline number exists for every metric we will improve later | `ragas` or hand-rolled (TBD in phase) |
+| **0** | [Baseline & Measurement](rag/00_BASELINE_AND_MEASUREMENT.md) — **🟢 done 2026-07-04** | (measurement spine) | A baseline number exists for every metric we will improve later ✅ (`evals/results/rag_phase0/`) | hand-rolled |
 | **1** | [Recall lift](rag/01_RECALL_LIFT.md) | Hybrid Retrieval (dense side) + Candidate Pool | recall@10 ≥ baseline + 5 pp | none |
 | **2** | [Query Understanding](rag/02_QUERY_UNDERSTANDING.md) | Query Understanding | recall@10 lift ≥ 5 pp over Phase 1 on multi-hop questions | none (uses existing 8B model) |
 | **3** | [BM25 Hybrid](rag/03_HYBRID_RETRIEVAL_BM25.md) | Hybrid Retrieval (sparse side) | recall@10 lift ≥ 5 pp on rare-symbol / proper-noun queries | none (Postgres FTS built-in) |
@@ -60,8 +60,8 @@ If a phase ships with `_after.json` ≤ `_before.json`, **the phase is reverted,
 |---|---|---|
 | `httpx_qa_v1.jsonl` (16 rows) | ✅ in repo | All phases (primary recall + grounding bench) |
 | `verifier_quality_v1.jsonl` (30 rows) | ✅ in repo | Phase 0 (calibrate verifier), Phase 5 (compression should not change verifier verdicts) |
-| `flask_qa_v1.jsonl` (target 20 rows) | ❌ Phase 0 creates | Phase 1 onward (cross-repo generalization check) |
-| `fastapi_qa_v1.jsonl` (target 15 rows) | ❌ Phase 0 creates | Phase 1 onward (cross-repo generalization check) |
+| `flask_qa_v1.jsonl` (20 rows: 17 gold + 3 traps) | ✅ Phase 0 created | Phase 1 onward (cross-repo generalization check) |
+| `fastapi_qa_v1.jsonl` (15 rows) | ✅ Phase 0 created | Phase 1 onward (cross-repo generalization check) |
 | `rare_symbol_v1.jsonl` (target 12 rows) | ❌ Phase 3 creates | Phase 3, 4 (BM25 + reranker validation) |
 | `multi_hop_v1.jsonl` (target 10 rows) | ❌ Phase 2 creates | Phase 2 onward (query-understanding lift) |
 

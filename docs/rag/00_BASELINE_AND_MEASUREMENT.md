@@ -114,3 +114,18 @@ Phase 0 is **complete** when `baseline.json` is committed and `CURRENT_PHASE.md`
 - **Paid-Groq quota or Ollama-only baseline?** Ollama-only doubles latency but stays free. Recommendation: paid Groq for the baseline (so later phases can A/B against the *real* production model), Ollama for development.
 - **Who labels?** If the user labels: 3–5 hrs of focused work. If Claude proposes + user reviews: ~1.5 hrs of user time (with the bias caveat from the earlier eval-labeling discussion).
 - **Significance test threshold.** Default proposal: `alpha = 0.05`, paired bootstrap, n_resamples = 10_000. Tunable in Phase 0 config.
+
+---
+
+## As-built record (Phase 0 closed 2026-07-04)
+
+**Status: 🟢 done.** Baseline committed in `8e7d0d6` → `evals/results/rag_phase0/` (`baseline.json`, `baseline.csv`, per-repo `httpx/flask/fastapi_baseline.json`).
+
+How the open questions resolved:
+
+- **Labeling:** Claude proposed + human reviewed (the ~1.5 h path). `evals/tools/propose_labels.py` gained a noise filter (drops `tests/`, `examples/`, `docs/`, `docs_src/`, `scripts/`; over-fetches top-150) after the first pass surfaced almost pure test/doc noise. Gold labels are therefore **source-only by construction**.
+- **flask_qa_v1 provenance:** 20 rows — 2 human-labeled, 12 AI-labeled from filtered candidates (spot-check recommended), 3 hand-labeled directly from the chunks table because retrieval missed them beyond rank 150 (`Config.from_object`, default-404 via `handle_http_exception`, cookie parsing via `open_session`), 3 not-in-repo traps.
+- **Baseline findings worth attacking in Phase 1+:** tests/doc-snippets outrank implementation code on vocabulary overlap; several true answers sat beyond rank 150 (pool-size alone won't fix those — expect Phase 3/4 to matter); FastAPI's `serialize_response` never surfaced at any k.
+- **Infra fixed during Phase 0:** Neon pooler drops idle SSL connections → `pool_pre_ping=True, pool_recycle=300` in `make_engine` (covers API, worker, and evals); HuggingFace router 402s (credits exhausted) — verifier must succeed on Groq/Cerebras.
+
+The step-by-step execution runbook that drove this phase (`00_EXECUTION_RUNBOOK.md`) is removed; git history retains it. `00_TODAY_PLAN.md` is now the 2-day ship plan for Phases 1–6.

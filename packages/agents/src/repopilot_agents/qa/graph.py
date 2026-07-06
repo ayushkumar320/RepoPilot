@@ -41,7 +41,7 @@ from repopilot_agents.qa.prompts import (
 from repopilot_agents.qa.types import SufficiencyVerdict
 from repopilot_agents.tools.graph_traverse import graph_traverse
 from repopilot_agents.tools.read_chunks import read_chunks
-from repopilot_agents.tools.vector_search import vector_search
+from repopilot_agents.tools.vector_search import NON_SOURCE_PATH_PREFIXES, vector_search
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef
 from repopilot_agents.verifier.grounding import (
     Claim,
@@ -55,6 +55,10 @@ log = structlog.get_logger(__name__)
 
 
 MAX_HOPS = 3
+# RAG Phase 1: pool width fetched from pgvector. The prompt slice stays at
+# ``k`` — Phase 5's compression will consume the full pool; until then the
+# graph trims the top-k itself.
+RECALL_K = 50
 NOT_FOUND_SENTINEL = "I couldn't find that in the repo."
 
 
@@ -91,12 +95,19 @@ async def answer_question(
     """Run the hybrid-retrieval Q&A loop for ``question``."""
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
-    # Initial vector hit.
+    # Initial vector hit: wide recall pool, source lane only (gold-label
+    # noise prefixes excluded), then trim to the top-k for the prompt.
     hits: list[ChunkHit] = await vector_search(
-        question, engine=engine, provider=provider, repo_id=repo_id, k=k
+        question,
+        engine=engine,
+        provider=provider,
+        repo_id=repo_id,
+        k=k,
+        recall_k=RECALL_K,
+        exclude_path_prefixes=NON_SOURCE_PATH_PREFIXES,
     )
-    ctx.retrieval_path.append(f"vector_search:k={k}:hits={len(hits)}")
-    initial_chunks = await read_chunks([h.ref for h in hits], engine=engine, repo_id=repo_id)
+    ctx.retrieval_path.append(f"vector_search:recall_k={RECALL_K}:k={k}:hits={len(hits)}")
+    initial_chunks = await read_chunks([h.ref for h in hits[:k]], engine=engine, repo_id=repo_id)
     _extend_context(ctx, initial_chunks)
 
     # Outer loop: sufficiency judge → optional traverse expansion.
@@ -257,4 +268,4 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     return out
 
 
-__all__ = ["MAX_HOPS", "NOT_FOUND_SENTINEL", "QAResult", "answer_question"]
+__all__ = ["MAX_HOPS", "NOT_FOUND_SENTINEL", "RECALL_K", "QAResult", "answer_question"]

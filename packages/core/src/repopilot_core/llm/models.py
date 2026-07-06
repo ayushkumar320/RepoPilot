@@ -77,6 +77,7 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
+        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
         ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_FALLBACK: (
@@ -89,8 +90,13 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     # Verifier is the highest call-volume agent. We use Groq's qwen-coder for
     # cost (fast) with HF as the durable fallback. No Ollama daemon required.
+    # Cerebras sits between them: the verifier chain must survive Groq 429
+    # bursts without reaching HF (which may be out of credits — 402).
+    # gemma-4-31b over gpt-oss-120b here: no thinking tokens, so the
+    # verifier's strict JSON parse (parse-fail = reject) stays reliable.
     ModelId.VERIFIER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
         ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-7B-Instruct"),
     ),
     # Embeddings run in-process via sentence-transformers (HF model weights).

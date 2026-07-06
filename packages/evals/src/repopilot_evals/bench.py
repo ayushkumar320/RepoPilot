@@ -24,6 +24,8 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+from repopilot_agents.qa import graph as qa_graph
+from repopilot_agents.tools.vector_search import NON_SOURCE_PATH_PREFIXES
 from repopilot_evals.runners.grounding import run_grounding_eval
 from repopilot_evals.runners.latency import run_latency_eval
 from repopilot_evals.runners.retrieval import run_retrieval_eval
@@ -49,7 +51,21 @@ async def bench_repo(
     print(f"[bench] phase {phase} · repo {repo} · dataset {dataset}")
 
     print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
-    retrieval = await run_retrieval_eval(dataset_name=dataset, repo_slug=repo, sample_limit=sample)
+    # Phase ≥ 1 measures the Q&A lane's retrieval policy (wide pool, source
+    # lane only); phase 0 keeps the raw k=max(ks) call so baselines stay
+    # reproducible.
+    retrieval_kwargs: dict[str, object] = {}
+    if phase >= 1:
+        retrieval_kwargs = {
+            "recall_k": qa_graph.RECALL_K,
+            "exclude_path_prefixes": NON_SOURCE_PATH_PREFIXES,
+        }
+    retrieval = await run_retrieval_eval(
+        dataset_name=dataset,
+        repo_slug=repo,
+        sample_limit=sample,
+        **retrieval_kwargs,  # type: ignore[arg-type]
+    )
     metrics: dict[str, object] = dict(retrieval.as_dict())
     metrics["per_question"] = {
         "recall@10": [c.recall[10] for c in retrieval.cases],
@@ -126,7 +142,75 @@ def aggregate(phase: int) -> tuple[Path, Path]:
         writer.writerow(["repo", *scalar_keys])
         for repo, m in per_repo.items():
             writer.writerow([repo, *[m.get(k, "") for k in scalar_keys]])
+
+    if phase >= 1:
+        after_path = out_dir / "_after.json"
+        after_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+        write_delta(phase, index)
     return json_path, csv_path
+
+
+LATENCY_P95_BUDGET = 1.5
+
+
+def write_delta(phase: int, after: dict[str, object]) -> None:
+    """Compare ``_after`` to ``_before`` per repo; fail on guardrail breaches.
+
+    Guardrail (RAG_PLAN + rag/01 §5): ``latency_p95_ms`` may not regress
+    beyond 1.5× the before-number. The recall/grounding gates need human
+    judgment + the significance runner, so they are printed, not asserted.
+    """
+    out_dir = results_dir(phase)
+    before_path = out_dir / "_before.json"
+    if not before_path.exists():
+        raise SystemExit(f"{before_path} missing — copy the previous phase's _after.json first")
+    before = json.loads(before_path.read_text(encoding="utf-8"))
+
+    tracked = (
+        "recall@5",
+        "recall@10",
+        "recall@20",
+        "ndcg@5",
+        "mrr",
+        "grounding_accuracy",
+        "hallucination_rate",
+        "latency_p95_ms",
+    )
+    delta: dict[str, dict[str, dict[str, float]]] = {}
+    breaches: list[str] = []
+    before_repos = before.get("repos", {})
+    after_repos_obj = after.get("repos")
+    after_repos: dict[str, dict[str, object]] = (
+        after_repos_obj if isinstance(after_repos_obj, dict) else {}
+    )
+    for repo, m_after in after_repos.items():
+        m_before = before_repos.get(repo, {})
+        repo_delta: dict[str, dict[str, float]] = {}
+        for key in tracked:
+            b, a = m_before.get(key), m_after.get(key)
+            if isinstance(b, (int, float)) and isinstance(a, (int, float)):
+                repo_delta[key] = {"before": float(b), "after": float(a), "delta": float(a - b)}
+        delta[repo] = repo_delta
+        lat = repo_delta.get("latency_p95_ms")
+        if lat and lat["before"] > 0 and lat["after"] > lat["before"] * LATENCY_P95_BUDGET:
+            breaches.append(
+                f"{repo}: latency_p95_ms {lat['before']:.0f} → {lat['after']:.0f} "
+                f"(> {LATENCY_P95_BUDGET}× budget)"
+            )
+
+    delta_path = out_dir / "delta.json"
+    delta_path.write_text(json.dumps(delta, indent=2) + "\n", encoding="utf-8")
+    print(f"[bench] wrote {delta_path}")
+    for repo, repo_delta in delta.items():
+        for key in ("recall@10", "ndcg@5", "grounding_accuracy", "latency_p95_ms"):
+            if key in repo_delta:
+                d = repo_delta[key]
+                print(
+                    f"  {repo:<8} {key:<20} {d['before']:.4f} → {d['after']:.4f} "
+                    f"(Δ {d['delta']:+.4f})"
+                )
+    if breaches:
+        raise SystemExit("[bench] latency guardrail breached: " + "; ".join(breaches))
 
 
 def self_test_significance(phase: int) -> None:

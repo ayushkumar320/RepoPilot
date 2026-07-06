@@ -9,6 +9,7 @@ under-count.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from math import log2
 
@@ -123,6 +124,8 @@ async def run_retrieval_eval(
     ks: tuple[int, ...] = DEFAULT_KS,
     sample_limit: int | None = None,
     settings: Settings | None = None,
+    recall_k: int | None = None,
+    exclude_path_prefixes: Sequence[str] = (),
 ) -> RetrievalEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     # Not-in-repo rows have no expected_refs; retrieval metrics skip them.
@@ -138,6 +141,8 @@ async def run_retrieval_eval(
                 provider=ctx.provider,
                 repo_id=resolved,
                 k=max(ks),
+                recall_k=recall_k,
+                exclude_path_prefixes=exclude_path_prefixes,
             )
             cases.append(score_case(row.question, hits, row.expected_refs, ks))
         return RetrievalEvalMetrics(total=len(cases), ks=ks, cases=cases)

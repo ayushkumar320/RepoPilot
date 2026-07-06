@@ -70,9 +70,13 @@ class Settings(BaseSettings):
 
     # ── LLM behaviour ────────────────────────────────────────────────────────
     llm_cache_path: Path = Field(default_factory=lambda: Path(".cache/llm.sqlite"))
-    llm_max_429_retries: int = 5
+    # Retry budget sized to ride out a full Groq 60s TPM window before the
+    # chain falls through to Cerebras. With base=0.5, max=20, jitter, worst
+    # case cumulative sleep across 8 attempts is ~80s — enough to drain a
+    # 60s per-minute quota reset before escalating.
+    llm_max_429_retries: int = 8
     llm_backoff_base_seconds: float = 0.5
-    llm_backoff_max_seconds: float = 8.0
+    llm_backoff_max_seconds: float = 20.0
     llm_request_timeout_seconds: float = 60.0
 
     # ── GitHub ───────────────────────────────────────────────────────────────

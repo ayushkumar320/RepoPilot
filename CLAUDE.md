@@ -10,16 +10,15 @@ This file is the **primary, always-loaded set of project rules** for RepoPilot. 
 
 **RepoPilot** (internally "Codebase Archaeologist") is a web app where a developer pastes a public GitHub repo URL and gets a **purpose-driven, guided onboarding tour** of an unfamiliar codebase, powered by a multi-agent AI system. Beachhead: junior devs and first-time OSS contributors on **Python** repos.
 
-The distinguishing bet: **before analyzing anything, the system captures pre-context (purpose + focus) and adapts every downstream agent to it.** See [`docs/01_PROBLEM_AND_SOLUTION.md`](docs/01_PROBLEM_AND_SOLUTION.md) for the full thesis.
+The distinguishing bet: **before analyzing anything, the system captures pre-context (purpose + focus) and adapts every downstream agent to it.** Product thesis and tech-stack rationale are archived under [`docs/archive/`](docs/archive/) — still true, no longer load-bearing for current work.
 
 | Want to understand… | Read |
 |---|---|
 | Where the build is right now | [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md) |
 | The 7-phase retrieval-quality plan | [`docs/RAG_PLAN.md`](docs/RAG_PLAN.md) |
-| The active phase's spec, gate, stop conditions | [`docs/rag/`](docs/rag/) |
-| The problem & the five principles | [`docs/01_PROBLEM_AND_SOLUTION.md`](docs/01_PROBLEM_AND_SOLUTION.md) |
-| Tech stack & why each choice | [`docs/02_TECH_STACK.md`](docs/02_TECH_STACK.md) |
+| The active phase's spec, gate, stop conditions | [`docs/rag/`](docs/rag/) (start at [`docs/rag/README.md`](docs/rag/README.md)) |
 | Agent topology, state schema, tools, verifier | [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) |
+| Historical: product thesis, tech-stack rationale | [`docs/archive/`](docs/archive/) |
 
 **Prefer the Graphify graph over reading these raw** — see §3.
 
@@ -96,7 +95,7 @@ The portable mirror lives in [`.agents/`](.agents/): [`rules/`](.agents/rules/) 
 
 ## 6. Engineering conventions
 
-Enforced in code review and CI — not optional. Full rationale in [`docs/02_TECH_STACK.md`](docs/02_TECH_STACK.md) and [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md).
+Enforced in code review and CI — not optional. Full rationale in [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) (and, historically, in [`docs/archive/02_TECH_STACK.md`](docs/archive/02_TECH_STACK.md)).
 
 - **Truthful over fluent.** Every factual claim from an agent carries a `file:line` ref. Unknown → say so; never invent. Verifier rejections render as "flagged", never silently dropped.
 - **No stat dumps.** Agents emit `Insight` objects (`finding` / `because` / `so_what` / `goal_link`), not raw metrics. Empty `so_what`/`goal_link` fails Pydantic validation by design.

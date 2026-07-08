@@ -78,36 +78,32 @@ def test_backoff_delay_is_bounded() -> None:
         assert 0.0 <= delay <= 8.0
 
 
-# ─── Test 3 — forced-429 storm falls back to Hugging Face (THE GATE) ────────
+# ─── Test 3 — forced-429 storm falls back to Cerebras (THE GATE) ────────────
 
 
-async def test_llm_forced_429_storm_falls_back_to_huggingface(tmp_settings) -> None:  # type: ignore[no-untyped-def]
-    """Groq is 429ing indefinitely. The provider must reach Hugging Face
-    and return a real response.
+async def test_llm_forced_429_storm_falls_back_to_cerebras(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """Groq is 429ing indefinitely. The provider must reach Cerebras and
+    return a real response.
 
-    Note: the v1 RESOLUTION chain for ``INTENT_PROFILER`` is Groq → HF
-    (the Cerebras tier was removed in the 2026-06-16 harness session —
-    the available Cerebras free-tier models didn't match the llama
-    bindings). The Cerebras client is still wired in here so that the
-    test continues to exercise the "skip a configured provider that
-    isn't in the per-model chain" branch.
+    Post-2026-07-07: HF is no longer in the chat resolution chain (its free
+    tier exhausts on a single bench run). The chat chain is Groq → Cerebras;
+    if BOTH are 429, `ProviderError` is raised instead of silently draining
+    HF credits.
     """
     groq = FakeClient(
         ProviderName.GROQ,
         [RateLimitError("storm")] * 50,
     )
-    cerebras = FakeClient(
-        ProviderName.CEREBRAS,
-        [RateLimitError("storm")] * 50,
-    )
-    hf_resp = make_response(
-        provider=ProviderName.HUGGINGFACE,
-        physical_model="meta-llama/Llama-3.3-70B-Instruct",
+    cerebras_resp = make_response(
+        provider=ProviderName.CEREBRAS,
+        physical_model="llama-3.3-70b",
         text="fallback-ok",
         prompt_tokens=11,
         completion_tokens=4,
     )
-    hf = FakeClient(ProviderName.HUGGINGFACE, [hf_resp])
+    cerebras = FakeClient(ProviderName.CEREBRAS, [cerebras_resp])
+    # HF client is wired but must NEVER be called for chat models.
+    hf = FakeClient(ProviderName.HUGGINGFACE, [])
 
     provider = make_provider(
         tmp_settings,
@@ -126,23 +122,22 @@ async def test_llm_forced_429_storm_falls_back_to_huggingface(tmp_settings) -> N
     elapsed = asyncio.get_event_loop().time() - started
 
     assert response.text == "fallback-ok"
-    assert response.provider == ProviderName.HUGGINGFACE
+    assert response.provider == ProviderName.CEREBRAS
     assert response.cached is False
     assert elapsed < 30.0, f"took {elapsed:.2f}s — gate is <30s"
 
-    # Each provider actually in the INTENT_PROFILER chain must have been
-    # tried up to its retry budget before the chain advanced — we don't
-    # allow a shortcut. Cerebras is not in the chain so it must NOT be
-    # called.
+    # Groq exhausts its retry budget before the chain advances to Cerebras.
+    # HF is not in any chat chain and must NOT be called.
     assert len(groq.calls) == tmp_settings.llm_max_429_retries
-    assert len(cerebras.calls) == 0
-    assert len(hf.calls) == 1
+    assert len(cerebras.calls) == 1
+    assert len(hf.calls) == 0
 
 
 async def test_llm_chain_exhausted_raises_provider_error(tmp_settings) -> None:  # type: ignore[no-untyped-def]
     groq = FakeClient(ProviderName.GROQ, [RateLimitError("storm")] * 50)
     cerebras = FakeClient(ProviderName.CEREBRAS, [RateLimitError("storm")] * 50)
-    hf = FakeClient(ProviderName.HUGGINGFACE, [RateLimitError("storm")] * 50)
+    # HF wired but not in the chat chain — must never be reached.
+    hf = FakeClient(ProviderName.HUGGINGFACE, [])
 
     provider = make_provider(
         tmp_settings,
@@ -156,15 +151,17 @@ async def test_llm_chain_exhausted_raises_provider_error(tmp_settings) -> None: 
     with pytest.raises(ProviderError):
         await provider.generate(ModelId.INTENT_PROFILER, _msgs())
 
+    assert len(hf.calls) == 0
+
 
 async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None:  # type: ignore[no-untyped-def]
     groq = FakeClient(ProviderName.GROQ, [RateLimitError("storm")] * 50)
-    hf = FakeClient(
-        ProviderName.HUGGINGFACE,
+    cerebras = FakeClient(
+        ProviderName.CEREBRAS,
         [
             make_response(
-                provider=ProviderName.HUGGINGFACE,
-                physical_model="meta-llama/Llama-3.3-70B-Instruct",
+                provider=ProviderName.CEREBRAS,
+                physical_model="llama-3.3-70b",
                 text="fallback-ok",
             )
         ],
@@ -173,7 +170,7 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
         tmp_settings,
         {
             ProviderName.GROQ: groq,
-            ProviderName.HUGGINGFACE: hf,
+            ProviderName.CEREBRAS: cerebras,
         },
     )
 
@@ -185,7 +182,7 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
 
     assert response.text == "fallback-ok"
     assert len(groq.calls) == 1
-    assert len(hf.calls) == 1
+    assert len(cerebras.calls) == 1
 
 
 # ─── Test 4 — tokens_used counter increments ───────────────────────────────
@@ -210,8 +207,8 @@ async def test_llm_token_counter_increments(tmp_settings) -> None:  # type: igno
 # ─── Cross-cutting — sanity ────────────────────────────────────────────────
 
 
-async def test_verifier_uses_groq_with_hf_fallback(tmp_settings) -> None:  # type: ignore[no-untyped-def]
-    """VERIFIER resolves to Groq first then Hugging Face — Cerebras must not be touched."""
+async def test_verifier_uses_groq_with_cerebras_fallback(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """VERIFIER resolves to Groq first, Cerebras on 429 — HF is NOT in the chain."""
     groq = FakeClient(
         ProviderName.GROQ,
         [
@@ -222,8 +219,10 @@ async def test_verifier_uses_groq_with_hf_fallback(tmp_settings) -> None:  # typ
             )
         ],
     )
-    cerebras = FakeClient(ProviderName.CEREBRAS, [])  # raise if called
-    hf = FakeClient(ProviderName.HUGGINGFACE, [])  # raise if called
+    cerebras = FakeClient(ProviderName.CEREBRAS, [])  # would raise if called
+    hf = FakeClient(
+        ProviderName.HUGGINGFACE, []
+    )  # would raise if called — HF is not in the chat chain
     provider = make_provider(
         tmp_settings,
         {
@@ -235,31 +234,33 @@ async def test_verifier_uses_groq_with_hf_fallback(tmp_settings) -> None:  # typ
 
     response = await provider.generate(ModelId.VERIFIER, _msgs())
     assert response.provider == ProviderName.GROQ
-    # Verifier has no Cerebras binding, and HF is only reached on Groq failure.
+    # Groq answers on first try; Cerebras is present but not needed. HF must
+    # never be called for a chat model.
     assert cerebras.calls == []
+    assert hf.calls == []
     assert hf.calls == []
 
 
 async def test_real_httpx_429_path(tmp_settings, respx_mock) -> None:  # type: ignore[no-untyped-def]
     """End-to-end with a real httpx client and respx mocks for the HTTP layer.
 
-    This proves the OpenAI-compatible client surface actually parses 429s
-    and propagates RateLimitError — no internal short-circuit. The HF
-    Inference Providers gateway is OpenAI-compatible so the same client
-    handles all three.
+    Proves the OpenAI-compatible client surface actually parses 429s and
+    propagates RateLimitError — no internal short-circuit. Post-2026-07-07:
+    HF is not in the chat chain, so Cerebras is the terminal fallback.
     """
-    # Groq is 429; Cerebras is the same shape; HF Inference Providers answers.
+    # Groq is 429; Cerebras answers 200. The HF route is registered but must
+    # never be reached — the chat resolution chain stops at Cerebras.
+    hf_route = respx_mock.post("https://router.huggingface.co/v1/chat/completions").mock(
+        return_value=httpx.Response(500, json={"error": "should not be called"})
+    )
     respx_mock.post("https://api.groq.com/openai/v1/chat/completions").mock(
         return_value=httpx.Response(429, json={"error": "slow down"})
     )
     respx_mock.post("https://api.cerebras.ai/v1/chat/completions").mock(
-        return_value=httpx.Response(429, json={"error": "slow down"})
-    )
-    respx_mock.post("https://router.huggingface.co/v1/chat/completions").mock(
         return_value=httpx.Response(
             200,
             json={
-                "choices": [{"message": {"content": "real-huggingface"}}],
+                "choices": [{"message": {"content": "real-cerebras"}}],
                 "usage": {"prompt_tokens": 12, "completion_tokens": 7},
             },
         )
@@ -271,6 +272,7 @@ async def test_real_httpx_429_path(tmp_settings, respx_mock) -> None:  # type: i
     finally:
         await provider.aclose()
 
-    assert response.text == "real-huggingface"
-    assert response.provider == ProviderName.HUGGINGFACE
+    assert response.text == "real-cerebras"
+    assert response.provider == ProviderName.CEREBRAS
     assert provider.tokens_used[ModelId.INTENT_PROFILER] == 19
+    assert hf_route.call_count == 0, "HF must never be called for chat models"

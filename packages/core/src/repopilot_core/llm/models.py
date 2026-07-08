@@ -48,56 +48,53 @@ class ModelBinding:
 # Per-model resolution chain. The first entry is the preferred provider; the
 # remaining entries are tried in order on RateLimitError / connection failure.
 #
-# Hugging Face's Inference Providers gateway (https://router.huggingface.co/v1)
-# is OpenAI-compatible and routes to underlying providers (Together, Replicate,
-# Cerebras, etc.). It is the universal final fallback for chat models.
+# **HF is NOT in any chat chain in v1.** The HF Inference Providers gateway
+# has a tiny free-tier credit budget (~$0.10/mo) that a single bench run can
+# exhaust. Chat chains stop at Cerebras — if BOTH Groq and Cerebras are 429,
+# raise `ProviderError` cleanly instead of silently draining HF credits.
+# The user can re-add HF explicitly when they have credits.
 #
-# EMBEDDINGS uses sentence-transformers in-process; the binding's physical
-# model is the HF model id passed to `SentenceTransformer(...)`. No HTTP.
+# EMBEDDINGS keeps the HUGGINGFACE ProviderName because that path is served
+# by the in-process sentence-transformers embedder (HF model weights, no HTTP,
+# no credits burned). See LLMProvider.embed().
 RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ModelId.INTENT_PROFILER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.CAPABILITY_PLANNER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.CARTOGRAPHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.FLOW_TRACER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-32B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
     ),
     ModelId.TEACHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
     ),
     ModelId.QA_FALLBACK: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-32B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
-        ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.1-8B-Instruct"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.1-8b"),
     ),
-    # Verifier is the highest call-volume agent. We use Groq's qwen-coder for
-    # cost (fast) with HF as the durable fallback. No Ollama daemon required.
-    # Cerebras sits between them: the verifier chain must survive Groq 429
-    # bursts without reaching HF (which may be out of credits — 402).
-    # gemma-4-31b over gpt-oss-120b here: no thinking tokens, so the
-    # verifier's strict JSON parse (parse-fail = reject) stays reliable.
+    # Verifier is the highest call-volume agent. gemma-4-31b on Cerebras has
+    # no thinking tokens so the verifier's strict JSON parse stays reliable.
     ModelId.VERIFIER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
         ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
-        ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen2.5-Coder-7B-Instruct"),
     ),
     # Embeddings run in-process via sentence-transformers (HF model weights).
     # physical_model is the HF model id passed to SentenceTransformer().

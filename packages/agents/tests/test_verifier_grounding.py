@@ -85,6 +85,51 @@ class _StubEngine:
 
 
 @pytest.mark.asyncio
+async def test_verify_claims_bounds_concurrency(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The semaphore must cap in-flight verifier calls at max_concurrency."""
+    import asyncio
+
+    from repopilot_agents.verifier import grounding as g
+
+    async def fake_read_chunks(refs: Any, *, engine: Any, repo_id: str) -> list[ChunkContent]:
+        return [ChunkContent(ref=CodeRef(file_path="x.py", start_line=1, end_line=2), content="c")]
+
+    monkeypatch.setattr(g, "read_chunks", fake_read_chunks)
+
+    in_flight = 0
+    peak = 0
+
+    class _SlowProvider:
+        async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
+            nonlocal in_flight, peak
+            in_flight += 1
+            peak = max(peak, in_flight)
+            await asyncio.sleep(0.01)
+            in_flight -= 1
+
+            class _R:
+                text = '{"decision":"supported","reason":"ok"}'
+
+            return _R()
+
+    # Distinct refs so the verdict cache never collapses the calls.
+    claims = [
+        Claim(text=f"claim {i}", refs=[CodeRef(file_path=f"f{i}.py", start_line=1, end_line=2)])
+        for i in range(10)
+    ]
+    await verify_claims(
+        claims,
+        provider=cast(Any, _SlowProvider()),
+        engine=cast(Any, _StubEngine()),
+        repo_id="r",
+        max_concurrency=3,
+    )
+    assert peak <= 3
+
+
+@pytest.mark.asyncio
 async def test_verify_claim_rejects_when_refs_have_no_chunks(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

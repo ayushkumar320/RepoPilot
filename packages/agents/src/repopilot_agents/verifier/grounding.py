@@ -246,14 +246,36 @@ async def verify_claims(
     provider: LLMProvider,
     engine: AsyncEngine,
     repo_id: str,
+    max_concurrency: int | None = None,
 ) -> list[_VerifyResult]:
-    """Verify N claims concurrently. M1: batched via ``asyncio.gather``."""
+    """Verify N claims concurrently, bounded to avoid 429 stampedes (M1).
+
+    ``max_concurrency`` caps in-flight verifier LLM calls; ``None`` reads
+    ``settings.llm_verifier_max_concurrency`` from the provider, ``0`` means
+    unbounded. Bounding matters on free-tier providers: an unbounded gather
+    over a whole section's claims exhausts the per-second quota instantly, so
+    the 429 backoff never gets a window to drain.
+    """
     if not claims:
         return []
-    results = await asyncio.gather(
-        *(verify_claim(c, provider=provider, engine=engine, repo_id=repo_id) for c in claims)
-    )
-    return list(results)
+
+    limit = max_concurrency
+    if limit is None:
+        settings = getattr(provider, "settings", None)
+        limit = getattr(settings, "llm_verifier_max_concurrency", 0) if settings else 0
+
+    if limit <= 0:
+        coros = [verify_claim(c, provider=provider, engine=engine, repo_id=repo_id) for c in claims]
+    else:
+        sem = asyncio.Semaphore(limit)
+
+        async def _bounded(claim: Claim) -> _VerifyResult:
+            async with sem:
+                return await verify_claim(claim, provider=provider, engine=engine, repo_id=repo_id)
+
+        coros = [_bounded(c) for c in claims]
+
+    return list(await asyncio.gather(*coros))
 
 
 def _apply(claim: Claim, verdict: VerifierVerdict) -> None:

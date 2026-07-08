@@ -78,6 +78,11 @@ class Settings(BaseSettings):
     llm_backoff_base_seconds: float = 0.5
     llm_backoff_max_seconds: float = 20.0
     llm_request_timeout_seconds: float = 60.0
+    # Cap on concurrent verifier LLM calls. Unbounded `asyncio.gather` over a
+    # section's claims stampedes the free-tier per-second quota so hard that
+    # backoff never catches up (both Groq and Cerebras 429 at once). A small
+    # cap lets the 429 backoff actually drain the quota window. 0 = unbounded.
+    llm_verifier_max_concurrency: int = 3
 
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None

@@ -1,0 +1,10 @@
+{
+  "note": "Verifier accuracy recheck after the <think>-token parse fix (grounding.py). Phase 0 baseline recorded 0.60; the D1.1 sanity gate (>=0.88) had been skipped when Phase 0 closed.",
+  "dataset": "verifier_quality_v1.jsonl",
+  "rows": 30,
+  "before": 0.60,
+  "after": 1.00,
+  "correct_after": 30,
+  "provider_note": "All 30 verdicts served by the Cerebras gemma-4-31b fallback; Groq was rate-limited throughout. Confirms both the parse fix and the Cerebras fallback as a quality referee.",
+  "measured_at": "2026-07-08"
+}

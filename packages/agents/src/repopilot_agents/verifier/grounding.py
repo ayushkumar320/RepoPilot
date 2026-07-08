@@ -137,22 +137,48 @@ def _user_prompt(claim: Claim, chunks: Sequence[ChunkContent]) -> str:
     return "\n".join(parts)
 
 
-_JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
+# Reasoning models (Groq qwen3, HF Qwen-Coder) prefix the answer with a
+# ``<think>…</think>`` block. Strip it before JSON extraction so the block's
+# own braces/prose can't derail the parse. Handles an unclosed ``<think>``
+# (budget ran out mid-thought) by dropping everything up to the first ``{``.
+_THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+_OPEN_THINK_RE = re.compile(r"<think>.*", re.DOTALL | re.IGNORECASE)
+# Match balanced-ish JSON objects; we pick the one that actually carries a
+# ``decision`` field rather than blindly taking the first/last brace span.
+_JSON_OBJ_RE = re.compile(r"\{[^{}]*\}", re.DOTALL)
+_JSON_SPAN_RE = re.compile(r"\{.*\}", re.DOTALL)
+
+
+def _strip_reasoning(raw: str) -> str:
+    """Remove ``<think>`` reasoning so only the answer payload remains."""
+    without_closed = _THINK_RE.sub("", raw)
+    return _OPEN_THINK_RE.sub("", without_closed).strip()
 
 
 def _parse_verdict(raw: str) -> VerifierVerdict | None:
-    """Pull the first JSON object out of ``raw`` and validate it."""
-    match = _JSON_RE.search(raw)
-    if match is None:
-        return None
-    try:
-        data = json.loads(match.group(0))
-    except json.JSONDecodeError:
-        return None
-    try:
-        return VerifierVerdict(**data)
-    except (ValidationError, TypeError):
-        return None
+    """Pull the verdict JSON out of ``raw`` and validate it.
+
+    Prefers the JSON object that carries a ``decision`` key (a reasoning
+    model may emit throwaway objects first); falls back to the widest brace
+    span so a plain ``{...}`` answer still parses.
+    """
+    cleaned = _strip_reasoning(raw)
+    candidates = [m.group(0) for m in _JSON_OBJ_RE.finditer(cleaned)]
+    span = _JSON_SPAN_RE.search(cleaned)
+    if span is not None:
+        candidates.append(span.group(0))
+    for candidate in candidates:
+        try:
+            data = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(data, dict) or "decision" not in data:
+            continue
+        try:
+            return VerifierVerdict(**data)
+        except (ValidationError, TypeError):
+            continue
+    return None
 
 
 async def verify_claim(
@@ -190,7 +216,9 @@ async def verify_claim(
         ModelId.VERIFIER,
         [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, chunks))],
         temperature=0.0,
-        max_tokens=200,
+        # Headroom for reasoning models: qwen3 spends its budget in a
+        # <think> block first, so 200 tokens starved the JSON entirely.
+        max_tokens=1024,
     )
 
     parsed = _parse_verdict(response.text)

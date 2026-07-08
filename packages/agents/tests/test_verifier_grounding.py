@@ -35,6 +35,37 @@ def test_parse_verdict_returns_none_on_invalid_decision() -> None:
     assert _parse_verdict('{"decision":"yes","reason":"x"}') is None
 
 
+def test_parse_verdict_strips_closed_think_block() -> None:
+    raw = (
+        "<think>The claim says foo calls bar. Chunk shows `return bar()`. "
+        "That is supported.</think>\n"
+        '{"decision":"supported","reason":"return bar() present"}'
+    )
+    v = _parse_verdict(raw)
+    assert v is not None
+    assert v.decision == "supported"
+
+
+def test_parse_verdict_survives_unclosed_think_when_json_precedes() -> None:
+    # Some models emit the answer, then keep thinking without closing the tag.
+    raw = '{"decision":"rejected","reason":"no overlap"}\n<think>wait, maybe'
+    v = _parse_verdict(raw)
+    assert v is not None
+    assert v.decision == "rejected"
+
+
+def test_parse_verdict_ignores_decoy_json_without_decision() -> None:
+    raw = '{"note":"scratchpad"} then the real answer {"decision":"supported","reason":"line 3"}'
+    v = _parse_verdict(raw)
+    assert v is not None
+    assert v.decision == "supported"
+
+
+def test_parse_verdict_returns_none_when_only_think_block() -> None:
+    # Budget exhausted inside reasoning — no JSON ever emitted → parse-fail.
+    assert _parse_verdict("<think>still reasoning about the claim") is None
+
+
 class _StubProvider:
     def __init__(self, raw_text: str) -> None:
         self.raw_text = raw_text

@@ -1,16 +1,16 @@
 # Graph Report - RepoPilot  (2026-07-08)
 
 ## Corpus Check
-- 163 files · ~97,713 words
+- 163 files · ~97,792 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1816 nodes · 4592 edges · 126 communities (95 shown, 31 thin omitted)
+- 1816 nodes · 4592 edges · 124 communities (93 shown, 31 thin omitted)
 - Extraction: 63% EXTRACTED · 37% INFERRED · 0% AMBIGUOUS · INFERRED: 1711 edges (avg confidence: 0.53)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `adfda45f`
+- Built from commit: `942f7f61`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -94,7 +94,6 @@
 - [[_COMMUNITY_Community 77|Community 77]]
 - [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
-- [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 83|Community 83]]
@@ -109,7 +108,6 @@
 - [[_COMMUNITY_Community 92|Community 92]]
 - [[_COMMUNITY_Community 94|Community 94]]
 - [[_COMMUNITY_Community 95|Community 95]]
-- [[_COMMUNITY_Community 96|Community 96]]
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
@@ -159,7 +157,7 @@
 ## Import Cycles
 - 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (126 total, 31 thin omitted)
+## Communities (124 total, 31 thin omitted)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.11
@@ -246,8 +244,8 @@ Cohesion: 0.17
 Nodes (15): ProviderError, All providers in the fallback chain failed., Chunk, LLMProvider, Message, Settings, Any, Path (+7 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.17
-Nodes (13): _coerce_output_shape(), Modality, CapabilityPlan, Any, IntentProfile, LLMProvider, OutputShape, IntentProfile (+5 more)
+Cohesion: 0.12
+Nodes (21): build_opportunity_briefing(), ranker_rationale(), Teacher-facing briefing helpers for Phase 5 opportunity cards., Attach the UI-visible Phase 5 briefing surfaces without reranking., Plain-English explanation of planner-derived ranker weights., _coerce_output_shape(), Modality, CapabilityPlan (+13 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.33
@@ -258,8 +256,8 @@ Cohesion: 0.08
 Nodes (55): _build_fact_bundle_for_test(), _fact_bundle(), Cartographer — produces ``system_map`` Insights from the call graph.  The Cartog, Run the Cartographer once.      Returns the state diff for the LangGraph reducer, Render the fact bundle as a compact text block.      We deliberately avoid prose, Resolve each symbol's CodeRef from graph_metrics's underlying lookup.      The m, _refs_for_symbols(), _resolve_refs() (+47 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.21
-Nodes (14): AsyncEngine, ChunkContent, Claim, LLMProvider, _generate_answer(), _judge_sufficiency(), _parse_claims(), One sentence per line → one Claim per line.      Refs are attached by matching s (+6 more)
+Cohesion: 0.16
+Nodes (20): AsyncEngine, ChunkContent, Claim, LLMProvider, _Context, _extend_context(), _generate_answer(), _is_not_found() (+12 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.12
@@ -375,7 +373,7 @@ Nodes (11): AsyncEngine, ChunkHit, LLMProvider, test_default_sql_filters_only_by
 
 ### Community 57 - "Community 57"
 Cohesion: 0.08
-Nodes (35): build_opportunity_briefing(), ranker_rationale(), Teacher-facing briefing helpers for Phase 5 opportunity cards., Attach the UI-visible Phase 5 briefing surfaces without reranking., Plain-English explanation of planner-derived ranker weights., CapabilityPlan, IntentProfile, Opportunity (+27 more)
+Nodes (35): detect_quality_opportunities(), _difficulty(), Lane B — deterministic code-health opportunities., Transform deterministic detector hits into unified opportunities., run_lane_b_quality(), IntentProfile, Opportunity, SymbolMetrics (+27 more)
 
 ### Community 58 - "Community 58"
 Cohesion: 0.33
@@ -390,8 +388,8 @@ Cohesion: 0.17
 Nodes (9): LangGraph nodes + capability library.  Phase 2 surface: the six deterministic to, ChunkContent, GraphQueryResult, Shared Pydantic types used across tools, verifier, and Q&A.  These are the typed, Result of ``read_chunks``: a CodeRef paired with the source text it points at., Result of ``graph_metrics``: per-symbol metric pack., Result of ``graph_query``: one row of an entry-points / hubs / layers query., SymbolMetrics (+1 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.14
-Nodes (17): Any, MonkeyPatch, answer_question(), _Context, _extend_context(), _is_not_found(), QAResult, Q&A LangGraph mini-graph — the Phase 2 spine.  ``` vector_search → graph_travers (+9 more)
+Cohesion: 0.15
+Nodes (15): Any, ChunkContent, CodeRef, MonkeyPatch, answer_question(), Run the hybrid-retrieval Q&A loop for ``question``., _chunk(), _patch_tools() (+7 more)
 
 ### Community 62 - "Community 62"
 Cohesion: 0.42
@@ -465,10 +463,6 @@ Nodes (4): Path, _iter_source_files(), Hard CI rule: nothing in the source tree 
 Cohesion: 0.25
 Nodes (7): EventDict, Any, configure_logging(), _drop_chunk_content(), Structlog setup: JSON renderer in prod/CI, human-friendly renderer in dev/tests., Strip any field carrying raw repo content. Logs must never persist source code., Wire up structlog. Idempotent — safe to call from app startup and from tests.
 
-### Community 80 - "Community 80"
-Cohesion: 0.33
-Nodes (8): detect_quality_opportunities(), _difficulty(), Lane B — deterministic code-health opportunities., Transform deterministic detector hits into unified opportunities., run_lane_b_quality(), IntentProfile, Opportunity, SymbolMetrics
-
 ### Community 81 - "Community 81"
 Cohesion: 0.40
 Nodes (4): Bench commands (referee, unchanged since Phase 0), Iron rules (baked into every spec), Order of execution, RAG Phase Ladder — README
@@ -497,10 +491,6 @@ Nodes (8): Alembic environment — uses Settings.postgres_dsn so dev + CI agree.
 Cohesion: 0.67
 Nodes (3): How the intent profile flows through the system, Q&A multi-turn (schema-reserved in v1, surfaced post-v0.1), What "always-on" means for Q&A specifically
 
-### Community 96 - "Community 96"
-Cohesion: 0.50
-Nodes (4): ChunkContent, CodeRef, _chunk(), _ref()
-
 ## Knowledge Gaps
 - **303 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `type` (+298 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -509,11 +499,11 @@ Nodes (4): ChunkContent, CodeRef, _chunk(), _ref()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `LLMProvider` connect `Community 76` to `Community 9`, `Community 12`, `Community 14`, `Community 19`, `Community 24`, `Community 25`, `Community 27`, `Community 28`, `Community 30`, `Community 34`, `Community 39`, `Community 45`, `Community 50`, `Community 52`, `Community 56`, `Community 61`, `Community 63`, `Community 64`, `Community 67`, `Community 74`, `Community 87`?**
+- **Why does `LLMProvider` connect `Community 76` to `Community 9`, `Community 12`, `Community 14`, `Community 19`, `Community 24`, `Community 25`, `Community 27`, `Community 28`, `Community 30`, `Community 34`, `Community 39`, `Community 45`, `Community 50`, `Community 52`, `Community 56`, `Community 63`, `Community 64`, `Community 67`, `Community 74`, `Community 87`?**
   _High betweenness centrality (0.096) - this node is a cross-community bridge._
 - **Why does `Settings` connect `Community 30` to `Community 9`, `Community 76`, `Community 45`, `Community 14`, `Community 15`, `Community 50`, `Community 51`, `Community 52`, `Community 53`, `Community 20`, `Community 87`, `Community 24`, `Community 19`, `Community 59`?**
   _High betweenness centrality (0.092) - this node is a cross-community bridge._
-- **Why does `IntentProfile` connect `Community 25` to `Community 64`, `Community 66`, `Community 67`, `Community 34`, `Community 39`, `Community 8`, `Community 72`, `Community 74`, `Community 11`, `Community 12`, `Community 76`, `Community 80`, `Community 57`, `Community 27`, `Community 30`?**
+- **Why does `IntentProfile` connect `Community 25` to `Community 64`, `Community 66`, `Community 67`, `Community 34`, `Community 39`, `Community 8`, `Community 72`, `Community 74`, `Community 11`, `Community 12`, `Community 76`, `Community 57`, `Community 27`, `Community 30`?**
   _High betweenness centrality (0.055) - this node is a cross-community bridge._
 - **Are the 147 inferred relationships involving `IntentProfile` (e.g. with `Any` and `TourEventType`) actually correct?**
   _`IntentProfile` has 147 INFERRED edges - model-reasoned connections that need verification._

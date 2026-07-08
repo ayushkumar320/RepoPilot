@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/models.py": {
-    "mtime": 1783340980.9327586,
-    "ast_hash": "86f497019cf055964a10a85c68f63352",
+    "mtime": 1783491077.1399894,
+    "ast_hash": "ba535442fd056986d257a1a7f9bec3c4",
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/provider.py": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/settings.py": {
-    "mtime": 1781877955.2087457,
-    "ast_hash": "0a6b659625c726a0e8a0bfa81de499e3",
+    "mtime": 1783491077.1404762,
+    "ast_hash": "ea73c3a7ade8b795121631583dcb4d88",
     "semantic_hash": ""
   },
   "packages/core/tests/__init__.py": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "packages/core/tests/test_llm_provider.py": {
-    "mtime": 1781877955.2093902,
-    "ast_hash": "f94783af74cdf1d5b293367716c06a0a",
+    "mtime": 1783491077.1408656,
+    "ast_hash": "8c3ff2c339e14109a3637c987e245bc6",
     "semantic_hash": ""
   },
   "packages/core/tests/test_settings.py": {

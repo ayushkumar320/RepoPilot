@@ -3620,7 +3620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "contribute_briefing",
-      "community": 57,
+      "community": 25,
       "norm_label": "briefing.py"
     },
     {
@@ -3630,7 +3630,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "contribute_briefing_ranker_rationale",
-      "community": 57,
+      "community": 25,
       "norm_label": "ranker_rationale()"
     },
     {
@@ -3640,7 +3640,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_py_capabilityplan",
-      "community": 57,
+      "community": 25,
       "norm_label": "capabilityplan"
     },
     {
@@ -3650,7 +3650,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_py_intentprofile",
-      "community": 57,
+      "community": 25,
       "norm_label": "intentprofile"
     },
     {
@@ -3660,7 +3660,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "contribute_briefing_build_opportunity_briefing",
-      "community": 57,
+      "community": 25,
       "norm_label": "build_opportunity_briefing()"
     },
     {
@@ -3670,7 +3670,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_py_opportunity",
-      "community": 57,
+      "community": 25,
       "norm_label": "opportunity"
     },
     {
@@ -3680,7 +3680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "contribute_briefing_rationale_1",
-      "community": 57,
+      "community": 25,
       "norm_label": "teacher-facing briefing helpers for phase 5 opportunity cards."
     },
     {
@@ -3690,7 +3690,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "contribute_briefing_rationale_9",
-      "community": 57,
+      "community": 25,
       "norm_label": "plain-english explanation of planner-derived ranker weights."
     },
     {
@@ -3700,7 +3700,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "contribute_briefing_rationale_26",
-      "community": 57,
+      "community": 25,
       "norm_label": "attach the ui-visible phase 5 briefing surfaces without reranking."
     },
     {
@@ -3850,7 +3850,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "contribute_lane_b_quality",
-      "community": 80,
+      "community": 57,
       "norm_label": "lane_b_quality.py"
     },
     {
@@ -3870,7 +3870,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "contribute_lane_b_quality_difficulty",
-      "community": 80,
+      "community": 57,
       "norm_label": "_difficulty()"
     },
     {
@@ -3880,7 +3880,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_py_symbolmetrics",
-      "community": 80,
+      "community": 57,
       "norm_label": "symbolmetrics"
     },
     {
@@ -3890,7 +3890,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "contribute_lane_b_quality_detect_quality_opportunities",
-      "community": 80,
+      "community": 57,
       "norm_label": "detect_quality_opportunities()"
     },
     {
@@ -3900,7 +3900,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_py_intentprofile",
-      "community": 80,
+      "community": 57,
       "norm_label": "intentprofile"
     },
     {
@@ -3910,7 +3910,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_lane_b_quality_py_opportunity",
-      "community": 80,
+      "community": 57,
       "norm_label": "opportunity"
     },
     {
@@ -3920,7 +3920,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "contribute_lane_b_quality_run_lane_b_quality",
-      "community": 80,
+      "community": 57,
       "norm_label": "run_lane_b_quality()"
     },
     {
@@ -3930,7 +3930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "contribute_lane_b_quality_rationale_1",
-      "community": 80,
+      "community": 57,
       "norm_label": "lane b \u2014 deterministic code-health opportunities."
     },
     {
@@ -3940,7 +3940,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "contribute_lane_b_quality_rationale_33",
-      "community": 80,
+      "community": 57,
       "norm_label": "transform deterministic detector hits into unified opportunities."
     },
     {
@@ -4880,7 +4880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "qa_graph",
-      "community": 61,
+      "community": 28,
       "norm_label": "graph.py"
     },
     {
@@ -4890,7 +4890,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "qa_graph_qaresult",
-      "community": 61,
+      "community": 28,
       "norm_label": "qaresult"
     },
     {
@@ -4900,7 +4900,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "qa_graph_context",
-      "community": 61,
+      "community": 28,
       "norm_label": "_context"
     },
     {
@@ -4940,7 +4940,7 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "qa_graph_extend_context",
-      "community": 61,
+      "community": 28,
       "norm_label": "_extend_context()"
     },
     {
@@ -4990,7 +4990,7 @@
       "source_location": "L229",
       "_origin": "ast",
       "id": "qa_graph_is_not_found",
-      "community": 61,
+      "community": 28,
       "norm_label": "_is_not_found()"
     },
     {
@@ -5020,7 +5020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "qa_graph_rationale_1",
-      "community": 61,
+      "community": 28,
       "norm_label": "q&a langgraph mini-graph \u2014 the phase 2 spine.  ``` vector_search \u2192 graph_travers"
     },
     {
@@ -5030,7 +5030,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "qa_graph_rationale_66",
-      "community": 61,
+      "community": 28,
       "norm_label": "the end-to-end output of one q&a run."
     },
     {
@@ -8500,7 +8500,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "tests_test_qa_graph_ref",
-      "community": 96,
+      "community": 61,
       "norm_label": "_ref()"
     },
     {
@@ -8510,7 +8510,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_tests_test_qa_graph_py_coderef",
-      "community": 96,
+      "community": 61,
       "norm_label": "coderef"
     },
     {
@@ -8520,7 +8520,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_test_qa_graph_chunk",
-      "community": 96,
+      "community": 61,
       "norm_label": "_chunk()"
     },
     {
@@ -8530,7 +8530,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "packages_agents_tests_test_qa_graph_py_chunkcontent",
-      "community": 96,
+      "community": 61,
       "norm_label": "chunkcontent"
     },
     {
@@ -10557,7 +10557,7 @@
       "label": "._coerce_web_origins()",
       "file_type": "code",
       "source_file": "packages/core/src/repopilot_core/settings.py",
-      "source_location": "L98",
+      "source_location": "L102",
       "_origin": "ast",
       "id": "repopilot_core_settings_settings_coerce_web_origins",
       "community": 20,
@@ -10567,7 +10567,7 @@
       "label": "get_settings()",
       "file_type": "code",
       "source_file": "packages/core/src/repopilot_core/settings.py",
-      "source_location": "L105",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "repopilot_core_settings_get_settings",
       "community": 19,
@@ -10617,9 +10617,9 @@
       "label": "Cached settings accessor. Tests should call `get_settings.cache_clear()`.",
       "file_type": "rationale",
       "source_file": "packages/core/src/repopilot_core/settings.py",
-      "source_location": "L106",
+      "source_location": "L110",
       "_origin": "ast",
-      "id": "repopilot_core_settings_rationale_106",
+      "id": "repopilot_core_settings_rationale_110",
       "community": 19,
       "norm_label": "cached settings accessor. tests should call `get_settings.cache_clear()`."
     },
@@ -11044,20 +11044,20 @@
       "norm_label": "test_backoff_delay_is_bounded()"
     },
     {
-      "label": "test_llm_forced_429_storm_falls_back_to_huggingface()",
+      "label": "test_llm_forced_429_storm_falls_back_to_cerebras()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
       "source_location": "L84",
       "_origin": "ast",
-      "id": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
+      "id": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
       "community": 9,
-      "norm_label": "test_llm_forced_429_storm_falls_back_to_huggingface()"
+      "norm_label": "test_llm_forced_429_storm_falls_back_to_cerebras()"
     },
     {
       "label": "test_llm_chain_exhausted_raises_provider_error()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L142",
+      "source_location": "L136",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_llm_chain_exhausted_raises_provider_error",
       "community": 9,
@@ -11067,7 +11067,7 @@
       "label": "test_llm_retry_override_caps_provider_attempts()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L160",
+      "source_location": "L157",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_llm_retry_override_caps_provider_attempts",
       "community": 9,
@@ -11077,27 +11077,27 @@
       "label": "test_llm_token_counter_increments()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L194",
+      "source_location": "L191",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_llm_token_counter_increments",
       "community": 9,
       "norm_label": "test_llm_token_counter_increments()"
     },
     {
-      "label": "test_verifier_uses_groq_with_hf_fallback()",
+      "label": "test_verifier_uses_groq_with_cerebras_fallback()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L213",
+      "source_location": "L210",
       "_origin": "ast",
-      "id": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback",
+      "id": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
       "community": 9,
-      "norm_label": "test_verifier_uses_groq_with_hf_fallback()"
+      "norm_label": "test_verifier_uses_groq_with_cerebras_fallback()"
     },
     {
       "label": "test_real_httpx_429_path()",
       "file_type": "code",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L243",
+      "source_location": "L244",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_real_httpx_429_path",
       "community": 9,
@@ -11114,34 +11114,34 @@
       "norm_label": "phase 0 tdd tests 1\u20134 for `llmprovider`.  each test is one of the gates from `do"
     },
     {
-      "label": "Groq is 429ing indefinitely. The provider must reach Hugging Face     and return",
+      "label": "Groq is 429ing indefinitely. The provider must reach Cerebras and     return a r",
       "file_type": "rationale",
       "source_file": "packages/core/tests/test_llm_provider.py",
       "source_location": "L85",
       "_origin": "ast",
       "id": "tests_test_llm_provider_rationale_85",
       "community": 9,
-      "norm_label": "groq is 429ing indefinitely. the provider must reach hugging face     and return"
+      "norm_label": "groq is 429ing indefinitely. the provider must reach cerebras and     return a r"
     },
     {
-      "label": "VERIFIER resolves to Groq first then Hugging Face \u2014 Cerebras must not be touched",
+      "label": "VERIFIER resolves to Groq first, Cerebras on 429 \u2014 HF is NOT in the chain.",
       "file_type": "rationale",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L214",
+      "source_location": "L211",
       "_origin": "ast",
-      "id": "tests_test_llm_provider_rationale_214",
+      "id": "tests_test_llm_provider_rationale_211",
       "community": 9,
-      "norm_label": "verifier resolves to groq first then hugging face \u2014 cerebras must not be touched"
+      "norm_label": "verifier resolves to groq first, cerebras on 429 \u2014 hf is not in the chain."
     },
     {
-      "label": "End-to-end with a real httpx client and respx mocks for the HTTP layer.      Thi",
+      "label": "End-to-end with a real httpx client and respx mocks for the HTTP layer.      Pro",
       "file_type": "rationale",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L244",
+      "source_location": "L245",
       "_origin": "ast",
-      "id": "tests_test_llm_provider_rationale_244",
+      "id": "tests_test_llm_provider_rationale_245",
       "community": 9,
-      "norm_label": "end-to-end with a real httpx client and respx mocks for the http layer.      thi"
+      "norm_label": "end-to-end with a real httpx client and respx mocks for the http layer.      pro"
     },
     {
       "label": "test_settings.py",
@@ -43021,9 +43021,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L152",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding",
-      "target": "verifier_grounding_strip_reasoning",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_strip_reasoning"
     },
     {
       "relation": "contains",
@@ -43934,9 +43934,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L165",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_parse_verdict",
-      "target": "verifier_grounding_strip_reasoning",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_strip_reasoning"
     },
     {
       "relation": "rationale_for",
@@ -43944,9 +43944,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L153",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_153",
-      "target": "verifier_grounding_strip_reasoning",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_strip_reasoning"
     },
     {
       "relation": "calls",
@@ -44042,9 +44042,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L159",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_159",
-      "target": "verifier_grounding_parse_verdict",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_parse_verdict"
     },
     {
       "relation": "calls",
@@ -44096,9 +44096,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L191",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_191",
-      "target": "verifier_grounding_verify_claim",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claim"
     },
     {
       "relation": "references",
@@ -44234,9 +44234,9 @@
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
       "source_location": "L250",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "verifier_grounding_rationale_250",
-      "target": "verifier_grounding_verify_claims",
-      "confidence_score": 1.0
+      "target": "verifier_grounding_verify_claims"
     },
     {
       "relation": "contains",
@@ -49095,9 +49095,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_ignores_decoy_json_without_decision",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_ignores_decoy_json_without_decision"
     },
     {
       "relation": "contains",
@@ -49125,9 +49125,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_when_only_think_block",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_returns_none_when_only_think_block"
     },
     {
       "relation": "contains",
@@ -49135,9 +49135,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_strips_closed_think_block",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_strips_closed_think_block"
     },
     {
       "relation": "contains",
@@ -49145,9 +49145,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_parse_verdict_survives_unclosed_think_when_json_precedes",
-      "confidence_score": 1.0
+      "target": "tests_test_verifier_grounding_test_parse_verdict_survives_unclosed_think_when_json_precedes"
     },
     {
       "relation": "contains",
@@ -50624,9 +50624,9 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L97",
+      "source_location": "L95",
       "weight": 1.0,
-      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
       "target": "llm_provider_ratelimiterror"
     },
     {
@@ -53629,11 +53629,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/src/repopilot_core/settings.py",
-      "source_location": "L106",
+      "source_location": "L110",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "repopilot_core_settings_rationale_106",
-      "target": "repopilot_core_settings_get_settings"
+      "source": "repopilot_core_settings_rationale_110",
+      "target": "repopilot_core_settings_get_settings",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -53838,11 +53838,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L95",
+      "source_location": "L93",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
-      "target": "tests_conftest_fakeclient"
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -53871,11 +53871,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L215",
+      "source_location": "L212",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback",
-      "target": "tests_conftest_fakeclient"
+      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "target": "tests_conftest_fakeclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -54086,11 +54086,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L112",
+      "source_location": "L108",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
-      "target": "tests_conftest_make_provider"
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -54119,11 +54119,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L227",
+      "source_location": "L226",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback",
-      "target": "tests_conftest_make_provider"
+      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "target": "tests_conftest_make_provider",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -54174,11 +54174,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L103",
+      "source_location": "L97",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
-      "target": "tests_conftest_make_response"
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -54207,11 +54207,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L218",
+      "source_location": "L215",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback",
-      "target": "tests_conftest_make_response"
+      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "target": "tests_conftest_make_response",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -54448,9 +54448,9 @@
       "source_file": "packages/core/tests/test_llm_provider.py",
       "source_location": "L84",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_test_llm_provider",
-      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface"
+      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -54486,11 +54486,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L213",
+      "source_location": "L210",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_test_llm_provider",
-      "target": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback"
+      "target": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -54551,11 +54551,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L123",
+      "source_location": "L119",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface",
-      "target": "tests_test_llm_provider_msgs"
+      "source": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -54595,11 +54595,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L236",
+      "source_location": "L235",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback",
-      "target": "tests_test_llm_provider_msgs"
+      "source": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "target": "tests_test_llm_provider_msgs",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -54618,29 +54618,29 @@
       "source_file": "packages/core/tests/test_llm_provider.py",
       "source_location": "L85",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_test_llm_provider_rationale_85",
-      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_huggingface"
+      "target": "tests_test_llm_provider_test_llm_forced_429_storm_falls_back_to_cerebras",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L214",
+      "source_location": "L211",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_rationale_214",
-      "target": "tests_test_llm_provider_test_verifier_uses_groq_with_hf_fallback"
+      "source": "tests_test_llm_provider_rationale_211",
+      "target": "tests_test_llm_provider_test_verifier_uses_groq_with_cerebras_fallback",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/core/tests/test_llm_provider.py",
-      "source_location": "L244",
+      "source_location": "L245",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_llm_provider_rationale_244",
-      "target": "tests_test_llm_provider_test_real_httpx_429_path"
+      "source": "tests_test_llm_provider_rationale_245",
+      "target": "tests_test_llm_provider_test_real_httpx_429_path",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -65726,5 +65726,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "adfda45f04d1ffc9fd714e7ce3ec40e72cdc6f11"
+  "built_at_commit": "942f7f61fdef1b6de9f1f8874b2449ff30dd89b5"
 }

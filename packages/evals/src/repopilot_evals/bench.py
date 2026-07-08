@@ -50,21 +50,27 @@ async def bench_repo(
     dataset = REPO_DATASETS[repo]
     print(f"[bench] phase {phase} · repo {repo} · dataset {dataset}")
 
-    print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
-    # Phase ≥ 1 measures the Q&A lane's retrieval policy (wide pool, source
-    # lane only); phase 0 keeps the raw k=max(ks) call so baselines stay
-    # reproducible.
-    retrieval_kwargs: dict[str, object] = {}
+    # One retrieval policy drives all three LLM-path evals so the arms are
+    # comparable under a single verifier. Phase 0 = pre-Phase-1 policy (k-only
+    # pool, no path filter); phase ≥ 1 = the Phase 1 policy (wide source-only
+    # pool). This is what makes the grounding/latency guardrails honest: both
+    # _before (phase 0) and _after (phase 1) are measured with the same,
+    # fixed verifier — only the retrieval policy differs.
+    policy_kwargs: dict[str, object]
     if phase >= 1:
-        retrieval_kwargs = {
+        policy_kwargs = {
             "recall_k": qa_graph.RECALL_K,
             "exclude_path_prefixes": NON_SOURCE_PATH_PREFIXES,
         }
+    else:
+        policy_kwargs = {"recall_k": None, "exclude_path_prefixes": ()}
+
+    print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
     retrieval = await run_retrieval_eval(
         dataset_name=dataset,
         repo_slug=repo,
         sample_limit=sample,
-        **retrieval_kwargs,  # type: ignore[arg-type]
+        **policy_kwargs,  # type: ignore[arg-type]
     )
     metrics: dict[str, object] = dict(retrieval.as_dict())
     metrics["per_question"] = {
@@ -76,9 +82,13 @@ async def bench_repo(
     if not skip_llm:
         print("[bench] grounding + hallucination (full answer_question path)…")
         grounding = await run_grounding_eval(
-            dataset_name=dataset, repo_slug=repo, sample_limit=sample
+            dataset_name=dataset,
+            repo_slug=repo,
+            sample_limit=sample,
+            **policy_kwargs,  # type: ignore[arg-type]
         )
         metrics["grounding_accuracy"] = grounding.grounding_accuracy
+        metrics["claim_grounding_rate"] = grounding.claim_grounding_rate
         metrics["hallucination_rate"] = grounding.hallucination_rate
         metrics["keyword_accuracy"] = grounding.keyword_accuracy
         metrics["grounding_cases"] = [asdict(c) for c in grounding.cases]
@@ -90,7 +100,12 @@ async def bench_repo(
             metrics["verifier_accuracy"] = verifier.accuracy
 
         print("[bench] latency p50/p95…")
-        latency = await run_latency_eval(dataset_name=dataset, repo_slug=repo, sample_limit=sample)
+        latency = await run_latency_eval(
+            dataset_name=dataset,
+            repo_slug=repo,
+            sample_limit=sample,
+            **policy_kwargs,  # type: ignore[arg-type]
+        )
         metrics.update(latency.as_dict())
         metrics.pop("total", None)
         metrics["total"] = retrieval.total
@@ -258,6 +273,8 @@ def main() -> int:
         "ndcg@10",
         "mrr",
         "grounding_accuracy",
+        "claim_grounding_rate",
+        "keyword_accuracy",
         "hallucination_rate",
         "verifier_accuracy",
         "latency_p50_ms",

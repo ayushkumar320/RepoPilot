@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1783339871.5160427,
-    "ast_hash": "6656e0a910e49b8bcbb2bde373da446c",
+    "mtime": 1783534577.7916217,
+    "ast_hash": "54e70cb712c21dd88200767cf10de9af",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/graph.py": {
-    "mtime": 1783340195.0852385,
-    "ast_hash": "ce0357e09e40a1bffd4b5a6b618f485c",
+    "mtime": 1783532472.4466095,
+    "ast_hash": "f32e80b3f530b7b7a1e8de7fe84e1d85",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/prompts.py": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/grounding.py": {
-    "mtime": 1781669702.0607414,
-    "ast_hash": "15e347662bfa07d712f33e06a9af9b51",
+    "mtime": 1783533905.9794102,
+    "ast_hash": "6cb14348e24ef29bf0c568bbaf2410c0",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/verifier.py": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "packages/evals/tests/test_eval_runners.py": {
-    "mtime": 1781669702.0611436,
-    "ast_hash": "a22c6893f602658a6bb8c181134c1e8b",
+    "mtime": 1783532497.90327,
+    "ast_hash": "884d0e15db555b1e0ef142bd9197a5cb",
     "semantic_hash": ""
   },
   ".github/workflows/eval-main.yml": {
@@ -735,13 +735,13 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/bench.py": {
-    "mtime": 1783340304.1669,
-    "ast_hash": "fec9b1351d6658189f0f1997ca8f4279",
+    "mtime": 1783533927.514013,
+    "ast_hash": "0b5bd8272527dccc4ab143ca6d50f383",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/latency.py": {
-    "mtime": 1783176909.4472723,
-    "ast_hash": "6e107e72deabae1756c73d590f573c48",
+    "mtime": 1783532364.9217484,
+    "ast_hash": "c1be2a1788b7f8714bb8b2144377d4c4",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/runners/retrieval.py": {
@@ -820,7 +820,7 @@
     "semantic_hash": ""
   },
   "evals/results/rag_phase0/httpx_baseline.json": {
-    "mtime": 1783339132.7269394,
+    "mtime": 1783534450.7896476,
     "ast_hash": "545e96168a28b2e68e20e59ee218e883",
     "semantic_hash": ""
   },
@@ -850,8 +850,8 @@
     "semantic_hash": ""
   },
   "evals/results/rag_phase1/_before.json": {
-    "mtime": 1783340054.7476442,
-    "ast_hash": "162dfe65b050ca9fe71812f8f85247cc",
+    "mtime": 1783534518.5646954,
+    "ast_hash": "8bebf3e13699196b7f3e407b2803b761",
     "semantic_hash": ""
   },
   "evals/results/rag_phase1/fastapi_baseline.json": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "evals/results/rag_phase1/httpx_baseline.json": {
-    "mtime": 1783341214.404161,
-    "ast_hash": "8d2a6df91edbe83ee8f6cb2097963f61",
+    "mtime": 1783534029.132146,
+    "ast_hash": "6dffbd5975b710fbc6889413c589b8f8",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_vector_search_filters.py": {
@@ -877,6 +877,16 @@
   "evals/results/rag_phase1/verifier_recheck.json": {
     "mtime": 1783490597.9439106,
     "ast_hash": "6187c5e8ddd7c5aff0bb2cb58658afa3",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase1/_after.json": {
+    "mtime": 1783534518.5650377,
+    "ast_hash": "e77d102bea395697e5cb1c29902ff7b5",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase1/delta.json": {
+    "mtime": 1783534518.5651276,
+    "ast_hash": "993f5c2297054fc9e1539c8afbc69360",
     "semantic_hash": ""
   }
 }

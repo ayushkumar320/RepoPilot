@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import structlog
@@ -91,8 +92,16 @@ async def answer_question(
     repo_id: str,
     k: int = 8,
     max_hops: int = MAX_HOPS,
+    recall_k: int | None = RECALL_K,
+    exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
 ) -> QAResult:
-    """Run the hybrid-retrieval Q&A loop for ``question``."""
+    """Run the hybrid-retrieval Q&A loop for ``question``.
+
+    ``recall_k`` / ``exclude_path_prefixes`` default to the Phase 1 policy
+    (wide source-only pool). Passing ``recall_k=None`` and
+    ``exclude_path_prefixes=()`` reproduces the pre-Phase-1 ``k``-only
+    retrieval — used by the eval to baseline both arms under one verifier.
+    """
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
     # Initial vector hit: wide recall pool, source lane only (gold-label
@@ -103,10 +112,11 @@ async def answer_question(
         provider=provider,
         repo_id=repo_id,
         k=k,
-        recall_k=RECALL_K,
-        exclude_path_prefixes=NON_SOURCE_PATH_PREFIXES,
+        recall_k=recall_k,
+        exclude_path_prefixes=exclude_path_prefixes,
     )
-    ctx.retrieval_path.append(f"vector_search:recall_k={RECALL_K}:k={k}:hits={len(hits)}")
+    pool = recall_k if recall_k is not None else k
+    ctx.retrieval_path.append(f"vector_search:recall_k={pool}:k={k}:hits={len(hits)}")
     initial_chunks = await read_chunks([h.ref for h in hits[:k]], engine=engine, repo_id=repo_id)
     _extend_context(ctx, initial_chunks)
 
@@ -268,4 +278,11 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     return out
 
 
-__all__ = ["MAX_HOPS", "NOT_FOUND_SENTINEL", "RECALL_K", "QAResult", "answer_question"]
+__all__ = [
+    "MAX_HOPS",
+    "NON_SOURCE_PATH_PREFIXES",
+    "NOT_FOUND_SENTINEL",
+    "RECALL_K",
+    "QAResult",
+    "answer_question",
+]

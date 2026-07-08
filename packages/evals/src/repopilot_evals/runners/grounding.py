@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
-from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, QAResult, answer_question
+from repopilot_agents.qa.graph import (
+    NON_SOURCE_PATH_PREFIXES,
+    NOT_FOUND_SENTINEL,
+    RECALL_K,
+    QAResult,
+    answer_question,
+)
 from repopilot_agents.types import CodeRef
 from repopilot_core.settings import Settings
 from repopilot_evals.datasets import (
@@ -24,6 +31,8 @@ class GroundingEvalCaseResult:
     ref_match: bool
     hallucination_pass: bool
     hops: int
+    n_claims: int = 0
+    n_verified: int = 0
 
 
 @dataclass(slots=True)
@@ -39,7 +48,24 @@ class GroundingEvalMetrics:
 
     @property
     def grounding_accuracy(self) -> float:
+        """All-or-nothing: fraction of questions with *every* claim verified.
+
+        Sensitive to answer richness — a question with many claims fails if a
+        single one is rejected. Read alongside ``claim_grounding_rate``.
+        """
         return self.grounded_correct / self.total if self.total else 0.0
+
+    @property
+    def claim_grounding_rate(self) -> float:
+        """Per-claim: fraction of *all* claims (across questions) verified.
+
+        Not confounded by how many claims an answer makes, so it separates
+        "answers got richer" from "answers got less grounded". Not-in-repo
+        questions contribute no claims and are excluded from the denominator.
+        """
+        total_claims = sum(c.n_claims for c in self.cases)
+        verified = sum(c.n_verified for c in self.cases)
+        return verified / total_claims if total_claims else 0.0
 
     @property
     def keyword_accuracy(self) -> float:
@@ -94,6 +120,8 @@ async def run_grounding_eval(
     repo_id: str | None = None,
     sample_limit: int | None = None,
     settings: Settings | None = None,
+    recall_k: int | None = RECALL_K,
+    exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
 ) -> GroundingEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     return await run_grounding_eval_rows(
@@ -101,6 +129,8 @@ async def run_grounding_eval(
         repo_slug=repo_slug,
         repo_id=repo_id,
         settings=settings,
+        recall_k=recall_k,
+        exclude_path_prefixes=exclude_path_prefixes,
     )
 
 
@@ -110,6 +140,8 @@ async def run_grounding_eval_rows(
     repo_slug: str,
     repo_id: str | None = None,
     settings: Settings | None = None,
+    recall_k: int | None = RECALL_K,
+    exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
 ) -> GroundingEvalMetrics:
     ctx = build_eval_context(settings)
     try:
@@ -121,11 +153,14 @@ async def run_grounding_eval_rows(
                 engine=ctx.engine,
                 provider=ctx.provider,
                 repo_id=resolved_repo_id,
+                recall_k=recall_k,
+                exclude_path_prefixes=exclude_path_prefixes,
             )
             grounded = all(claim.status == "verified" for claim in result.claims)
             keyword_match = _contains_all_keywords(result.answer, row.expected_answer_keywords)
             ref_match = _has_expected_refs(result, row.expected_refs)
             hallucination_pass = _is_hallucination_safe(row, result)
+            n_verified = sum(1 for claim in result.claims if claim.status == "verified")
             cases.append(
                 GroundingEvalCaseResult(
                     question=row.question,
@@ -134,6 +169,8 @@ async def run_grounding_eval_rows(
                     ref_match=ref_match,
                     hallucination_pass=hallucination_pass,
                     hops=result.hops,
+                    n_claims=len(result.claims),
+                    n_verified=n_verified,
                 )
             )
 

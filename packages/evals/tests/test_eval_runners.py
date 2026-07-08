@@ -53,6 +53,7 @@ async def test_httpx_qa_grounding_accuracy_sampled(monkeypatch: pytest.MonkeyPat
         repo_id: str,
         k: int = 8,
         max_hops: int = 3,
+        **_kwargs: object,
     ) -> QAResult:
         ref = CodeRef(
             file_path="httpx/_client.py", start_line=10, end_line=20, symbol="httpx.Client"
@@ -146,6 +147,7 @@ async def test_run_grounding_eval_rows_computes_metrics(monkeypatch: pytest.Monk
         repo_id: str,
         k: int = 8,
         max_hops: int = 3,
+        **_kwargs: object,
     ) -> QAResult:
         if "not in repo" in question.lower():
             return QAResult(

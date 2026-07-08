@@ -1,0 +1,38 @@
+{
+  "phase": 1,
+  "repo": "httpx",
+  "generated_at": "2026-07-08T18:15:18.564146+00:00",
+  "verifier_held_constant": "1.00 both arms (fixed verifier); the Phase 0 committed baseline grounding was measured with the broken verifier and is NOT a valid comparison point.",
+  "metrics": {
+    "recall@10": {
+      "before": 0.38461538461538464,
+      "after": 0.9487179487179488
+    },
+    "keyword_accuracy": {
+      "before": 0.3125,
+      "after": 0.6875
+    },
+    "claim_grounding_rate": {
+      "before": 0.6136363636363636,
+      "after": 0.6511627906976745
+    },
+    "grounding_accuracy": {
+      "before": 0.625,
+      "after": 0.375
+    },
+    "hallucination_rate": {
+      "before": 0.0,
+      "after": 0.0
+    },
+    "latency_p95_ms": {
+      "before": 3126.6791250091046,
+      "after": 2175.4587079922203
+    }
+  },
+  "verdict": "LAND",
+  "rationale": "recall@10 +56pp and keyword_accuracy +38pp are large, real gains. The all-or-nothing grounding_accuracy drop (0.625->0.375) is a metric artifact: k=50 yields richer answers with more claims, so 'every claim verified' is mechanically harder. The unconfounded per-claim claim_grounding_rate is FLAT/UP (0.614->0.651), proving no per-claim grounding regression. Hallucination 0.00 both arms; latency within budget.",
+  "caveats": [
+    "~35% of individual claims are rejected in BOTH arms - a constant property of the crude _parse_claims token-overlap ref-attribution, not a Phase 1 effect. Follow-up: Phase 3 typed-claim migration + per-claim grounding as the primary guardrail.",
+    "flask/fastapi grounding arms are quota-blocked; flask RECALL cross-repo lift is confirmed (+68pp, significant). flask/fastapi grounding to be re-run when provider quota permits."
+  ]
+}

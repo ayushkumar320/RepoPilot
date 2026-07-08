@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
 
-from repopilot_agents.qa.graph import answer_question
+from repopilot_agents.qa.graph import (
+    NON_SOURCE_PATH_PREFIXES,
+    RECALL_K,
+    answer_question,
+)
 from repopilot_core.settings import Settings
 from repopilot_evals.datasets import (
     dataset_path,
@@ -51,6 +56,8 @@ async def run_latency_eval(
     repo_id: str | None = None,
     sample_limit: int | None = None,
     settings: Settings | None = None,
+    recall_k: int | None = RECALL_K,
+    exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
 ) -> LatencyEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     ctx = build_eval_context(settings)
@@ -64,6 +71,8 @@ async def run_latency_eval(
                 engine=ctx.engine,
                 provider=ctx.provider,
                 repo_id=resolved,
+                recall_k=recall_k,
+                exclude_path_prefixes=exclude_path_prefixes,
             )
             timings.append((time.perf_counter() - start) * 1000)
         return LatencyEvalMetrics(total=len(timings), timings_ms=timings)

@@ -52,17 +52,20 @@
       1.0
     ]
   },
-  "grounding_accuracy": 0.1875,
+  "grounding_accuracy": 0.375,
+  "claim_grounding_rate": 0.6511627906976745,
   "hallucination_rate": 0.0,
   "keyword_accuracy": 0.6875,
   "grounding_cases": [
     {
       "question": "How does httpx.Client.send dispatch a Request through the transport layer?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 6
     },
     {
       "question": "Where is timeout configuration merged into a Request before it is dispatched?",
@@ -70,7 +73,9 @@
       "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 4,
+      "n_verified": 1
     },
     {
       "question": "How is the Authorization header constructed for HTTP Basic authentication?",
@@ -78,15 +83,19 @@
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 4,
+      "n_verified": 1
     },
     {
       "question": "How is the connection pool sized via max_connections and max_keepalive_connections?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 3,
+      "n_verified": 3
     },
     {
       "question": "How does the GZipDecoder decode gzipped response bodies?",
@@ -94,15 +103,19 @@
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 4
     },
     {
       "question": "How does Client enforce a maximum redirect limit while following redirects?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 5
     },
     {
       "question": "Where are HTTP status codes classified as informational, success, redirect, or error?",
@@ -110,7 +123,9 @@
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 2
     },
     {
       "question": "Where does httpx provide a Zstandard decoder for zstd-encoded responses?",
@@ -118,7 +133,9 @@
       "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 9,
+      "n_verified": 5
     },
     {
       "question": "Where is the SSL context created for outgoing TLS connections?",
@@ -126,7 +143,9 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 5
     },
     {
       "question": "How is a Proxy URL plus optional auth represented in the configuration model?",
@@ -134,7 +153,9 @@
       "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 8,
+      "n_verified": 4
     },
     {
       "question": "Trace what happens between Client.send and the underlying httpcore.Request being dispatched by the connection pool.",
@@ -142,7 +163,9 @@
       "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 1
+      "hops": 1,
+      "n_claims": 15,
+      "n_verified": 10
     },
     {
       "question": "How does DigestAuth handle a 401 challenge and produce a follow-up request with credentials?",
@@ -150,7 +173,9 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 8,
+      "n_verified": 5
     },
     {
       "question": "How does the client merge its default timeout into per-request extensions before a request is sent?",
@@ -158,7 +183,9 @@
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 0
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 5
     },
     {
       "question": "Does httpx automatically rotate AWS IAM credentials retrieved from EC2 instance metadata?",
@@ -166,7 +193,9 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3
+      "hops": 3,
+      "n_claims": 0,
+      "n_verified": 0
     },
     {
       "question": "Where does httpx implement a Django ORM connection pool backed by SQLAlchemy?",
@@ -174,7 +203,9 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3
+      "hops": 3,
+      "n_claims": 0,
+      "n_verified": 0
     },
     {
       "question": "What file defines the React component tree for the httpx documentation site?",
@@ -182,15 +213,17 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3
+      "hops": 3,
+      "n_claims": 0,
+      "n_verified": 0
     }
   ],
-  "verifier_accuracy": 0.6666666666666666,
-  "latency_p50_ms": 1640.1760839798953,
-  "latency_p95_ms": 2171.217541996157,
+  "verifier_accuracy": 1.0,
+  "latency_p50_ms": 1791.4382909948472,
+  "latency_p95_ms": 2175.4587079922203,
   "total": 13,
   "repo": "httpx",
   "dataset": "httpx_qa_v1.jsonl",
   "phase": 1,
-  "generated_at": "2026-07-06T12:33:34.400585+00:00"
+  "generated_at": "2026-07-08T18:07:09.130887+00:00"
 }

@@ -1,6 +1,6 @@
 # Current Build Phase
 
-> **Next build purpose:** **RAG Phase 3 — BM25 Hybrid** (Phase 2 Query Understanding is timeboxed polish — may defer). Add a sparse keyword lane fused with dense via RRF; it's also the natural attack on fastapi's flat recall (its misses are lexical, not tests/docs noise). Spec: [`rag/03_HYBRID_RETRIEVAL_BM25.md`](rag/03_HYBRID_RETRIEVAL_BM25.md).
+> **Next build purpose:** **RAG Phase 3 — BM25 Hybrid** (Phase 2 Query Understanding was **deferred 2026-07-08** — see the deferral note below). Add a sparse keyword lane fused with dense via RRF; it's also the natural attack on fastapi's flat recall (its misses are lexical, not tests/docs noise). Spec: [`rag/03_HYBRID_RETRIEVAL_BM25.md`](rag/03_HYBRID_RETRIEVAL_BM25.md).
 > **Last verified gate:** **RAG Phase 1 — Recall Lift LANDED** (httpx). recall@10 0.385 → **0.949** (+56pp, significant); keyword_accuracy 0.312 → **0.688**; per-claim grounding 0.614 → 0.651 (no regression); hallucination 0.00; verifier 1.00. Artifacts: `evals/results/rag_phase1/{_before,_after,delta}.json`.
 > **Last updated:** 2026-07-08
 
@@ -35,7 +35,7 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 |---|---|---|---|
 | **0 — Baseline** 🟢 | "Unmeasured under real LLM load" | Frozen datasets, baseline numbers, bench + significance runner | done ✅ |
 | **1 — Recall Lift** 🟢 **landed** | Right chunk exists but never enters the k=8 pool (flask misses beyond rank 150) | A 50-wide source-only pool + metadata-filter params for Phase 2 to drive | recall@10 +5 pp → **+56pp ✅** |
-| 2 — Query Understanding *(may defer)* | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
+| 2 — Query Understanding ⚪ **deferred** (2026-07-08) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
 | **3 — BM25 Hybrid** 🟡 **← next** **(must-ship)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp on rare-symbol |
 | 4 — Reranking **(must-ship)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8 | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 |
 | 5 — Compression *(may defer)* | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens, grounding equal |
@@ -44,7 +44,16 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 
 Priority (from the 2-day ship plan): **1 + 3 + 4 are the meaningful-quality minimum; 2, 5, 6 are timeboxed polish** — a blown timebox means cut and defer with a clean entry note, never stretch.
 
-Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked.
+Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked · ⚪ deferred (timeboxed, cut cleanly).
+
+### Phase 2 — Query Understanding: DEFERRED (2026-07-08)
+
+Cut per the 2-day ship plan's priority call (1 + 3 + 4 are the must-ship quality spine; 2 + 5 + 6 are polish). Deferring is a clean, expected outcome — not a failure.
+
+- **Nothing was implemented** — no `QuerySpec`, no partial code merged. Clean cut, no half-merged state.
+- **Downstream is unaffected**: Phase 3 measures against Phase 1's landed `_after.json`, and Phase 3 builds the RRF union helper itself (it was only *shared* with Phase 2, not owned by it). Spec confirms: *"If Phase 2 is deferred, run Phase 3 against Phase 1's `_after.json`."*
+- **Entry state if resumed** ([rag/02](rag/02_QUERY_UNDERSTANDING.md)): needs a new `multi_hop_v1.jsonl` (10 labeled rows via the propose→review flow), `qa/query_spec.py` + prompt, and N-parallel `vector_search` + RRF union in `qa/graph.py`. Uses the existing 8B model — zero new deps. Timebox: 2h hard.
+- **Reconsider when**: multi-hop questions are visibly the weak spot after Phase 4, or `fastapi` recall stays flat after Phase 3 (BM25) — query rewriting is the other lever for the lexical-mismatch misses.
 
 ---
 

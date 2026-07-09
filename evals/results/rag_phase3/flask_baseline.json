@@ -1,0 +1,97 @@
+{
+  "mrr": 0.8,
+  "recall@5": 0.8666666666666666,
+  "recall@10": 0.9333333333333333,
+  "recall@20": 0.9333333333333333,
+  "ndcg@5": 0.7437194785781032,
+  "ndcg@10": 0.7719728731500689,
+  "per_question": {
+    "recall@10": [
+      1.0,
+      1.0,
+      1.0,
+      0.6666666666666666,
+      1.0
+    ],
+    "ndcg@5": [
+      0.6509209298071326,
+      0.7653606369886217,
+      0.6309297535714575,
+      0.7039180890341347,
+      0.9674679834891693
+    ],
+    "mrr": [
+      0.5,
+      1.0,
+      0.5,
+      1.0,
+      1.0
+    ]
+  },
+  "recall@10_dense": 1.0,
+  "recall@10_sparse": 0.5,
+  "recall@10_hybrid": 0.9333333333333333,
+  "grounding_accuracy": 0.6,
+  "claim_grounding_rate": 0.7647058823529411,
+  "hallucination_rate": 0.0,
+  "keyword_accuracy": 0.0,
+  "grounding_cases": [
+    {
+      "question": "How does Flask route a URL to its view function?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 4
+    },
+    {
+      "question": "Where does Flask create the application context?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 1,
+      "n_verified": 1
+    },
+    {
+      "question": "Where is the request object made available to view code?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 2,
+      "n_verified": 2
+    },
+    {
+      "question": "Where are Jinja templates rendered in Flask?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 3,
+      "n_verified": 3
+    },
+    {
+      "question": "How does Flask register a blueprint on the app?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 3
+    }
+  ],
+  "latency_p50_ms": 2457.080207997933,
+  "latency_p95_ms": 3095.2805420092773,
+  "total": 5,
+  "repo": "flask",
+  "dataset": "flask_qa_v1.jsonl",
+  "phase": 3,
+  "generated_at": "2026-07-09T05:27:44.435851+00:00"
+}

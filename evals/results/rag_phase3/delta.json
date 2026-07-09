@@ -32,5 +32,27 @@
     "httpx general recall@10 -5pp (0.949->0.897): BM25 keyword noise displaces some dense hits on well-stated NL questions. Resolved properly by Phase 4 rerank / Phase 2 query routing.",
     "Grounding/latency guardrails not re-measured (LLM quota); retrieval-only gate here. Re-run full bench --phase 3 when quota permits.",
     "fastapi_rare_symbol_v1 (12 rows) auto-generated from indexed symbols, refs DB-verified; httpx rare_symbol_v1 (12 rows) terse symbol queries. Both frozen going forward."
-  ]
+  ],
+  "llm_guardrails_httpx": {
+    "note": "Full answer_question path through hybrid retrieval (16 rows). Confirms Phase 3 hybrid does not break end-to-end guardrails vs Phase 1 dense.",
+    "claim_grounding_rate": {
+      "phase1_dense": 0.651,
+      "phase3_hybrid": 0.7317
+    },
+    "hallucination_rate": 0.0,
+    "verifier_accuracy": 1.0,
+    "grounding_accuracy_all_or_nothing": 0.3125,
+    "latency_p95_ms": 3078.7,
+    "latency_caveat": "p95 inflated by free-tier 429 backoff during the run, not by the hybrid path (BM25 adds <50ms). Needs a clean non-throttled run for a definitive latency verdict."
+  },
+  "llm_guardrails_cross_repo": {
+    "flask_partial_5rows": {
+      "claim_grounding_rate": 0.7647,
+      "hallucination_rate": 0.0,
+      "grounding_accuracy": 0.6,
+      "note": "5/20 rows \u2014 free-tier burst limit; directionally consistent with httpx (hallucination 0, per-claim grounding healthy)."
+    },
+    "fastapi": "NOT MEASURED \u2014 free-tier quota exhausted (heaviest run, cold cache, last in queue). Re-run bench --phase 3 --repo fastapi when a fresh provider window is available.",
+    "verdict": "Hybrid retrieval does NOT break end-to-end guardrails: hallucination 0.00 and per-claim grounding not regressed on httpx (full) + flask (partial). fastapi grounding remains the one open cross-repo check."
+  }
 }

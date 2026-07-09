@@ -1,0 +1,232 @@
+{
+  "mrr": 0.8730769230769231,
+  "recall@5": 0.8717948717948718,
+  "recall@10": 0.8974358974358974,
+  "recall@20": 0.9743589743589743,
+  "ndcg@5": 0.8250539622137707,
+  "ndcg@10": 0.835488729400882,
+  "per_question": {
+    "recall@10": [
+      0.6666666666666666,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.6666666666666666,
+      1.0,
+      0.3333333333333333
+    ],
+    "ndcg@5": [
+      0.6713860725233041,
+      1.0,
+      1.0,
+      1.0,
+      0.43067655807339306,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.7039180890341347,
+      0.9197207891481876,
+      0.0
+    ],
+    "mrr": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.25,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.1
+    ]
+  },
+  "recall@10_dense": 0.9487179487179488,
+  "recall@10_sparse": 0.5512820512820513,
+  "recall@10_hybrid": 0.8974358974358974,
+  "grounding_accuracy": 0.3125,
+  "claim_grounding_rate": 0.7317073170731707,
+  "hallucination_rate": 0.0,
+  "keyword_accuracy": 0.5,
+  "grounding_cases": [
+    {
+      "question": "How does httpx.Client.send dispatch a Request through the transport layer?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 7,
+      "n_verified": 7
+    },
+    {
+      "question": "Where is timeout configuration merged into a Request before it is dispatched?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 4,
+      "n_verified": 1
+    },
+    {
+      "question": "How is the Authorization header constructed for HTTP Basic authentication?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 4,
+      "n_verified": 1
+    },
+    {
+      "question": "How is the connection pool sized via max_connections and max_keepalive_connections?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 3
+    },
+    {
+      "question": "How does the GZipDecoder decode gzipped response bodies?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 5,
+      "n_verified": 4
+    },
+    {
+      "question": "How does Client enforce a maximum redirect limit while following redirects?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 3
+    },
+    {
+      "question": "Where are HTTP status codes classified as informational, success, redirect, or error?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 5
+    },
+    {
+      "question": "Where does httpx provide a Zstandard decoder for zstd-encoded responses?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 9,
+      "n_verified": 6
+    },
+    {
+      "question": "Where is the SSL context created for outgoing TLS connections?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 4
+    },
+    {
+      "question": "How is a Proxy URL plus optional auth represented in the configuration model?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 7
+    },
+    {
+      "question": "Trace what happens between Client.send and the underlying httpcore.Request being dispatched by the connection pool.",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 11,
+      "n_verified": 9
+    },
+    {
+      "question": "How does DigestAuth handle a 401 challenge and produce a follow-up request with credentials?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 8,
+      "n_verified": 7
+    },
+    {
+      "question": "How does the client merge its default timeout into per-request extensions before a request is sent?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 5,
+      "n_verified": 3
+    },
+    {
+      "question": "Does httpx automatically rotate AWS IAM credentials retrieved from EC2 instance metadata?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 0,
+      "n_verified": 0
+    },
+    {
+      "question": "Where does httpx implement a Django ORM connection pool backed by SQLAlchemy?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 0,
+      "n_verified": 0
+    },
+    {
+      "question": "What file defines the React component tree for the httpx documentation site?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 3,
+      "n_claims": 0,
+      "n_verified": 0
+    }
+  ],
+  "verifier_accuracy": 1.0,
+  "latency_p50_ms": 2106.818125001155,
+  "latency_p95_ms": 3078.7061250011902,
+  "total": 13,
+  "repo": "httpx",
+  "dataset": "httpx_qa_v1.jsonl",
+  "phase": 3,
+  "generated_at": "2026-07-09T05:25:03.758674+00:00"
+}

@@ -1,0 +1,27 @@
+{
+  "phase": 3,
+  "arm": "hybrid dense+BM25 RRF (dense_weight=3.0)",
+  "generated_at": "2026-07-09T04:42:27.175828+00:00",
+  "recall@10": {
+    "httpx_rare": 1.0,
+    "fastapi_rare": 0.5833,
+    "httpx_general": 0.8974
+  },
+  "per_lane": {
+    "httpx_rare": {
+      "dense": 1.0,
+      "sparse": 0.75,
+      "hybrid": 1.0
+    },
+    "fastapi_rare": {
+      "dense": 0.4167,
+      "sparse": 0.8333,
+      "hybrid": 0.5833
+    },
+    "httpx_general": {
+      "dense": 0.9487,
+      "sparse": 0.5513,
+      "hybrid": 0.8974
+    }
+  }
+}

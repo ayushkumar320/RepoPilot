@@ -65,12 +65,17 @@ async def bench_repo(
     else:
         policy_kwargs = {"recall_k": None, "exclude_path_prefixes": ()}
 
+    # Phase ≥ 3 fuses a BM25 lane; the headline retrieval metric uses hybrid.
+    headline_kwargs = dict(policy_kwargs)
+    if phase >= 3:
+        headline_kwargs["search_mode"] = "hybrid"
+
     print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
     retrieval = await run_retrieval_eval(
         dataset_name=dataset,
         repo_slug=repo,
         sample_limit=sample,
-        **policy_kwargs,  # type: ignore[arg-type]
+        **headline_kwargs,  # type: ignore[arg-type]
     )
     metrics: dict[str, object] = dict(retrieval.as_dict())
     metrics["per_question"] = {
@@ -78,6 +83,19 @@ async def bench_repo(
         "ndcg@5": [c.ndcg[5] for c in retrieval.cases],
         "mrr": [c.mrr for c in retrieval.cases],
     }
+
+    # Per-lane attribution (Phase 3 gate): recall@10 for dense / sparse / hybrid
+    # so BM25's marginal contribution is explicit. Retrieval-only, no LLM cost.
+    if phase >= 3:
+        for lane in ("dense", "sparse", "hybrid"):
+            lane_m = await run_retrieval_eval(
+                dataset_name=dataset,
+                repo_slug=repo,
+                sample_limit=sample,
+                search_mode=lane,  # type: ignore[arg-type]
+                **policy_kwargs,  # type: ignore[arg-type]
+            )
+            metrics[f"recall@10_{lane}"] = lane_m.as_dict()["recall@10"]
 
     if not skip_llm:
         print("[bench] grounding + hallucination (full answer_question path)…")

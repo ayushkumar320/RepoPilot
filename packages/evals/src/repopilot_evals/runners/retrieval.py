@@ -12,7 +12,10 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from math import log2
+from typing import Literal
 
+from repopilot_agents.tools.bm25_search import bm25_search
+from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.vector_search import vector_search
 from repopilot_agents.types import ChunkHit, CodeRef
 from repopilot_core.settings import Settings
@@ -22,6 +25,8 @@ from repopilot_evals.datasets import (
     take_rows,
 )
 from repopilot_evals.runners.common import build_eval_context, resolve_repo_id
+
+SearchMode = Literal["dense", "sparse", "hybrid"]
 
 DEFAULT_KS = (5, 10, 20)
 
@@ -126,24 +131,44 @@ async def run_retrieval_eval(
     settings: Settings | None = None,
     recall_k: int | None = None,
     exclude_path_prefixes: Sequence[str] = (),
+    search_mode: SearchMode = "dense",
 ) -> RetrievalEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     # Not-in-repo rows have no expected_refs; retrieval metrics skip them.
     rows = [row for row in rows if not row.not_in_repo and row.expected_refs]
     ctx = build_eval_context(settings)
+    pool = recall_k if recall_k is not None else max(ks)
     try:
         resolved = await resolve_repo_id(ctx.engine, repo_slug=repo_slug, repo_id=repo_id)
         cases: list[RetrievalCaseResult] = []
         for row in rows:
-            hits = await vector_search(
-                row.question,
-                engine=ctx.engine,
-                provider=ctx.provider,
-                repo_id=resolved,
-                k=max(ks),
-                recall_k=recall_k,
-                exclude_path_prefixes=exclude_path_prefixes,
-            )
+            if search_mode == "sparse":
+                hits = await bm25_search(
+                    row.question,
+                    engine=ctx.engine,
+                    repo_id=resolved,
+                    k=pool,
+                    exclude_path_prefixes=exclude_path_prefixes,
+                )
+            elif search_mode == "hybrid":
+                hits = await hybrid_search(
+                    row.question,
+                    engine=ctx.engine,
+                    provider=ctx.provider,
+                    repo_id=resolved,
+                    recall_k=pool,
+                    exclude_path_prefixes=exclude_path_prefixes,
+                )
+            else:
+                hits = await vector_search(
+                    row.question,
+                    engine=ctx.engine,
+                    provider=ctx.provider,
+                    repo_id=resolved,
+                    k=max(ks),
+                    recall_k=recall_k,
+                    exclude_path_prefixes=exclude_path_prefixes,
+                )
             cases.append(score_case(row.question, hits, row.expected_refs, ks))
         return RetrievalEvalMetrics(total=len(cases), ks=ks, cases=cases)
     finally:

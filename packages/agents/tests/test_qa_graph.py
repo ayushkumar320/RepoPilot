@@ -57,6 +57,11 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
             ChunkHit(ref=_ref("beta"), distance=0.2, kind="function"),
         ]
 
+    # The Q&A graph calls hybrid_search by default (Phase 3); return the same
+    # canned hits so the loop-logic tests stay retrieval-agnostic.
+    async def fake_hybrid_search(question: str, **kw: Any) -> list[ChunkHit]:
+        return await fake_vector_search(question, **kw)
+
     async def fake_read_chunks(refs: Any, **kw: Any) -> list[ChunkContent]:
         return [
             ChunkContent(
@@ -85,6 +90,7 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
         return out
 
     monkeypatch.setattr(qa_graph, "vector_search", fake_vector_search)
+    monkeypatch.setattr(qa_graph, "hybrid_search", fake_hybrid_search)
     monkeypatch.setattr(qa_graph, "read_chunks", fake_read_chunks)
     monkeypatch.setattr(qa_graph, "graph_traverse", fake_graph_traverse)
     monkeypatch.setattr(qa_graph, "verify_claims", fake_verify_claims)
@@ -125,7 +131,7 @@ async def test_grounded_answer_produces_verified_claims() -> None:
     assert "alpha returns one" in result.answer
     assert len(result.claims) == 2
     assert all(c.status == "verified" for c in result.claims)
-    assert result.retrieval_path[0].startswith("vector_search:")
+    assert result.retrieval_path[0].startswith("hybrid_search:")
 
 
 @pytest.mark.asyncio

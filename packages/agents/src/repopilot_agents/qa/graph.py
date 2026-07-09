@@ -41,6 +41,7 @@ from repopilot_agents.qa.prompts import (
 )
 from repopilot_agents.qa.types import SufficiencyVerdict
 from repopilot_agents.tools.graph_traverse import graph_traverse
+from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.tools.vector_search import NON_SOURCE_PATH_PREFIXES, vector_search
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef
@@ -94,6 +95,7 @@ async def answer_question(
     max_hops: int = MAX_HOPS,
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
+    use_hybrid: bool = True,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -101,22 +103,40 @@ async def answer_question(
     (wide source-only pool). Passing ``recall_k=None`` and
     ``exclude_path_prefixes=()`` reproduces the pre-Phase-1 ``k``-only
     retrieval — used by the eval to baseline both arms under one verifier.
+
+    ``use_hybrid`` (Phase 3) fuses a BM25 sparse lane with the dense lane via
+    RRF. Requires ``recall_k`` (BM25 needs a pool); with ``recall_k=None`` it
+    falls back to pure dense, so the pre-Phase-1 baseline arm stays dense-only.
+    Set ``use_hybrid=False`` for the Phase 1/2 dense-only ``_before`` arm.
     """
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
-    # Initial vector hit: wide recall pool, source lane only (gold-label
-    # noise prefixes excluded), then trim to the top-k for the prompt.
-    hits: list[ChunkHit] = await vector_search(
-        question,
-        engine=engine,
-        provider=provider,
-        repo_id=repo_id,
-        k=k,
-        recall_k=recall_k,
-        exclude_path_prefixes=exclude_path_prefixes,
-    )
-    pool = recall_k if recall_k is not None else k
-    ctx.retrieval_path.append(f"vector_search:recall_k={pool}:k={k}:hits={len(hits)}")
+    # Initial retrieval: wide source-only pool (gold-label noise prefixes
+    # excluded), then trim to the top-k for the prompt. Phase 3 fuses a BM25
+    # sparse lane in; the pre-Phase-1 baseline (recall_k=None) stays dense.
+    hits: list[ChunkHit]
+    if use_hybrid and recall_k is not None:
+        hits = await hybrid_search(
+            question,
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+        )
+        ctx.retrieval_path.append(f"hybrid_search:recall_k={recall_k}:k={k}:hits={len(hits)}")
+    else:
+        hits = await vector_search(
+            question,
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            k=k,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+        )
+        pool = recall_k if recall_k is not None else k
+        ctx.retrieval_path.append(f"vector_search:recall_k={pool}:k={k}:hits={len(hits)}")
     initial_chunks = await read_chunks([h.ref for h in hits[:k]], engine=engine, repo_id=repo_id)
     _extend_context(ctx, initial_chunks)
 

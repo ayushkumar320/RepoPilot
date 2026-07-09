@@ -84,6 +84,15 @@ class Settings(BaseSettings):
     # cap lets the 429 backoff actually drain the quota window. 0 = unbounded.
     llm_verifier_max_concurrency: int = 3
 
+    # ── Reranking (RAG Phase 4) ──────────────────────────────────────────────
+    # Cross-encoder over the post-retrieval pool. MiniLM-L-6-v2 is 80 MB ONNX,
+    # ~460 pairs/s on CPU; BAAI/bge-reranker-base (1 GB) is the quality
+    # fallback if the pairwise self-test flags MiniLM as code-mismatched.
+    rerank_enabled: bool = True
+    rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
+    rerank_max_pool: int = 30
+    rerank_lambda: float = 0.7
+
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None
 

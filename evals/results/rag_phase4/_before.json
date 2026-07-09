@@ -1,0 +1,52 @@
+{
+  "phase": 4,
+  "arm": "hybrid, no rerank (Phase 3 landed pipeline)",
+  "generated_at": "2026-07-09T06:02:27.450892+00:00",
+  "datasets": {
+    "httpx_qa_v1.jsonl": {
+      "total": 13.0,
+      "mrr": 0.8731,
+      "recall@5": 0.8718,
+      "recall@10": 0.8974,
+      "recall@20": 0.9744,
+      "ndcg@5": 0.8251,
+      "ndcg@10": 0.8355
+    },
+    "rare_symbol_v1.jsonl": {
+      "total": 12.0,
+      "mrr": 0.8611,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "ndcg@5": 0.8968,
+      "ndcg@10": 0.8968
+    },
+    "fastapi_rare_symbol_v1.jsonl": {
+      "total": 12.0,
+      "mrr": 0.4719,
+      "recall@5": 0.5833,
+      "recall@10": 0.5833,
+      "recall@20": 0.5833,
+      "ndcg@5": 0.4906,
+      "ndcg@10": 0.4906
+    },
+    "flask_qa_v1.jsonl": {
+      "total": 17.0,
+      "mrr": 0.7908,
+      "recall@5": 0.7549,
+      "recall@10": 0.8284,
+      "recall@20": 0.9216,
+      "ndcg@5": 0.6897,
+      "ndcg@10": 0.7239
+    },
+    "fastapi_qa_v1.jsonl": {
+      "total": 3.0,
+      "mrr": 0.3506,
+      "recall@5": 0.1111,
+      "recall@10": 0.1111,
+      "recall@20": 0.1111,
+      "ndcg@5": 0.1564,
+      "ndcg@10": 0.1564
+    }
+  }
+}

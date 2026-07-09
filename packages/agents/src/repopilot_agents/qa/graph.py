@@ -40,6 +40,8 @@ from repopilot_agents.qa.prompts import (
     sufficiency_user_prompt,
 )
 from repopilot_agents.qa.types import SufficiencyVerdict
+from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
+from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.tools.graph_traverse import graph_traverse
 from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.read_chunks import read_chunks
@@ -96,6 +98,7 @@ async def answer_question(
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_hybrid: bool = True,
+    use_rerank: bool = True,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -108,6 +111,10 @@ async def answer_question(
     RRF. Requires ``recall_k`` (BM25 needs a pool); with ``recall_k=None`` it
     falls back to pure dense, so the pre-Phase-1 baseline arm stays dense-only.
     Set ``use_hybrid=False`` for the Phase 1/2 dense-only ``_before`` arm.
+
+    ``use_rerank`` (Phase 4) cross-encoder-reranks + MMR-diversifies the top
+    of the pool before the prompt slice. Requires ``recall_k`` (needs a pool
+    to reorder); disabled automatically on the pre-Phase-1 baseline arm.
     """
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
@@ -137,7 +144,23 @@ async def answer_question(
         )
         pool = recall_k if recall_k is not None else k
         ctx.retrieval_path.append(f"vector_search:recall_k={pool}:k={k}:hits={len(hits)}")
-    initial_chunks = await read_chunks([h.ref for h in hits[:k]], engine=engine, repo_id=repo_id)
+
+    if use_rerank and recall_k is not None and len(hits) > k:
+        # Phase 4: fetch the top of the pool, cross-encoder rerank + MMR
+        # diversify, and let the reranked order decide the prompt slice.
+        pool_hits = hits[:RERANK_MAX_POOL]
+        pool_chunks = await read_chunks([h.ref for h in pool_hits], engine=engine, repo_id=repo_id)
+        if len(pool_chunks) == len(pool_hits):
+            ranked = rerank_and_diversify(question, pool_hits, pool_chunks, k=k)
+            ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
+            initial_chunks = [content for _, content in ranked]
+        else:
+            # read_chunks dropped refs (stale index?) — fall back untranked.
+            initial_chunks = pool_chunks[:k]
+    else:
+        initial_chunks = await read_chunks(
+            [h.ref for h in hits[:k]], engine=engine, repo_id=repo_id
+        )
     _extend_context(ctx, initial_chunks)
 
     # Outer loop: sufficiency judge → optional traverse expansion.

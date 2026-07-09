@@ -1,7 +1,7 @@
 # Current Build Phase
 
-> **Next build purpose:** **RAG Phase 4 — Reranking** (cross-encoder + MMR over the fused candidate pool). It's also the clean fix for Phase 3's residual httpx-general cost: a reranker reorders the dense+BM25 pool so BM25 noise stops displacing dense hits. Spec: [`rag/04_RERANKING.md`](rag/04_RERANKING.md). (Phase 2 Query Understanding remains **deferred** — see note below.)
-> **Last verified gate:** **RAG Phase 3 — BM25 Hybrid LANDED (active).** fastapi rare-symbol recall@10 0.417 → **0.583** (+17pp, where dense fails); httpx rare 1.00 (unchanged, dense already saturated); httpx general 0.949 → 0.897 (−5pp accepted cost). `dense_weight=3.0`. Retrieval-only gate (LLM guardrails pending quota). Artifacts: `evals/results/rag_phase3/{_before,_after,delta}.json`.
+> **Active:** **RAG Phase 4 — Reranking — CODE LANDED, EVAL GATE PENDING.** All code is implemented (cross-encoder reranker + MMR diversity + graph wiring + retrieval runner + tests). `_before.json` committed. The pairwise self-test and full bench sweep (`_after.json`) were interrupted — see Phase 4 section below for what remains. Spec: [`rag/04_RERANKING.md`](rag/04_RERANKING.md). (Phase 2 Query Understanding remains **deferred** — see note below.)
+> **Last verified gate:** **RAG Phase 3 — BM25 Hybrid LANDED.** fastapi rare-symbol recall@10 0.417 → **0.583** (+17pp); httpx rare 1.00 (unchanged); httpx general 0.949 → 0.897 (−5pp accepted cost). Artifacts: `evals/results/rag_phase3/{_before,_after,delta}.json`.
 > **Last updated:** 2026-07-09
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
@@ -37,7 +37,7 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 | **1 — Recall Lift** 🟢 **landed** | Right chunk exists but never enters the k=8 pool (flask misses beyond rank 150) | A 50-wide source-only pool + metadata-filter params for Phase 2 to drive | recall@10 +5 pp → **+56pp ✅** |
 | 2 — Query Understanding ⚪ **deferred** (2026-07-08) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
 | **3 — BM25 Hybrid** 🟢 **landed (active)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp rare-symbol → **fastapi +17pp ✅** |
-| **4 — Reranking** 🟡 **← next** **(must-ship)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 |
+| **4 — Reranking** 🟡 **← active (code landed, eval pending)** **(must-ship)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 |
 | 5 — Compression *(may defer)* | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens, grounding equal |
 | 6 — Ingestion Enrichment *(may defer)* | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
 | [7 — Ship Closeout](rag/07_SHIP_CLOSEOUT.md) **(must-ship)** | A one-time win regresses silently | CI regression gate: retrieval PRs must ship a fresh `_after.json` | RAG_PLAN Definition of Done |
@@ -54,6 +54,72 @@ Cut per the 2-day ship plan's priority call (1 + 3 + 4 are the must-ship quality
 - **Downstream is unaffected**: Phase 3 measures against Phase 1's landed `_after.json`, and Phase 3 builds the RRF union helper itself (it was only *shared* with Phase 2, not owned by it). Spec confirms: *"If Phase 2 is deferred, run Phase 3 against Phase 1's `_after.json`."*
 - **Entry state if resumed** ([rag/02](rag/02_QUERY_UNDERSTANDING.md)): needs a new `multi_hop_v1.jsonl` (10 labeled rows via the propose→review flow), `qa/query_spec.py` + prompt, and N-parallel `vector_search` + RRF union in `qa/graph.py`. Uses the existing 8B model — zero new deps. Timebox: 2h hard.
 - **Reconsider when**: multi-hop questions are visibly the weak spot after Phase 4, or `fastapi` recall stays flat after Phase 3 (BM25) — query rewriting is the other lever for the lexical-mismatch misses.
+
+---
+
+## Phase 4 — Reranking: code landed, eval gate pending
+
+All code is implemented per [rag/04](rag/04_RERANKING.md). Here's exactly what was built and what remains.
+
+### What was built
+
+**New module: `packages/agents/src/repopilot_agents/rerank/`** (4 files, ~235 LOC):
+
+| File | Purpose |
+|---|---|
+| [`__init__.py`](../packages/agents/src/repopilot_agents/rerank/__init__.py) | Package exports: `CrossEncoderReranker`, `mmr_select`, `rerank_and_diversify` |
+| [`cross_encoder.py`](../packages/agents/src/repopilot_agents/rerank/cross_encoder.py) | `CrossEncoderReranker` wrapping `fastembed.TextCrossEncoder`. Lazy model load, SHA256 score cache, symbol-prefix for code chunks. Default: `Xenova/ms-marco-MiniLM-L-6-v2` (~80 MB ONNX). Process-wide singleton via `shared_reranker()`. |
+| [`mmr.py`](../packages/agents/src/repopilot_agents/rerank/mmr.py) | Pure-function MMR over text+relevance with token-set Jaccard similarity (not dense embeddings — `ChunkHit` doesn't carry vectors, and Jaccard catches near-duplicate code well). Min-max normalises relevance scores. Default `lambda_=0.7`. |
+| [`pipeline.py`](../packages/agents/src/repopilot_agents/rerank/pipeline.py) | `rerank_and_diversify(query, hits, contents, k=8)` — composes cross-encoder scoring + MMR selection. Truncates pool to `max_pool=30` before scoring. |
+
+**Modified files:**
+
+| File | Change |
+|---|---|
+| [`settings.py`](../packages/core/src/repopilot_core/settings.py) | +9 lines: `rerank_enabled`, `rerank_model`, `rerank_max_pool`, `rerank_lambda` settings |
+| [`graph.py`](../packages/agents/src/repopilot_agents/qa/graph.py) | +25 lines: `use_rerank` param on `answer_question`; rerank splice between retrieval and prompt slice (fetches pool → cross-encoder rerank → MMR → top-k for answerer). Falls back to un-reranked if `read_chunks` drops refs. |
+| [`retrieval.py`](../packages/evals/src/repopilot_evals/runners/retrieval.py) | +52 lines: `rerank` mode in eval runner (`_apply_rerank` helper); `diversity` metric on `RetrievalCaseResult` (distinct file paths in top-5). |
+| [`bench.py`](../packages/evals/src/repopilot_evals/bench.py) | Fixed unused `type: ignore` comment. |
+| [`pyproject.toml`](../packages/agents/pyproject.toml) | Added `fastembed>=0.4` dependency. |
+
+**New tests:**
+
+| File | Tests |
+|---|---|
+| [`test_mmr.py`](../packages/agents/tests/test_mmr.py) | 7 tests: empty/zero-k, length mismatch, pure-relevance (λ=1), near-duplicate demotion, high-λ keeps relevant duplicates, constant-relevance normalisation safety, Jaccard bounds. |
+| [`test_cross_encoder.py`](../packages/agents/tests/test_cross_encoder.py) | 7 tests (stubbed encoder, no real model download): score ordering, cache deduplication, empty-no-load, symbol prefix, pipeline reorder, parallel mismatch, empty pool. |
+
+**Baseline recorded:** `evals/results/rag_phase4/_before.json` — Phase 3 landed pipeline (hybrid, no rerank). Key numbers: httpx NDCG@5 = 0.825, httpx MRR = 0.873, flask NDCG@5 = 0.690.
+
+### Design decisions & deviations from spec
+
+1. **Model: MiniLM, not BGE-reranker-base.** The spec defaulted to `BAAI/bge-reranker-base` (~1 GB). Implementation uses `Xenova/ms-marco-MiniLM-L-6-v2` (~80 MB ONNX, ~460 pairs/s on M-series Mac) — much faster and lighter. The pairwise self-test was started to validate whether MiniLM meets the 90% accuracy bar; MiniLM scored **85%**, and the BGE fallback test was interrupted by credit exhaustion. The `rerank_model` setting makes this configurable.
+
+2. **MMR similarity: Jaccard, not dense embeddings.** The spec sketched MMR over embeddings, but `ChunkHit` doesn't carry vectors. Token-set Jaccard over code identifiers captures near-duplicates well (methods of the same class share most tokens). This is documented as a deviation.
+
+3. **Score cache: in-process dict, not SQLite.** At ~460 pairs/s, persistent caching isn't worth the plumbing. SHA256-keyed dict suffices.
+
+### What remains for a collaborator to finish
+
+> [!IMPORTANT]
+> The code is complete and tested (fast-lane: unit tests pass, mypy clean, ruff clean). What's missing is the **eval gate** — the numbers that prove the reranker improves NDCG@5.
+
+1. **Pairwise self-test resolution**: MiniLM scored 85% on a pairwise (query, positive, negative) accuracy test — below the spec's 90% bar. The BGE-reranker-base fallback test was started but interrupted. **Next step**: re-run the pairwise self-test with `BAAI/bge-reranker-base` (1 GB one-time download). If BGE passes 90%, update `rerank_model` default in settings. If neither passes, document the stop condition.
+
+2. **Full bench sweep (`_after.json`)**: Run `bench --phase 4` across all datasets with reranking enabled. Sweep `lambda_ ∈ {0.5, 0.7, 0.9}` to pick the best MMR trade-off. Commit `_after.json` and `delta.json`.
+
+3. **Gate checklist** (from spec §5):
+   - [ ] `NDCG@5 after − NDCG@5 before ≥ 0.05` on `httpx_qa_v1`
+   - [ ] Same lift on at least one of `flask_qa_v1` / `fastapi_qa_v1`
+   - [ ] `diversity_score after ≥ diversity_score before` on every dataset
+   - [ ] Reranker self-test ≥ 90% pairwise accuracy
+   - [ ] `grounding_accuracy` does not regress > 1 pp
+   - [ ] `latency_p95_ms` ≤ 2× Phase 0 baseline
+   - [ ] `_after.json` and `delta.json` committed
+
+4. **LLM guardrails**: As with Phase 3, run the full answer path with reranking to confirm grounding/hallucination rates hold.
+
+5. **Once gate passes**: update this file's banner to mark Phase 4 as 🟢 **landed**, advance the "Next build purpose" to Phase 5 (Context Compression) or 7 (Ship Closeout) per the priority spine.
 
 ---
 

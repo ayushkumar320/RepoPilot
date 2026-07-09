@@ -79,6 +79,7 @@ class RetrievalCaseResult:
     recall: dict[int, float]
     ndcg: dict[int, float]
     mrr: float
+    diversity: float = 0.0  # distinct file paths in top-5 / 5 (Phase 4 MMR gate)
 
 
 @dataclass(slots=True)
@@ -97,6 +98,10 @@ class RetrievalEvalMetrics:
     def mean_mrr(self) -> float:
         return sum(c.mrr for c in self.cases) / self.total if self.total else 0.0
 
+    @property
+    def mean_diversity(self) -> float:
+        return sum(c.diversity for c in self.cases) / self.total if self.total else 0.0
+
     def as_dict(self) -> dict[str, float | int]:
         out: dict[str, float | int] = {"total": self.total, "mrr": self.mean_mrr}
         for k in self.ks:
@@ -104,6 +109,7 @@ class RetrievalEvalMetrics:
         for k in self.ks:
             if k <= 10:
                 out[f"ndcg@{k}"] = self.mean_ndcg(k)
+        out["diversity_score"] = self.mean_diversity
         return out
 
 
@@ -112,12 +118,14 @@ def score_case(
 ) -> RetrievalCaseResult:
     rels = relevance_vector([h.ref for h in hits], expected)
     n = len(expected)
+    top5_paths = {h.ref.file_path for h in hits[:5]}
     return RetrievalCaseResult(
         question=question,
         n_expected=n,
         recall={k: recall_at_k(rels, n, k) for k in ks},
         ndcg={k: ndcg_at_k(rels, n, k) for k in ks},
         mrr=mrr(rels),
+        diversity=len(top5_paths) / min(5, len(hits)) if hits else 0.0,
     )
 
 
@@ -132,6 +140,9 @@ async def run_retrieval_eval(
     recall_k: int | None = None,
     exclude_path_prefixes: Sequence[str] = (),
     search_mode: SearchMode = "dense",
+    rerank: bool = False,
+    rerank_lambda: float = 0.7,
+    rerank_max_pool: int = 30,
 ) -> RetrievalEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     # Not-in-repo rows have no expected_refs; retrieval metrics skip them.
@@ -169,10 +180,51 @@ async def run_retrieval_eval(
                     recall_k=recall_k,
                     exclude_path_prefixes=exclude_path_prefixes,
                 )
+            if rerank and hits:
+                hits = await _apply_rerank(
+                    row.question,
+                    hits,
+                    engine=ctx.engine,
+                    repo_id=resolved,
+                    head_k=max(ks),
+                    lambda_=rerank_lambda,
+                    max_pool=rerank_max_pool,
+                )
             cases.append(score_case(row.question, hits, row.expected_refs, ks))
         return RetrievalEvalMetrics(total=len(cases), ks=ks, cases=cases)
     finally:
         await ctx.aclose()
+
+
+async def _apply_rerank(
+    question: str,
+    hits: list[ChunkHit],
+    *,
+    engine: object,
+    repo_id: str,
+    head_k: int,
+    lambda_: float,
+    max_pool: int,
+) -> list[ChunkHit]:
+    """Rerank the pool head; keep the tail in original order so recall@k holds."""
+    from repopilot_agents.rerank.pipeline import rerank_and_diversify
+    from repopilot_agents.tools.read_chunks import read_chunks
+
+    pool_hits = hits[:max_pool]
+    pool_chunks = await read_chunks(
+        [h.ref for h in pool_hits],
+        engine=engine,  # type: ignore[arg-type]
+        repo_id=repo_id,
+    )
+    if len(pool_chunks) != len(pool_hits):
+        return hits  # stale refs — score the un-reranked pool honestly
+    ranked = rerank_and_diversify(
+        question, pool_hits, pool_chunks, k=head_k, lambda_=lambda_, max_pool=max_pool
+    )
+    head = [hit for hit, _ in ranked]
+    head_keys = {(h.ref.file_path, h.ref.start_line, h.ref.end_line) for h in head}
+    tail = [h for h in hits if (h.ref.file_path, h.ref.start_line, h.ref.end_line) not in head_keys]
+    return head + tail
 
 
 __all__ = [

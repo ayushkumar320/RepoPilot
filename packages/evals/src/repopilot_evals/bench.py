@@ -92,7 +92,7 @@ async def bench_repo(
                 dataset_name=dataset,
                 repo_slug=repo,
                 sample_limit=sample,
-                search_mode=lane,  # type: ignore[arg-type]
+                search_mode=lane,
                 **policy_kwargs,  # type: ignore[arg-type]
             )
             metrics[f"recall@10_{lane}"] = lane_m.as_dict()["recall@10"]

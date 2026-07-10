@@ -125,9 +125,11 @@ The sweep (λ ∈ {0.5, 0.7, 0.9, 1.0} × pool ∈ {30, 50}) found **pool=50 is 
 |---|---|---|---|---|
 | httpx | 16/16 | **0.00** | 0.638 | 0.563 |
 | fastapi | full | **0.00** | 0.429 | **0.800** |
-| flask | 5/20 (partial) | **0.00** | 0.765 | — |
+| flask | 20/20 **complete** | **0.00** | **0.789** | 0.300 |
 
-**The reranked pipeline is hallucination-safe everywhere.** The per-claim-vs-keyword gap (fastapi: claims 0.43 but keywords 0.80) isolates the one remaining answer-side weakness: the token-overlap claim→ref attribution in `_parse_claims` pins correct claims to non-supporting chunks. That fix is the next work item; flask's Phase 4 completion is deliberately deferred until after it (measure once, not twice). Latency still has no clean verdict (every window was 429-throttled).
+**FULL EVAL COMPLETE — the reranked pipeline is hallucination-safe on all three repos (full datasets).** The per-claim-vs-keyword gap (fastapi: claims 0.43 but keywords 0.80) isolates the one remaining answer-side weakness: the token-overlap claim→ref attribution in `_parse_claims` pins correct claims to non-supporting chunks. That fix is the next work item. Latency on the one mostly-clean run: p95 3.9s ≈ 2.7× the Phase 0 baseline — **over the cumulative 1.5× DoD budget**; flagged for Ship Closeout (drivers: verifier concurrency cap serializing claims, reasoning-model fallbacks, 4096-token headroom).
+
+Postscript on the week of 429s: the root cause was finally a **malformed `.env` line** — `GROQ_API_KEY=gsk_...#Yash ka key` (inline comment, no space before `#`) sent the comment as part of the key → Groq 401 → all load collapsed onto Cerebras → burst 429s. One line fix; both providers healthy since.
 
 Infra fixes shipped along the way: malformed-completion fallthrough with payload logging (`provider.py`), and reasoning-model token headroom (`max_tokens` 200→1024 judge, 400→4096 answerer — Cerebras `gpt-oss-120b` was observed burning 1021 reasoning tokens before emitting any content).
 

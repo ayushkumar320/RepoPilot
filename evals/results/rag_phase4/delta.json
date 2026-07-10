@@ -121,9 +121,14 @@
       "note": "CLOSED - the long-open cross-repo check. Hallucination 0.00, keyword 0.80 (answers substantively right); per-claim 0.43 is the attribution weakness, not answer quality."
     },
     "flask": {
-      "status": "partial (5/20 at Phase 3: hallucination 0.00, per-claim 0.765)",
-      "phase4_completion": "quota-blocked; deliberately deferred until after the _parse_claims attribution fix so it is measured once, not twice."
+      "status": "COMPLETE (full 20 rows, reranked path)",
+      "hallucination_rate": 0.0,
+      "claim_grounding_rate": 0.7886,
+      "grounding_accuracy": 0.4,
+      "keyword_accuracy": 0.3,
+      "latency_p95_ms": 3852.1,
+      "note": "Best per-claim grounding of the three repos (0.789). Root cause of the week of 429s finally found: the .env GROQ_API_KEY had an inline comment with no space before # \u2014 the parser sent gsk_...#Yash ka key to Groq (401), collapsing all load onto Cerebras."
     },
-    "verdict": "Reranked pipeline is hallucination-safe on all measured repos (0.00 everywhere). Per-claim grounding (httpx 0.64, fastapi 0.43, flask 0.76 partial) vs keyword accuracy (0.56/0.80) isolates claim->ref attribution as the single answer-side weakness - the next work item."
+    "verdict": "FULL EVAL COMPLETE: hallucination 0.00 on all three repos (full datasets). Per-claim grounding: flask 0.789, httpx 0.638, fastapi 0.429. The per-claim vs keyword gap isolates _parse_claims attribution as the single remaining answer-side item. Latency p95 3.9s on the one mostly-clean run (~2.7x Phase 0 baseline) - over the cumulative 1.5x DoD budget; needs attention at Ship Closeout (drivers: verifier concurrency cap serializing claims, reasoning-model fallbacks, 4096-token headroom)."
   }
 }

@@ -20,7 +20,6 @@ from repopilot_agents.types import ChunkContent
 from repopilot_core.llm.models import ModelId
 from repopilot_core.llm.provider import LLMProvider, Message
 
-
 _JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
 
 

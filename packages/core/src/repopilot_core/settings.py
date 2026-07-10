@@ -92,7 +92,7 @@ class Settings(BaseSettings):
     # section's claims stampedes the free-tier per-second quota so hard that
     # backoff never catches up (both Groq and Cerebras 429 at once). A small
     # cap lets the 429 backoff actually drain the quota window. 0 = unbounded.
-    llm_verifier_max_concurrency: int = 3
+    llm_verifier_max_concurrency: int = 10
 
     # ── Reranking (RAG Phase 4) ──────────────────────────────────────────────
     # Cross-encoder over the post-retrieval pool. MiniLM-L-6-v2 is 80 MB ONNX,

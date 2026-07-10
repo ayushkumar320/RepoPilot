@@ -42,7 +42,17 @@ async def test_compress_chunk_keeps_clipped_merged_ranges() -> None:
     chunk = await compress_chunk("what matters?", _chunk(), provider=cast(Any, provider))
     assert chunk.kept_line_spans == [(10, 15), (20, 22)]
     assert render_chunk_view(chunk) == "\n".join(
-        ["line_10", "line_11", "line_12", "line_13", "line_14", "line_15", "line_20", "line_21", "line_22"]
+        [
+            "line_10",
+            "line_11",
+            "line_12",
+            "line_13",
+            "line_14",
+            "line_15",
+            "line_20",
+            "line_21",
+            "line_22",
+        ]
     )
 
 

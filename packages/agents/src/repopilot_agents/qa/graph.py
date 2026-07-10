@@ -33,14 +33,15 @@ import structlog
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from repopilot_agents.qa.compress import compress_chunks
 from repopilot_agents.qa.prompts import (
     ANSWER_SYSTEM,
     SUFFICIENCY_SYSTEM,
     answer_user_prompt,
     sufficiency_user_prompt,
 )
-from repopilot_agents.qa.compress import compress_chunks
 from repopilot_agents.qa.types import SufficiencyVerdict
+from repopilot_agents.rerank.attribution import attribute_refs
 from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.tools.graph_traverse import graph_traverse
@@ -315,13 +316,37 @@ def _is_not_found(answer: str) -> bool:
     return "couldn't find" in norm or "could not find" in norm or "not in the repo" in norm
 
 
+def _attribute_refs_lexical(text: str, pool: list[ChunkContent]) -> list[CodeRef]:
+    """Original token-overlap attribution — offline fallback only.
+
+    Its "false-positive refs are harmless" assumption was disproven by the
+    eval matrix: the verifier judges a claim against *its* refs, so a
+    mis-pinned claim is rejected even when a supporting chunk is in context.
+    """
+    tokens = {t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", text)}
+    scored: list[tuple[int, ChunkContent]] = []
+    for chunk in pool:
+        sym_tokens = {
+            t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", chunk.ref.symbol or "")
+        }
+        overlap = len(tokens & sym_tokens)
+        if overlap > 0:
+            scored.append((overlap, chunk))
+    scored.sort(key=lambda t: -t[0])
+    refs = [c.ref for _, c in scored[:2]]
+    if not refs and pool:
+        refs = [pool[0].ref]
+    return refs
+
+
 def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     """One sentence per line → one Claim per line.
 
-    Refs are attached by matching short symbol mentions against the
-    available chunks. This is intentionally generous — false-positive ref
-    attribution is harmless because the verifier checks each claim against
-    its refs, not the other way around.
+    Refs are attached by cross-encoder attribution (``rerank.attribution``):
+    each claim is scored against every context chunk and pinned to the top-2.
+    The verifier reads the union of a claim's ref chunks, so attribution only
+    needs the supporting chunk in the top-2, not ranked first. Falls back to
+    the lexical heuristic if the reranker model is unavailable (offline CI).
     """
     out: list[Claim] = []
     pool = list(chunks)
@@ -329,23 +354,13 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
         text = line.strip(" -•").strip()
         if not text:
             continue
-        # Heuristic ref attribution: take the first two chunks that share any
-        # token with the line. Cheap and good enough for Phase 2 — Phase 3
-        # will move this into the typed state once Claim has a Pydantic home.
-        tokens = {t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", text)}
-        scored: list[tuple[int, ChunkContent]] = []
-        for chunk in pool:
-            sym_tokens = {
-                t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", chunk.ref.symbol or "")
-            }
-            overlap = len(tokens & sym_tokens)
-            if overlap > 0:
-                scored.append((overlap, chunk))
-        scored.sort(key=lambda t: -t[0])
-        refs = [c.ref for _, c in scored[:2]]
+        refs: list[CodeRef]
+        try:
+            refs = attribute_refs(text, pool, k=2)
+        except Exception as exc:  # model unavailable / load failure
+            log.warning("claims.attribution_fallback", error=str(exc)[:120])
+            refs = _attribute_refs_lexical(text, pool)
         if not refs and pool:
-            # Fall back to the top retrieved chunk so the claim has at least
-            # one ref the verifier can check against.
             refs = [pool[0].ref]
         if refs:
             out.append(Claim(text=text, refs=refs))

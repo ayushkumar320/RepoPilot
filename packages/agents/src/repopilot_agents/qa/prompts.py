@@ -93,8 +93,7 @@ COMPRESS_SYSTEM = (
     'this schema: {"keep":[[start_line,end_line], ...]}. Select the smallest '
     "set of line ranges needed to answer the question. If unsure, keep the "
     "line. If the chunk is irrelevant, return an empty keep list. Never "
-    "generate an answer to the user question.\n\n"
-    + _DATA_NOT_INSTRUCTIONS
+    "generate an answer to the user question.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
 
 

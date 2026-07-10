@@ -89,6 +89,12 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
             )
         return out
 
+    # Keep the fast lane hermetic: attribution normally loads the ONNX
+    # reranker; stub it with the same top-2 shape.
+    def fake_attribute_refs(text: str, pool: Any, *, k: int = 2, **kw: Any) -> list[Any]:
+        return [c.ref for c in list(pool)[:k]]
+
+    monkeypatch.setattr(qa_graph, "attribute_refs", fake_attribute_refs)
     monkeypatch.setattr(qa_graph, "vector_search", fake_vector_search)
     monkeypatch.setattr(qa_graph, "hybrid_search", fake_hybrid_search)
     monkeypatch.setattr(qa_graph, "read_chunks", fake_read_chunks)
@@ -160,7 +166,9 @@ async def test_hop_budget_enforced_at_three() -> None:
 async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_compress_chunks(question: str, chunks: Any, **kw: Any) -> list[ChunkContent]:
         return [
-            chunk.model_copy(update={"kept_line_spans": [(chunk.ref.start_line, chunk.ref.start_line)]})
+            chunk.model_copy(
+                update={"kept_line_spans": [(chunk.ref.start_line, chunk.ref.start_line)]}
+            )
             for chunk in chunks
         ]
 

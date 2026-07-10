@@ -223,19 +223,21 @@ async def verify_claim(
         )
     except ProviderError as exc:
         # Safe failure: if every verifier provider is exhausted, reject the
-        # claim rather than crashing the whole answer path.
+        # claim rather than crashing the whole answer path. Deliberately NOT
+        # cached — the failure is transient, and caching it would keep the
+        # claim rejected for the rest of the process even after providers
+        # recover.
         log.warning(
             "verifier.provider_error",
             claim=claim.text[:80],
             error=repr(exc),
         )
-        parsed = VerifierVerdict(decision="rejected", reason="verifier_provider_error")
-        _CACHE.put(key, parsed)
-        _apply(claim, parsed)
+        err_verdict = VerifierVerdict(decision="rejected", reason="verifier_provider_error")
+        _apply(claim, err_verdict)
         return _VerifyResult(
             claim=claim,
-            verdict=parsed,
-            objection=_objection_if_rejected(claim, parsed),
+            verdict=err_verdict,
+            objection=_objection_if_rejected(claim, err_verdict),
         )
 
     parsed = _parse_verdict(response.text)

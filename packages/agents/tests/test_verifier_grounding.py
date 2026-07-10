@@ -7,13 +7,13 @@ from typing import Any, cast
 import pytest
 
 from repopilot_agents.types import ChunkContent, CodeRef
-from repopilot_core.llm.provider import ProviderError
 from repopilot_agents.verifier.grounding import (
     Claim,
     _parse_verdict,
     verify_claim,
     verify_claims,
 )
+from repopilot_core.llm.provider import ProviderError
 
 
 def test_parse_verdict_accepts_clean_json() -> None:
@@ -205,7 +205,9 @@ async def test_verify_claim_provider_error_rejects_instead_of_crashing(
 
     class _FailingProvider:
         async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
-            raise ProviderError("all providers failed for verifier: RateLimitError('cerebras returned 429')")
+            raise ProviderError(
+                "all providers failed for verifier: RateLimitError('cerebras returned 429')"
+            )
 
     claim = Claim(
         text="foo calls bar",

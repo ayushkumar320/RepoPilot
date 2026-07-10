@@ -80,7 +80,7 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
+        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
     ),
     ModelId.QA_FALLBACK: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
@@ -88,7 +88,7 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.1-8b"),
+        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
     ),
     # Verifier is the highest call-volume agent. gemma-4-31b on Cerebras has
     # no thinking tokens so the verifier's strict JSON parse stays reliable.
@@ -100,4 +100,24 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     # physical_model is the HF model id passed to SentenceTransformer().
     # nomic-embed-text-v1.5 is 768-dim, matches the existing pgvector schema.
     ModelId.EMBEDDINGS: (ModelBinding(ProviderName.HUGGINGFACE, "nomic-ai/nomic-embed-text-v1.5"),),
+}
+
+
+# Opt-in HF Inference Providers chat fallback, appended to a model's chain only
+# when settings.llm_hf_chat_fallback is set (see LLMProvider._resolution_for).
+# Kept OUT of RESOLUTION so default behavior is unchanged and HF credits are
+# never touched unless the operator explicitly enables it. Physical ids are the
+# HF router names mirroring each model's Groq primary (verified on the router):
+#   llama-3.3-70b → Llama-3.3-70B-Instruct, qwen/qwen3-32b → Qwen3-32B,
+#   llama-3.1-8b-instant → Llama-3.1-8B-Instruct.
+HF_CHAT_FALLBACK: dict[ModelId, ModelBinding] = {
+    ModelId.INTENT_PROFILER: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+    ModelId.CAPABILITY_PLANNER: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+    ModelId.CARTOGRAPHER: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+    ModelId.FLOW_TRACER: ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen3-32B"),
+    ModelId.TEACHER: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+    ModelId.QA_PRIMARY: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.3-70B-Instruct"),
+    ModelId.QA_FALLBACK: ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen3-32B"),
+    ModelId.CODE_HEALTH: ModelBinding(ProviderName.HUGGINGFACE, "meta-llama/Llama-3.1-8B-Instruct"),
+    ModelId.VERIFIER: ModelBinding(ProviderName.HUGGINGFACE, "Qwen/Qwen3-32B"),
 }

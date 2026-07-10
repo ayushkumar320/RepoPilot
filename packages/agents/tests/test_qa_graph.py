@@ -154,3 +154,28 @@ async def test_hop_budget_enforced_at_three() -> None:
     assert result.hops == 3
     # 3 sufficiency calls + 1 answer call = 4
     assert provider.call_count == 4
+
+
+@pytest.mark.asyncio
+async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    async def fake_compress_chunks(question: str, chunks: Any, **kw: Any) -> list[ChunkContent]:
+        return [
+            chunk.model_copy(update={"kept_line_spans": [(chunk.ref.start_line, chunk.ref.start_line)]})
+            for chunk in chunks
+        ]
+
+    monkeypatch.setattr(qa_graph, "compress_chunks", fake_compress_chunks)
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one.",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        use_compress=True,
+    )
+    assert "compress:k=2" in result.retrieval_path

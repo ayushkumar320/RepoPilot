@@ -56,22 +56,28 @@ async def bench_repo(
     # pool). This is what makes the grounding/latency guardrails honest: both
     # _before (phase 0) and _after (phase 1) are measured with the same,
     # fixed verifier — only the retrieval policy differs.
-    policy_kwargs: dict[str, object]
+    retrieval_policy_kwargs: dict[str, object]
+    llm_policy_kwargs: dict[str, object]
     if phase >= 1:
-        policy_kwargs = {
+        retrieval_policy_kwargs = {
             "recall_k": qa_graph.RECALL_K,
             "exclude_path_prefixes": NON_SOURCE_PATH_PREFIXES,
         }
     else:
-        policy_kwargs = {"recall_k": None, "exclude_path_prefixes": ()}
+        retrieval_policy_kwargs = {"recall_k": None, "exclude_path_prefixes": ()}
+    llm_policy_kwargs = dict(retrieval_policy_kwargs)
 
     # Phase ≥ 3 fuses a BM25 lane; the headline retrieval metric uses hybrid.
     # Phase ≥ 4 additionally cross-encoder-reranks + MMR-diversifies the pool.
-    headline_kwargs = dict(policy_kwargs)
+    headline_kwargs = dict(retrieval_policy_kwargs)
     if phase >= 3:
         headline_kwargs["search_mode"] = "hybrid"
     if phase >= 4:
         headline_kwargs["rerank"] = True
+    if phase >= 5:
+        llm_policy_kwargs["use_compress"] = True
+    else:
+        llm_policy_kwargs["use_compress"] = False
 
     print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
     retrieval = await run_retrieval_eval(
@@ -96,7 +102,7 @@ async def bench_repo(
                 repo_slug=repo,
                 sample_limit=sample,
                 search_mode=lane,
-                **policy_kwargs,  # type: ignore[arg-type]
+                **retrieval_policy_kwargs,  # type: ignore[arg-type]
             )
             metrics[f"recall@10_{lane}"] = lane_m.as_dict()["recall@10"]
 
@@ -106,12 +112,13 @@ async def bench_repo(
             dataset_name=dataset,
             repo_slug=repo,
             sample_limit=sample,
-            **policy_kwargs,  # type: ignore[arg-type]
+            **llm_policy_kwargs,  # type: ignore[arg-type]
         )
         metrics["grounding_accuracy"] = grounding.grounding_accuracy
         metrics["claim_grounding_rate"] = grounding.claim_grounding_rate
         metrics["hallucination_rate"] = grounding.hallucination_rate
         metrics["keyword_accuracy"] = grounding.keyword_accuracy
+        metrics["input_tokens_per_question"] = grounding.input_tokens_per_question
         metrics["grounding_cases"] = [asdict(c) for c in grounding.cases]
 
         if repo == "httpx":
@@ -125,7 +132,7 @@ async def bench_repo(
             dataset_name=dataset,
             repo_slug=repo,
             sample_limit=sample,
-            **policy_kwargs,  # type: ignore[arg-type]
+            **llm_policy_kwargs,  # type: ignore[arg-type]
         )
         metrics.update(latency.as_dict())
         metrics.pop("total", None)
@@ -210,6 +217,7 @@ def write_delta(phase: int, after: dict[str, object]) -> None:
         "mrr",
         "grounding_accuracy",
         "hallucination_rate",
+        "input_tokens_per_question",
         "latency_p95_ms",
     )
     delta: dict[str, dict[str, dict[str, float]]] = {}
@@ -297,6 +305,7 @@ def main() -> int:
         "claim_grounding_rate",
         "keyword_accuracy",
         "hallucination_rate",
+        "input_tokens_per_question",
         "verifier_accuracy",
         "latency_p50_ms",
         "latency_p95_ms",

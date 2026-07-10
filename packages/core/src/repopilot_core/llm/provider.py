@@ -36,16 +36,28 @@ from collections import defaultdict
 from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, Self
 
 import httpx
 import structlog
 
-from repopilot_core.llm.models import RESOLUTION, ModelBinding, ModelId, ProviderName
+from repopilot_core.llm.models import (
+    HF_CHAT_FALLBACK,
+    RESOLUTION,
+    ModelBinding,
+    ModelId,
+    ProviderName,
+)
 from repopilot_core.settings import Settings, get_settings
 
 log = structlog.get_logger(__name__)
+
+_MODEL_FALLBACKS: dict[ModelId, tuple[ModelId, ...]] = {
+    ModelId.QA_PRIMARY: (ModelId.QA_FALLBACK,),
+}
 
 
 # ─── Public types ──────────────────────────────────────────────────────────
@@ -56,7 +68,15 @@ class ProviderError(RuntimeError):
 
 
 class RateLimitError(RuntimeError):
-    """HTTP 429 from a provider — triggers retry/fallback inside the provider."""
+    """HTTP 429 from a provider — triggers retry/fallback inside the provider.
+
+    ``retry_after`` is the parsed ``Retry-After`` header in seconds when the
+    provider supplied one (naming the exact quota-window reset), else ``None``.
+    """
+
+    def __init__(self, message: str, *, retry_after: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
 
 
 @dataclass(frozen=True, slots=True)
@@ -238,6 +258,29 @@ def _backoff_delay(attempt: int, base: float, cap: float) -> float:
     return random.uniform(0.0, expo)
 
 
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a ``Retry-After`` header (delta-seconds or HTTP-date) into seconds.
+
+    Providers emit the numeric delta-seconds form; the HTTP-date form is also
+    RFC-legal, so honor both. Returns ``None`` for missing/garbage/negative
+    values so the caller falls back to jittered backoff.
+    """
+    if not value:
+        return None
+    value = value.strip()
+    try:
+        secs = float(value)
+    except ValueError:
+        try:
+            parsed = parsedate_to_datetime(value)
+        except (ValueError, TypeError):
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        secs = (parsed - datetime.now(UTC)).total_seconds()
+    return secs if secs > 0 else None
+
+
 # ─── Provider HTTP clients ──────────────────────────────────────────────────
 
 
@@ -291,21 +334,13 @@ class _OpenAICompatibleClient(_BaseClient):
             headers=headers,
         )
         if resp.status_code == 429:
-            raise RateLimitError(f"{self.provider.value} returned 429")
+            raise RateLimitError(
+                f"{self.provider.value} returned 429",
+                retry_after=_parse_retry_after(resp.headers.get("retry-after")),
+            )
         resp.raise_for_status()
         data = resp.json()
-        # Under load some providers return a message with no "content" key
-        # (e.g. reasoning-only or refusal shapes). Treat it as a transport
-        # failure so provider.generate falls through the chain instead of
-        # crashing the whole run with a KeyError.
-        try:
-            text = data["choices"][0]["message"]["content"]
-        except (KeyError, IndexError, TypeError) as exc:
-            raise ConnectionError(
-                f"{self.provider.value} returned a malformed completion: {exc!r}. Raw response: {data}"
-            ) from exc
-        if text is None:
-            raise ConnectionError(f"{self.provider.value} returned null content")
+        text = _extract_openai_compatible_text(data)
         usage = data.get("usage") or {}
         return LLMResponse(
             text=text,
@@ -315,6 +350,53 @@ class _OpenAICompatibleClient(_BaseClient):
             prompt_tokens=int(usage.get("prompt_tokens", 0)),
             completion_tokens=int(usage.get("completion_tokens", 0)),
         )
+
+
+def _extract_openai_compatible_text(data: dict[str, Any]) -> str:
+    """Extract assistant text from OpenAI-compatible payload variants.
+
+    Some providers return ``message.content`` as a string, others as a list of
+    typed blocks, and some non-standard fallbacks expose ``text`` on the
+    choice itself. Normalize those shapes into one plain string.
+    """
+    choices = data.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise ProviderError(f"provider response missing choices: {data!r}")
+
+    choice = choices[0]
+    if not isinstance(choice, dict):
+        raise ProviderError(f"provider response choice must be an object: {choice!r}")
+
+    message = choice.get("message")
+    if isinstance(message, dict):
+        content = message.get("content")
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts: list[str] = []
+            for item in content:
+                if isinstance(item, str):
+                    parts.append(item)
+                    continue
+                if not isinstance(item, dict):
+                    continue
+                text = item.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+                    continue
+                if item.get("type") == "output_text":
+                    value = item.get("text") or item.get("content")
+                    if isinstance(value, str):
+                        parts.append(value)
+            joined = "".join(parts).strip()
+            if joined:
+                return joined
+
+    text = choice.get("text")
+    if isinstance(text, str) and text.strip():
+        return text
+
+    raise ProviderError(f"provider response missing assistant text: {data!r}")
 
 
 class _SentenceTransformersEmbedder(_BaseClient):
@@ -463,43 +545,35 @@ class LLMProvider:
             log.debug("llm.cache_hit", model=model.value, provider=cached.provider.value)
             return cached
 
-        chain = RESOLUTION.get(model)
-        if not chain:
-            raise ProviderError(f"no resolution chain for {model.value}")
-
+        candidate_models = (model, *_MODEL_FALLBACKS.get(model, ()))
         last_error: Exception | None = None
-        for binding in chain:
-            client = self.clients.get(binding.provider)
-            if client is None:
-                log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
-                continue
+        for candidate in candidate_models:
             try:
-                response = await self._call_with_429_retry(
-                    client,
-                    binding,
+                response = await self._generate_uncached(
+                    candidate,
                     messages,
                     kwargs,
-                    max_attempts=retry_429_attempts,
+                    retry_429_attempts=retry_429_attempts,
                 )
-            except RateLimitError as exc:
+            except ProviderError as exc:
                 last_error = exc
-                log.warning(
-                    "llm.provider_exhausted_retries",
-                    model=model.value,
-                    provider=binding.provider.value,
-                    physical=binding.physical_model,
-                )
-                continue
-            except (httpx.HTTPError, ConnectionError, OSError) as exc:
-                last_error = exc
-                log.warning(
-                    "llm.provider_transport_error",
-                    model=model.value,
-                    provider=binding.provider.value,
-                    error=str(exc),
-                )
+                if candidate != model:
+                    log.warning(
+                        "llm.model_fallback_failed",
+                        requested_model=model.value,
+                        fallback_model=candidate.value,
+                        error=repr(exc),
+                    )
                 continue
 
+            if candidate != model:
+                log.info(
+                    "llm.model_fallback_used",
+                    requested_model=model.value,
+                    fallback_model=candidate.value,
+                    provider=response.provider.value,
+                    physical=response.physical_model,
+                )
             response.model = model
             self.tokens_used[model] += response.total_tokens
             await self.cache.put(key, response)
@@ -562,19 +636,90 @@ class LLMProvider:
         while True:
             try:
                 return await client.chat(binding, messages, kwargs)
-            except RateLimitError:
+            except RateLimitError as exc:
                 attempt += 1
                 if attempt >= max_attempts:
                     raise
-                delay = _backoff_delay(
+                jittered = _backoff_delay(
                     attempt - 1,
                     self.settings.llm_backoff_base_seconds,
                     self.settings.llm_backoff_max_seconds,
                 )
+                # A provider-supplied Retry-After names the exact quota-window
+                # reset, so trust it over the guess — but never wait less than
+                # the jittered backoff, and cap it so a huge header can't stall.
+                if exc.retry_after is not None:
+                    delay = max(
+                        jittered,
+                        min(exc.retry_after, self.settings.llm_retry_after_cap_seconds),
+                    )
+                else:
+                    delay = jittered
                 log.info(
                     "llm.backoff",
                     provider=binding.provider.value,
                     attempt=attempt,
                     delay=round(delay, 3),
+                    retry_after=exc.retry_after,
                 )
                 await asyncio.sleep(delay)
+
+    async def _generate_uncached(
+        self,
+        model: ModelId,
+        messages: Sequence[Message],
+        kwargs: dict[str, Any],
+        *,
+        retry_429_attempts: int | None,
+    ) -> LLMResponse:
+        chain = RESOLUTION.get(model)
+        if not chain:
+            raise ProviderError(f"no resolution chain for {model.value}")
+
+        # Opt-in last-resort HF binding, appended only when enabled AND the HF
+        # client is configured — so Groq→Cerebras exhaustion falls through to HF
+        # instead of crashing an eval run. Off by default (HF free tier is tiny).
+        if (
+            self.settings.llm_hf_chat_fallback
+            and ProviderName.HUGGINGFACE in self.clients
+            and model in HF_CHAT_FALLBACK
+        ):
+            chain = (*chain, HF_CHAT_FALLBACK[model])
+
+        last_error: Exception | None = None
+        for binding in chain:
+            client = self.clients.get(binding.provider)
+            if client is None:
+                log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
+                continue
+            try:
+                response = await self._call_with_429_retry(
+                    client,
+                    binding,
+                    messages,
+                    kwargs,
+                    max_attempts=retry_429_attempts,
+                )
+            except RateLimitError as exc:
+                last_error = exc
+                log.warning(
+                    "llm.provider_exhausted_retries",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    physical=binding.physical_model,
+                )
+                continue
+            except (httpx.HTTPError, ConnectionError, OSError) as exc:
+                last_error = exc
+                log.warning(
+                    "llm.provider_transport_error",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    error=str(exc),
+                )
+                continue
+
+            response.model = model
+            return response
+
+        raise ProviderError(f"all providers failed for {model.value}: {last_error!r}") from last_error

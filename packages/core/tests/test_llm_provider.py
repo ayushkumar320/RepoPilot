@@ -18,6 +18,8 @@ from repopilot_core.llm.provider import (
     ProviderError,
     RateLimitError,
     _backoff_delay,
+    _extract_openai_compatible_text,
+    _parse_retry_after,
 )
 
 from .conftest import FakeClient, make_provider, make_response
@@ -185,6 +187,53 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
     assert len(cerebras.calls) == 1
 
 
+async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    groq = FakeClient(
+        ProviderName.GROQ,
+        [
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            make_response(
+                provider=ProviderName.GROQ,
+                physical_model="qwen/qwen3-32b",
+                text="fallback-answer",
+                prompt_tokens=9,
+                completion_tokens=4,
+            ),
+        ],
+    )
+    cerebras = FakeClient(
+        ProviderName.CEREBRAS,
+        [
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+        ],
+    )
+    provider = make_provider(
+        tmp_settings,
+        {
+            ProviderName.GROQ: groq,
+            ProviderName.CEREBRAS: cerebras,
+        },
+    )
+
+    response = await provider.generate(ModelId.QA_PRIMARY, _msgs())
+
+    assert response.text == "fallback-answer"
+    assert response.model == ModelId.QA_PRIMARY
+    assert response.provider == ProviderName.GROQ
+    assert response.physical_model == "qwen/qwen3-32b"
+    assert provider.tokens_used[ModelId.QA_PRIMARY] == 13
+    assert [call[0] for call in groq.calls] == [
+        "llama-3.3-70b-versatile",
+        "llama-3.3-70b-versatile",
+        "llama-3.3-70b-versatile",
+        "qwen/qwen3-32b",
+    ]
+
+
 # ─── Test 4 — tokens_used counter increments ───────────────────────────────
 
 
@@ -276,3 +325,178 @@ async def test_real_httpx_429_path(tmp_settings, respx_mock) -> None:  # type: i
     assert response.provider == ProviderName.CEREBRAS
     assert provider.tokens_used[ModelId.INTENT_PROFILER] == 19
     assert hf_route.call_count == 0, "HF must never be called for chat models"
+
+
+# ─── Retry-After handling ──────────────────────────────────────────────────
+
+
+def test_parse_retry_after_variants() -> None:
+    from datetime import UTC, datetime, timedelta
+    from email.utils import format_datetime
+
+    # delta-seconds form
+    assert _parse_retry_after("7") == 7.0
+    assert _parse_retry_after("  0.5 ") == 0.5
+    # missing / garbage / non-positive → None (fall back to jittered backoff)
+    assert _parse_retry_after(None) is None
+    assert _parse_retry_after("") is None
+    assert _parse_retry_after("soon") is None
+    assert _parse_retry_after("0") is None
+    assert _parse_retry_after("-3") is None
+    # HTTP-date form ~30s in the future resolves to a positive delta
+    future = format_datetime(datetime.now(UTC) + timedelta(seconds=30))
+    parsed = _parse_retry_after(future)
+    assert parsed is not None and 20.0 < parsed <= 31.0
+
+
+async def test_retry_after_header_overrides_backoff(tmp_settings, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """A provider-supplied Retry-After (capped) wins over the jittered backoff."""
+    import asyncio as _asyncio
+
+    settings = tmp_settings.model_copy(
+        update={
+            "llm_backoff_base_seconds": 0.0,
+            "llm_backoff_max_seconds": 0.0,
+            "llm_retry_after_cap_seconds": 60.0,
+            "llm_max_429_retries": 3,
+        }
+    )
+    slept: list[float] = []
+
+    async def _fake_sleep(delay: float) -> None:
+        slept.append(delay)
+
+    monkeypatch.setattr(_asyncio, "sleep", _fake_sleep)
+
+    groq = FakeClient(
+        ProviderName.GROQ,
+        [
+            RateLimitError("burst", retry_after=7.0),
+            make_response(provider=ProviderName.GROQ),
+        ],
+    )
+    provider = make_provider(settings, {ProviderName.GROQ: groq})
+
+    response = await provider.generate(ModelId.INTENT_PROFILER, _msgs())
+
+    assert response.text == "ok"
+    # Jittered backoff would be 0.0; Retry-After forces the honest 7s wait.
+    assert slept == [7.0]
+
+
+async def test_retry_after_is_capped(tmp_settings, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """A hostile/huge Retry-After can't stall the run past the cap."""
+    import asyncio as _asyncio
+
+    settings = tmp_settings.model_copy(
+        update={
+            "llm_backoff_base_seconds": 0.0,
+            "llm_backoff_max_seconds": 0.0,
+            "llm_retry_after_cap_seconds": 30.0,
+            "llm_max_429_retries": 3,
+        }
+    )
+    slept: list[float] = []
+
+    async def _fake_sleep(delay: float) -> None:
+        slept.append(delay)
+
+    monkeypatch.setattr(_asyncio, "sleep", _fake_sleep)
+
+    groq = FakeClient(
+        ProviderName.GROQ,
+        [
+            RateLimitError("burst", retry_after=9999.0),
+            make_response(provider=ProviderName.GROQ),
+        ],
+    )
+    provider = make_provider(settings, {ProviderName.GROQ: groq})
+
+    await provider.generate(ModelId.INTENT_PROFILER, _msgs())
+    assert slept == [30.0]
+
+
+# ─── Opt-in HF chat fallback ───────────────────────────────────────────────
+
+
+async def test_hf_chat_fallback_used_when_enabled(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """With llm_hf_chat_fallback on, a Groq+Cerebras storm falls through to HF."""
+    settings = tmp_settings.model_copy(update={"llm_hf_chat_fallback": True})
+    groq = FakeClient(ProviderName.GROQ, [RateLimitError("storm")] * 50)
+    cerebras = FakeClient(ProviderName.CEREBRAS, [RateLimitError("storm")] * 50)
+    hf = FakeClient(
+        ProviderName.HUGGINGFACE,
+        [
+            make_response(
+                provider=ProviderName.HUGGINGFACE,
+                physical_model="meta-llama/Llama-3.3-70B-Instruct",
+                text="hf-rescued",
+            )
+        ],
+    )
+    provider = make_provider(
+        settings,
+        {
+            ProviderName.GROQ: groq,
+            ProviderName.CEREBRAS: cerebras,
+            ProviderName.HUGGINGFACE: hf,
+        },
+    )
+
+    response = await provider.generate(ModelId.INTENT_PROFILER, _msgs())
+
+    assert response.text == "hf-rescued"
+    assert response.provider == ProviderName.HUGGINGFACE
+    assert len(hf.calls) == 1
+
+
+async def test_hf_chat_fallback_off_by_default(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """Default (flag off): a Groq+Cerebras storm raises rather than touching HF."""
+    groq = FakeClient(ProviderName.GROQ, [RateLimitError("storm")] * 50)
+    cerebras = FakeClient(ProviderName.CEREBRAS, [RateLimitError("storm")] * 50)
+    hf = FakeClient(ProviderName.HUGGINGFACE, [])  # raises if called
+    provider = make_provider(
+        tmp_settings,
+        {
+            ProviderName.GROQ: groq,
+            ProviderName.CEREBRAS: cerebras,
+            ProviderName.HUGGINGFACE: hf,
+        },
+    )
+
+    with pytest.raises(ProviderError):
+        await provider.generate(ModelId.INTENT_PROFILER, _msgs())
+    assert hf.calls == []
+
+
+def test_extract_openai_compatible_text_accepts_string_content() -> None:
+    text = _extract_openai_compatible_text({"choices": [{"message": {"content": "hello"}}]})
+    assert text == "hello"
+
+
+def test_extract_openai_compatible_text_accepts_block_content() -> None:
+    text = _extract_openai_compatible_text(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "content": [
+                            {"type": "output_text", "text": "hello "},
+                            {"type": "output_text", "text": "world"},
+                        ]
+                    }
+                }
+            ]
+        }
+    )
+    assert text == "hello world"
+
+
+def test_extract_openai_compatible_text_falls_back_to_choice_text() -> None:
+    text = _extract_openai_compatible_text({"choices": [{"text": "fallback"}]})
+    assert text == "fallback"
+
+
+def test_extract_openai_compatible_text_raises_on_missing_text() -> None:
+    with pytest.raises(ProviderError):
+        _extract_openai_compatible_text({"choices": [{"message": {}}]})

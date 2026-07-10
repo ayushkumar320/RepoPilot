@@ -251,7 +251,7 @@ async def _judge_sufficiency(
             Message("user", sufficiency_user_prompt(question, chunks)),
         ],
         temperature=0.0,
-        max_tokens=200,
+        max_tokens=1024,
     )
     match = _JSON_RE.search(response.text)
     if match is None:
@@ -274,7 +274,7 @@ async def _generate_answer(provider: LLMProvider, question: str, chunks: list[Ch
             Message("user", answer_user_prompt(question, chunks)),
         ],
         temperature=0.0,
-        max_tokens=400,
+        max_tokens=1024,
     )
     return response.text.strip()
 

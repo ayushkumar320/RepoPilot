@@ -90,5 +90,26 @@
     "Diversity gate: diversity_score drops on rare-symbol sets \u2014 correct behavior, not MMR failure: for single-symbol queries the right top-5 concentrates in the defining file. On general QA sets diversity holds (flask 0.588 held; httpx 0.400->0.385 within noise).",
     "Grounding/latency LLM guardrails pending provider quota (same standing item as Phase 3; fastapi grounding still the one open cross-repo check)."
   ],
-  "mmr_finding": "Light MMR (0.9) beats MMR-off on httpx recall@10 (0.974 vs 0.949) \u2014 diversity pulls distinct-file gold chunks into the top-10."
+  "mmr_finding": "Light MMR (0.9) beats MMR-off on httpx recall@10 (0.974 vs 0.949) \u2014 diversity pulls distinct-file gold chunks into the top-10.",
+  "llm_guardrails_httpx": {
+    "note": "Full 16-row answer path through hybrid+rerank (lambda=0.9, pool=50).",
+    "hallucination_rate": 0.0,
+    "grounding_accuracy_all_or_nothing": {
+      "phase3": 0.3125,
+      "phase4": 0.3125,
+      "verdict": "unchanged - formal gate (<=1pp regression) passes"
+    },
+    "claim_grounding_rate": {
+      "phase1_dense": 0.651,
+      "phase3_hybrid": 0.732,
+      "phase4_reranked": 0.6375,
+      "note": "per-claim dipped 0.732->0.638 vs Phase 3; within noise band of ~80 claims but flagged honestly. Possible cause: MMR-diversified top-8 makes the token-overlap claim->ref attribution mismatch more - the known _parse_claims weakness, next work item."
+    },
+    "verifier_accuracy": 1.0,
+    "keyword_accuracy": 0.5625,
+    "latency_p95_ms": {
+      "value": 5256.3,
+      "verdict": "NO VERDICT - inflated by free-tier 429 backoff during the staged run; rerank itself adds ~110ms. Needs one clean unthrottled window."
+    }
+  }
 }

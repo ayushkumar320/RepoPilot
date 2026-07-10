@@ -294,7 +294,18 @@ class _OpenAICompatibleClient(_BaseClient):
             raise RateLimitError(f"{self.provider.value} returned 429")
         resp.raise_for_status()
         data = resp.json()
-        text = data["choices"][0]["message"]["content"]
+        # Under load some providers return a message with no "content" key
+        # (e.g. reasoning-only or refusal shapes). Treat it as a transport
+        # failure so provider.generate falls through the chain instead of
+        # crashing the whole run with a KeyError.
+        try:
+            text = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ConnectionError(
+                f"{self.provider.value} returned a malformed completion: {exc!r}. Raw response: {data}"
+            ) from exc
+        if text is None:
+            raise ConnectionError(f"{self.provider.value} returned null content")
         usage = data.get("usage") or {}
         return LLMResponse(
             text=text,

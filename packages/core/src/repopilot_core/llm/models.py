@@ -69,32 +69,46 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ModelId.CARTOGRAPHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
     ),
     ModelId.FLOW_TRACER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
         ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
     ),
     ModelId.TEACHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
     ),
+    # QA_PRIMARY chain broadened for bench stability on fastapi (2026-07-11):
+    # Groq llama-3.3-70b is aggressively rate-limited on free tier, and the
+    # previous Cerebras fallback (`gemma-4-31b`) does not exist in the Cerebras
+    # catalog — 429s therefore had nowhere to land. Chain now hops through two
+    # Cerebras models (different rate buckets) before a Groq gpt-oss shim.
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
+        ModelBinding(ProviderName.GROQ, "openai/gpt-oss-20b"),
     ),
     ModelId.QA_FALLBACK: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
         ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
-        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
+        ModelBinding(ProviderName.GROQ, "openai/gpt-oss-20b"),
     ),
-    # Verifier is the highest call-volume agent. gemma-4-31b on Cerebras has
-    # no thinking tokens so the verifier's strict JSON parse stays reliable.
+    # Verifier is the highest call-volume agent. Groq qwen3-32b is the primary
+    # for its strict-JSON discipline; Cerebras qwen-3-32b matches semantics for
+    # the failover, and gpt-oss-120b is the last-resort shim.
     ModelId.VERIFIER: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
     ),
     # Embeddings run in-process via sentence-transformers (HF model weights).
     # physical_model is the HF model id passed to SentenceTransformer().

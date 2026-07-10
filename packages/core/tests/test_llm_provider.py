@@ -188,12 +188,15 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
 
 
 async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    # QA_PRIMARY chain (2026-07-11 broadened): Groq llama-3.3, Cerebras
+    # llama-3.3, Cerebras llama-4-scout, Groq openai/gpt-oss-20b. After the
+    # full chain 429s the caller spills to QA_FALLBACK, which starts on Groq
+    # qwen3-32b.
     groq = FakeClient(
         ProviderName.GROQ,
         [
-            RateLimitError("storm"),
-            RateLimitError("storm"),
-            RateLimitError("storm"),
+            RateLimitError("storm"),  # QA_PRIMARY: llama-3.3-70b-versatile
+            RateLimitError("storm"),  # QA_PRIMARY: openai/gpt-oss-20b
             make_response(
                 provider=ProviderName.GROQ,
                 physical_model="qwen/qwen3-32b",
@@ -206,9 +209,8 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
     cerebras = FakeClient(
         ProviderName.CEREBRAS,
         [
-            RateLimitError("storm"),
-            RateLimitError("storm"),
-            RateLimitError("storm"),
+            RateLimitError("storm"),  # QA_PRIMARY: llama-3.3-70b
+            RateLimitError("storm"),  # QA_PRIMARY: llama-4-scout-17b-16e-instruct
         ],
     )
     provider = make_provider(
@@ -219,7 +221,9 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
         },
     )
 
-    response = await provider.generate(ModelId.QA_PRIMARY, _msgs())
+    response = await provider.generate(
+        ModelId.QA_PRIMARY, _msgs(), retry_429_attempts=1
+    )
 
     assert response.text == "fallback-answer"
     assert response.model == ModelId.QA_PRIMARY
@@ -228,9 +232,12 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
     assert provider.tokens_used[ModelId.QA_PRIMARY] == 13
     assert [call[0] for call in groq.calls] == [
         "llama-3.3-70b-versatile",
-        "llama-3.3-70b-versatile",
-        "llama-3.3-70b-versatile",
+        "openai/gpt-oss-20b",
         "qwen/qwen3-32b",
+    ]
+    assert [call[0] for call in cerebras.calls] == [
+        "llama-3.3-70b",
+        "llama-4-scout-17b-16e-instruct",
     ]
 
 

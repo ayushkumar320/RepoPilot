@@ -274,7 +274,11 @@ async def _generate_answer(provider: LLMProvider, question: str, chunks: list[Ch
             Message("user", answer_user_prompt(question, chunks)),
         ],
         temperature=0.0,
-        max_tokens=1024,
+        # Reasoning-model headroom: Cerebras gpt-oss-120b spends its budget in
+        # a separate `reasoning` field before emitting content — a hard
+        # multi-step question was observed burning 1021 reasoning tokens and
+        # dying at 1024 with no content at all. 4096 gives real room.
+        max_tokens=4096,
     )
     return response.text.strip()
 

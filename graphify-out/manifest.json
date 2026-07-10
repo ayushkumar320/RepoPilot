@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1783654609.826033,
-    "ast_hash": "cab5fa709a7738687805b2fd37015302",
+    "mtime": 1783689391.1699944,
+    "ast_hash": "2059ecd0c5eb7dc9f4b71b1f7d0cd6d6",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/jobs/__init__.py": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/graph.py": {
-    "mtime": 1783662515.5539382,
-    "ast_hash": "f30a718cbf55d891e20ad20e62092da5",
+    "mtime": 1783687925.724779,
+    "ast_hash": "8c249ae971a8c5518141fb43a565d4e7",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/prompts.py": {
@@ -955,8 +955,8 @@
     "semantic_hash": ""
   },
   "evals/results/rag_phase4/delta.json": {
-    "mtime": 1783660671.1390448,
-    "ast_hash": "1b2b1a77fe28ac198797c2ee6541bfee",
+    "mtime": 1783689370.0541966,
+    "ast_hash": "9a9eb62bfdfc701be4d239c0dd7ee2cf",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/rerank/__init__.py": {
@@ -1007,6 +1007,11 @@
   "AGENTS.md": {
     "mtime": 1783661171.8129964,
     "ast_hash": "7b3ff7f27cd18dbd8b8c481c725ca207",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase4/fastapi_baseline.json": {
+    "mtime": 1783686723.316094,
+    "ast_hash": "c12a29efb2c31484f72641c14c40a3a7",
     "semantic_hash": ""
   }
 }

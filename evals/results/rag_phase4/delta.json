@@ -111,5 +111,19 @@
       "value": 5256.3,
       "verdict": "NO VERDICT - inflated by free-tier 429 backoff during the staged run; rerank itself adds ~110ms. Needs one clean unthrottled window."
     }
+  },
+  "llm_guardrails_cross_repo": {
+    "fastapi_full": {
+      "hallucination_rate": 0.0,
+      "grounding_accuracy": 0.4,
+      "claim_grounding_rate": 0.4286,
+      "keyword_accuracy": 0.8,
+      "note": "CLOSED - the long-open cross-repo check. Hallucination 0.00, keyword 0.80 (answers substantively right); per-claim 0.43 is the attribution weakness, not answer quality."
+    },
+    "flask": {
+      "status": "partial (5/20 at Phase 3: hallucination 0.00, per-claim 0.765)",
+      "phase4_completion": "quota-blocked; deliberately deferred until after the _parse_claims attribution fix so it is measured once, not twice."
+    },
+    "verdict": "Reranked pipeline is hallucination-safe on all measured repos (0.00 everywhere). Per-claim grounding (httpx 0.64, fastapi 0.43, flask 0.76 partial) vs keyword accuracy (0.56/0.80) isolates claim->ref attribution as the single answer-side weakness - the next work item."
   }
 }

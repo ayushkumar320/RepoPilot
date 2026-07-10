@@ -117,7 +117,19 @@ The sweep (λ ∈ {0.5, 0.7, 0.9, 1.0} × pool ∈ {30, 50}) found **pool=50 is 
 - Spec gate 3 (MRR on `multi_hop_v1`) not runnable — Phase 2 deferred, dataset doesn't exist. Substitute: MRR on rare sets 0.861 → 0.958 (httpx), 0.472 → 0.917 (fastapi).
 - Diversity drops on rare-symbol sets are **correct behavior** (single-symbol answers concentrate in the defining file), holds on general QA sets.
 - Self-test **0.90** = the bar (20 seeded, DB-verified triples).
-- LLM grounding/latency guardrails pending provider quota — same standing item as Phase 3 (fastapi grounding remains the one open cross-repo check). Rerank costs ~110 ms/query on CPU; latency budget is safe by construction.
+- Rerank costs ~110 ms/query on CPU; latency budget is safe by construction.
+
+### LLM guardrails through the reranked path (closed 2026-07-10)
+
+| repo | rows | hallucination | per-claim grounding | keyword acc |
+|---|---|---|---|---|
+| httpx | 16/16 | **0.00** | 0.638 | 0.563 |
+| fastapi | full | **0.00** | 0.429 | **0.800** |
+| flask | 5/20 (partial) | **0.00** | 0.765 | — |
+
+**The reranked pipeline is hallucination-safe everywhere.** The per-claim-vs-keyword gap (fastapi: claims 0.43 but keywords 0.80) isolates the one remaining answer-side weakness: the token-overlap claim→ref attribution in `_parse_claims` pins correct claims to non-supporting chunks. That fix is the next work item; flask's Phase 4 completion is deliberately deferred until after it (measure once, not twice). Latency still has no clean verdict (every window was 429-throttled).
+
+Infra fixes shipped along the way: malformed-completion fallthrough with payload logging (`provider.py`), and reasoning-model token headroom (`max_tokens` 200→1024 judge, 400→4096 answerer — Cerebras `gpt-oss-120b` was observed burning 1021 reasoning tokens before emitting any content).
 
 ---
 

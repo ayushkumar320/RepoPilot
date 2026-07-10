@@ -66,9 +66,12 @@ async def bench_repo(
         policy_kwargs = {"recall_k": None, "exclude_path_prefixes": ()}
 
     # Phase ≥ 3 fuses a BM25 lane; the headline retrieval metric uses hybrid.
+    # Phase ≥ 4 additionally cross-encoder-reranks + MMR-diversifies the pool.
     headline_kwargs = dict(policy_kwargs)
     if phase >= 3:
         headline_kwargs["search_mode"] = "hybrid"
+    if phase >= 4:
+        headline_kwargs["rerank"] = True
 
     print("[bench] retrieval metrics (no LLM cost beyond embeddings)…")
     retrieval = await run_retrieval_eval(

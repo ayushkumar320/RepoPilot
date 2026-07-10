@@ -141,8 +141,8 @@ async def run_retrieval_eval(
     exclude_path_prefixes: Sequence[str] = (),
     search_mode: SearchMode = "dense",
     rerank: bool = False,
-    rerank_lambda: float = 0.7,
-    rerank_max_pool: int = 30,
+    rerank_lambda: float = 0.9,
+    rerank_max_pool: int = 50,
 ) -> RetrievalEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     # Not-in-repo rows have no expected_refs; retrieval metrics skip them.

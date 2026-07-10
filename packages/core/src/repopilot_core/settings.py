@@ -88,10 +88,13 @@ class Settings(BaseSettings):
     # Cross-encoder over the post-retrieval pool. MiniLM-L-6-v2 is 80 MB ONNX,
     # ~460 pairs/s on CPU; BAAI/bge-reranker-base (1 GB) is the quality
     # fallback if the pairwise self-test flags MiniLM as code-mismatched.
+    # Defaults benched in Phase 4 (lambda x pool sweep): pool=50 reranks the
+    # full hybrid pool (fastapi rare recall@10 0.583 -> 0.917); lambda=0.9 is
+    # the min-regret diversity setting (recall up on every dataset).
     rerank_enabled: bool = True
     rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
-    rerank_max_pool: int = 30
-    rerank_lambda: float = 0.7
+    rerank_max_pool: int = 50
+    rerank_lambda: float = 0.9
 
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None

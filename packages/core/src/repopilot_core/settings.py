@@ -77,7 +77,17 @@ class Settings(BaseSettings):
     llm_max_429_retries: int = 8
     llm_backoff_base_seconds: float = 0.5
     llm_backoff_max_seconds: float = 20.0
+    # When a provider returns a `Retry-After` on 429, honor it instead of the
+    # jittered backoff — it names the exact quota-window reset, so guessing is
+    # strictly worse. Capped so a hostile/huge header can't stall the run.
+    llm_retry_after_cap_seconds: float = 60.0
     llm_request_timeout_seconds: float = 60.0
+    # Opt-in last-resort chat fallback to Hugging Face Inference Providers when
+    # BOTH Groq and Cerebras 429 (e.g. an eval storm exhausts both TPM windows).
+    # Default off: the HF free tier is a tiny (~$0.10/mo) credit budget a single
+    # bench run can drain. Set LLM_HF_CHAT_FALLBACK=1 for eval runs where you'd
+    # rather spend HF credits than crash. Requires HUGGINGFACE_API_KEY.
+    llm_hf_chat_fallback: bool = False
     # Cap on concurrent verifier LLM calls. Unbounded `asyncio.gather` over a
     # section's claims stampedes the free-tier per-second quota so hard that
     # backoff never catches up (both Groq and Cerebras 429 at once). A small

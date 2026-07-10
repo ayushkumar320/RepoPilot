@@ -36,13 +36,21 @@ from collections import defaultdict
 from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, Self
 
 import httpx
 import structlog
 
-from repopilot_core.llm.models import RESOLUTION, ModelBinding, ModelId, ProviderName
+from repopilot_core.llm.models import (
+    HF_CHAT_FALLBACK,
+    RESOLUTION,
+    ModelBinding,
+    ModelId,
+    ProviderName,
+)
 from repopilot_core.settings import Settings, get_settings
 
 log = structlog.get_logger(__name__)
@@ -60,7 +68,15 @@ class ProviderError(RuntimeError):
 
 
 class RateLimitError(RuntimeError):
-    """HTTP 429 from a provider — triggers retry/fallback inside the provider."""
+    """HTTP 429 from a provider — triggers retry/fallback inside the provider.
+
+    ``retry_after`` is the parsed ``Retry-After`` header in seconds when the
+    provider supplied one (naming the exact quota-window reset), else ``None``.
+    """
+
+    def __init__(self, message: str, *, retry_after: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
 
 
 @dataclass(frozen=True, slots=True)
@@ -242,6 +258,29 @@ def _backoff_delay(attempt: int, base: float, cap: float) -> float:
     return random.uniform(0.0, expo)
 
 
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a ``Retry-After`` header (delta-seconds or HTTP-date) into seconds.
+
+    Providers emit the numeric delta-seconds form; the HTTP-date form is also
+    RFC-legal, so honor both. Returns ``None`` for missing/garbage/negative
+    values so the caller falls back to jittered backoff.
+    """
+    if not value:
+        return None
+    value = value.strip()
+    try:
+        secs = float(value)
+    except ValueError:
+        try:
+            parsed = parsedate_to_datetime(value)
+        except (ValueError, TypeError):
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        secs = (parsed - datetime.now(UTC)).total_seconds()
+    return secs if secs > 0 else None
+
+
 # ─── Provider HTTP clients ──────────────────────────────────────────────────
 
 
@@ -295,7 +334,10 @@ class _OpenAICompatibleClient(_BaseClient):
             headers=headers,
         )
         if resp.status_code == 429:
-            raise RateLimitError(f"{self.provider.value} returned 429")
+            raise RateLimitError(
+                f"{self.provider.value} returned 429",
+                retry_after=_parse_retry_after(resp.headers.get("retry-after")),
+            )
         resp.raise_for_status()
         data = resp.json()
         text = _extract_openai_compatible_text(data)
@@ -594,20 +636,31 @@ class LLMProvider:
         while True:
             try:
                 return await client.chat(binding, messages, kwargs)
-            except RateLimitError:
+            except RateLimitError as exc:
                 attempt += 1
                 if attempt >= max_attempts:
                     raise
-                delay = _backoff_delay(
+                jittered = _backoff_delay(
                     attempt - 1,
                     self.settings.llm_backoff_base_seconds,
                     self.settings.llm_backoff_max_seconds,
                 )
+                # A provider-supplied Retry-After names the exact quota-window
+                # reset, so trust it over the guess — but never wait less than
+                # the jittered backoff, and cap it so a huge header can't stall.
+                if exc.retry_after is not None:
+                    delay = max(
+                        jittered,
+                        min(exc.retry_after, self.settings.llm_retry_after_cap_seconds),
+                    )
+                else:
+                    delay = jittered
                 log.info(
                     "llm.backoff",
                     provider=binding.provider.value,
                     attempt=attempt,
                     delay=round(delay, 3),
+                    retry_after=exc.retry_after,
                 )
                 await asyncio.sleep(delay)
 
@@ -622,6 +675,16 @@ class LLMProvider:
         chain = RESOLUTION.get(model)
         if not chain:
             raise ProviderError(f"no resolution chain for {model.value}")
+
+        # Opt-in last-resort HF binding, appended only when enabled AND the HF
+        # client is configured — so Groq→Cerebras exhaustion falls through to HF
+        # instead of crashing an eval run. Off by default (HF free tier is tiny).
+        if (
+            self.settings.llm_hf_chat_fallback
+            and ProviderName.HUGGINGFACE in self.clients
+            and model in HF_CHAT_FALLBACK
+        ):
+            chain = (*chain, HF_CHAT_FALLBACK[model])
 
         last_error: Exception | None = None
         for binding in chain:

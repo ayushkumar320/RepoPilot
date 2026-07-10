@@ -72,6 +72,6 @@ async def test_compress_chunks_runs_in_parallel_and_handles_errors() -> None:
     )
     # On failure the safe path returns the original chunks unmutated.
     assert len(out) == 2
-    for orig, got in zip(original, out):
+    for orig, got in zip(original, out, strict=True):
         assert got.content == orig.content
         assert got.kept_line_spans is None

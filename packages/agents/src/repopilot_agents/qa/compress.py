@@ -148,7 +148,7 @@ async def compress_chunks(
         return_exceptions=True,
     )
     out: list[ChunkContent] = []
-    for original, result in zip(chunks, results):
+    for original, result in zip(chunks, results, strict=True):
         if isinstance(result, BaseException):
             out.append(original)
         else:

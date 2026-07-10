@@ -1,0 +1,48 @@
+{
+  "phase": 4,
+  "arm": "hybrid + cross-encoder rerank + MMR (lambda=0.9, pool=50, MiniLM-L-6-v2)",
+  "generated_at": "2026-07-10T03:31:05.235444+00:00",
+  "self_test_pairwise_accuracy": 0.9,
+  "datasets": {
+    "httpx_qa_v1.jsonl": {
+      "total": 13.0,
+      "mrr": 0.8526,
+      "recall@5": 0.8846,
+      "recall@10": 0.9744,
+      "recall@20": 0.9744,
+      "ndcg@5": 0.818,
+      "ndcg@10": 0.8561,
+      "diversity_score": 0.3846
+    },
+    "flask_qa_v1.jsonl": {
+      "total": 17.0,
+      "mrr": 0.8329,
+      "recall@5": 0.7353,
+      "recall@10": 0.8676,
+      "recall@20": 0.9412,
+      "ndcg@5": 0.7079,
+      "ndcg@10": 0.7606,
+      "diversity_score": 0.5882
+    },
+    "rare_symbol_v1.jsonl": {
+      "total": 12.0,
+      "mrr": 0.9583,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "ndcg@5": 0.9692,
+      "ndcg@10": 0.9692,
+      "diversity_score": 0.35
+    },
+    "fastapi_rare_symbol_v1.jsonl": {
+      "total": 12.0,
+      "mrr": 0.9167,
+      "recall@5": 0.9167,
+      "recall@10": 0.9167,
+      "recall@20": 0.9167,
+      "ndcg@5": 0.9167,
+      "ndcg@10": 0.9167,
+      "diversity_score": 0.5667
+    }
+  }
+}

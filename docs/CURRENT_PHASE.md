@@ -1,6 +1,6 @@
 # Current Build Phase
 
-> **Next build purpose:** **RAG Phase 5 — Context Compression** (timeboxed polish, 90 min hard — may defer) or straight to **Phase 7 — Ship Closeout** (must-ship). The must-ship quality spine (1 + 3 + 4) is now fully landed. Phase 5 needs LLM quota (its gate is token-reduction at equal grounding); if quota is tight, run Ship Closeout first. (Phase 2 remains **deferred**.)
+> **Next build purpose:** **RAG Phase 5 — Context Compression: code-complete on branch `rag-phase5-compression`, awaiting measured gate.** Implementation, wiring, settings, tests, and the `input_tokens_per_question` bench metric are all in; only the LLM-quota-bound `bench --phase 5` run against `httpx_qa_v1` remains to produce `_before/_after/delta.json` and confirm the ≥40% token reduction at equal grounding. If quota is tight, **Phase 7 — Ship Closeout** is the must-ship fallback. (Phase 2 remains **deferred**.)
 > **Last verified gate:** **RAG Phase 4 — Reranking LANDED (active).** Reranking the full 50-pool: fastapi rare recall@10 0.583 → **0.917**, httpx general 0.897 → **0.974** (above Phase 1's dense 0.949 — Phase 3's −5pp cost erased), NDCG@5 fastapi-rare +0.426, self-test 0.90. λ=0.9, pool=50, MiniLM-L-6-v2. Artifacts: `evals/results/rag_phase4/{_before,_after,delta}.json`.
 > **Last updated:** 2026-07-10
 
@@ -38,7 +38,7 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 | 2 — Query Understanding ⚪ **deferred** (2026-07-08) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
 | **3 — BM25 Hybrid** 🟢 **landed (active)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp rare-symbol → **fastapi +17pp ✅** |
 | **4 — Reranking** 🟢 **landed (active)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 → **fastapi-rare +0.426, recall@10 up everywhere ✅** |
-| **5 — Compression** 🟡 **← next** *(may defer)* | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens, grounding equal |
+| **5 — Compression** 🟡 **code-complete, gate pending** *(branch `rag-phase5-compression`)* | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens, grounding equal |
 | 6 — Ingestion Enrichment *(may defer)* | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
 | [7 — Ship Closeout](rag/07_SHIP_CLOSEOUT.md) **(must-ship)** | A one-time win regresses silently | CI regression gate: retrieval PRs must ship a fresh `_after.json` | RAG_PLAN Definition of Done |
 
@@ -132,6 +132,30 @@ The sweep (λ ∈ {0.5, 0.7, 0.9, 1.0} × pool ∈ {30, 50}) found **pool=50 is 
 Postscript on the week of 429s: the root cause was finally a **malformed `.env` line** — `GROQ_API_KEY=gsk_...#Yash ka key` (inline comment, no space before `#`) sent the comment as part of the key → Groq 401 → all load collapsed onto Cerebras → burst 429s. One line fix; both providers healthy since.
 
 Infra fixes shipped along the way: malformed-completion fallthrough with payload logging (`provider.py`), and reasoning-model token headroom (`max_tokens` 200→1024 judge, 400→4096 answerer — Cerebras `gpt-oss-120b` was observed burning 1021 reasoning tokens before emitting any content).
+
+---
+
+## Phase 5 — Compression: code-complete on branch (2026-07-10)
+
+All code, wiring, and tests are in on `rag-phase5-compression`. The gate is measurement-only — needs an LLM-quota window to run `bench --phase 5`.
+
+**What is built:**
+- [`packages/agents/src/repopilot_agents/qa/compress.py`](../packages/agents/src/repopilot_agents/qa/compress.py) — `compress_chunk` (per-chunk 8B call, safe skips for `kind="module"` / <15 lines / parse fail / empty keep) + `compress_chunks` (now **`asyncio.gather` in parallel** with `return_exceptions=True` so an upstream 429 on one chunk leaves the rest un-mutated, never dropped) + `render_chunk_view`.
+- Prompts: `COMPRESS_SYSTEM` and `_render_numbered_chunk` in [`qa/prompts.py`](../packages/agents/src/repopilot_agents/qa/prompts.py); `answer_user_prompt` renders chunks via `_chunk_view` which respects `kept_line_spans`.
+- Type change: `ChunkContent.kept_line_spans: list[tuple[int, int]] | None` in [`types.py`](../packages/agents/src/repopilot_agents/types.py).
+- Graph wiring: [`qa/graph.py`](../packages/agents/src/repopilot_agents/qa/graph.py) — `answer_question(..., use_compress=True)` splices `compress_chunks` between rerank and the answerer's prompt slice, gated by `settings.compress_enabled`, logs `compress:k={n}` to `retrieval_path`.
+- Settings: `compress_enabled=True`, `compress_min_chunk_lines=15` in [`settings.py`](../packages/core/src/repopilot_core/settings.py).
+- Bench metric: `answer_input_tokens` on `QAResult` → `input_tokens_per_question` aggregated in [`grounding.py`](../packages/evals/src/repopilot_evals/runners/grounding.py) and surfaced in [`bench.py`](../packages/evals/src/repopilot_evals/bench.py) delta rows.
+- Tests: [`test_compress.py`](../packages/agents/tests/test_compress.py) (4 tests: clip+merge, JSON-parse fallback, module/short skip, answer-prompt-uses-compressed-view) + [`test_compress_integration.py`](../packages/agents/tests/test_compress_integration.py) (2 tests: **verifier-sees-full-content invariant** — `.content` unmutated post-compression so `read_chunks` in the verifier path always returns the full source; parallel-error fallback).
+
+**Safety invariant (locked by architecture, not by a flag):** the verifier fetches chunks fresh via `read_chunks(claim.refs)` — that returns `ChunkContent.content` (the full stored source), which compression never mutates. There is no code path where a compressed view reaches the verifier. `test_compress_integration.py::test_verifier_sees_full_content_after_compression` locks this.
+
+**What remains — measurement only:**
+1. `bench --phase 5 --repo httpx` twice (compress disabled must match Phase 4 exactly; compress enabled produces the delta).
+2. Confirm the six gate lines in [rag/05](rag/05_CONTEXT_COMPRESSION.md#5-gate): `input_tokens after ≤ 0.6× before`, `grounding_accuracy` within −1 pp, `verifier_accuracy` invariant, `hallucination_rate` non-regressed, `latency_p50` non-regressed, `latency_p95 ≤ 1.2× Phase 4`.
+3. Commit `evals/results/rag_phase5/{_before,_after,delta}.json`, flip the phase table row to 🟢 landed, update this banner.
+
+**If quota stays tight:** cut Phase 5 cleanly per the 2-day-ship-plan rule (timeboxed polish, deferred is a good outcome), leave the branch on a shelf with the code intact, and jump to Phase 7 Ship Closeout — nothing downstream depends on Phase 5's `_after.json`.
 
 ---
 

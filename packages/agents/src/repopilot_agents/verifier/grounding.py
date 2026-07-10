@@ -38,7 +38,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.types import ChunkContent, CodeRef
 from repopilot_core.llm.models import ModelId
-from repopilot_core.llm.provider import LLMProvider, Message
+from repopilot_core.llm.provider import LLMProvider, Message, ProviderError
 
 log = structlog.get_logger(__name__)
 
@@ -212,14 +212,31 @@ async def verify_claim(
             objection=_objection_if_rejected(claim, cached),
         )
 
-    response = await provider.generate(
-        ModelId.VERIFIER,
-        [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, chunks))],
-        temperature=0.0,
-        # Headroom for reasoning models: qwen3 spends its budget in a
-        # <think> block first, so 200 tokens starved the JSON entirely.
-        max_tokens=1024,
-    )
+    try:
+        response = await provider.generate(
+            ModelId.VERIFIER,
+            [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, chunks))],
+            temperature=0.0,
+            # Headroom for reasoning models: qwen3 spends its budget in a
+            # <think> block first, so 200 tokens starved the JSON entirely.
+            max_tokens=1024,
+        )
+    except ProviderError as exc:
+        # Safe failure: if every verifier provider is exhausted, reject the
+        # claim rather than crashing the whole answer path.
+        log.warning(
+            "verifier.provider_error",
+            claim=claim.text[:80],
+            error=repr(exc),
+        )
+        parsed = VerifierVerdict(decision="rejected", reason="verifier_provider_error")
+        _CACHE.put(key, parsed)
+        _apply(claim, parsed)
+        return _VerifyResult(
+            claim=claim,
+            verdict=parsed,
+            objection=_objection_if_rejected(claim, parsed),
+        )
 
     parsed = _parse_verdict(response.text)
     if parsed is None:

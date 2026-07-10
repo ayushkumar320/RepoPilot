@@ -80,7 +80,7 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.QA_PRIMARY: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
-        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
+        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
     ),
     ModelId.QA_FALLBACK: (
         ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
@@ -88,7 +88,7 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
-        ModelBinding(ProviderName.CEREBRAS, "llama-3.1-8b"),
+        ModelBinding(ProviderName.CEREBRAS, "gemma-4-31b"),
     ),
     # Verifier is the highest call-volume agent. gemma-4-31b on Cerebras has
     # no thinking tokens so the verifier's strict JSON parse stays reliable.

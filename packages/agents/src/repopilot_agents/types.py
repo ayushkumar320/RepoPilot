@@ -41,6 +41,7 @@ class ChunkContent(BaseModel):
     content: str
     summary: str | None = None
     kind: str = "function"
+    kept_line_spans: list[tuple[int, int]] | None = None
 
 
 class ChunkHit(BaseModel):

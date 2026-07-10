@@ -39,6 +39,7 @@ from repopilot_agents.qa.prompts import (
     answer_user_prompt,
     sufficiency_user_prompt,
 )
+from repopilot_agents.qa.compress import compress_chunks
 from repopilot_agents.qa.types import SufficiencyVerdict
 from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
@@ -54,6 +55,7 @@ from repopilot_agents.verifier.grounding import (
 )
 from repopilot_core.llm.models import ModelId
 from repopilot_core.llm.provider import LLMProvider, Message
+from repopilot_core.settings import get_settings
 
 log = structlog.get_logger(__name__)
 
@@ -75,6 +77,7 @@ class QAResult(BaseModel):
     objections: list[VerifierObjection] = Field(default_factory=list)
     hops: int = 0
     retrieval_path: list[str] = Field(default_factory=list)
+    answer_input_tokens: int = 0
 
 
 @dataclass(slots=True)
@@ -99,6 +102,7 @@ async def answer_question(
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_hybrid: bool = True,
     use_rerank: bool = True,
+    use_compress: bool = True,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -115,7 +119,12 @@ async def answer_question(
     ``use_rerank`` (Phase 4) cross-encoder-reranks + MMR-diversifies the top
     of the pool before the prompt slice. Requires ``recall_k`` (needs a pool
     to reorder); disabled automatically on the pre-Phase-1 baseline arm.
+
+    ``use_compress`` (Phase 5) narrows the answerer's view of each chunk to
+    load-bearing lines only. ``ChunkContent.content`` remains full text so the
+    verifier still checks claims against the whole source chunk.
     """
+    settings = get_settings()
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
     # Initial retrieval: wide source-only pool (gold-label noise prefixes
@@ -161,6 +170,14 @@ async def answer_question(
         initial_chunks = await read_chunks(
             [h.ref for h in hits[:k]], engine=engine, repo_id=repo_id
         )
+    if use_compress and settings.compress_enabled and initial_chunks:
+        initial_chunks = await compress_chunks(
+            question,
+            initial_chunks,
+            provider=provider,
+            min_lines=settings.compress_min_chunk_lines,
+        )
+        ctx.retrieval_path.append(f"compress:k={len(initial_chunks)}")
     _extend_context(ctx, initial_chunks)
 
     # Outer loop: sufficiency judge → optional traverse expansion.
@@ -188,6 +205,7 @@ async def answer_question(
         _extend_context(ctx, new_chunks)
         hops += 1
 
+    answer_prompt_tokens = _estimate_tokens(answer_user_prompt(question, ctx.chunks))
     answer_text = await _generate_answer(provider, question, ctx.chunks)
 
     if _is_not_found(answer_text):
@@ -198,6 +216,7 @@ async def answer_question(
             objections=[],
             hops=hops,
             retrieval_path=ctx.retrieval_path,
+            answer_input_tokens=answer_prompt_tokens,
         )
 
     claims = _parse_claims(answer_text, ctx.chunks)
@@ -209,6 +228,7 @@ async def answer_question(
             objections=[],
             hops=hops,
             retrieval_path=ctx.retrieval_path,
+            answer_input_tokens=answer_prompt_tokens,
         )
 
     verify_results = await verify_claims(claims, provider=provider, engine=engine, repo_id=repo_id)
@@ -226,6 +246,7 @@ async def answer_question(
         objections=objections,
         hops=hops,
         retrieval_path=ctx.retrieval_path,
+        answer_input_tokens=answer_prompt_tokens,
     )
 
 
@@ -239,6 +260,11 @@ def _extend_context(ctx: _Context, chunks: list[ChunkContent]) -> None:
             continue
         ctx.seen_refs.add(key)
         ctx.chunks.append(chunk)
+
+
+def _estimate_tokens(text: str) -> int:
+    """Cheap, stable token estimate for relative Phase 5 prompt-size gating."""
+    return max(1, (len(text) + 3) // 4) if text else 0
 
 
 async def _judge_sufficiency(
@@ -267,11 +293,12 @@ async def _judge_sufficiency(
 
 
 async def _generate_answer(provider: LLMProvider, question: str, chunks: list[ChunkContent]) -> str:
+    user_prompt = answer_user_prompt(question, chunks)
     response = await provider.generate(
         ModelId.QA_PRIMARY,
         [
             Message("system", ANSWER_SYSTEM),
-            Message("user", answer_user_prompt(question, chunks)),
+            Message("user", user_prompt),
         ],
         temperature=0.0,
         max_tokens=400,

@@ -17,6 +17,7 @@ from repopilot_core.llm.provider import (
     Message,
     ProviderError,
     RateLimitError,
+    _extract_openai_compatible_text,
     _backoff_delay,
 )
 
@@ -185,6 +186,53 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
     assert len(cerebras.calls) == 1
 
 
+async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    groq = FakeClient(
+        ProviderName.GROQ,
+        [
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            make_response(
+                provider=ProviderName.GROQ,
+                physical_model="qwen/qwen3-32b",
+                text="fallback-answer",
+                prompt_tokens=9,
+                completion_tokens=4,
+            ),
+        ],
+    )
+    cerebras = FakeClient(
+        ProviderName.CEREBRAS,
+        [
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+            RateLimitError("storm"),
+        ],
+    )
+    provider = make_provider(
+        tmp_settings,
+        {
+            ProviderName.GROQ: groq,
+            ProviderName.CEREBRAS: cerebras,
+        },
+    )
+
+    response = await provider.generate(ModelId.QA_PRIMARY, _msgs())
+
+    assert response.text == "fallback-answer"
+    assert response.model == ModelId.QA_PRIMARY
+    assert response.provider == ProviderName.GROQ
+    assert response.physical_model == "qwen/qwen3-32b"
+    assert provider.tokens_used[ModelId.QA_PRIMARY] == 13
+    assert [call[0] for call in groq.calls] == [
+        "llama-3.3-70b-versatile",
+        "llama-3.3-70b-versatile",
+        "llama-3.3-70b-versatile",
+        "qwen/qwen3-32b",
+    ]
+
+
 # ─── Test 4 — tokens_used counter increments ───────────────────────────────
 
 
@@ -276,3 +324,36 @@ async def test_real_httpx_429_path(tmp_settings, respx_mock) -> None:  # type: i
     assert response.provider == ProviderName.CEREBRAS
     assert provider.tokens_used[ModelId.INTENT_PROFILER] == 19
     assert hf_route.call_count == 0, "HF must never be called for chat models"
+
+
+def test_extract_openai_compatible_text_accepts_string_content() -> None:
+    text = _extract_openai_compatible_text({"choices": [{"message": {"content": "hello"}}]})
+    assert text == "hello"
+
+
+def test_extract_openai_compatible_text_accepts_block_content() -> None:
+    text = _extract_openai_compatible_text(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "content": [
+                            {"type": "output_text", "text": "hello "},
+                            {"type": "output_text", "text": "world"},
+                        ]
+                    }
+                }
+            ]
+        }
+    )
+    assert text == "hello world"
+
+
+def test_extract_openai_compatible_text_falls_back_to_choice_text() -> None:
+    text = _extract_openai_compatible_text({"choices": [{"text": "fallback"}]})
+    assert text == "fallback"
+
+
+def test_extract_openai_compatible_text_raises_on_missing_text() -> None:
+    with pytest.raises(ProviderError):
+        _extract_openai_compatible_text({"choices": [{"message": {}}]})

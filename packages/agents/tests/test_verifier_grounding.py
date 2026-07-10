@@ -7,6 +7,7 @@ from typing import Any, cast
 import pytest
 
 from repopilot_agents.types import ChunkContent, CodeRef
+from repopilot_core.llm.provider import ProviderError
 from repopilot_agents.verifier.grounding import (
     Claim,
     _parse_verdict,
@@ -187,6 +188,41 @@ async def test_verify_claim_parse_fail_rejects(
 
 
 @pytest.mark.asyncio
+async def test_verify_claim_provider_error_rejects_instead_of_crashing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def fake_read_chunks(refs: Any, *, engine: Any, repo_id: str) -> list[ChunkContent]:
+        return [
+            ChunkContent(
+                ref=CodeRef(file_path="x.py", start_line=1, end_line=2),
+                content="def foo(): return bar()",
+            )
+        ]
+
+    from repopilot_agents.verifier import grounding as g
+
+    monkeypatch.setattr(g, "read_chunks", fake_read_chunks)
+
+    class _FailingProvider:
+        async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
+            raise ProviderError("all providers failed for verifier: RateLimitError('cerebras returned 429')")
+
+    claim = Claim(
+        text="foo calls bar",
+        refs=[CodeRef(file_path="x.py", start_line=1, end_line=2)],
+    )
+    result = await verify_claim(
+        claim,
+        provider=cast(Any, _FailingProvider()),
+        engine=cast(Any, _StubEngine()),
+        repo_id="repo",
+    )
+    assert result.verdict.decision == "rejected"
+    assert result.verdict.reason == "verifier_provider_error"
+    assert claim.status == "rejected"
+
+
+@pytest.mark.asyncio
 async def test_verify_claims_cache_hit_skips_provider(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -219,3 +255,46 @@ async def test_verify_claims_cache_hit_skips_provider(
     assert provider.call_count == 1  # second call hit the cache
     assert results[0].verdict.decision == "supported"
     assert results[1].cached
+
+
+@pytest.mark.asyncio
+async def test_verify_claim_uses_full_chunk_content_even_when_compressed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    full_content = "line 1 keep\nline 2 contradicting detail\nline 3 keep"
+
+    async def fake_read_chunks(refs: Any, *, engine: Any, repo_id: str) -> list[ChunkContent]:
+        return [
+            ChunkContent(
+                ref=CodeRef(file_path="x.py", start_line=1, end_line=3),
+                content=full_content,
+                kept_line_spans=[(1, 1), (3, 3)],
+            )
+        ]
+
+    from repopilot_agents.verifier import grounding as g
+
+    monkeypatch.setattr(g, "read_chunks", fake_read_chunks)
+
+    class _InspectProvider:
+        async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
+            user_text = messages[1].content
+            assert "line 2 contradicting detail" in user_text
+            assert "<source file=x.py:1-3" in user_text
+
+            class _R:
+                text = '{"decision":"supported","reason":"ok"}'
+
+            return _R()
+
+    claim = Claim(
+        text="foo calls bar",
+        refs=[CodeRef(file_path="x.py", start_line=1, end_line=3)],
+    )
+    result = await verify_claim(
+        claim,
+        provider=cast(Any, _InspectProvider()),
+        engine=cast(Any, _StubEngine()),
+        repo_id="repo",
+    )
+    assert result.verdict.decision == "supported"

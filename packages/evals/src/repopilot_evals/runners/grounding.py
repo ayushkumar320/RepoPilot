@@ -33,6 +33,7 @@ class GroundingEvalCaseResult:
     hops: int
     n_claims: int = 0
     n_verified: int = 0
+    answer_input_tokens: int = 0
 
 
 @dataclass(slots=True)
@@ -86,6 +87,12 @@ class GroundingEvalMetrics:
             self.multi_hop_correct / self.multi_hop_questions if self.multi_hop_questions else 0.0
         )
 
+    @property
+    def input_tokens_per_question(self) -> float:
+        return (
+            sum(case.answer_input_tokens for case in self.cases) / self.total if self.total else 0.0
+        )
+
 
 def _contains_all_keywords(answer: str, keywords: list[str]) -> bool:
     if not keywords:
@@ -122,6 +129,7 @@ async def run_grounding_eval(
     settings: Settings | None = None,
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
+    use_compress: bool = True,
 ) -> GroundingEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     return await run_grounding_eval_rows(
@@ -131,6 +139,7 @@ async def run_grounding_eval(
         settings=settings,
         recall_k=recall_k,
         exclude_path_prefixes=exclude_path_prefixes,
+        use_compress=use_compress,
     )
 
 
@@ -142,6 +151,7 @@ async def run_grounding_eval_rows(
     settings: Settings | None = None,
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
+    use_compress: bool = True,
 ) -> GroundingEvalMetrics:
     ctx = build_eval_context(settings)
     try:
@@ -155,6 +165,7 @@ async def run_grounding_eval_rows(
                 repo_id=resolved_repo_id,
                 recall_k=recall_k,
                 exclude_path_prefixes=exclude_path_prefixes,
+                use_compress=use_compress,
             )
             grounded = all(claim.status == "verified" for claim in result.claims)
             keyword_match = _contains_all_keywords(result.answer, row.expected_answer_keywords)
@@ -171,6 +182,7 @@ async def run_grounding_eval_rows(
                     hops=result.hops,
                     n_claims=len(result.claims),
                     n_verified=n_verified,
+                    answer_input_tokens=result.answer_input_tokens,
                 )
             )
 

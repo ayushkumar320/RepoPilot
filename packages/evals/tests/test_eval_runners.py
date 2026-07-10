@@ -60,7 +60,10 @@ async def test_httpx_qa_grounding_accuracy_sampled(monkeypatch: pytest.MonkeyPat
         )
         if "not in repo" in question.lower():
             return QAResult(
-                question=question, answer="I couldn't find that in the repo.", claims=[]
+                question=question,
+                answer="I couldn't find that in the repo.",
+                claims=[],
+                answer_input_tokens=12,
             )
         return QAResult(
             question=question,
@@ -69,6 +72,7 @@ async def test_httpx_qa_grounding_accuracy_sampled(monkeypatch: pytest.MonkeyPat
             objections=[],
             hops=1,
             retrieval_path=["vector_search", "graph_traverse"],
+            answer_input_tokens=24,
         )
 
     monkeypatch.setattr(grounding_runner, "answer_question", _fake_answer_question)
@@ -151,7 +155,10 @@ async def test_run_grounding_eval_rows_computes_metrics(monkeypatch: pytest.Monk
     ) -> QAResult:
         if "not in repo" in question.lower():
             return QAResult(
-                question=question, answer="I couldn't find that in the repo.", claims=[]
+                question=question,
+                answer="I couldn't find that in the repo.",
+                claims=[],
+                answer_input_tokens=11,
             )
         ref = CodeRef(
             file_path="httpx/_client.py", start_line=10, end_line=20, symbol="httpx.Client"
@@ -163,6 +170,7 @@ async def test_run_grounding_eval_rows_computes_metrics(monkeypatch: pytest.Monk
             objections=[],
             hops=1,
             retrieval_path=[],
+            answer_input_tokens=21,
         )
 
     monkeypatch.setattr(grounding_runner, "answer_question", _fake_answer_question)
@@ -178,6 +186,7 @@ async def test_run_grounding_eval_rows_computes_metrics(monkeypatch: pytest.Monk
     assert metrics.ref_recall == 1.0
     assert metrics.hallucination_rate == 0.0
     assert metrics.multi_hop_accuracy == 1.0
+    assert metrics.input_tokens_per_question == 16.0
 
 
 @pytest.mark.asyncio

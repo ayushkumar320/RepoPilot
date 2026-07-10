@@ -32,12 +32,35 @@ def _render_chunks(chunks: Sequence[ChunkContent]) -> str:
         return "(no chunks retrieved)"
     parts: list[str] = []
     for chunk in chunks:
+        view = _chunk_view(chunk)
         parts.append(
             f"<source file={chunk.ref.file_path}:{chunk.ref.start_line}-"
             f"{chunk.ref.end_line} symbol={chunk.ref.symbol!r}>\n"
-            f"{chunk.content.rstrip()}\n</source>"
+            f"{view.rstrip()}\n</source>"
         )
     return "\n\n".join(parts)
+
+
+def _chunk_view(chunk: ChunkContent) -> str:
+    if not chunk.kept_line_spans:
+        return chunk.content
+    lines = chunk.content.splitlines()
+    base = chunk.ref.start_line
+    kept: list[str] = []
+    for start, end in chunk.kept_line_spans:
+        rel_start = max(0, start - base)
+        rel_end = min(len(lines), end - base + 1)
+        if rel_end > rel_start:
+            kept.extend(lines[rel_start:rel_end])
+    return "\n".join(kept) or chunk.content
+
+
+def _render_numbered_chunk(chunk: ChunkContent) -> str:
+    start = chunk.ref.start_line
+    lines = chunk.content.rstrip("\n").splitlines()
+    if not lines:
+        return f"{start}:"
+    return "\n".join(f"{start + i}:{line}" for i, line in enumerate(lines))
 
 
 SUFFICIENCY_SYSTEM = (
@@ -65,6 +88,15 @@ ANSWER_SYSTEM = (
     "single claim that can be checked against the chunks.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
 
+COMPRESS_SYSTEM = (
+    "You see one Python code chunk and a user question. Return ONLY JSON with "
+    'this schema: {"keep":[[start_line,end_line], ...]}. Select the smallest '
+    "set of line ranges needed to answer the question. If unsure, keep the "
+    "line. If the chunk is irrelevant, return an empty keep list. Never "
+    "generate an answer to the user question.\n\n"
+    + _DATA_NOT_INSTRUCTIONS
+)
+
 
 def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
     return (
@@ -77,7 +109,9 @@ def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
 
 __all__ = [
     "ANSWER_SYSTEM",
+    "COMPRESS_SYSTEM",
     "SUFFICIENCY_SYSTEM",
+    "_render_numbered_chunk",
     "answer_user_prompt",
     "sufficiency_user_prompt",
 ]

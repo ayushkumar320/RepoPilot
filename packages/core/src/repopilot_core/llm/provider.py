@@ -47,6 +47,10 @@ from repopilot_core.settings import Settings, get_settings
 
 log = structlog.get_logger(__name__)
 
+_MODEL_FALLBACKS: dict[ModelId, tuple[ModelId, ...]] = {
+    ModelId.QA_PRIMARY: (ModelId.QA_FALLBACK,),
+}
+
 
 # ─── Public types ──────────────────────────────────────────────────────────
 
@@ -294,7 +298,7 @@ class _OpenAICompatibleClient(_BaseClient):
             raise RateLimitError(f"{self.provider.value} returned 429")
         resp.raise_for_status()
         data = resp.json()
-        text = data["choices"][0]["message"]["content"]
+        text = _extract_openai_compatible_text(data)
         usage = data.get("usage") or {}
         return LLMResponse(
             text=text,
@@ -304,6 +308,53 @@ class _OpenAICompatibleClient(_BaseClient):
             prompt_tokens=int(usage.get("prompt_tokens", 0)),
             completion_tokens=int(usage.get("completion_tokens", 0)),
         )
+
+
+def _extract_openai_compatible_text(data: dict[str, Any]) -> str:
+    """Extract assistant text from OpenAI-compatible payload variants.
+
+    Some providers return ``message.content`` as a string, others as a list of
+    typed blocks, and some non-standard fallbacks expose ``text`` on the
+    choice itself. Normalize those shapes into one plain string.
+    """
+    choices = data.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise ProviderError(f"provider response missing choices: {data!r}")
+
+    choice = choices[0]
+    if not isinstance(choice, dict):
+        raise ProviderError(f"provider response choice must be an object: {choice!r}")
+
+    message = choice.get("message")
+    if isinstance(message, dict):
+        content = message.get("content")
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts: list[str] = []
+            for item in content:
+                if isinstance(item, str):
+                    parts.append(item)
+                    continue
+                if not isinstance(item, dict):
+                    continue
+                text = item.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+                    continue
+                if item.get("type") == "output_text":
+                    value = item.get("text") or item.get("content")
+                    if isinstance(value, str):
+                        parts.append(value)
+            joined = "".join(parts).strip()
+            if joined:
+                return joined
+
+    text = choice.get("text")
+    if isinstance(text, str) and text.strip():
+        return text
+
+    raise ProviderError(f"provider response missing assistant text: {data!r}")
 
 
 class _SentenceTransformersEmbedder(_BaseClient):
@@ -452,43 +503,35 @@ class LLMProvider:
             log.debug("llm.cache_hit", model=model.value, provider=cached.provider.value)
             return cached
 
-        chain = RESOLUTION.get(model)
-        if not chain:
-            raise ProviderError(f"no resolution chain for {model.value}")
-
+        candidate_models = (model, *_MODEL_FALLBACKS.get(model, ()))
         last_error: Exception | None = None
-        for binding in chain:
-            client = self.clients.get(binding.provider)
-            if client is None:
-                log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
-                continue
+        for candidate in candidate_models:
             try:
-                response = await self._call_with_429_retry(
-                    client,
-                    binding,
+                response = await self._generate_uncached(
+                    candidate,
                     messages,
                     kwargs,
-                    max_attempts=retry_429_attempts,
+                    retry_429_attempts=retry_429_attempts,
                 )
-            except RateLimitError as exc:
+            except ProviderError as exc:
                 last_error = exc
-                log.warning(
-                    "llm.provider_exhausted_retries",
-                    model=model.value,
-                    provider=binding.provider.value,
-                    physical=binding.physical_model,
-                )
-                continue
-            except (httpx.HTTPError, ConnectionError, OSError) as exc:
-                last_error = exc
-                log.warning(
-                    "llm.provider_transport_error",
-                    model=model.value,
-                    provider=binding.provider.value,
-                    error=str(exc),
-                )
+                if candidate != model:
+                    log.warning(
+                        "llm.model_fallback_failed",
+                        requested_model=model.value,
+                        fallback_model=candidate.value,
+                        error=repr(exc),
+                    )
                 continue
 
+            if candidate != model:
+                log.info(
+                    "llm.model_fallback_used",
+                    requested_model=model.value,
+                    fallback_model=candidate.value,
+                    provider=response.provider.value,
+                    physical=response.physical_model,
+                )
             response.model = model
             self.tokens_used[model] += response.total_tokens
             await self.cache.put(key, response)
@@ -567,3 +610,53 @@ class LLMProvider:
                     delay=round(delay, 3),
                 )
                 await asyncio.sleep(delay)
+
+    async def _generate_uncached(
+        self,
+        model: ModelId,
+        messages: Sequence[Message],
+        kwargs: dict[str, Any],
+        *,
+        retry_429_attempts: int | None,
+    ) -> LLMResponse:
+        chain = RESOLUTION.get(model)
+        if not chain:
+            raise ProviderError(f"no resolution chain for {model.value}")
+
+        last_error: Exception | None = None
+        for binding in chain:
+            client = self.clients.get(binding.provider)
+            if client is None:
+                log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
+                continue
+            try:
+                response = await self._call_with_429_retry(
+                    client,
+                    binding,
+                    messages,
+                    kwargs,
+                    max_attempts=retry_429_attempts,
+                )
+            except RateLimitError as exc:
+                last_error = exc
+                log.warning(
+                    "llm.provider_exhausted_retries",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    physical=binding.physical_model,
+                )
+                continue
+            except (httpx.HTTPError, ConnectionError, OSError) as exc:
+                last_error = exc
+                log.warning(
+                    "llm.provider_transport_error",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    error=str(exc),
+                )
+                continue
+
+            response.model = model
+            return response
+
+        raise ProviderError(f"all providers failed for {model.value}: {last_error!r}") from last_error

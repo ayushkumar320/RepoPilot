@@ -1,8 +1,8 @@
 # Current Build Phase
 
-> **Active:** **RAG Phase 4 — Reranking — CODE LANDED, EVAL GATE PENDING.** All code is implemented (cross-encoder reranker + MMR diversity + graph wiring + retrieval runner + tests). `_before.json` committed. The pairwise self-test and full bench sweep (`_after.json`) were interrupted — see Phase 4 section below for what remains. Spec: [`rag/04_RERANKING.md`](rag/04_RERANKING.md). (Phase 2 Query Understanding remains **deferred** — see note below.)
+> **Active:** **RAG Phase 4 — Reranking — CODE LANDED, EVAL GATE PENDING.** All code is implemented (cross-encoder reranker + MMR diversity + graph wiring + retrieval runner + tests). `_before.json` committed. The Phase 4 bench was re-run on **2026-07-10** after fixing live runtime issues (OpenAI-compatible fallback parsing, `code_health` fallback model, `qa_primary` fallback model), but the full LLM-path gate is still blocked by **Groq + Cerebras 429 exhaustion** before `_after.json` can be produced. See Phase 4 section below for the exact blocker. Spec: [`rag/04_RERANKING.md`](rag/04_RERANKING.md). (Phase 2 Query Understanding remains **deferred** — see note below.)
 > **Last verified gate:** **RAG Phase 3 — BM25 Hybrid LANDED.** fastapi rare-symbol recall@10 0.417 → **0.583** (+17pp); httpx rare 1.00 (unchanged); httpx general 0.949 → 0.897 (−5pp accepted cost). Artifacts: `evals/results/rag_phase3/{_before,_after,delta}.json`.
-> **Last updated:** 2026-07-09
+> **Last updated:** 2026-07-10
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
 
@@ -103,6 +103,22 @@ All code is implemented per [rag/04](rag/04_RERANKING.md). Here's exactly what w
 
 > [!IMPORTANT]
 > The code is complete and tested (fast-lane: unit tests pass, mypy clean, ruff clean). What's missing is the **eval gate** — the numbers that prove the reranker improves NDCG@5.
+
+### 2026-07-10 re-run status
+
+Phase 4 eval was actively re-run on **2026-07-10** because `evals/results/rag_phase4/` only contained `_before.json`. The rerun surfaced and fixed three real runtime blockers before reaching the actual provider wall:
+
+- **OpenAI-compatible fallback parser**: Cerebras fallback responses could omit `message.content`; the provider now accepts string, block-list, and `choice.text` variants instead of crashing on `KeyError`.
+- **`code_health` fallback model**: the compression-model fallback used in later phase work pointed at a dead Cerebras model id; fixed to a working one.
+- **`qa_primary` fallback model**: the first Cerebras fallback returned reasoning-only payloads; the next fallback model id 404ed; both were corrected so the answer path can at least enter the fallback lane.
+
+**Current blocker after those fixes:** the Phase 4 `httpx` bench now reaches the reranked full answer path, but the gate run still dies on live provider quota:
+
+- Groq `qa_primary` exhausts retries under the bench's repeated answer-generation load.
+- Cerebras `qa_primary` now parses correctly, but also 429s under the same run.
+- End result: `ProviderError: all providers failed for qa_primary: RateLimitError('cerebras returned 429')`
+
+So the missing `_after.json` is now an honest **quota blocker**, not a code-path gap. No Phase 4 metrics were landed from this re-run because the full bench did not complete.
 
 1. **Pairwise self-test resolution**: MiniLM scored 85% on a pairwise (query, positive, negative) accuracy test — below the spec's 90% bar. The BGE-reranker-base fallback test was started but interrupted. **Next step**: re-run the pairwise self-test with `BAAI/bge-reranker-base` (1 GB one-time download). If BGE passes 90%, update `rerank_model` default in settings. If neither passes, document the stop condition.
 

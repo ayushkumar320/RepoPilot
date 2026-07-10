@@ -93,6 +93,10 @@ class Settings(BaseSettings):
     rerank_max_pool: int = 30
     rerank_lambda: float = 0.7
 
+    # ── Context compression (RAG Phase 5) ───────────────────────────────────
+    compress_enabled: bool = True
+    compress_min_chunk_lines: int = 15
+
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None
 

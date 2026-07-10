@@ -9,6 +9,7 @@ when building the answer prompt.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 from collections.abc import Sequence
@@ -137,9 +138,21 @@ async def compress_chunks(
     provider: LLMProvider,
     min_lines: int = 15,
 ) -> list[ChunkContent]:
+    if not chunks:
+        return []
+    results = await asyncio.gather(
+        *(
+            compress_chunk(question, chunk, provider=provider, min_lines=min_lines)
+            for chunk in chunks
+        ),
+        return_exceptions=True,
+    )
     out: list[ChunkContent] = []
-    for chunk in chunks:
-        out.append(await compress_chunk(question, chunk, provider=provider, min_lines=min_lines))
+    for original, result in zip(chunks, results):
+        if isinstance(result, BaseException):
+            out.append(original)
+        else:
+            out.append(result)
     return out
 
 

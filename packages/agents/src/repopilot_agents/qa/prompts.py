@@ -31,9 +31,10 @@ def _render_chunks(chunks: Sequence[ChunkContent]) -> str:
     if not chunks:
         return "(no chunks retrieved)"
     parts: list[str] = []
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks):
         view = _chunk_view(chunk)
         parts.append(
+            f"Chunk [{i}]:\n"
             f"<source file={chunk.ref.file_path}:{chunk.ref.start_line}-"
             f"{chunk.ref.end_line} symbol={chunk.ref.symbol!r}>\n"
             f"{view.rstrip()}\n</source>"
@@ -85,7 +86,9 @@ ANSWER_SYSTEM = (
     "2. If the chunks don't contain the answer, reply EXACTLY: "
     '"I couldn\'t find that in the repo."\n'
     "3. Format your answer as one short sentence per line. Every line is a "
-    "single claim that can be checked against the chunks.\n\n" + _DATA_NOT_INSTRUCTIONS
+    "single claim that can be checked against the chunks.\n"
+    "4. VERY IMPORTANT: You must append the citation for each claim at the end of the line, using the chunk index like [0] or [0][2]. Every claim MUST have at least one citation.\n\n"
+    + _DATA_NOT_INSTRUCTIONS
 )
 
 COMPRESS_SYSTEM = (
@@ -102,7 +105,7 @@ def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
         f"QUESTION:\n{question}\n\n"
         f"CHUNKS:\n{_render_chunks(chunks)}\n\n"
         "Write the answer below as one claim per line. Each claim must be "
-        "directly supported by a chunk."
+        "directly supported by a chunk, and you MUST cite the chunk index (e.g. [0]) at the end of the line."
     )
 
 

@@ -41,7 +41,6 @@ from repopilot_agents.qa.prompts import (
     sufficiency_user_prompt,
 )
 from repopilot_agents.qa.types import SufficiencyVerdict
-from repopilot_agents.rerank.attribution import attribute_refs
 from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.tools.graph_traverse import graph_traverse
@@ -316,37 +315,11 @@ def _is_not_found(answer: str) -> bool:
     return "couldn't find" in norm or "could not find" in norm or "not in the repo" in norm
 
 
-def _attribute_refs_lexical(text: str, pool: list[ChunkContent]) -> list[CodeRef]:
-    """Original token-overlap attribution — offline fallback only.
-
-    Its "false-positive refs are harmless" assumption was disproven by the
-    eval matrix: the verifier judges a claim against *its* refs, so a
-    mis-pinned claim is rejected even when a supporting chunk is in context.
-    """
-    tokens = {t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", text)}
-    scored: list[tuple[int, ChunkContent]] = []
-    for chunk in pool:
-        sym_tokens = {
-            t.lower() for t in re.findall(r"[A-Za-z_][A-Za-z_0-9]+", chunk.ref.symbol or "")
-        }
-        overlap = len(tokens & sym_tokens)
-        if overlap > 0:
-            scored.append((overlap, chunk))
-    scored.sort(key=lambda t: -t[0])
-    refs = [c.ref for _, c in scored[:2]]
-    if not refs and pool:
-        refs = [pool[0].ref]
-    return refs
-
-
 def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     """One sentence per line → one Claim per line.
 
-    Refs are attached by cross-encoder attribution (``rerank.attribution``):
-    each claim is scored against every context chunk and pinned to the top-2.
-    The verifier reads the union of a claim's ref chunks, so attribution only
-    needs the supporting chunk in the top-2, not ranked first. Falls back to
-    the lexical heuristic if the reranker model is unavailable (offline CI).
+    Extracts explicit [X] citations from the LLM output to map claims
+    directly to the chunks they came from.
     """
     out: list[Claim] = []
     pool = list(chunks)
@@ -354,16 +327,28 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
         text = line.strip(" -•").strip()
         if not text:
             continue
-        refs: list[CodeRef]
-        try:
-            refs = attribute_refs(text, pool, k=2)
-        except Exception as exc:  # model unavailable / load failure
-            log.warning("claims.attribution_fallback", error=str(exc)[:120])
-            refs = _attribute_refs_lexical(text, pool)
+
+        refs: list[CodeRef] = []
+        citations = re.findall(r"\[(\d+)\]", text)
+        for c in citations:
+            idx = int(c)
+            if 0 <= idx < len(pool):
+                refs.append(pool[idx].ref)
+
+        clean_text = re.sub(r"\s*\[\d+\]\s*", "", text).strip()
+
         if not refs and pool:
             refs = [pool[0].ref]
+
         if refs:
-            out.append(Claim(text=text, refs=refs))
+            seen = set()
+            unique_refs = []
+            for r in refs:
+                key = (r.file_path, r.start_line, r.end_line)
+                if key not in seen:
+                    seen.add(key)
+                    unique_refs.append(r)
+            out.append(Claim(text=clean_text or text, refs=unique_refs))
     return out
 
 

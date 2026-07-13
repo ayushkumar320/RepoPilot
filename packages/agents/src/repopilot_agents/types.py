@@ -42,6 +42,9 @@ class ChunkContent(BaseModel):
     summary: str | None = None
     kind: str = "function"
     kept_line_spans: list[tuple[int, int]] | None = None
+    signature: str | None = None
+    decorators: list[str] = Field(default_factory=list)
+    neighbor_symbols: list[str] = Field(default_factory=list)
 
 
 class ChunkHit(BaseModel):

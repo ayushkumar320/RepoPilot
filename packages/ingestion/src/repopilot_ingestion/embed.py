@@ -40,9 +40,10 @@ async def embed_chunks(
     sem = asyncio.Semaphore(max(1, settings.ingestion_embed_concurrency))
 
     async def one(chunk: Chunk) -> EmbeddedChunk:
+        embedding_text = chunk.enriched_text or chunk.content
         async with sem:
             try:
-                response: EmbeddingResponse = await provider.embed(chunk.content)
+                response: EmbeddingResponse = await provider.embed(embedding_text)
                 return EmbeddedChunk(chunk=chunk, vector=response.vector)
             except ProviderError as exc:
                 log.warning(
@@ -52,7 +53,7 @@ async def embed_chunks(
                     end_line=chunk.end_line,
                     error=str(exc),
                 )
-                return EmbeddedChunk(chunk=chunk, vector=_stable_fallback_vector(chunk.content))
+                return EmbeddedChunk(chunk=chunk, vector=_stable_fallback_vector(embedding_text))
 
     log.info("embed.start", count=len(chunks))
     embedded = await asyncio.gather(*(one(c) for c in chunks))

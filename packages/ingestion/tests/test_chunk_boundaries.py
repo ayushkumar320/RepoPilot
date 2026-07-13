@@ -23,7 +23,7 @@ def test_chunks_on_ast_boundaries() -> None:
     chunks = chunk_file(parsed, rel_path=FIXTURE.name)
     lines = _source_lines(FIXTURE)
 
-    starters = {"def ", "async def ", "class "}
+    starters = {"def ", "async def ", "class ", "@"}
     for chunk in chunks:
         if chunk.kind == "module":
             continue

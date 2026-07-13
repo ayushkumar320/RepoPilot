@@ -91,6 +91,10 @@ chunks = Table(
     Column("kind", String(16), nullable=False),
     Column("summary", Text, nullable=True),
     Column("content", Text, nullable=False),
+    Column("enriched_text", Text, nullable=True),
+    Column("signature", Text, nullable=True),
+    Column("decorators", JSONB, nullable=False, server_default="[]"),
+    Column("neighbor_symbols", JSONB, nullable=False, server_default="[]"),
     Index("ix_chunks_repo_symbol", "repo_id", "symbol"),
     Index("ix_chunks_repo_file", "repo_id", "file_path"),
 )

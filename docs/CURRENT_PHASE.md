@@ -1,7 +1,7 @@
 # Current Build Phase
 
-> **Next build purpose:** **RAG Phase 7 — Ship Closeout (must-ship).** We will set up CI regression gates to ensure retrieval PRs ship a fresh `_after.json`. (Phases 2 and 6 remain **deferred**.)
-> **Last verified gate:** **RAG Phase 5 — Compression LANDED (gate overridden).** The code is complete, but the −40% token reduction gate failed (~0% drop) because the `code_health` model hit `413 Payload Too Large` limits on Groq for massive chunks, triggering graceful fallback to uncompressed text. The user explicitly passed the gate. Artifacts: `evals/results/rag_phase5/baseline.json`.
+> **Current build purpose:** **RAG Phase 6 — Ingestion Enrichment (active).** We are enriching ingestion-side chunk text with signatures, decorators, docstrings, and neighbor symbols, then measuring whether corpus-only changes lift recall.
+> **Last verified gate:** **RAG Phase 5 — Compression LANDED (gate overridden).** The code is complete, but the −40% token reduction gate failed (~0% drop) because the `code_health` model hit `413 Payload Too Large` limits on Groq for massive chunks, triggering graceful fallback to uncompressed text. The user explicitly passed the gate. Phase 6 baseline seeded from `evals/results/rag_phase5/_after.json` to `evals/results/rag_phase6/_before.json`.
 > **Last updated:** 2026-07-13
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
@@ -39,7 +39,7 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 | **3 — BM25 Hybrid** 🟢 **landed (active)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp rare-symbol → **fastapi +17pp ✅** |
 | **4 — Reranking** 🟢 **landed (active)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 → **fastapi-rare +0.426, recall@10 up everywhere ✅** |
 | **5 — Compression** 🟢 **landed (gate overridden)** | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens (FAILED, overridden) |
-| 6 — Ingestion Enrichment ⚪ **deferred** | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
+| 6 — Ingestion Enrichment 🟡 **active** | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
 | [7 — Ship Closeout](rag/07_SHIP_CLOSEOUT.md) **(must-ship)** | A one-time win regresses silently | CI regression gate: retrieval PRs must ship a fresh `_after.json` | RAG_PLAN Definition of Done |
 
 Priority (from the 2-day ship plan): **1 + 3 + 4 are the meaningful-quality minimum; 2, 5, 6 are timeboxed polish** — a blown timebox means cut and defer with a clean entry note, never stretch.

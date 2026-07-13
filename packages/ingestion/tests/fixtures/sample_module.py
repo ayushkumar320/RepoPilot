@@ -7,6 +7,13 @@ from collections.abc import Iterable
 CONSTANT = 42
 
 
+def route(path: str):
+    def decorate(func):
+        return func
+
+    return decorate
+
+
 def top_level_function(x: int, y: int) -> int:
     """Return x + y."""
     z = x + y
@@ -35,3 +42,19 @@ class Dog(Animal):
 
     def fetch(self, thing: str) -> str:
         return f"fetched {thing}"
+
+
+@route("/login")
+def login(request: str, *, redirect_url: str | None = None) -> str:
+    """Validate session csrf redirect."""
+    return redirect_url or request
+
+
+@route("/kennel")
+class Kennel(Dog):
+    """Stores decorated dog handlers."""
+
+    @route("/feed")
+    def feed(self) -> str:
+        """Feed dog bowls."""
+        return self.fetch("bowl")

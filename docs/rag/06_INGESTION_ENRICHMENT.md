@@ -1,5 +1,7 @@
 # RAG Phase 6 — Ingestion Enrichment
 
+> **Status:** Active as of 2026-07-13. Baseline seeded from `evals/results/rag_phase5/_after.json` to `evals/results/rag_phase6/_before.json`.
+
 ## 1. Goal
 
 Lift recall@10 by **≥ 3 percentage points** from **corpus-side changes alone** — same retrieval, same reranker, but the chunks themselves carry richer metadata and better-shaped content.

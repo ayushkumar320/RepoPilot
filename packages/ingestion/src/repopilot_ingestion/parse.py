@@ -15,6 +15,8 @@ the AST itself surfaces deterministically.
 
 from __future__ import annotations
 
+import ast
+import re
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -52,6 +54,9 @@ class ParsedSymbol:
     start_line: int
     end_line: int
     docstring: str | None
+    signature: str
+    decorators: tuple[str, ...] = ()
+    docstring_tokens: tuple[str, ...] = ()
     # For classes: dotted base names appearing in the parens.
     bases: tuple[str, ...] = ()
     # For classes: child method names in source order.
@@ -153,16 +158,17 @@ def _parse_from_import(node: Node, source: str) -> list[ImportEdge]:
 def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[ParsedSymbol]:
     out: list[ParsedSymbol] = []
     for child in _iter_block_children(node):
-        if child.type in {"function_definition", "decorated_definition"}:
-            fn = _strip_decorator(child)
-            if fn is None or fn.type != "function_definition":
-                continue
+        stripped = _strip_decorator(child)
+        decorators = tuple(_decorators(child, source))
+        if stripped is not None and stripped.type == "function_definition":
+            fn = stripped
             name_node = fn.child_by_field_name("name")
             if name_node is None:
                 continue
             name = _text(name_node, source)
             qual = f"{parent_qual}.{name}" if parent_qual else name
             start, end = _line_span(child)
+            docstring = _first_docstring(fn, source)
             out.append(
                 ParsedSymbol(
                     name=name,
@@ -170,18 +176,23 @@ def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[Parse
                     kind="function",
                     start_line=start,
                     end_line=end,
-                    docstring=_first_docstring(fn, source),
+                    docstring=docstring,
+                    signature=_signature(fn, source),
+                    decorators=decorators,
+                    docstring_tokens=_docstring_tokens(docstring),
                 )
             )
-        elif child.type == "class_definition":
-            name_node = child.child_by_field_name("name")
+        elif stripped is not None and stripped.type == "class_definition":
+            cls = stripped
+            name_node = cls.child_by_field_name("name")
             if name_node is None:
                 continue
             name = _text(name_node, source)
             qual = f"{parent_qual}.{name}" if parent_qual else name
             start, end = _line_span(child)
-            bases = tuple(_class_base_names(child, source))
-            methods = tuple(_class_method_names(child, source))
+            bases = tuple(_class_base_names(cls, source))
+            methods = tuple(_class_method_names(cls, source))
+            docstring = _first_docstring(cls, source)
             out.append(
                 ParsedSymbol(
                     name=name,
@@ -189,24 +200,28 @@ def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[Parse
                     kind="class",
                     start_line=start,
                     end_line=end,
-                    docstring=_first_docstring(child, source),
+                    docstring=docstring,
+                    signature=_signature(cls, source),
+                    decorators=decorators,
+                    docstring_tokens=_docstring_tokens(docstring),
                     bases=bases,
                     method_names=methods,
                 )
             )
             # Methods are emitted as independent ``method`` symbols so the
             # chunker can keep their bodies separate from the class chunk.
-            body = child.child_by_field_name("body")
+            body = cls.child_by_field_name("body")
             if body is not None:
                 for method in _iter_block_children(body):
-                    fn = _strip_decorator(method)
-                    if fn is None or fn.type != "function_definition":
+                    method_fn = _strip_decorator(method)
+                    if method_fn is None or method_fn.type != "function_definition":
                         continue
-                    mname_node = fn.child_by_field_name("name")
+                    mname_node = method_fn.child_by_field_name("name")
                     if mname_node is None:
                         continue
                     mname = _text(mname_node, source)
                     mstart, mend = _line_span(method)
+                    method_docstring = _first_docstring(method_fn, source)
                     out.append(
                         ParsedSymbol(
                             name=mname,
@@ -214,7 +229,10 @@ def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[Parse
                             kind="method",
                             start_line=mstart,
                             end_line=mend,
-                            docstring=_first_docstring(fn, source),
+                            docstring=method_docstring,
+                            signature=_signature(method_fn, source),
+                            decorators=tuple(_decorators(method, source)),
+                            docstring_tokens=_docstring_tokens(method_docstring),
                         )
                     )
     return out
@@ -238,13 +256,31 @@ def _iter_block_children(node: Node) -> Iterator[Node]:
 
 def _strip_decorator(node: Node) -> Node | None:
     """Return the underlying ``function_definition`` from a (possibly decorated) node."""
-    if node.type == "function_definition":
+    if node.type in {"function_definition", "class_definition"}:
         return node
     if node.type == "decorated_definition":
         for child in node.children:
             if child.type in {"function_definition", "class_definition"}:
                 return child
     return None
+
+
+def _decorators(node: Node, source: str) -> list[str]:
+    if node.type != "decorated_definition":
+        return []
+    return [
+        _text(child, source).strip()
+        for child in node.children
+        if child.type == "decorator" and _text(child, source).strip()
+    ]
+
+
+def _signature(node: Node, source: str) -> str:
+    """Return the def/class header without decorators or body text."""
+    body = node.child_by_field_name("body")
+    if body is None:
+        return _text(node, source).splitlines()[0].strip()
+    return source[node.start_byte : body.start_byte].rstrip().removesuffix(":").rstrip() + ":"
 
 
 def _first_docstring(node: Node, source: str) -> str | None:
@@ -256,9 +292,30 @@ def _first_docstring(node: Node, source: str) -> str | None:
             inner = child.children[0] if child.children else None
             if inner is not None and inner.type == "string":
                 # Strip the surrounding quote tokens by trimming the raw text.
-                return _text(inner, source)
+                raw = _text(inner, source)
+                try:
+                    value = ast.literal_eval(raw)
+                except (SyntaxError, ValueError):
+                    return raw
+                return value if isinstance(value, str) else raw
         break
     return None
+
+
+def _docstring_tokens(docstring: str | None, *, limit: int = 12) -> tuple[str, ...]:
+    if not docstring:
+        return ()
+    seen: set[str] = set()
+    out: list[str] = []
+    for token in re.findall(r"[A-Za-z_][A-Za-z0-9_]{2,}", docstring):
+        key = token.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(token)
+        if len(out) >= limit:
+            break
+    return tuple(out)
 
 
 def _class_base_names(node: Node, source: str) -> list[str]:

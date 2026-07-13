@@ -23,7 +23,7 @@ import structlog
 
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings
-from repopilot_ingestion.chunk import Chunk, chunk_file
+from repopilot_ingestion.chunk import Chunk, chunk_file, enrich_chunks_with_neighbors
 from repopilot_ingestion.clone import (
     CloneResult,
     clone_to_tempdir,
@@ -131,6 +131,7 @@ async def index_repo(
 
             graph = build_graph(modules)
             adjacency = graph_to_adjacency(graph)
+            chunks = enrich_chunks_with_neighbors(chunks, adjacency)
 
             summarised = await summarise_chunks(chunks, provider=provider, settings=settings)
             embedded = await embed_chunks(chunks, provider=provider, settings=settings)

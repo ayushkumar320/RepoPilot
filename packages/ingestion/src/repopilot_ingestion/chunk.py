@@ -34,6 +34,11 @@ class Chunk:
     start_line: int
     end_line: int
     content: str
+    enriched_text: str | None = None
+    signature: str | None = None
+    decorators: tuple[str, ...] = ()
+    docstring_tokens: tuple[str, ...] = ()
+    neighbor_symbols: tuple[str, ...] = ()
 
 
 def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> list[Chunk]:
@@ -67,6 +72,7 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                     start_line=module_lines[0],
                     end_line=module_lines[-1],
                     content=module_content,
+                    signature=f"module {parsed.module or _module_symbol_from_path(file_path)}",
                 )
             )
 
@@ -81,6 +87,17 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                     start_line=sym.start_line,
                     end_line=_class_header_end_line(sym, lines),
                     content=content,
+                    enriched_text=_build_enriched_text(
+                        signature=sym.signature,
+                        decorators=sym.decorators,
+                        docstring_tokens=sym.docstring_tokens,
+                        neighbor_symbols=sym.bases + sym.method_names,
+                        body=content,
+                    ),
+                    signature=sym.signature,
+                    decorators=sym.decorators,
+                    docstring_tokens=sym.docstring_tokens,
+                    neighbor_symbols=sym.bases + sym.method_names,
                 )
             )
         elif sym.kind in {"function", "method"}:
@@ -93,6 +110,16 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                     start_line=sym.start_line,
                     end_line=sym.end_line,
                     content=content,
+                    enriched_text=_build_enriched_text(
+                        signature=sym.signature,
+                        decorators=sym.decorators,
+                        docstring_tokens=sym.docstring_tokens,
+                        neighbor_symbols=(),
+                        body=content,
+                    ),
+                    signature=sym.signature,
+                    decorators=sym.decorators,
+                    docstring_tokens=sym.docstring_tokens,
                 )
             )
 
@@ -148,4 +175,82 @@ def _module_symbol_from_path(path: str) -> str:
     return p.replace("/", ".").lstrip(".")
 
 
-__all__ = ["Chunk", "ChunkKind", "chunk_file"]
+def _build_enriched_text(
+    *,
+    signature: str | None,
+    decorators: tuple[str, ...],
+    docstring_tokens: tuple[str, ...],
+    neighbor_symbols: tuple[str, ...],
+    body: str,
+) -> str:
+    prefix: list[str] = []
+    if decorators:
+        prefix.append("# decorators: " + ", ".join(decorators))
+    if signature:
+        prefix.append("# signature: " + " ".join(signature.split()))
+    if neighbor_symbols:
+        prefix.append("# neighbors: " + ", ".join(neighbor_symbols[:5]))
+    if docstring_tokens:
+        prefix.append("# docstring keywords: " + ", ".join(docstring_tokens))
+    if not prefix:
+        return body
+    return "\n".join(prefix) + "\n" + body
+
+
+def enrich_chunks_with_neighbors(
+    chunks: list[Chunk],
+    adjacency: dict[str, dict[str, list[str]]],
+    *,
+    limit: int = 5,
+) -> list[Chunk]:
+    """Return chunks with graph neighbor symbols folded into ``enriched_text``.
+
+    ``content`` remains raw source. The synthetic lines are only for embedding
+    and BM25 indexing.
+    """
+    out: list[Chunk] = []
+    for chunk in chunks:
+        neighbors = _neighbor_symbols_for_chunk(chunk, adjacency, limit=limit)
+        combined_neighbors = tuple(dict.fromkeys((*chunk.neighbor_symbols, *neighbors)))
+        enriched_text = _build_enriched_text(
+            signature=chunk.signature,
+            decorators=chunk.decorators,
+            docstring_tokens=chunk.docstring_tokens,
+            neighbor_symbols=combined_neighbors,
+            body=chunk.content,
+        )
+        out.append(
+            Chunk(
+                file_path=chunk.file_path,
+                symbol=chunk.symbol,
+                kind=chunk.kind,
+                start_line=chunk.start_line,
+                end_line=chunk.end_line,
+                content=chunk.content,
+                enriched_text=enriched_text,
+                signature=chunk.signature,
+                decorators=chunk.decorators,
+                docstring_tokens=chunk.docstring_tokens,
+                neighbor_symbols=combined_neighbors,
+            )
+        )
+    return out
+
+
+def _neighbor_symbols_for_chunk(
+    chunk: Chunk,
+    adjacency: dict[str, dict[str, list[str]]],
+    *,
+    limit: int,
+) -> tuple[str, ...]:
+    buckets = adjacency.get(chunk.symbol, {})
+    if chunk.kind in {"function", "method"}:
+        candidates = buckets.get("calls", [])
+    elif chunk.kind == "class":
+        candidates = [*buckets.get("inherits", []), *buckets.get("calls", [])]
+    else:
+        candidates = buckets.get("imports", [])
+    return tuple(dict.fromkeys(candidates))[:limit]
+
+
+__all__ = ["Chunk", "ChunkKind", "chunk_file", "enrich_chunks_with_neighbors"]

@@ -38,7 +38,7 @@ Each phase is independently shippable; each unlocks the next. The diagram on the
 | **3** | [BM25 Hybrid](rag/03_HYBRID_RETRIEVAL_BM25.md) | Hybrid Retrieval (sparse side) | recall@10 lift ≥ 5 pp on rare-symbol / proper-noun queries | none (Postgres FTS built-in) |
 | **4** | [Reranking](rag/04_RERANKING.md) | Reranking | NDCG@5 lift ≥ 0.05 over Phase 3 | `fastembed` (~80 MB) |
 | **5** | [Context Compression](rag/05_CONTEXT_COMPRESSION.md) | Context Compression | ≥ 40% input-token reduction at equal grounding-accuracy | none |
-| **6** | [Ingestion Enrichment](rag/06_INGESTION_ENRICHMENT.md) | Embeddings + Vector DB (offline side) | recall@10 lift ≥ 3 pp from corpus-side change alone | none (radon optional) |
+| **6** | [Ingestion Enrichment](rag/06_INGESTION_ENRICHMENT.md) — **🟡 active 2026-07-13** | Embeddings + Vector DB (offline side) | recall@10 lift ≥ 3 pp from corpus-side change alone | none (radon optional) |
 
 After Phase 6, the pipeline implements the full user-supplied diagram with every stage measured.
 

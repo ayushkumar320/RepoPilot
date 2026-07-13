@@ -55,13 +55,27 @@ async def read_chunks(
         chunks_table.c.kind,
         chunks_table.c.summary,
         chunks_table.c.content,
+        chunks_table.c.signature,
+        chunks_table.c.decorators,
+        chunks_table.c.neighbor_symbols,
     ).where(and_(chunks_table.c.repo_id == repo_id, or_(*clauses)))
 
     async with engine.connect() as conn:
         rows = (await conn.execute(query)).all()
 
     by_key: dict[tuple[str, int, int], ChunkContent] = {}
-    for file_path, start_line, end_line, symbol, kind, summary, content in rows:
+    for (
+        file_path,
+        start_line,
+        end_line,
+        symbol,
+        kind,
+        summary,
+        content,
+        signature,
+        decorators,
+        neighbor_symbols,
+    ) in rows:
         ref = CodeRef(
             file_path=file_path,
             start_line=int(start_line),
@@ -69,7 +83,13 @@ async def read_chunks(
             symbol=symbol,
         )
         by_key[(ref.file_path, ref.start_line, ref.end_line)] = ChunkContent(
-            ref=ref, content=content, summary=summary, kind=kind
+            ref=ref,
+            content=content,
+            summary=summary,
+            kind=kind,
+            signature=signature,
+            decorators=list(decorators or []),
+            neighbor_symbols=list(neighbor_symbols or []),
         )
 
     out: list[ChunkContent] = []

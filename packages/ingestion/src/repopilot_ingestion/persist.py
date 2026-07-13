@@ -133,6 +133,10 @@ async def persist_index(
                     kind=s.chunk.kind,
                     summary=s.summary,
                     content=s.chunk.content,
+                    enriched_text=s.chunk.enriched_text,
+                    signature=s.chunk.signature,
+                    decorators=list(s.chunk.decorators),
+                    neighbor_symbols=list(s.chunk.neighbor_symbols),
                 )
                 .returning(chunks_table.c.id)
             )

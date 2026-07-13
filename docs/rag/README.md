@@ -15,7 +15,7 @@ The plan they collectively implement is [`../RAG_PLAN.md`](../RAG_PLAN.md). The 
 | [`03_HYBRID_RETRIEVAL_BM25.md`](03_HYBRID_RETRIEVAL_BM25.md) | 3 — BM25 Hybrid | **must-ship** | ~3 h + re-index |
 | [`04_RERANKING.md`](04_RERANKING.md) | 4 — Reranking | **must-ship** | ~3 h |
 | [`05_CONTEXT_COMPRESSION.md`](05_CONTEXT_COMPRESSION.md) | 5 — Context Compression | polish (may defer) | 90 min hard |
-| [`06_INGESTION_ENRICHMENT.md`](06_INGESTION_ENRICHMENT.md) | 6 — Ingestion Enrichment | polish (may defer) | 90 min hard incl. re-index |
+| [`06_INGESTION_ENRICHMENT.md`](06_INGESTION_ENRICHMENT.md) | 6 — Ingestion Enrichment | **active polish** | 90 min hard incl. re-index |
 | [`07_SHIP_CLOSEOUT.md`](07_SHIP_CLOSEOUT.md) | Ship / Definition of Done | **must-ship** | ~1 h |
 | [`RISKS.md`](RISKS.md) | Cross-phase risk register | reference | — |
 

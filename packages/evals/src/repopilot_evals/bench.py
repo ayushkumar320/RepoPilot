@@ -45,7 +45,12 @@ def results_dir(phase: int) -> Path:
 
 
 async def bench_repo(
-    repo: str, *, phase: int, skip_llm: bool, sample: int | None
+    repo: str,
+    *,
+    phase: int,
+    skip_llm: bool,
+    sample: int | None,
+    index_time_seconds: float | None = None,
 ) -> dict[str, object]:
     dataset = REPO_DATASETS[repo]
     print(f"[bench] phase {phase} · repo {repo} · dataset {dataset}")
@@ -141,6 +146,8 @@ async def bench_repo(
     metrics["repo"] = repo
     metrics["dataset"] = dataset
     metrics["phase"] = phase
+    if index_time_seconds is not None:
+        metrics["index_time_seconds"] = index_time_seconds
     metrics["generated_at"] = datetime.now(UTC).isoformat()
     return metrics
 
@@ -219,6 +226,7 @@ def write_delta(phase: int, after: dict[str, object]) -> None:
         "hallucination_rate",
         "input_tokens_per_question",
         "latency_p95_ms",
+        "index_time_seconds",
     )
     delta: dict[str, dict[str, dict[str, float]]] = {}
     breaches: list[str] = []
@@ -246,7 +254,13 @@ def write_delta(phase: int, after: dict[str, object]) -> None:
     delta_path.write_text(json.dumps(delta, indent=2) + "\n", encoding="utf-8")
     print(f"[bench] wrote {delta_path}")
     for repo, repo_delta in delta.items():
-        for key in ("recall@10", "ndcg@5", "grounding_accuracy", "latency_p95_ms"):
+        for key in (
+            "recall@10",
+            "ndcg@5",
+            "grounding_accuracy",
+            "latency_p95_ms",
+            "index_time_seconds",
+        ):
             if key in repo_delta:
                 d = repo_delta[key]
                 print(
@@ -278,6 +292,12 @@ def main() -> int:
     parser.add_argument("--aggregate", action="store_true")
     parser.add_argument("--skip-llm", action="store_true", help="retrieval metrics only")
     parser.add_argument("--sample", type=int, default=None, help="limit to first N rows")
+    parser.add_argument(
+        "--index-time-seconds",
+        type=float,
+        default=None,
+        help="record the re-index wall-clock time for Phase 6 gate artifacts",
+    )
     args = parser.parse_args()
 
     if args.aggregate:
@@ -290,7 +310,13 @@ def main() -> int:
         parser.error("--repo or --aggregate is required")
 
     metrics = asyncio.run(
-        bench_repo(args.repo, phase=args.phase, skip_llm=args.skip_llm, sample=args.sample)
+        bench_repo(
+            args.repo,
+            phase=args.phase,
+            skip_llm=args.skip_llm,
+            sample=args.sample,
+            index_time_seconds=args.index_time_seconds,
+        )
     )
     path = write_repo_result(args.phase, args.repo, metrics)
     print(f"[bench] wrote {path}")
@@ -309,6 +335,7 @@ def main() -> int:
         "verifier_accuracy",
         "latency_p50_ms",
         "latency_p95_ms",
+        "index_time_seconds",
     ):
         if key in metrics:
             print(

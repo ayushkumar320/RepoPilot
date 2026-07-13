@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 
 CONSTANT = 42
 
 
-def route(path: str):
-    def decorate(func):
+def route(path: str) -> Callable[[Callable[..., object]], Callable[..., object]]:
+    def decorate(func: Callable[..., object]) -> Callable[..., object]:
         return func
 
     return decorate

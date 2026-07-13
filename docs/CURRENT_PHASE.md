@@ -1,8 +1,8 @@
 # Current Build Phase
 
-> **Next build purpose:** **RAG Phase 5 — Context Compression: code-complete on branch `rag-phase5-compression`, awaiting measured gate.** Implementation, wiring, settings, tests, and the `input_tokens_per_question` bench metric are all in; only the LLM-quota-bound `bench --phase 5` run against `httpx_qa_v1` remains to produce `_before/_after/delta.json` and confirm the ≥40% token reduction at equal grounding. If quota is tight, **Phase 7 — Ship Closeout** is the must-ship fallback. (Phase 2 remains **deferred**.)
-> **Last verified gate:** **RAG Phase 4 — Reranking LANDED (active).** Reranking the full 50-pool: fastapi rare recall@10 0.583 → **0.917**, httpx general 0.897 → **0.974** (above Phase 1's dense 0.949 — Phase 3's −5pp cost erased), NDCG@5 fastapi-rare +0.426, self-test 0.90. λ=0.9, pool=50, MiniLM-L-6-v2. Artifacts: `evals/results/rag_phase4/{_before,_after,delta}.json`.
-> **Last updated:** 2026-07-10
+> **Next build purpose:** **RAG Phase 7 — Ship Closeout (must-ship).** We will set up CI regression gates to ensure retrieval PRs ship a fresh `_after.json`. (Phases 2 and 6 remain **deferred**.)
+> **Last verified gate:** **RAG Phase 5 — Compression LANDED (gate overridden).** The code is complete, but the −40% token reduction gate failed (~0% drop) because the `code_health` model hit `413 Payload Too Large` limits on Groq for massive chunks, triggering graceful fallback to uncompressed text. The user explicitly passed the gate. Artifacts: `evals/results/rag_phase5/baseline.json`.
+> **Last updated:** 2026-07-13
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
 
@@ -38,8 +38,8 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 | 2 — Query Understanding ⚪ **deferred** (2026-07-08) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
 | **3 — BM25 Hybrid** 🟢 **landed (active)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp rare-symbol → **fastapi +17pp ✅** |
 | **4 — Reranking** 🟢 **landed (active)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 → **fastapi-rare +0.426, recall@10 up everywhere ✅** |
-| **5 — Compression** 🟡 **code-complete, gate pending** *(branch `rag-phase5-compression`)* | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens, grounding equal |
-| 6 — Ingestion Enrichment *(may defer)* | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
+| **5 — Compression** 🟢 **landed (gate overridden)** | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens (FAILED, overridden) |
+| 6 — Ingestion Enrichment ⚪ **deferred** | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
 | [7 — Ship Closeout](rag/07_SHIP_CLOSEOUT.md) **(must-ship)** | A one-time win regresses silently | CI regression gate: retrieval PRs must ship a fresh `_after.json` | RAG_PLAN Definition of Done |
 
 Priority (from the 2-day ship plan): **1 + 3 + 4 are the meaningful-quality minimum; 2, 5, 6 are timeboxed polish** — a blown timebox means cut and defer with a clean entry note, never stretch.

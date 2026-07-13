@@ -221,9 +221,7 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
         },
     )
 
-    response = await provider.generate(
-        ModelId.QA_PRIMARY, _msgs(), retry_429_attempts=1
-    )
+    response = await provider.generate(ModelId.QA_PRIMARY, _msgs(), retry_429_attempts=1)
 
     assert response.text == "fallback-answer"
     assert response.model == ModelId.QA_PRIMARY

@@ -722,4 +722,6 @@ class LLMProvider:
             response.model = model
             return response
 
-        raise ProviderError(f"all providers failed for {model.value}: {last_error!r}") from last_error
+        raise ProviderError(
+            f"all providers failed for {model.value}: {last_error!r}"
+        ) from last_error

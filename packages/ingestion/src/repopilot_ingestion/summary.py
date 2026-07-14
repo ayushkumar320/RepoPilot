@@ -48,9 +48,11 @@ def _prompt(chunk: Chunk) -> list[Message]:
 async def summarise_chunks(
     chunks: Sequence[Chunk],
     *,
-    provider: LLMProvider,
+    provider: LLMProvider | None,
     settings: Settings,
 ) -> list[SummarisedChunk]:
+    if provider is None:
+        return [SummarisedChunk(chunk=c, summary="unknown") for c in chunks]
     """Summarise every chunk concurrently, bounded by the configured semaphore.
 
     In local/dev usage the chat providers may be rate-limited or out of quota.

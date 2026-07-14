@@ -56,9 +56,12 @@ async def embed_chunks(
                 return EmbeddedChunk(chunk=chunk, vector=_stable_fallback_vector(embedding_text))
 
     log.info("embed.start", count=len(chunks))
-    embedded = await asyncio.gather(*(one(c) for c in chunks))
+    embedded = []
+    for c in chunks:
+        res = await one(c)
+        embedded.append(res)
     log.info("embed.done", count=len(embedded))
-    return list(embedded)
+    return embedded
 
 
 def _stable_fallback_vector(text: str) -> list[float]:

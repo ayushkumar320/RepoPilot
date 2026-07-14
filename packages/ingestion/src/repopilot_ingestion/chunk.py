@@ -88,6 +88,8 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                     end_line=_class_header_end_line(sym, lines),
                     content=content,
                     enriched_text=_build_enriched_text(
+                        symbol=sym.qualified_name,
+                        kind="class",
                         signature=sym.signature,
                         decorators=sym.decorators,
                         docstring_tokens=sym.docstring_tokens,
@@ -111,6 +113,8 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                     end_line=sym.end_line,
                     content=content,
                     enriched_text=_build_enriched_text(
+                        symbol=sym.qualified_name,
+                        kind=sym.kind,
                         signature=sym.signature,
                         decorators=sym.decorators,
                         docstring_tokens=sym.docstring_tokens,
@@ -177,6 +181,8 @@ def _module_symbol_from_path(path: str) -> str:
 
 def _build_enriched_text(
     *,
+    symbol: str,
+    kind: str,
     signature: str | None,
     decorators: tuple[str, ...],
     docstring_tokens: tuple[str, ...],
@@ -184,12 +190,18 @@ def _build_enriched_text(
     body: str,
 ) -> str:
     prefix: list[str] = []
+    if kind == "method":
+        parts = symbol.split(".")
+        if len(parts) >= 2:
+            prefix.append(f"# class: {parts[-2]}")
+    prefix.append(f"# symbol: {symbol}")
+    prefix.append(f"# kind: {kind}")
     if decorators:
         prefix.append("# decorators: " + ", ".join(decorators))
     if signature:
         prefix.append("# signature: " + " ".join(signature.split()))
     if neighbor_symbols:
-        prefix.append("# neighbors: " + ", ".join(neighbor_symbols[:5]))
+        prefix.append(f"# neighbors: " + ", ".join(neighbor_symbols[:5]))
     if docstring_tokens:
         prefix.append("# docstring keywords: " + ", ".join(docstring_tokens))
     if not prefix:
@@ -213,6 +225,8 @@ def enrich_chunks_with_neighbors(
         neighbors = _neighbor_symbols_for_chunk(chunk, adjacency, limit=limit)
         combined_neighbors = tuple(dict.fromkeys((*chunk.neighbor_symbols, *neighbors)))
         enriched_text = _build_enriched_text(
+            symbol=chunk.symbol,
+            kind=chunk.kind,
             signature=chunk.signature,
             decorators=chunk.decorators,
             docstring_tokens=chunk.docstring_tokens,

@@ -120,50 +120,48 @@ async def persist_index(
             )
         )
 
+        chunk_values = []
         for s in summarised_list:
-            key = (s.chunk.file_path, s.chunk.start_line, s.chunk.end_line)
-            result = await session.execute(
-                insert(chunks_table)
-                .values(
-                    repo_id=repo_id,
-                    file_path=s.chunk.file_path,
-                    start_line=s.chunk.start_line,
-                    end_line=s.chunk.end_line,
-                    symbol=s.chunk.symbol,
-                    kind=s.chunk.kind,
-                    summary=s.summary,
-                    content=s.chunk.content,
-                    enriched_text=s.chunk.enriched_text,
-                    signature=s.chunk.signature,
-                    decorators=list(s.chunk.decorators),
-                    neighbor_symbols=list(s.chunk.neighbor_symbols),
-                )
-                .returning(chunks_table.c.id)
-            )
-            chunk_id = int(result.scalar_one())
-            chunk_count += 1
+            chunk_values.append(dict(
+                repo_id=repo_id,
+                file_path=s.chunk.file_path,
+                start_line=s.chunk.start_line,
+                end_line=s.chunk.end_line,
+                symbol=s.chunk.symbol,
+                kind=s.chunk.kind,
+                summary=s.summary,
+                content=s.chunk.content,
+                enriched_text=s.chunk.enriched_text,
+                signature=s.chunk.signature,
+                decorators=list(s.chunk.decorators),
+                neighbor_symbols=list(s.chunk.neighbor_symbols),
+            ))
 
-            emb = embedded.get(key)
-            if emb is None:
-                log.warning(
-                    "persist.embedding_missing",
-                    repo_id=repo_id,
-                    symbol=s.chunk.symbol,
-                )
-                continue
-            if len(emb.vector) != EMBEDDING_DIM:
-                raise ValueError(
-                    f"embedding dim {len(emb.vector)} != {EMBEDDING_DIM} "
-                    f"for chunk {s.chunk.symbol!r}"
-                )
-            literal = "[" + ",".join(repr(float(x)) for x in emb.vector) + "]"
-            await session.execute(
-                text(
-                    "INSERT INTO chunk_embeddings (chunk_id, embedding) "
-                    "VALUES (:chunk_id, CAST(:literal AS vector))"
-                ),
-                {"chunk_id": chunk_id, "literal": literal},
+        chunk_count = len(chunk_values)
+        if chunk_count > 0:
+            result = await session.execute(
+                insert(chunks_table).returning(chunks_table.c.id, chunks_table.c.file_path, chunks_table.c.start_line, chunks_table.c.end_line, chunks_table.c.symbol),
+                chunk_values
             )
+            rows = result.all()
+            
+            emb_values = []
+            for row in rows:
+                c_id, f_path, s_line, e_line, sym = row
+                key = (f_path, s_line, e_line)
+                emb = embedded.get(key)
+                if emb is None:
+                    log.warning("persist.embedding_missing", repo_id=repo_id, symbol=sym)
+                    continue
+                literal = "[" + ",".join(repr(float(x)) for x in emb.vector) + "]"
+                emb_values.append({"chunk_id": c_id, "literal": literal})
+            
+            if emb_values:
+                for chunk_batch in [emb_values[i:i + 1000] for i in range(0, len(emb_values), 1000)]:
+                    await session.execute(
+                        text("INSERT INTO chunk_embeddings (chunk_id, embedding) VALUES (:chunk_id, CAST(:literal AS vector))"),
+                        chunk_batch
+                    )
 
         node_count = len(adjacency)
         await session.execute(

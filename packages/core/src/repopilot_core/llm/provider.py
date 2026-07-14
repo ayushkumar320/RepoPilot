@@ -433,13 +433,11 @@ class _SentenceTransformersEmbedder(_BaseClient):
     async def embed(self, binding: ModelBinding, text: str) -> EmbeddingResponse:
         model = await self._ensure_loaded()
         async with self._encode_lock:
-            vector = await asyncio.to_thread(
-                lambda: model.encode(
-                    text,
-                    normalize_embeddings=True,
-                    convert_to_numpy=True,
-                ).tolist()
-            )
+            vector = model.encode(
+                text,
+                normalize_embeddings=True,
+                convert_to_numpy=True,
+            ).tolist()
         return EmbeddingResponse(
             vector=list(vector),
             model=ModelId.EMBEDDINGS,

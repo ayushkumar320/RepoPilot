@@ -21,9 +21,6 @@ from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async
 
 from repopilot_core.settings import Settings
 from repopilot_ingestion.db import (
-    EMBEDDING_DIM,
-)
-from repopilot_ingestion.db import (
     chunks as chunks_table,
 )
 from repopilot_ingestion.db import (
@@ -122,29 +119,37 @@ async def persist_index(
 
         chunk_values = []
         for s in summarised_list:
-            chunk_values.append(dict(
-                repo_id=repo_id,
-                file_path=s.chunk.file_path,
-                start_line=s.chunk.start_line,
-                end_line=s.chunk.end_line,
-                symbol=s.chunk.symbol,
-                kind=s.chunk.kind,
-                summary=s.summary,
-                content=s.chunk.content,
-                enriched_text=s.chunk.enriched_text,
-                signature=s.chunk.signature,
-                decorators=list(s.chunk.decorators),
-                neighbor_symbols=list(s.chunk.neighbor_symbols),
-            ))
+            chunk_values.append(
+                dict(
+                    repo_id=repo_id,
+                    file_path=s.chunk.file_path,
+                    start_line=s.chunk.start_line,
+                    end_line=s.chunk.end_line,
+                    symbol=s.chunk.symbol,
+                    kind=s.chunk.kind,
+                    summary=s.summary,
+                    content=s.chunk.content,
+                    enriched_text=s.chunk.enriched_text,
+                    signature=s.chunk.signature,
+                    decorators=list(s.chunk.decorators),
+                    neighbor_symbols=list(s.chunk.neighbor_symbols),
+                )
+            )
 
         chunk_count = len(chunk_values)
         if chunk_count > 0:
             result = await session.execute(
-                insert(chunks_table).returning(chunks_table.c.id, chunks_table.c.file_path, chunks_table.c.start_line, chunks_table.c.end_line, chunks_table.c.symbol),
-                chunk_values
+                insert(chunks_table).returning(
+                    chunks_table.c.id,
+                    chunks_table.c.file_path,
+                    chunks_table.c.start_line,
+                    chunks_table.c.end_line,
+                    chunks_table.c.symbol,
+                ),
+                chunk_values,
             )
             rows = result.all()
-            
+
             emb_values = []
             for row in rows:
                 c_id, f_path, s_line, e_line, sym = row
@@ -155,12 +160,16 @@ async def persist_index(
                     continue
                 literal = "[" + ",".join(repr(float(x)) for x in emb.vector) + "]"
                 emb_values.append({"chunk_id": c_id, "literal": literal})
-            
+
             if emb_values:
-                for chunk_batch in [emb_values[i:i + 1000] for i in range(0, len(emb_values), 1000)]:
+                for chunk_batch in [
+                    emb_values[i : i + 1000] for i in range(0, len(emb_values), 1000)
+                ]:
                     await session.execute(
-                        text("INSERT INTO chunk_embeddings (chunk_id, embedding) VALUES (:chunk_id, CAST(:literal AS vector))"),
-                        chunk_batch
+                        text(
+                            "INSERT INTO chunk_embeddings (chunk_id, embedding) VALUES (:chunk_id, CAST(:literal AS vector))"
+                        ),
+                        chunk_batch,
                     )
 
         node_count = len(adjacency)

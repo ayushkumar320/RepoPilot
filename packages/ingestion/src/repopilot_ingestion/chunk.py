@@ -201,7 +201,7 @@ def _build_enriched_text(
     if signature:
         prefix.append("# signature: " + " ".join(signature.split()))
     if neighbor_symbols:
-        prefix.append(f"# neighbors: " + ", ".join(neighbor_symbols[:5]))
+        prefix.append("# neighbors: " + ", ".join(neighbor_symbols[:5]))
     if docstring_tokens:
         prefix.append("# docstring keywords: " + ", ".join(docstring_tokens))
     if not prefix:

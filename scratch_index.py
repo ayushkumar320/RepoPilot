@@ -1,7 +1,9 @@
 import asyncio
-from repopilot_core.settings import Settings
+
 from repopilot_core.llm.provider import LLMProvider
+from repopilot_core.settings import Settings
 from repopilot_ingestion.pipeline import index_repo
+
 
 async def main():
     settings = Settings()
@@ -15,6 +17,7 @@ async def main():
     for url, version in repos:
         print(f"Indexing {url} @ {version}")
         await index_repo(url, provider=provider, settings=settings)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

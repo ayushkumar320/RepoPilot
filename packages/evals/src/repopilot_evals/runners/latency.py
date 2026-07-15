@@ -59,6 +59,7 @@ async def run_latency_eval(
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_compress: bool = True,
+    use_query_understanding: bool = True,
 ) -> LatencyEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     ctx = build_eval_context(settings)
@@ -75,6 +76,7 @@ async def run_latency_eval(
                 recall_k=recall_k,
                 exclude_path_prefixes=exclude_path_prefixes,
                 use_compress=use_compress,
+                use_query_understanding=use_query_understanding,
             )
             timings.append((time.perf_counter() - start) * 1000)
         return LatencyEvalMetrics(total=len(timings), timings_ms=timings)

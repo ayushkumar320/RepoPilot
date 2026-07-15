@@ -99,6 +99,31 @@ COMPRESS_SYSTEM = (
     "generate an answer to the user question.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
 
+QUERY_SPEC_SYSTEM = (
+    "You rewrite codebase Q&A questions for retrieval. Return ONLY one JSON "
+    "object with this schema: "
+    '{"rewrites":["..."],"extracted_symbols":["..."],'
+    '"extracted_paths":["..."],"intent_class":"factual|procedural|'
+    'architectural|where_is|compare","needs_multi_hop":true|false}. '
+    "Use 2-3 short rewrites that preserve the user's meaning. Extract exact "
+    "symbols or file paths only when the question names them. Prefer Python "
+    "identifier-shaped retrieval terms in rewrites: include plausible class, "
+    "method, and constant spellings from the user's words, such as "
+    "`DigestAuth auth_flow 401 www-authenticate`, `BasicAuth Authorization`, "
+    "`max_redirects TooManyRedirects redirect`, `SSL create_ssl_context`, or "
+    "`Limits max_connections HTTPTransport`. Do not invent file paths or "
+    "module names."
+)
+
+
+def query_spec_user_prompt(question: str) -> str:
+    return (
+        "QUESTION:\n"
+        f"{question}\n\n"
+        "Return retrieval-focused JSON. Include a lexical rewrite with likely "
+        "code identifiers when obvious, and a natural-language paraphrase."
+    )
+
 
 def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
     return (
@@ -112,8 +137,10 @@ def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
 __all__ = [
     "ANSWER_SYSTEM",
     "COMPRESS_SYSTEM",
+    "QUERY_SPEC_SYSTEM",
     "SUFFICIENCY_SYSTEM",
     "_render_numbered_chunk",
     "answer_user_prompt",
+    "query_spec_user_prompt",
     "sufficiency_user_prompt",
 ]

@@ -1,5 +1,7 @@
 # RAG Phase 2 — Query Understanding (Rewriting + Multi-Query + Metadata Extraction)
 
+> **Status 2026-07-15:** Implemented, but not landed. Retrieval-only measurement on `multi_hop_v1`/httpx found raw dense recall@10 **0.8500** vs query-understanding recall@10 **0.8167**. Ranking improved (`ndcg@10` 0.7343 → 0.7435; MRR 0.8667 → 0.9000), but the recall gate requires +5 pp, so this phase remains unlanded until rewrite acceptance improves or the phase is explicitly deferred.
+
 ## 1. Goal
 
 Lift recall@10 on **multi-hop questions** by **≥ 5 percentage points** over the Phase 1 number, by transforming the raw user question into a structured `QuerySpec` before retrieval.
@@ -61,9 +63,11 @@ top_pool = unioned[:50]    # back to a single pool of 50 for downstream
 
 RRF (Reciprocal Rank Fusion) is the standard fusion technique — combines ranked lists without needing to compare distance scores across queries. The `k_constant=60` is the literature default.
 
+Implemented note: the raw user query lane is weighted 3× above rewrite lanes. This protects the original dense ranking from noisy rewrites, matching the Phase 3 dense-over-sparse precedent.
+
 ### Metadata filter wiring
 
-If `spec.extracted_paths` is non-empty, the calls become `vector_search(q, path_prefix=...)` — Phase 1 already exposed this surface. If the user asks *"how does `flask._helpers` validate URLs?"* the extraction yields `flask._helpers`, the pool gets filtered to that module.
+If `spec.extracted_paths` is non-empty and the intent is a focused `where_is` query, the calls become `vector_search(q, path_prefix=...)` — Phase 1 already exposed this surface. Path filters are intentionally disabled for multi-hop/architectural questions because an early run showed broad flow questions could collapse to zero-hit lanes when the small model extracted phrase-like "paths."
 
 ## 4. What changes in the eval
 

@@ -38,6 +38,12 @@ REPO_DATASETS = {
     "fastapi": "fastapi_qa_v1.jsonl",
 }
 
+PHASE_DATASETS = {
+    2: {
+        "httpx": "multi_hop_v1.jsonl",
+    }
+}
+
 
 def results_dir(phase: int) -> Path:
     root = Path(__file__).resolve().parents[4]
@@ -52,7 +58,7 @@ async def bench_repo(
     sample: int | None,
     index_time_seconds: float | None = None,
 ) -> dict[str, object]:
-    dataset = REPO_DATASETS[repo]
+    dataset = PHASE_DATASETS.get(phase, {}).get(repo, REPO_DATASETS[repo])
     print(f"[bench] phase {phase} · repo {repo} · dataset {dataset}")
 
     # One retrieval policy drives all three LLM-path evals so the arms are
@@ -79,6 +85,11 @@ async def bench_repo(
         headline_kwargs["search_mode"] = "hybrid"
     if phase >= 4:
         headline_kwargs["rerank"] = True
+    if phase >= 2:
+        headline_kwargs["query_understanding"] = True
+        llm_policy_kwargs["use_query_understanding"] = True
+    else:
+        llm_policy_kwargs["use_query_understanding"] = False
     if phase >= 5:
         llm_policy_kwargs["use_compress"] = True
     else:

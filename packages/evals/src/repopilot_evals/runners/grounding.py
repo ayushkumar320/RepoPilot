@@ -130,6 +130,7 @@ async def run_grounding_eval(
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_compress: bool = True,
+    use_query_understanding: bool = True,
 ) -> GroundingEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     return await run_grounding_eval_rows(
@@ -140,6 +141,7 @@ async def run_grounding_eval(
         recall_k=recall_k,
         exclude_path_prefixes=exclude_path_prefixes,
         use_compress=use_compress,
+        use_query_understanding=use_query_understanding,
     )
 
 
@@ -152,6 +154,7 @@ async def run_grounding_eval_rows(
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_compress: bool = True,
+    use_query_understanding: bool = True,
 ) -> GroundingEvalMetrics:
     ctx = build_eval_context(settings)
     try:
@@ -166,6 +169,7 @@ async def run_grounding_eval_rows(
                 recall_k=recall_k,
                 exclude_path_prefixes=exclude_path_prefixes,
                 use_compress=use_compress,
+                use_query_understanding=use_query_understanding,
             )
             grounded = all(claim.status == "verified" for claim in result.claims)
             keyword_match = _contains_all_keywords(result.answer, row.expected_answer_keywords)

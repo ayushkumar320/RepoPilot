@@ -40,7 +40,11 @@ async def embed_chunks(
     sem = asyncio.Semaphore(max(1, settings.ingestion_embed_concurrency))
 
     async def one(chunk: Chunk) -> EmbeddedChunk:
-        embedding_text = chunk.enriched_text or chunk.content
+        embedding_text = (
+            chunk.enriched_text
+            if settings.ingestion_embed_enriched_text and chunk.enriched_text is not None
+            else chunk.content
+        )
         async with sem:
             try:
                 response: EmbeddingResponse = await provider.embed(embedding_text)

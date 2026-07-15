@@ -1,8 +1,8 @@
 # Current Build Phase
 
-> **Current build purpose:** **RAG Phase 6 — Ingestion Enrichment (active).** We are enriching ingestion-side chunk text with signatures, decorators, docstrings, and neighbor symbols, then measuring whether corpus-only changes lift recall.
+> **Current build purpose:** **Finish unfinished RAG polish and close out.** Phase 2 now has an implementation + `multi_hop_v1` retrieval-only measurement, but the recall gate is not met. Phase 6 now has a dense-regression fix, but it still needs a fresh re-index + full Phase 6 bench before it can land.
 > **Last verified gate:** **RAG Phase 5 — Compression LANDED (gate overridden).** The code is complete, but the −40% token reduction gate failed (~0% drop) because the `code_health` model hit `413 Payload Too Large` limits on Groq for massive chunks, triggering graceful fallback to uncompressed text. The user explicitly passed the gate. Phase 6 baseline seeded from `evals/results/rag_phase5/_after.json` to `evals/results/rag_phase6/_before.json`.
-> **Last updated:** 2026-07-13
+> **Last updated:** 2026-07-15
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
 
@@ -35,25 +35,26 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 |---|---|---|---|
 | **0 — Baseline** 🟢 | "Unmeasured under real LLM load" | Frozen datasets, baseline numbers, bench + significance runner | done ✅ |
 | **1 — Recall Lift** 🟢 **landed** | Right chunk exists but never enters the k=8 pool (flask misses beyond rank 150) | A 50-wide source-only pool + metadata-filter params for Phase 2 to drive | recall@10 +5 pp → **+56pp ✅** |
-| 2 — Query Understanding ⚪ **deferred** (2026-07-08) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + the RRF union helper Phase 3 reuses | +5 pp on multi-hop |
+| 2 — Query Understanding 🟡 **implemented, gate not met** (2026-07-15) | User says "redirects", code says `_redirect_method` — one literal query misses | `QuerySpec` rewrites + raw-weighted RRF union over dense rewrite lanes | multi-hop recall@10 raw 0.8500 → query-understanding 0.8167 ❌ |
 | **3 — BM25 Hybrid** 🟢 **landed (active)** | Embeddings can't rank rare tokens (exact symbols, error strings) | Sparse lane fused via RRF → a stable ~50-chunk hybrid pool | +5 pp rare-symbol → **fastapi +17pp ✅** |
 | **4 — Reranking** 🟢 **landed (active)** | Best chunk is *in* the pool at rank 27; answerer reads only top ~8; also fixes Phase 3's httpx-general fusion cost | Cross-encoder + MMR ordered top-8 — the input compression trims | NDCG@5 +0.05 → **fastapi-rare +0.426, recall@10 up everywhere ✅** |
 | **5 — Compression** 🟢 **landed (gate overridden)** | Top chunks are 40–80 lines; 3–8 lines are load-bearing | Lean prompts (verifier still sees full source) | −40% input tokens (FAILED, overridden) |
-| 6 — Ingestion Enrichment 🟡 **active** | Raw chunk text embeds worse than signature+decorators+docstring | Richer corpus; last because it re-pays a full re-index per iteration | +3 pp from corpus alone |
+| 6 — Ingestion Enrichment 🟡 **fix applied, needs re-bench** | Raw chunk text embeds worse than signature+decorators+docstring | Enriched text feeds BM25/FTS; dense embeddings default back to raw source to avoid the measured NDCG regression | prior net recall@10 Δ=0; fresh re-index/re-bench required |
 | [7 — Ship Closeout](rag/07_SHIP_CLOSEOUT.md) **(must-ship)** | A one-time win regresses silently | CI regression gate: retrieval PRs must ship a fresh `_after.json` | RAG_PLAN Definition of Done |
 
 Priority (from the 2-day ship plan): **1 + 3 + 4 are the meaningful-quality minimum; 2, 5, 6 are timeboxed polish** — a blown timebox means cut and defer with a clean entry note, never stretch.
 
 Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked · ⚪ deferred (timeboxed, cut cleanly).
 
-### Phase 2 — Query Understanding: DEFERRED (2026-07-08)
+### Phase 2 — Query Understanding: IMPLEMENTED, GATE NOT MET (2026-07-15)
 
-Cut per the 2-day ship plan's priority call (1 + 3 + 4 are the must-ship quality spine; 2 + 5 + 6 are polish). Deferring is a clean, expected outcome — not a failure.
+Phase 2 was resumed after the original clean deferral. The implementation is now present, but the retrieval gate is not met on the first measured dataset.
 
-- **Nothing was implemented** — no `QuerySpec`, no partial code merged. Clean cut, no half-merged state.
-- **Downstream is unaffected**: Phase 3 measures against Phase 1's landed `_after.json`, and Phase 3 builds the RRF union helper itself (it was only *shared* with Phase 2, not owned by it). Spec confirms: *"If Phase 2 is deferred, run Phase 3 against Phase 1's `_after.json`."*
-- **Entry state if resumed** ([rag/02](rag/02_QUERY_UNDERSTANDING.md)): needs a new `multi_hop_v1.jsonl` (10 labeled rows via the propose→review flow), `qa/query_spec.py` + prompt, and N-parallel `vector_search` + RRF union in `qa/graph.py`. Uses the existing 8B model — zero new deps. Timebox: 2h hard.
-- **Reconsider when**: multi-hop questions are visibly the weak spot after Phase 4, or `fastapi` recall stays flat after Phase 3 (BM25) — query rewriting is the other lever for the lexical-mismatch misses.
+- **Implemented**: `qa/query_spec.py`, `QUERY_SPEC_SYSTEM`, Q&A graph fan-out over raw + rewrites, raw-query-weighted RRF, path filters limited to focused `where_is` specs, eval-runner support, and `multi_hop_v1.jsonl`.
+- **Measured retrieval-only on `multi_hop_v1`/httpx**: raw dense recall@10 = **0.8500**; Phase 2 query-understanding recall@10 = **0.8167**. NDCG/MRR improved (`ndcg@10` 0.7343 → 0.7435; MRR 0.8667 → 0.9000), but the phase gate is recall@10 +5 pp, so this does **not** land.
+- **Runtime default**: disabled via `query_understanding_enabled=False` until the recall gate passes. Phase 2 evals can still force the path on with explicit runner flags.
+- **Likely cause**: the 8B query-spec model produces useful rank hints but also noisy rewrites/symbols. The current guardrails prevent the worst path-filter failures, but rewrite fusion still does not add new gold refs inside top-10.
+- **Next options**: keep the feature behind settings and either build query-adaptive rewrite acceptance (only accept rewrite lanes that improve a retrieval self-check) or defer Phase 2 and move to Ship Closeout.
 
 ---
 

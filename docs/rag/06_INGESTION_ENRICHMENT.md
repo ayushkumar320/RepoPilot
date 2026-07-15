@@ -1,6 +1,6 @@
 # RAG Phase 6 — Ingestion Enrichment
 
-> **Status:** Active as of 2026-07-13. Baseline seeded from `evals/results/rag_phase5/_after.json` to `evals/results/rag_phase6/_before.json`.
+> **Status:** Fix applied 2026-07-15; needs fresh re-index + full bench before landing. The first Phase 6 run produced net recall@10 Δ=0 and regressed httpx NDCG@5 (0.8179 → 0.7999), consistent with synthetic enrichment hurting dense embedding order. Dense embeddings now default back to raw `content`; `enriched_text` remains stored for BM25/FTS.
 
 ## 1. Goal
 
@@ -25,7 +25,7 @@ Phase 5 prerequisite-checks:
 | `packages/ingestion/src/repopilot_ingestion/chunk.py` | edit | ~+60 | New `enriched_text` field built from `signature + decorators + docstring + neighbor_symbols + body` — this is what gets embedded and stored as `content_tsv` |
 | `packages/ingestion/src/repopilot_ingestion/migrations/versions/000Y_chunks_enrichment.py` | new | ~70 | Add `chunks.signature`, `chunks.decorators` (JSONB), `chunks.neighbor_symbols` (JSONB) columns |
 | `packages/ingestion/src/repopilot_ingestion/persist.py` | edit | ~+15 | Write the new columns |
-| `packages/ingestion/src/repopilot_ingestion/embed.py` | edit | ~+5 | Embed `enriched_text`, not raw `content` |
+| `packages/ingestion/src/repopilot_ingestion/embed.py` | edit | ~+5 | Embed raw `content` by default; optional `ingestion_embed_enriched_text` can re-enable enriched dense embeddings for experiments |
 | `packages/agents/src/repopilot_agents/tools/read_chunks.py` | edit | ~+5 | Return enriched fields if present (verifier still uses raw `content`) |
 | `packages/ingestion/tests/test_enrichment.py` | new | ~100 | Decorator extraction, signature parsing, neighbor-symbol selection |
 | `evals/results/rag_phase6/` | new artifact dir | — | `_before`/`_after`/`delta` |
@@ -45,7 +45,7 @@ def login(request, *, redirect_url=None):
     ...
 ```
 
-The `# ...` lines are **synthetic** — added at ingestion time before embedding. They are not in the source. They are not what the answerer sees (the answerer reads `content`, not `enriched_text`). They exist *only to be embedded* — so the dense vector captures "this function is about login, csrf, session, redirect" even if those tokens never appear in the raw body.
+The `# ...` lines are **synthetic** — added at ingestion time and persisted as `enriched_text`. They are not in the source. They are not what the answerer sees (the answerer reads `content`, not `enriched_text`). After the first failed Phase 6 run, they no longer feed dense embeddings by default; they remain useful for BM25/FTS via `content_tsv`.
 
 ### Critical safety rule (same shape as Phase 5's)
 

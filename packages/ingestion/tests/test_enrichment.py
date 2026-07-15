@@ -75,7 +75,7 @@ def test_neighbor_symbols_are_added_from_graph_adjacency() -> None:
 
 
 @pytest.mark.asyncio
-async def test_embed_chunks_uses_enriched_text_when_present(tmp_path: Path) -> None:
+async def test_embed_chunks_uses_raw_content_by_default(tmp_path: Path) -> None:
     parsed = parse_file(FIXTURE, module="sample")
     chunks = chunk_file(parsed, rel_path=FIXTURE.name)
     login = next(chunk for chunk in chunks if chunk.symbol == "sample.login")
@@ -88,6 +88,27 @@ async def test_embed_chunks_uses_enriched_text_when_present(tmp_path: Path) -> N
             repopilot_env="test",
             llm_cache_path=tmp_path / "llm.sqlite",
             ingestion_embed_concurrency=1,
+        ),
+    )
+
+    assert provider.texts == [login.content]
+
+
+@pytest.mark.asyncio
+async def test_embed_chunks_can_opt_into_enriched_text(tmp_path: Path) -> None:
+    parsed = parse_file(FIXTURE, module="sample")
+    chunks = chunk_file(parsed, rel_path=FIXTURE.name)
+    login = next(chunk for chunk in chunks if chunk.symbol == "sample.login")
+    provider = RecordingEmbedProvider()
+
+    await embed_chunks(
+        [login],
+        provider=provider,  # type: ignore[arg-type]
+        settings=Settings(
+            repopilot_env="test",
+            llm_cache_path=tmp_path / "llm.sqlite",
+            ingestion_embed_concurrency=1,
+            ingestion_embed_enriched_text=True,
         ),
     )
 

@@ -94,6 +94,10 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(qa_graph, "read_chunks", fake_read_chunks)
     monkeypatch.setattr(qa_graph, "graph_traverse", fake_graph_traverse)
     monkeypatch.setattr(qa_graph, "verify_claims", fake_verify_claims)
+    async def fake_build_query_spec(question: str, **kw: Any) -> Any:
+        return qa_graph.fallback_query_spec(question)
+
+    monkeypatch.setattr(qa_graph, "build_query_spec", fake_build_query_spec)
 
 
 @pytest.mark.asyncio
@@ -131,7 +135,7 @@ async def test_grounded_answer_produces_verified_claims() -> None:
     assert "alpha returns one" in result.answer
     assert len(result.claims) == 2
     assert all(c.status == "verified" for c in result.claims)
-    assert result.retrieval_path[0].startswith("hybrid_search:")
+    assert any(entry.startswith("hybrid_search:") for entry in result.retrieval_path)
 
 
 @pytest.mark.asyncio

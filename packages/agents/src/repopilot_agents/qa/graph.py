@@ -24,6 +24,7 @@ will wrap, so swapping in ``StateGraph`` later is a refactor, not a rewrite.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 from collections.abc import Sequence
@@ -40,7 +41,9 @@ from repopilot_agents.qa.prompts import (
     answer_user_prompt,
     sufficiency_user_prompt,
 )
+from repopilot_agents.qa.query_spec import QuerySpec, build_query_spec, fallback_query_spec
 from repopilot_agents.qa.types import SufficiencyVerdict
+from repopilot_agents.qa.union import reciprocal_rank_fusion
 from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.tools.graph_traverse import graph_traverse
@@ -101,6 +104,7 @@ async def answer_question(
     recall_k: int | None = RECALL_K,
     exclude_path_prefixes: Sequence[str] = NON_SOURCE_PATH_PREFIXES,
     use_hybrid: bool = True,
+    use_query_understanding: bool | None = None,
     use_rerank: bool = True,
     use_compress: bool = True,
 ) -> QAResult:
@@ -116,6 +120,11 @@ async def answer_question(
     falls back to pure dense, so the pre-Phase-1 baseline arm stays dense-only.
     Set ``use_hybrid=False`` for the Phase 1/2 dense-only ``_before`` arm.
 
+    ``use_query_understanding`` (Phase 2) asks a cheap model for retrieval
+    rewrites and path hints, fans retrieval out over the rewrites, then fuses
+    the pools with RRF. ``None`` follows settings; explicit ``True``/``False``
+    lets evals A/B the path. Parse/provider failures fall back to raw.
+
     ``use_rerank`` (Phase 4) cross-encoder-reranks + MMR-diversifies the top
     of the pool before the prompt slice. Requires ``recall_k`` (needs a pool
     to reorder); disabled automatically on the pre-Phase-1 baseline arm.
@@ -127,32 +136,23 @@ async def answer_question(
     settings = get_settings()
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
-    # Initial retrieval: wide source-only pool (gold-label noise prefixes
-    # excluded), then trim to the top-k for the prompt. Phase 3 fuses a BM25
-    # sparse lane in; the pre-Phase-1 baseline (recall_k=None) stays dense.
-    hits: list[ChunkHit]
-    if use_hybrid and recall_k is not None:
-        hits = await hybrid_search(
-            question,
-            engine=engine,
-            provider=provider,
-            repo_id=repo_id,
-            recall_k=recall_k,
-            exclude_path_prefixes=exclude_path_prefixes,
-        )
-        ctx.retrieval_path.append(f"hybrid_search:recall_k={recall_k}:k={k}:hits={len(hits)}")
-    else:
-        hits = await vector_search(
-            question,
-            engine=engine,
-            provider=provider,
-            repo_id=repo_id,
-            k=k,
-            recall_k=recall_k,
-            exclude_path_prefixes=exclude_path_prefixes,
-        )
-        pool = recall_k if recall_k is not None else k
-        ctx.retrieval_path.append(f"vector_search:recall_k={pool}:k={k}:hits={len(hits)}")
+    hits = await _initial_retrieval(
+        question,
+        engine=engine,
+        provider=provider,
+        repo_id=repo_id,
+        k=k,
+        recall_k=recall_k,
+        exclude_path_prefixes=exclude_path_prefixes,
+        use_hybrid=use_hybrid,
+        use_query_understanding=(
+            settings.query_understanding_enabled
+            if use_query_understanding is None
+            else use_query_understanding
+        ),
+        max_rewrites=settings.query_understanding_max_rewrites,
+        retrieval_path=ctx.retrieval_path,
+    )
 
     if use_rerank and recall_k is not None and len(hits) > k:
         # Phase 4: fetch the top of the pool, cross-encoder rerank + MMR
@@ -265,6 +265,122 @@ def _extend_context(ctx: _Context, chunks: list[ChunkContent]) -> None:
 def _estimate_tokens(text: str) -> int:
     """Cheap, stable token estimate for relative Phase 5 prompt-size gating."""
     return max(1, (len(text) + 3) // 4) if text else 0
+
+
+async def _initial_retrieval(
+    question: str,
+    *,
+    engine: AsyncEngine,
+    provider: LLMProvider,
+    repo_id: str,
+    k: int,
+    recall_k: int | None,
+    exclude_path_prefixes: Sequence[str],
+    use_hybrid: bool,
+    use_query_understanding: bool,
+    max_rewrites: int,
+    retrieval_path: list[str],
+) -> list[ChunkHit]:
+    pool = recall_k if recall_k is not None else k
+    if use_query_understanding:
+        spec = await build_query_spec(question, provider=provider)
+    else:
+        spec = fallback_query_spec(question)
+
+    queries = spec.retrieval_queries(max_rewrites=max_rewrites if use_query_understanding else 0)
+    path_prefix = _single_path_prefix(spec)
+
+    if len(queries) == 1:
+        hits = await _retrieve_one(
+            queries[0],
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            k=k,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+            use_hybrid=use_hybrid,
+            path_prefix=path_prefix,
+        )
+    else:
+        pools = await asyncio.gather(
+            *(
+                _retrieve_one(
+                    query,
+                    engine=engine,
+                    provider=provider,
+                    repo_id=repo_id,
+                    k=k,
+                    recall_k=recall_k,
+                    exclude_path_prefixes=exclude_path_prefixes,
+                    use_hybrid=use_hybrid,
+                    path_prefix=path_prefix,
+                )
+                for query in queries
+            )
+        )
+        hits = reciprocal_rank_fusion(pools, weights=_query_lane_weights(len(pools)))[:pool]
+
+    mode = "hybrid_search" if use_hybrid and recall_k is not None else "vector_search"
+    if use_query_understanding:
+        retrieval_path.append(
+            "query_spec:"
+            f"queries={len(queries)}:paths={len(spec.extracted_paths)}:"
+            f"intent={spec.intent_class}:multi_hop={spec.needs_multi_hop}"
+        )
+    retrieval_path.append(f"{mode}:recall_k={pool}:k={k}:hits={len(hits)}")
+    return hits
+
+
+async def _retrieve_one(
+    query: str,
+    *,
+    engine: AsyncEngine,
+    provider: LLMProvider,
+    repo_id: str,
+    k: int,
+    recall_k: int | None,
+    exclude_path_prefixes: Sequence[str],
+    use_hybrid: bool,
+    path_prefix: str | None,
+) -> list[ChunkHit]:
+    if use_hybrid and recall_k is not None:
+        return await hybrid_search(
+            query,
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            recall_k=recall_k,
+            path_prefix=path_prefix,
+            exclude_path_prefixes=exclude_path_prefixes,
+        )
+    return await vector_search(
+        query,
+        engine=engine,
+        provider=provider,
+        repo_id=repo_id,
+        k=k,
+        recall_k=recall_k,
+        path_prefix=path_prefix,
+        exclude_path_prefixes=exclude_path_prefixes,
+    )
+
+
+def _single_path_prefix(spec: QuerySpec) -> str | None:
+    if spec.needs_multi_hop or spec.intent_class != "where_is":
+        return None
+    if len(spec.extracted_paths) != 1:
+        return None
+    path = spec.extracted_paths[0]
+    if path.endswith(".py"):
+        return path
+    return path.rstrip("/") + "/"
+
+
+def _query_lane_weights(count: int) -> list[float]:
+    if count <= 0:
+        return []
+    return [3.0, *([1.0] * (count - 1))]
 
 
 async def _judge_sufficiency(

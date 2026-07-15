@@ -110,6 +110,10 @@ class Settings(BaseSettings):
     compress_enabled: bool = True
     compress_min_chunk_lines: int = 15
 
+    # ── Query understanding (RAG Phase 2) ───────────────────────────────────
+    query_understanding_enabled: bool = False
+    query_understanding_max_rewrites: int = 3
+
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None
 
@@ -119,6 +123,9 @@ class Settings(BaseSettings):
     ingestion_summary_concurrency: int = 8
     ingestion_embed_batch_size: int = 32
     ingestion_embed_concurrency: int = 4
+    # Phase 6 found synthetic prefixes can hurt dense ordering. Keep raw-source
+    # embeddings by default; ``enriched_text`` still feeds the BM25 tsvector.
+    ingestion_embed_enriched_text: bool = False
 
     # ── Datastores ───────────────────────────────────────────────────────────
     postgres_dsn: str = "postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot"

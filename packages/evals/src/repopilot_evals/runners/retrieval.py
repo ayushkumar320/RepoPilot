@@ -9,11 +9,14 @@ under-count.
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from math import log2
 from typing import Literal
 
+from repopilot_agents.qa.query_spec import QuerySpec, build_query_spec
+from repopilot_agents.qa.union import reciprocal_rank_fusion
 from repopilot_agents.tools.bm25_search import bm25_search
 from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.vector_search import vector_search
@@ -143,6 +146,8 @@ async def run_retrieval_eval(
     rerank: bool = False,
     rerank_lambda: float = 0.9,
     rerank_max_pool: int = 50,
+    query_understanding: bool = False,
+    query_max_rewrites: int = 3,
 ) -> RetrievalEvalMetrics:
     rows = take_rows(load_grounding_dataset(dataset_path(dataset_name)), sample_limit)
     # Not-in-repo rows have no expected_refs; retrieval metrics skip them.
@@ -153,33 +158,19 @@ async def run_retrieval_eval(
         resolved = await resolve_repo_id(ctx.engine, repo_slug=repo_slug, repo_id=repo_id)
         cases: list[RetrievalCaseResult] = []
         for row in rows:
-            if search_mode == "sparse":
-                hits = await bm25_search(
-                    row.question,
-                    engine=ctx.engine,
-                    repo_id=resolved,
-                    k=pool,
-                    exclude_path_prefixes=exclude_path_prefixes,
-                )
-            elif search_mode == "hybrid":
-                hits = await hybrid_search(
-                    row.question,
-                    engine=ctx.engine,
-                    provider=ctx.provider,
-                    repo_id=resolved,
-                    recall_k=pool,
-                    exclude_path_prefixes=exclude_path_prefixes,
-                )
-            else:
-                hits = await vector_search(
-                    row.question,
-                    engine=ctx.engine,
-                    provider=ctx.provider,
-                    repo_id=resolved,
-                    k=max(ks),
-                    recall_k=recall_k,
-                    exclude_path_prefixes=exclude_path_prefixes,
-                )
+            hits = await _retrieve_for_eval(
+                row.question,
+                engine=ctx.engine,
+                provider=ctx.provider,
+                repo_id=resolved,
+                k=max(ks),
+                pool=pool,
+                recall_k=recall_k,
+                exclude_path_prefixes=exclude_path_prefixes,
+                search_mode=search_mode,
+                query_understanding=query_understanding,
+                query_max_rewrites=query_max_rewrites,
+            )
             if rerank and hits:
                 hits = await _apply_rerank(
                     row.question,
@@ -225,6 +216,131 @@ async def _apply_rerank(
     head_keys = {(h.ref.file_path, h.ref.start_line, h.ref.end_line) for h in head}
     tail = [h for h in hits if (h.ref.file_path, h.ref.start_line, h.ref.end_line) not in head_keys]
     return head + tail
+
+
+async def _retrieve_for_eval(
+    question: str,
+    *,
+    engine: object,
+    provider: object,
+    repo_id: str,
+    k: int,
+    pool: int,
+    recall_k: int | None,
+    exclude_path_prefixes: Sequence[str],
+    search_mode: SearchMode,
+    query_understanding: bool,
+    query_max_rewrites: int,
+) -> list[ChunkHit]:
+    if not query_understanding or search_mode == "sparse":
+        return await _retrieve_one(
+            question,
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            k=k,
+            pool=pool,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+            search_mode=search_mode,
+            path_prefix=None,
+        )
+
+    spec = await build_query_spec(question, provider=provider)  # type: ignore[arg-type]
+    queries = spec.retrieval_queries(max_rewrites=query_max_rewrites)
+    path_prefix = _single_path_prefix(spec)
+    if len(queries) == 1:
+        return await _retrieve_one(
+            queries[0],
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            k=k,
+            pool=pool,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+            search_mode=search_mode,
+            path_prefix=path_prefix,
+        )
+    lanes = await asyncio.gather(
+        *(
+            _retrieve_one(
+                query,
+                engine=engine,
+                provider=provider,
+                repo_id=repo_id,
+                k=k,
+                pool=pool,
+                recall_k=recall_k,
+                exclude_path_prefixes=exclude_path_prefixes,
+                search_mode=search_mode,
+                path_prefix=path_prefix,
+            )
+            for query in queries
+        )
+    )
+    return reciprocal_rank_fusion(lanes, weights=_query_lane_weights(len(lanes)))[:pool]
+
+
+async def _retrieve_one(
+    query: str,
+    *,
+    engine: object,
+    provider: object,
+    repo_id: str,
+    k: int,
+    pool: int,
+    recall_k: int | None,
+    exclude_path_prefixes: Sequence[str],
+    search_mode: SearchMode,
+    path_prefix: str | None,
+) -> list[ChunkHit]:
+    if search_mode == "sparse":
+        return await bm25_search(
+            query,
+            engine=engine,  # type: ignore[arg-type]
+            repo_id=repo_id,
+            k=pool,
+            path_prefix=path_prefix,
+            exclude_path_prefixes=exclude_path_prefixes,
+        )
+    if search_mode == "hybrid":
+        return await hybrid_search(
+            query,
+            engine=engine,  # type: ignore[arg-type]
+            provider=provider,  # type: ignore[arg-type]
+            repo_id=repo_id,
+            recall_k=pool,
+            path_prefix=path_prefix,
+            exclude_path_prefixes=exclude_path_prefixes,
+        )
+    return await vector_search(
+        query,
+        engine=engine,  # type: ignore[arg-type]
+        provider=provider,  # type: ignore[arg-type]
+        repo_id=repo_id,
+        k=k,
+        recall_k=recall_k,
+        path_prefix=path_prefix,
+        exclude_path_prefixes=exclude_path_prefixes,
+    )
+
+
+def _single_path_prefix(spec: QuerySpec) -> str | None:
+    if spec.needs_multi_hop or spec.intent_class != "where_is":
+        return None
+    if len(spec.extracted_paths) != 1:
+        return None
+    path = spec.extracted_paths[0]
+    if path.endswith(".py"):
+        return path
+    return path.rstrip("/") + "/"
+
+
+def _query_lane_weights(count: int) -> list[float]:
+    if count <= 0:
+        return []
+    return [3.0, *([1.0] * (count - 1))]
 
 
 __all__ = [

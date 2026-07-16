@@ -1,6 +1,6 @@
 {
   "phase": 6,
-  "generated_at": "2026-07-14T01:00:02.539826+00:00",
+  "generated_at": "2026-07-16T16:45:46.425504+00:00",
   "repos": {
     "httpx": {
       "mrr": 0.8423076923076922,
@@ -64,7 +64,7 @@
       "claim_grounding_rate": 0.9375,
       "hallucination_rate": 0.0,
       "keyword_accuracy": 0.625,
-      "input_tokens_per_question": 2345.125,
+      "input_tokens_per_question": 2274.6875,
       "grounding_cases": [
         {
           "question": "How does httpx.Client.send dispatch a Request through the transport layer?",
@@ -215,10 +215,10 @@
           "keyword_match": true,
           "ref_match": true,
           "hallucination_pass": true,
-          "hops": 0,
+          "hops": 3,
           "n_claims": 0,
           "n_verified": 0,
-          "answer_input_tokens": 3667
+          "answer_input_tokens": 3098
         },
         {
           "question": "Where does httpx implement a Django ORM connection pool backed by SQLAlchemy?",
@@ -229,7 +229,7 @@
           "hops": 3,
           "n_claims": 0,
           "n_verified": 0,
-          "answer_input_tokens": 3483
+          "answer_input_tokens": 2925
         },
         {
           "question": "What file defines the React component tree for the httpx documentation site?",
@@ -244,16 +244,15 @@
         }
       ],
       "verifier_accuracy": 1.0,
-      "latency_p50_ms": 1259.4169170042733,
-      "latency_p95_ms": 1875.852874989505,
+      "latency_p50_ms": 1990.3781249886379,
+      "latency_p95_ms": 3764.863999997033,
       "total": 13,
       "repo": "httpx",
       "dataset": "httpx_qa_v1.jsonl",
       "phase": 6,
-      "generated_at": "2026-07-13T22:47:53.529146+00:00"
+      "generated_at": "2026-07-16T15:53:03.585066+00:00"
     },
     "flask": {
-      "total": 17,
       "mrr": 0.858288770053476,
       "recall@5": 0.7745098039215685,
       "recall@10": 0.8676470588235294,
@@ -323,13 +322,242 @@
       "recall@10_dense": 0.7843137254901961,
       "recall@10_sparse": 0.6813725490196079,
       "recall@10_hybrid": 0.8676470588235294,
+      "grounding_accuracy": 0.55,
+      "claim_grounding_rate": 0.875,
+      "hallucination_rate": 0.0,
+      "keyword_accuracy": 0.25,
+      "input_tokens_per_question": 3186.0,
+      "grounding_cases": [
+        {
+          "question": "How does Flask route a URL to its view function?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 4,
+          "n_verified": 4,
+          "answer_input_tokens": 3613
+        },
+        {
+          "question": "Where does Flask create the application context?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 3,
+          "n_verified": 3,
+          "answer_input_tokens": 2288
+        },
+        {
+          "question": "Where is the request object made available to view code?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 2,
+          "n_verified": 2,
+          "answer_input_tokens": 3266
+        },
+        {
+          "question": "Where are Jinja templates rendered in Flask?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 3,
+          "n_verified": 3,
+          "answer_input_tokens": 1485
+        },
+        {
+          "question": "How does Flask register a blueprint on the app?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 9,
+          "n_verified": 8,
+          "answer_input_tokens": 3654
+        },
+        {
+          "question": "How is the session serialized and signed?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 6,
+          "n_verified": 5,
+          "answer_input_tokens": 2219
+        },
+        {
+          "question": "Where does Flask decide the response mimetype?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 6,
+          "n_verified": 3,
+          "answer_input_tokens": 3581
+        },
+        {
+          "question": "How does the flask run CLI command start the dev server?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 6,
+          "n_verified": 5,
+          "answer_input_tokens": 3139
+        },
+        {
+          "question": "Where are before_request callbacks invoked?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 5,
+          "n_verified": 4,
+          "answer_input_tokens": 2209
+        },
+        {
+          "question": "How does a request travel from WSGI entry to the view function and back to a response?",
+          "grounded": false,
+          "keyword_match": true,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 8,
+          "n_verified": 5,
+          "answer_input_tokens": 3526
+        },
+        {
+          "question": "How do blueprints interact with url_for to build endpoint names?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 9,
+          "n_verified": 8,
+          "answer_input_tokens": 4002
+        },
+        {
+          "question": "How does the app context relate to the request context during a request?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 10,
+          "n_verified": 10,
+          "answer_input_tokens": 2390
+        },
+        {
+          "question": "How does Flask's test client construct a fake request environment through to dispatch?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 7,
+          "n_verified": 7,
+          "answer_input_tokens": 3015
+        },
+        {
+          "question": "How does error handling propagate from a view exception to a rendered error response?",
+          "grounded": false,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 9,
+          "n_verified": 8,
+          "answer_input_tokens": 4075
+        },
+        {
+          "question": "How does Flask integrate with Redis for session storage?",
+          "grounded": true,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 0,
+          "n_verified": 0,
+          "answer_input_tokens": 2549
+        },
+        {
+          "question": "Where does Flask implement WebSocket support?",
+          "grounded": true,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 0,
+          "n_verified": 0,
+          "answer_input_tokens": 6188
+        },
+        {
+          "question": "How does Flask's built-in admin dashboard authenticate users?",
+          "grounded": true,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 0,
+          "n_verified": 0,
+          "answer_input_tokens": 2925
+        },
+        {
+          "question": "How does Flask load configuration from an object?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 4,
+          "n_verified": 4,
+          "answer_input_tokens": 3250
+        },
+        {
+          "question": "How does Flask handle a 404 error by default?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 8,
+          "n_verified": 8,
+          "answer_input_tokens": 3580
+        },
+        {
+          "question": "Where does Flask parse cookie data from the request?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 5,
+          "n_verified": 4,
+          "answer_input_tokens": 2766
+        }
+      ],
+      "latency_p50_ms": 2539.6161249955185,
+      "latency_p95_ms": 4027.3574579914566,
+      "total": 17,
       "repo": "flask",
       "dataset": "flask_qa_v1.jsonl",
       "phase": 6,
-      "generated_at": "2026-07-14T00:59:32.746721+00:00"
+      "generated_at": "2026-07-16T16:05:07.234451+00:00"
     },
     "fastapi": {
-      "total": 3,
       "mrr": 0.7000000000000001,
       "recall@5": 0.5555555555555555,
       "recall@10": 0.8333333333333334,
@@ -357,10 +585,75 @@
       "recall@10_dense": 0.3333333333333333,
       "recall@10_sparse": 0.2222222222222222,
       "recall@10_hybrid": 0.5555555555555555,
+      "grounding_accuracy": 0.8,
+      "claim_grounding_rate": 0.95,
+      "hallucination_rate": 0.0,
+      "keyword_accuracy": 0.4,
+      "input_tokens_per_question": 11351.2,
+      "grounding_cases": [
+        {
+          "question": "Where does FastAPI generate the OpenAPI schema?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 2,
+          "n_verified": 2,
+          "answer_input_tokens": 2065
+        },
+        {
+          "question": "How does a request flow from the ASGI app through routing to the endpoint function?",
+          "grounded": false,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 10,
+          "n_verified": 9,
+          "answer_input_tokens": 8847
+        },
+        {
+          "question": "How does dependency caching work across a single request?",
+          "grounded": true,
+          "keyword_match": false,
+          "ref_match": false,
+          "hallucination_pass": true,
+          "hops": 0,
+          "n_claims": 8,
+          "n_verified": 8,
+          "answer_input_tokens": 10249
+        },
+        {
+          "question": "How does FastAPI's built-in rate limiter throttle requests?",
+          "grounded": true,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 0,
+          "n_verified": 0,
+          "answer_input_tokens": 18235
+        },
+        {
+          "question": "Where does FastAPI implement GraphQL resolvers?",
+          "grounded": true,
+          "keyword_match": true,
+          "ref_match": true,
+          "hallucination_pass": true,
+          "hops": 3,
+          "n_claims": 0,
+          "n_verified": 0,
+          "answer_input_tokens": 17360
+        }
+      ],
+      "latency_p50_ms": 4208.883000013884,
+      "latency_p95_ms": 12065.485250001075,
+      "total": 3,
       "repo": "fastapi",
       "dataset": "fastapi_qa_v1.jsonl",
       "phase": 6,
-      "generated_at": "2026-07-14T01:00:01.995921+00:00"
+      "generated_at": "2026-07-16T16:45:34.054400+00:00"
     }
   }
 }

@@ -37,13 +37,13 @@
     },
     "input_tokens_per_question": {
       "before": 2591.3125,
-      "after": 2345.125,
-      "delta": -246.1875
+      "after": 2274.6875,
+      "delta": -316.625
     },
     "latency_p95_ms": {
       "before": 1381.3116249984887,
-      "after": 1875.852874989505,
-      "delta": 494.54124999101623
+      "after": 3764.863999997033,
+      "delta": 2383.552374998544
     }
   },
   "flask": {
@@ -71,6 +71,26 @@
       "before": 0.8328664799253034,
       "after": 0.858288770053476,
       "delta": 0.025422290128172653
+    },
+    "grounding_accuracy": {
+      "before": 0.65,
+      "after": 0.55,
+      "delta": -0.09999999999999998
+    },
+    "hallucination_rate": {
+      "before": 0.0,
+      "after": 0.0,
+      "delta": 0.0
+    },
+    "input_tokens_per_question": {
+      "before": 3439.45,
+      "after": 3186.0,
+      "delta": -253.44999999999982
+    },
+    "latency_p95_ms": {
+      "before": 2440.6605000003765,
+      "after": 4027.3574579914566,
+      "delta": 1586.6969579910801
     }
   },
   "fastapi": {
@@ -98,6 +118,26 @@
       "before": 0.7000000000000001,
       "after": 0.7000000000000001,
       "delta": 0.0
+    },
+    "grounding_accuracy": {
+      "before": 0.8,
+      "after": 0.8,
+      "delta": 0.0
+    },
+    "hallucination_rate": {
+      "before": 0.0,
+      "after": 0.0,
+      "delta": 0.0
+    },
+    "input_tokens_per_question": {
+      "before": 14455.0,
+      "after": 11351.2,
+      "delta": -3103.7999999999993
+    },
+    "latency_p95_ms": {
+      "before": 2148.653291998926,
+      "after": 12065.485250001075,
+      "delta": 9916.831958002149
     }
   }
 }

@@ -60,7 +60,7 @@
   "claim_grounding_rate": 0.9375,
   "hallucination_rate": 0.0,
   "keyword_accuracy": 0.625,
-  "input_tokens_per_question": 2345.125,
+  "input_tokens_per_question": 2274.6875,
   "grounding_cases": [
     {
       "question": "How does httpx.Client.send dispatch a Request through the transport layer?",
@@ -211,10 +211,10 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 0,
+      "hops": 3,
       "n_claims": 0,
       "n_verified": 0,
-      "answer_input_tokens": 3667
+      "answer_input_tokens": 3098
     },
     {
       "question": "Where does httpx implement a Django ORM connection pool backed by SQLAlchemy?",
@@ -225,7 +225,7 @@
       "hops": 3,
       "n_claims": 0,
       "n_verified": 0,
-      "answer_input_tokens": 3483
+      "answer_input_tokens": 2925
     },
     {
       "question": "What file defines the React component tree for the httpx documentation site?",
@@ -240,11 +240,11 @@
     }
   ],
   "verifier_accuracy": 1.0,
-  "latency_p50_ms": 1259.4169170042733,
-  "latency_p95_ms": 1875.852874989505,
+  "latency_p50_ms": 1990.3781249886379,
+  "latency_p95_ms": 3764.863999997033,
   "total": 13,
   "repo": "httpx",
   "dataset": "httpx_qa_v1.jsonl",
   "phase": 6,
-  "generated_at": "2026-07-13T22:47:53.529146+00:00"
+  "generated_at": "2026-07-16T15:53:03.585066+00:00"
 }

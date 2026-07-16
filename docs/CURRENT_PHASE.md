@@ -62,8 +62,8 @@ Current state: implemented, but not landed. On `multi_hop_v1`/httpx, raw dense r
 6. Re-run the Phase 2 bench:
 
    ```bash
-   python -m repopilot_evals.bench --phase 2 --repo httpx
-   python -m repopilot_evals.bench --phase 2 --aggregate
+   uv run python -m repopilot_evals.bench --phase 2 --repo httpx
+   uv run python -m repopilot_evals.bench --phase 2 --aggregate
    ```
 
 7. Land only if all Phase 2 gates pass: recall@10 +5 pp on `multi_hop_v1`, no recall regression on `httpx_qa_v1`/`flask_qa_v1`/`fastapi_qa_v1`, grounding within -1 pp, extraction accuracy >= 0.85, and latency p95 <= 1.3x Phase 1.
@@ -79,10 +79,10 @@ Current state: fix applied, not landed. The first Phase 6 run had net recall@10 
 4. Run the full Phase 6 bench:
 
    ```bash
-   python -m repopilot_evals.bench --phase 6 --repo httpx
-   python -m repopilot_evals.bench --phase 6 --repo flask
-   python -m repopilot_evals.bench --phase 6 --repo fastapi
-   python -m repopilot_evals.bench --phase 6 --aggregate
+   uv run python -m repopilot_evals.bench --phase 6 --repo httpx
+   uv run python -m repopilot_evals.bench --phase 6 --repo flask
+   uv run python -m repopilot_evals.bench --phase 6 --repo fastapi
+   uv run python -m repopilot_evals.bench --phase 6 --aggregate
    ```
 
 5. Land only if all Phase 6 gates pass: recall@10 +3 pp on `httpx` and at least one of `flask`/`fastapi`, no NDCG@5 regression, grounding within -1 pp, and `httpx` index time <= 100 s.

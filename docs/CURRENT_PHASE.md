@@ -2,7 +2,7 @@
 
 > **Current build purpose:** **Finish unfinished RAG polish and close out.** Phase 2 now has an implementation + `multi_hop_v1` retrieval-only measurement, but the recall gate is not met. Phase 6 now has a dense-regression fix, but it still needs a fresh re-index + full Phase 6 bench before it can land.
 > **Last verified gate:** **RAG Phase 5 — Compression LANDED (gate overridden).** The code is complete, but the −40% token reduction gate failed (~0% drop) because the `code_health` model hit `413 Payload Too Large` limits on Groq for massive chunks, triggering graceful fallback to uncompressed text. The user explicitly passed the gate. Phase 6 baseline seeded from `evals/results/rag_phase5/_after.json` to `evals/results/rag_phase6/_before.json`.
-> **Last updated:** 2026-07-15
+> **Last updated:** 2026-07-16
 
 This document is the **always-correct pointer** at where the build is. Anyone (human or agent) starting a session reads this first. The plan it points at is [`RAG_PLAN.md`](RAG_PLAN.md); the execution schedule is the **2-day ship plan** in [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md); per-phase specs (each is also the build prompt to hand a coding agent) live in [`rag/`](rag/).
 
@@ -45,6 +45,49 @@ User Query → Query Understanding → Hybrid Retrieval → Candidate Pool (50�
 Priority (from the 2-day ship plan): **1 + 3 + 4 are the meaningful-quality minimum; 2, 5, 6 are timeboxed polish** — a blown timebox means cut and defer with a clean entry note, never stretch.
 
 Legend: 🟢 done · 🟡 active · ⚪ pending · 🔴 blocked · ⚪ deferred (timeboxed, cut cleanly).
+
+## What's left — Phase 2 and Phase 6 closeout
+
+The current closeout has two independent workstreams. **Phase 2 needs a retrieval-quality fix before it can land. Phase 6 has the dense-regression fix applied and now needs a fresh re-index plus a full bench.** Do Phase 2 first only if there is time to iterate; otherwise defer it cleanly and run Phase 6 validation.
+
+### Phase 2 fix steps — Query Understanding
+
+Current state: implemented, but not landed. On `multi_hop_v1`/httpx, raw dense recall@10 is **0.8500** and query-understanding recall@10 is **0.8167**. NDCG/MRR improved, but the recall gate requires **+5 pp**, so runtime stays disabled via `query_understanding_enabled=False`.
+
+1. Keep `query_understanding_enabled=False` until the gate passes.
+2. Add query-adaptive rewrite acceptance before RRF fusion. Run raw + rewrite lanes, then drop rewrite lanes that do not add credible new support, such as new expected refs, high-confidence novel chunks, or relevant files/symbols not already covered by the raw lane.
+3. Debug `multi_hop_v1` row by row: compare raw top-10, each rewrite top-10, fused top-10, and which rewrite displaced a gold chunk.
+4. Tune fusion conservatively: try raw weight 5x, accept only the best rewrite, cap rewrite contribution, or fall back to raw-only when rewrites diverge from the raw query intent.
+5. Verify `query_spec_extraction_accuracy >= 0.85`; the phase cannot land on recall alone.
+6. Re-run the Phase 2 bench:
+
+   ```bash
+   python -m repopilot_evals.bench --phase 2 --repo httpx
+   python -m repopilot_evals.bench --phase 2 --aggregate
+   ```
+
+7. Land only if all Phase 2 gates pass: recall@10 +5 pp on `multi_hop_v1`, no recall regression on `httpx_qa_v1`/`flask_qa_v1`/`fastapi_qa_v1`, grounding within -1 pp, extraction accuracy >= 0.85, and latency p95 <= 1.3x Phase 1.
+8. If the gate still misses after the timebox, mark Phase 2 ⚪ deferred here and move to Ship Closeout. Do not enable it by default.
+
+### Phase 6 validation steps — Ingestion Enrichment
+
+Current state: fix applied, not landed. The first Phase 6 run had net recall@10 Δ=0 and regressed httpx NDCG@5, consistent with synthetic enrichment hurting dense embedding order. Dense embeddings now default back to raw `content`; `enriched_text` remains stored for BM25/FTS.
+
+1. Preserve `ingestion_embed_enriched_text=False`. Do not return to enriched dense embeddings unless a separate experiment proves it improves NDCG.
+2. Freshly re-index the eval repos (`httpx`, `flask`, `fastapi`) so the stored rows include Phase 6 enrichment fields.
+3. Confirm indexed chunks keep raw `content` as the source of truth, store `enriched_text`, and use enrichment only for BM25/FTS by default.
+4. Run the full Phase 6 bench:
+
+   ```bash
+   python -m repopilot_evals.bench --phase 6 --repo httpx
+   python -m repopilot_evals.bench --phase 6 --repo flask
+   python -m repopilot_evals.bench --phase 6 --repo fastapi
+   python -m repopilot_evals.bench --phase 6 --aggregate
+   ```
+
+5. Land only if all Phase 6 gates pass: recall@10 +3 pp on `httpx` and at least one of `flask`/`fastapi`, no NDCG@5 regression, grounding within -1 pp, and `httpx` index time <= 100 s.
+6. If NDCG still regresses, inspect whether enriched BM25 over-promotes synthetic prefix lines (`# decorators`, `# signature`, `# neighbors`). Strip, downweight, or field-weight those prefixes before rerunning.
+7. If recall lift is still under 1 pp anywhere after the fresh bench, mark Phase 6 ⚪ deferred and move to Phase 7. The phase is timeboxed polish, so a clean defer is preferable to stretching the ship closeout.
 
 ### Phase 2 — Query Understanding: IMPLEMENTED, GATE NOT MET (2026-07-15)
 

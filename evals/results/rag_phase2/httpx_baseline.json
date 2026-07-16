@@ -1,5 +1,4 @@
 {
-  "total": 10,
   "mrr": 0.9,
   "recall@5": 0.7666666666666667,
   "recall@10": 0.8166666666666667,
@@ -45,8 +44,129 @@
       1.0
     ]
   },
+  "grounding_accuracy": 0.5,
+  "claim_grounding_rate": 0.8970588235294118,
+  "hallucination_rate": 0.0,
+  "keyword_accuracy": 0.4,
+  "input_tokens_per_question": 2672.5,
+  "grounding_cases": [
+    {
+      "question": "Trace the path from Client.send to the transport call that hands a request to httpcore.",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 7,
+      "answer_input_tokens": 3205
+    },
+    {
+      "question": "How does the client apply its default timeout settings to a request before dispatch?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 6,
+      "answer_input_tokens": 2822
+    },
+    {
+      "question": "What happens when DigestAuth receives a 401 challenge and prepares the next credentialed request?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 8,
+      "n_verified": 7,
+      "answer_input_tokens": 1645
+    },
+    {
+      "question": "How are redirect responses followed while enforcing the configured redirect cap?",
+      "grounded": true,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 7,
+      "answer_input_tokens": 2469
+    },
+    {
+      "question": "Where does the response-content decoding path connect gzip and zstd support?",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 6,
+      "answer_input_tokens": 1706
+    },
+    {
+      "question": "How do status-code helpers identify redirect and error responses used by client redirect handling?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 5,
+      "answer_input_tokens": 2145
+    },
+    {
+      "question": "How does proxy configuration combine a proxy URL with optional credentials?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 9,
+      "n_verified": 7,
+      "answer_input_tokens": 3672
+    },
+    {
+      "question": "How is TLS verification configuration turned into an SSL context for transports?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 6,
+      "answer_input_tokens": 3404
+    },
+    {
+      "question": "Trace how a request-level authentication flow can attach Basic auth headers before dispatch.",
+      "grounded": true,
+      "keyword_match": false,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 6,
+      "answer_input_tokens": 1614
+    },
+    {
+      "question": "How do pool limit settings reach the default transport that opens network connections?",
+      "grounded": false,
+      "keyword_match": true,
+      "ref_match": false,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 6,
+      "n_verified": 4,
+      "answer_input_tokens": 4043
+    }
+  ],
+  "verifier_accuracy": 1.0,
+  "latency_p50_ms": 1443.7071669999568,
+  "latency_p95_ms": 2024.9631669994415,
+  "total": 10,
   "repo": "httpx",
   "dataset": "multi_hop_v1.jsonl",
   "phase": 2,
-  "generated_at": "2026-07-15T04:06:00.472655+00:00"
+  "generated_at": "2026-07-16T15:24:09.949789+00:00"
 }

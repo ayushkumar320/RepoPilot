@@ -1,0 +1,2 @@
+repo,claim_grounding_rate,diversity_score,grounding_accuracy,hallucination_rate,input_tokens_per_question,keyword_accuracy,latency_p50_ms,latency_p95_ms,mrr,ndcg@10,ndcg@5,phase,recall@10,recall@20,recall@5,total,verifier_accuracy
+httpx,0.8970588235294118,0.44000000000000006,0.5,0.0,2672.5,0.4,1443.7071669999568,2024.9631669994415,0.9,0.7435379771507564,0.7230997373919077,2,0.8166666666666667,0.85,0.7666666666666667,10,1.0

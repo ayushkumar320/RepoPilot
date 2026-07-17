@@ -4,7 +4,7 @@ RepoPilot is a purpose-driven codebase onboarding tool for public Python reposit
 
 The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
-> Current status: Phase 5 implementation has started. Phase 4's API/web product slice is in place, but the real large-repo `flask` live-demo gate is still pending because indexing/tour generation depends on external provider capacity. See [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md).
+> Current status: the RAG closeout is shipped on `main` and the project is ready for local beta/demo use. Start with the [local startup guide](docs/STARTUP_GUIDE.md). Historical phase and eval notes are archived under [docs/](docs/).
 
 ## What It Does
 
@@ -31,10 +31,10 @@ RepoPilot is not a general chatbot over code. The LLM never invents the call gra
 | Q&A spine | Hybrid vector + graph retrieval with verifier loop |
 | Orchestration | Intent profiler, deterministic capability planner, LangGraph state graph |
 | Experience | FastAPI + Next.js product slice, SSE streams, code viewer scaffolding |
-| Contribute mode | First Phase 5 scaffold landed: Lane A/B/C cores, ranker, eval registration |
-| Ship hardening | Pending |
+| Contribute mode | Lane A/B/C cores, ranker, and eval registration scaffold |
+| Ship hardening | RAG ship report and retrieval eval artifact gate in CI |
 
-The exact phase pointer lives in [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md). The full build plan lives in [docs/04_BUILD_PLAN.md](docs/04_BUILD_PLAN.md).
+The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md). Build history lives in [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md), [docs/RAG_PLAN.md](docs/RAG_PLAN.md), and [docs/rag/](docs/rag/).
 
 ## Architecture At A Glance
 
@@ -174,7 +174,7 @@ flowchart LR
     traverse["graph_traverse<br/>bounded graph paths"]
     query["graph_query<br/>hubs, entry points, layers"]
     metrics["graph_metrics<br/>fan-in, fan-out, complexity, tests"]
-    issues["github_issues<br/>Phase 5 live fetch"]
+    issues["github_issues<br/>issue context"]
     agents["Agents"]
 
     source --> read --> agents
@@ -231,13 +231,13 @@ graphify update .
 | `packages/agents/src/repopilot_agents/graph.py` | Main LangGraph wiring |
 | `packages/agents/src/repopilot_agents/tools/` | Deterministic tool layer |
 | `packages/agents/src/repopilot_agents/verifier/` | Grounding and actionability checks |
-| `packages/agents/src/repopilot_agents/contribute/` | Phase 5 Lane A/B/C and ranker scaffolding |
+| `packages/agents/src/repopilot_agents/contribute/` | Contribute-mode Lane A/B/C and ranker scaffolding |
 | `apps/api/src/repopilot_api/app.py` | FastAPI routes and SSE endpoints |
 | `apps/web/src/components/repopilot-app.tsx` | Main web experience |
 
 ## API Surface
 
-The Phase 4 API exposes:
+The API exposes:
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -254,77 +254,16 @@ In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.
 
 ## Setup Your Own Local Instance
 
-### Prerequisites
-
-- Python 3.12
-- [uv](https://docs.astral.sh/uv/)
-- Node.js 20+
-- npm
-- Docker Desktop or Docker Engine
-- Git
-- Optional but useful: `graphify`
-
-### 1. Clone and install
+Use the dedicated [local startup guide](docs/STARTUP_GUIDE.md). The short version is:
 
 ```bash
-git clone https://github.com/ayushkumar320/RepoPilot.git
-cd RepoPilot
 uv sync --all-packages --all-groups
-cd apps/web
-npm install
-cd ../..
-```
-
-### 2. Create `.env`
-
-For local Docker-backed Postgres and Redis:
-
-```bash
-cat > .env <<'EOF'
-REPOPILOT_ENV=development
-POSTGRES_DSN=postgresql+psycopg://repopilot:repopilot@localhost:5432/repopilot
-REDIS_URL=redis://localhost:6379/0
-REPOPILOT_WEB_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
-
-# At least one chat provider is needed for real generation.
-GROQ_API_KEY=
-CEREBRAS_API_KEY=
-HUGGINGFACE_API_KEY=
-
-# Needed for live Phase 5 GitHub issue fetching once enabled.
-GITHUB_PAT=
-
-# Optional tracing.
-LANGSMITH_API_KEY=
-LANGSMITH_PROJECT=repopilot-dev
-EOF
-```
-
-Notes:
-
-- Embeddings use `nomic-ai/nomic-embed-text-v1.5` through sentence-transformers and download on first use.
-- Groq/Cerebras/Hugging Face keys are optional for many unit tests, but real tours and live evals need provider capacity.
-- `GITHUB_PAT` is optional today; Phase 5 live issue fetching will need it for reliable GitHub API access.
-
-### 3. Start data services
-
-```bash
+cd apps/web && npm install && cd ../..
+cp .env.example .env
 make docker-up
 make db-migrate
-```
-
-This starts:
-
-- Postgres 16 with pgvector on port `5432`
-- Redis on port `6379`
-
-### 4. Run the API
-
-```bash
 uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
 ```
-
-### 5. Run the web app
 
 In a second terminal:
 
@@ -334,23 +273,6 @@ npm run dev
 ```
 
 Open `http://127.0.0.1:3000`.
-
-### 6. Run checks
-
-```bash
-make lint
-make typecheck
-make test
-```
-
-Useful targeted checks:
-
-```bash
-uv run python -m repopilot_evals status
-cd apps/web && npm run typecheck
-cd apps/web && npm run test:e2e
-cd apps/web && npm run test:lighthouse
-```
 
 ## Development Workflow
 
@@ -390,22 +312,21 @@ RepoPilot follows a few hard rules:
 | File | Why read it |
 |---|---|
 | [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
-| [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md) | Always-current build status |
-| [docs/00_CLAUDE_BUILD_GUIDE.md](docs/00_CLAUDE_BUILD_GUIDE.md) | Standing build context |
-| [docs/01_PROBLEM_AND_SOLUTION.md](docs/01_PROBLEM_AND_SOLUTION.md) | Product thesis |
-| [docs/02_TECH_STACK.md](docs/02_TECH_STACK.md) | Stack choices and tradeoffs |
+| [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md) | Local runbook: install, env, services, API, web, checks |
+| [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md) | Build closeout status and deferred eval notes |
 | [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
-| [docs/04_BUILD_PLAN.md](docs/04_BUILD_PLAN.md) | Phase-by-phase gates |
-| [docs/05_PHASE_PROMPTS.md](docs/05_PHASE_PROMPTS.md) | Paste-ready implementation prompts |
+| [docs/EVAL_SYSTEM.md](docs/EVAL_SYSTEM.md) | Eval harness and regression-gate explanation |
+| [docs/archive/](docs/archive/) | Product thesis and historical stack rationale |
+| [docs/rag/](docs/rag/) | Historical RAG phase specs and ship-closeout notes |
 
 ## Known Limitations
 
 - Python-only target repos for v1.
 - Public GitHub repos only.
 - Large live repo demos depend on external model/provider quotas.
-- Phase 5 live GitHub issue fetching and full detector plumbing are not complete yet.
-- Phase 5 eval datasets are currently scaffolded; real hand-labeled rows are still needed.
-- Docker Compose is for local data services; the Phase 4 app dev flow runs API/web directly.
+- Query Understanding and Ingestion Enrichment are implemented/evaluated but deferred because their gates missed.
+- Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
+- Docker Compose is for local data services; the app dev flow runs API/web directly.
 
 ## License
 

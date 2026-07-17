@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_qa_graph.py": {
-    "mtime": 1784087025.3611126,
-    "ast_hash": "e09ce21cfa356e53c3afd2924803df1c",
+    "mtime": 1784267798.2891774,
+    "ast_hash": "0a59c7f465d6d1dc52eb426c4a19831d",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_state.py": {
@@ -885,8 +885,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1781839778.4239902,
-    "ast_hash": "5302feb65e90564b41bdbc5932d81f54",
+    "mtime": 1784268192.4994946,
+    "ast_hash": "da0a5935ee28e6d67fa90e03ec9b61a0",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -910,8 +910,8 @@
     "semantic_hash": ""
   },
   "docs/README.md": {
-    "mtime": 1783362112.4136577,
-    "ast_hash": "fd79180cc1c0e531efe3cc65a66489ca",
+    "mtime": 1784268192.6554163,
+    "ast_hash": "bf55b85908013fb2246fba5a945516e1",
     "semantic_hash": ""
   },
   "docs/archive/01_PROBLEM_AND_SOLUTION.md": {
@@ -1145,8 +1145,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/query_spec.py": {
-    "mtime": 1784086911.1122222,
-    "ast_hash": "2f35b41965d12d89f1b77c4aef5117d7",
+    "mtime": 1784267798.2893386,
+    "ast_hash": "dee4a5b7a9720616f3d10888f167a7fd",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_qa_multi_query.py": {
@@ -1187,6 +1187,11 @@
   "evals/results/SHIP_REPORT.md": {
     "mtime": 1784267626.9062264,
     "ast_hash": "bb2400cbe852f8a1ac850add89665679",
+    "semantic_hash": ""
+  },
+  "docs/STARTUP_GUIDE.md": {
+    "mtime": 1784268192.578145,
+    "ast_hash": "9da5ed106a2f32451396ff81d332cb81",
     "semantic_hash": ""
   }
 }

@@ -1,29 +1,31 @@
 # RepoPilot — Docs
 
-The product slice (clone → index → retrieve → answer → verify) ships on `main`. Current focus: **measured retrieval quality**, driven by [`RAG_PLAN.md`](RAG_PLAN.md). **Next build: RAG Phase 1 — Recall Lift** (see [`CURRENT_PHASE.md`](CURRENT_PHASE.md)).
+The product slice (clone → index → retrieve → answer → verify) ships on `main`, and the RAG closeout is complete. Start with [`STARTUP_GUIDE.md`](STARTUP_GUIDE.md) when you want to run the project locally.
 
 > Prefer the [Graphify knowledge graph](../graphify-out/) over reading raw — `graphify query "<question>"`. Project rules live in [`../CLAUDE.md`](../CLAUDE.md); this is the human-readable map.
 
 ## The one-paragraph story
 
-Phase 0 baselined the shipped pipeline and found its bottleneck: a k=8 candidate pool that misses gold chunks (some ranked beyond 150). The remaining phases fix that in dependency order — **widen the pool (1)**, **widen what queries catch (2, 3)**, **fix the ordering (4)**, **shrink the prompt cost (5)**, **enrich the corpus (6)** — then **lock it in with a CI regression gate (7)**. Each phase lands only with a measured, significant lift over the previous landed phase; otherwise it's reverted. Phases 1+3+4 are the must-ship minimum; 2, 5, 6 are timeboxed polish.
+RepoPilot is now organized as a runnable beta plus archived build history. The live docs explain how to run, understand, and validate the app. The RAG phase ladder remains in the repo as historical evidence for the retrieval-quality work: Phases 1, 3, 4, 5, and 7 shipped; Phases 2 and 6 were evaluated and cleanly deferred.
 
 ## Read in order (cold pickup)
 
-1. [`CURRENT_PHASE.md`](CURRENT_PHASE.md) — next build purpose, the improvement chain, active-phase entry state.
-2. [`RAG_PLAN.md`](RAG_PLAN.md) — the 7-phase plan: measurement spine, metrics, sequencing rationale, Definition of Done.
-3. [`rag/README.md`](rag/README.md) — phase-ladder index: iron rules, timeboxes, priorities, bench commands.
-4. The active phase's spec in [`rag/`](rag/) — spec + executable build prompt in one; hand it to a coding agent.
-5. [`rag/00_TODAY_PLAN.md`](rag/00_TODAY_PLAN.md) — the 2-day ship schedule and cut lines.
+1. [`STARTUP_GUIDE.md`](STARTUP_GUIDE.md) — install, environment, services, API, web, checks.
+2. [`../README.md`](../README.md) — product overview, architecture diagrams, source map.
+3. [`03_ARCHITECTURE.md`](03_ARCHITECTURE.md) — agent topology, state schema, tools, verifier.
+4. [`EVAL_SYSTEM.md`](EVAL_SYSTEM.md) — eval harness and retrieval regression gate.
+5. [`CURRENT_PHASE.md`](CURRENT_PHASE.md) — shipped closeout status and deferred eval notes.
 
 ## Layout
 
 ```
 docs/
 ├── README.md              this file — the map
-├── CURRENT_PHASE.md       always-correct pointer: next build purpose + phase ladder
-├── RAG_PLAN.md            the 7-phase retrieval-quality plan (the "why" and the gates)
+├── STARTUP_GUIDE.md       local startup and operator commands
+├── CURRENT_PHASE.md       shipped closeout status + deferred phase notes
+├── RAG_PLAN.md            archived retrieval-quality plan
 ├── 03_ARCHITECTURE.md     agent topology, state, tools, verifier (what the phases modify)
-├── rag/                   per-phase specs 00–07 (each = spec + build prompt), RISKS, 2-day plan
+├── EVAL_SYSTEM.md         eval harness and artifact protocol
+├── rag/                   archived per-phase RAG specs, risks, and ship closeout
 └── archive/               reference — product thesis + tech stack (git retains everything)
 ```

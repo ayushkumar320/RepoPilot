@@ -189,9 +189,7 @@ npm run test:e2e
 npm run test:lighthouse
 ```
 
-## 8. Eval And Graph Maintenance
-
-For retrieval eval runs, use the phase bench runner documented in `docs/EVAL_SYSTEM.md` and `docs/rag/README.md`.
+## 8. Graph Maintenance
 
 After major code, architecture, or multi-file documentation changes, update the committed Graphify graph:
 

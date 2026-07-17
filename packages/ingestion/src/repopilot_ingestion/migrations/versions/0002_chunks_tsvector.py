@@ -6,8 +6,7 @@ and a GIN index for Postgres full-text search (``bm25_search`` tool).
 Analyzer choice: ``simple`` (not ``english``). Code retrieval keys on exact
 identifiers — ``english`` stems and drops stopwords, which helps prose but
 hurts rare symbols; ``simple`` lowercases without stemming, preserving
-identifier tokens. See docs/rag/03 §Honest notes (english is the A/B
-alternative if rare-symbol recall underperforms).
+identifier tokens.
 
 Because the column is ``GENERATED ALWAYS AS ... STORED``, it backfills for
 already-indexed repos on migration and auto-populates on future inserts —
@@ -35,8 +34,8 @@ def upgrade() -> None:
     # Postgres ts_rank_cd has no IDF, so without this a chunk that merely
     # *mentions* a common word outranks the chunk that *defines* the rare
     # symbol. Weighting symbol matches to band A (queried with a {D,C,B,A}
-    # weight array favouring A) makes the defining chunk win — which is
-    # exactly what rare-symbol retrieval needs. See docs/rag/03.
+    # weight array favouring A) makes the defining chunk win — exactly what
+    # rare-symbol retrieval needs.
     op.execute(
         """
         ALTER TABLE chunks ADD COLUMN content_tsv tsvector

@@ -15,8 +15,7 @@ Design rules (enforced both here and in code review — see
    reducer composes diffs from node returns rather than letting nodes
    mutate each other's slots in place.
 3. There is **no** ``purpose`` enum. Everything goal-shaped flows through
-   ``IntentProfile`` / ``CapabilityPlan``. A CI grep enforces this from
-   Phase 3 onward (see ``docs/CURRENT_PHASE.md``).
+   ``IntentProfile`` / ``CapabilityPlan``.
 
 ``CodeRef`` is re-exported from ``repopilot_agents.types`` to keep the
 Phase 2 tool layer's import surface intact; defining it in one place

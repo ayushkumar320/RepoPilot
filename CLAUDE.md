@@ -14,9 +14,7 @@ The distinguishing bet: **before analyzing anything, the system captures pre-con
 
 | Want to understand… | Read |
 |---|---|
-| Where the build is right now | [`docs/CURRENT_PHASE.md`](docs/CURRENT_PHASE.md) |
-| The 7-phase retrieval-quality plan | [`docs/RAG_PLAN.md`](docs/RAG_PLAN.md) |
-| The active phase's spec, gate, stop conditions | [`docs/rag/`](docs/rag/) (start at [`docs/rag/README.md`](docs/rag/README.md)) |
+| How to run the project locally | [`docs/STARTUP_GUIDE.md`](docs/STARTUP_GUIDE.md) |
 | Agent topology, state schema, tools, verifier | [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) |
 | Historical: product thesis, tech-stack rationale | [`docs/archive/`](docs/archive/) |
 

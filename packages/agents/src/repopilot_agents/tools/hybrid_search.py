@@ -1,16 +1,10 @@
 """``hybrid_search`` — fuse the dense (vector) and sparse (BM25) lanes.
 
-The top of the Phase 3 retrieval stack. Runs ``vector_search`` and
-``bm25_search`` concurrently, then fuses their rankings with Reciprocal Rank
-Fusion so a chunk found by *either* lane surfaces, and one found by *both*
-ranks highest. Same ``list[ChunkHit]`` return shape as ``vector_search``, so
-the Q&A graph swaps one call for the other.
-
-Phase 2 (query rewriting) was deferred, so this takes a raw query string and
-runs a single dense lane. The signature keeps ``recall_k`` /
-``exclude_path_prefixes`` so it's a drop-in for the Phase 1 ``vector_search``
-call; when Phase 2 lands, the raw query becomes N dense rewrite-lanes fed
-through the same ``reciprocal_rank_fusion``.
+Runs ``vector_search`` and ``bm25_search`` concurrently, then fuses their
+rankings with Reciprocal Rank Fusion so a chunk found by *either* lane
+surfaces, and one found by *both* ranks highest. Same ``list[ChunkHit]``
+return shape as ``vector_search``, so the Q&A graph swaps one call for the
+other.
 """
 
 from __future__ import annotations
@@ -33,10 +27,9 @@ log = structlog.get_logger(__name__)
 # balance is repo-dependent: on httpx dense is near-perfect (so fusion must not
 # reorder it), while on fastapi dense fails on rare symbols and BM25 rescues
 # them (+42pp). A single global weight can't be optimal for both — that needs
-# query-adaptive routing (Phase 2) or the Phase 4 reranker. 3.0 is the balance
-# chosen for a Q&A product: it protects natural-language questions (httpx
-# general −5pp, rare 1.0 preserved) while still beating dense +17pp on fastapi
-# rare symbols. Measured sweep in docs/rag/03 §Honest notes.
+# query-adaptive routing or reranking. 3.0 is the balance chosen for a Q&A
+# product: it protects natural-language questions while still giving rare
+# symbols enough sparse-lane lift.
 DENSE_WEIGHT = 3.0
 SPARSE_WEIGHT = 1.0
 

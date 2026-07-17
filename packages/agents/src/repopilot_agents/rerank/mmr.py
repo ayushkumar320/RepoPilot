@@ -3,14 +3,12 @@
 ``MMR(c) = lambda * relevance(c) - (1 - lambda) * max(sim(c, chosen))``
 
 ``lambda=1.0`` is pure relevance; ``0.0`` pure diversity. Code retrieval
-wants relevance-heavy (multiple methods of one class are sometimes *the*
-answer), so the default is 0.7 (docs/rag/04), benched over {0.5, 0.7, 0.9}.
+wants relevance-heavy selection because multiple methods of one class are
+sometimes the answer, so the default stays relevance-biased.
 
-Similarity: token-set Jaccard over the item texts. The spec sketched MMR over
-dense embeddings, but ``ChunkHit`` doesn't carry vectors and the reranker
-already needs chunk text in hand — and near-duplicates in code (methods of
-the same class, overload pairs) share most identifier tokens, which Jaccard
-captures directly. Deviation noted in docs/rag/04 land notes.
+Similarity: token-set Jaccard over the item texts. ``ChunkHit`` does not carry
+vectors and the reranker already needs chunk text in hand; near-duplicates in
+code share most identifier tokens, which Jaccard captures directly.
 """
 
 from __future__ import annotations

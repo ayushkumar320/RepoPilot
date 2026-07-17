@@ -6,13 +6,11 @@ relevance directly. Slower per pair, far more accurate; that's why it runs on
 the small post-retrieval pool, never the corpus.
 
 Model choice: ``Xenova/ms-marco-MiniLM-L-6-v2`` (~80 MB ONNX, CPU) scores
-~460 pairs/s on an M-series Mac — a 30-chunk pool costs ~65 ms, well inside
-the phase's latency budget. ``BAAI/bge-reranker-base`` (1.04 GB) is the
-configurable quality fallback if the self-test says MiniLM is mismatched to
-code (spec §6). Configured via ``settings.rerank_model``.
+~460 pairs/s on an M-series Mac. ``BAAI/bge-reranker-base`` (1.04 GB) is the
+configurable quality fallback. Configured via ``settings.rerank_model``.
 
-Chunks are scored as ``symbol + newline + content`` — the symbol prefix is
-the known fix for rerankers under-ranking code (docs/rag/04 §6).
+Chunks are scored as ``symbol + newline + content`` so code symbols contribute
+directly to the pair score.
 
 Scores are cached in-process by ``sha256(model + query + text)``; at ~460
 pairs/s a persistent cache isn't worth the plumbing.

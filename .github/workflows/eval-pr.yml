@@ -7,8 +7,7 @@
 # - Uses Postgres+pgvector as a service container. No daemon dependencies:
 #   Verifier runs against Groq (with HF Inference Providers fallback), and
 #   embeddings run in-process via sentence-transformers.
-# - Skips cleanly if a required dataset file is missing (so this is green on a
-#   fresh repo where Blockers 2/3 in docs/CURRENT_PHASE.md aren't done yet).
+# - Skips cleanly if a required dataset file is missing.
 # - Skips on forks where secrets aren't available (LLM-bound tests detect missing
 #   GROQ_API_KEY and skip).
 # - Hard timeout 8 minutes (target 5; 8 is the panic budget).

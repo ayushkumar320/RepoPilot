@@ -16,8 +16,7 @@ Design notes:
   else gets dropped at validation time. That keeps the planner's
   deterministic rules sound.
 - **No purpose enum.** The profiler never returns a "purpose". The
-  planner consumes weights + keywords + framing. See the CI grep rule in
-  ``docs/CURRENT_PHASE.md``.
+  planner consumes weights + keywords + framing.
 """
 
 from __future__ import annotations

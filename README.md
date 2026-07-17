@@ -4,7 +4,7 @@ RepoPilot is a purpose-driven codebase onboarding tool for public Python reposit
 
 The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
-> Current status: the RAG closeout is shipped on `main` and the project is ready for local beta/demo use. Start with the [local startup guide](docs/STARTUP_GUIDE.md). Historical phase and eval notes are archived under [docs/](docs/).
+> Current status: the project is ready for local beta/demo use. Start with the [local startup guide](docs/STARTUP_GUIDE.md).
 
 ## What It Does
 
@@ -34,7 +34,7 @@ RepoPilot is not a general chatbot over code. The LLM never invents the call gra
 | Contribute mode | Lane A/B/C cores, ranker, and eval registration scaffold |
 | Ship hardening | RAG ship report and retrieval eval artifact gate in CI |
 
-The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md). Build history lives in [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md), [docs/RAG_PLAN.md](docs/RAG_PLAN.md), and [docs/rag/](docs/rag/).
+The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md). Architecture details live in [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md).
 
 ## Architecture At A Glance
 
@@ -213,7 +213,7 @@ graphify update .
 │   └── evals/                # eval registry, datasets, runners, reports
 ├── infra/
 │   └── postgres/             # pgvector init SQL
-├── docs/                     # design source of truth and phase gates
+├── docs/                     # startup guide, architecture, and historical product rationale
 ├── graphify-out/             # committed knowledge graph over this repo
 ├── docker-compose.yml        # Postgres + pgvector, Redis
 ├── Makefile                  # common dev/test commands
@@ -304,11 +304,8 @@ RepoPilot follows a few hard rules:
 |---|---|
 | [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
 | [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md) | Local runbook: install, env, services, API, web, checks |
-| [docs/CURRENT_PHASE.md](docs/CURRENT_PHASE.md) | Build closeout status and deferred eval notes |
 | [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
-| [docs/EVAL_SYSTEM.md](docs/EVAL_SYSTEM.md) | Eval harness and regression-gate explanation |
 | [docs/archive/](docs/archive/) | Product thesis and historical stack rationale |
-| [docs/rag/](docs/rag/) | Historical RAG phase specs and ship-closeout notes |
 
 ## Known Limitations
 

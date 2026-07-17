@@ -2,8 +2,8 @@
 
 The real ONNX model stays out of the fast lane (80 MB download, slow import);
 these tests stub ``TextCrossEncoder`` to verify caching, symbol-prefixing,
-and pipeline composition. The real-model pairwise self-test is a slow-lane /
-bench concern (docs/rag/04 §4).
+and pipeline composition. The real-model pairwise self-test is a slow-lane
+bench concern.
 """
 
 from __future__ import annotations

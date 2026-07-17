@@ -25,11 +25,9 @@ from repopilot_agents.types import ChunkContent, ChunkHit
 
 log = structlog.get_logger(__name__)
 
-# Benched over lambda {0.5,0.7,0.9,1.0} x pool {30,50} (docs/rag/04 land
-# notes). pool=50 is decisive: reranking the FULL hybrid pool pulls fastapi
-# rare-symbol chunks from below rank 10 to the top (recall@10 0.583 -> 0.917).
-# lambda=0.9 is min-regret: recall@10 up on every dataset, no NDCG regression
-# beyond noise, and light MMR beats MMR-off on httpx recall (0.974 vs 0.949).
+# Benched over lambda {0.5,0.7,0.9,1.0} x pool {30,50}. pool=50 is decisive:
+# reranking the full hybrid pool pulls rare-symbol chunks from below rank 10
+# toward the top. lambda=0.9 is the min-regret default.
 DEFAULT_MAX_POOL = 50
 DEFAULT_LAMBDA = 0.9
 

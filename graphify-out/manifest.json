@@ -330,8 +330,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/intent/profiler.py": {
-    "mtime": 1781667259.4091015,
-    "ast_hash": "31f6f9aa68429dd6bffdaf29e3cdca33",
+    "mtime": 1784269350.3239164,
+    "ast_hash": "72a2d5c8cb6e55ea4783ecc610f2103f",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/prompts/__init__.py": {
@@ -380,23 +380,23 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/rerank/cross_encoder.py": {
-    "mtime": 1783675897.3696446,
-    "ast_hash": "01a2b7e3bb24896c0ae12c3d27f1a47e",
+    "mtime": 1784269350.565227,
+    "ast_hash": "512c1a2000605383f927fe14637325ec",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/rerank/mmr.py": {
-    "mtime": 1783675897.36969,
-    "ast_hash": "61f313a39cf8c6465758bd5c3691920b",
+    "mtime": 1784269350.4036975,
+    "ast_hash": "d8348a3072f5f7c167cb6b97530c037a",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/rerank/pipeline.py": {
-    "mtime": 1783706607.284085,
-    "ast_hash": "979d8f24106dda1401cdca6549a40ca7",
+    "mtime": 1784269350.4838176,
+    "ast_hash": "e3e3a60db0b2ae8f7f6b3316dc14a535",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/state.py": {
-    "mtime": 1781838673.738934,
-    "ast_hash": "b20105c5c5840083788cb8f40c0c8031",
+    "mtime": 1784269350.2434824,
+    "ast_hash": "761a82f75b00207ededc94c6059195d4",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/__init__.py": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/hybrid_search.py": {
-    "mtime": 1783675897.3698912,
-    "ast_hash": "46a4c8e6dabc8a30e8225a29f4cd2570",
+    "mtime": 1784269350.7293446,
+    "ast_hash": "34410ffff269350d5a79fc497c5af1af",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/read_chunks.py": {
@@ -495,8 +495,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_cross_encoder.py": {
-    "mtime": 1783675897.3702753,
-    "ast_hash": "4d086894edd61c5b1250f98b8d70c3cf",
+    "mtime": 1784269350.8981068,
+    "ast_hash": "ded3527b6c6143c36594372d62cdef14",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_goal_anchor.py": {
@@ -635,8 +635,8 @@
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/bench.py": {
-    "mtime": 1784087171.1294236,
-    "ast_hash": "f4ed14fcc3b56eff1a162c13f65fd2d3",
+    "mtime": 1784269350.810121,
+    "ast_hash": "da3ffb877a711cadddf1b4ad9fe86194",
     "semantic_hash": ""
   },
   "packages/evals/src/repopilot_evals/datasets.py": {
@@ -750,8 +750,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/migrations/versions/0002_chunks_tsvector.py": {
-    "mtime": 1783675897.3717542,
-    "ast_hash": "93a8c674fa4a2e2943183da094fa8516",
+    "mtime": 1784269350.6491437,
+    "ast_hash": "99941b8ccb6ceeb88ddba062c8319ef3",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/migrations/versions/__init__.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/eval-pr.yml": {
-    "mtime": 1781600403.9166565,
-    "ast_hash": "b2e456873bb009ca0a970aff3f40584f",
+    "mtime": 1784269366.4642854,
+    "ast_hash": "40eb2148ec1d7c4caceac61adcd77825",
     "semantic_hash": ""
   },
   ".pre-commit-config.yaml": {
@@ -875,18 +875,18 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1783706607.2801,
-    "ast_hash": "7b3ff7f27cd18dbd8b8c481c725ca207",
+    "mtime": 1784269274.1562002,
+    "ast_hash": "50110b6bbaba00e6f1623df678ce074f",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1783339415.9319472,
-    "ast_hash": "33294bc2e007ff5b781f6ee3fb2b2082",
+    "mtime": 1784269274.2395344,
+    "ast_hash": "39e6cfe01dda8577a3d79f5089fc7ec9",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1784269110.42371,
-    "ast_hash": "b147cc17f68b6889a38343c8850cee75",
+    "mtime": 1784269274.3215635,
+    "ast_hash": "76aad03db9af0ebc357598a6ffd65853",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -899,19 +899,9 @@
     "ast_hash": "a640eaee2e21aa37b1c5c3d56fd977cc",
     "semantic_hash": ""
   },
-  "docs/CURRENT_PHASE.md": {
-    "mtime": 1784267626.9876978,
-    "ast_hash": "b9ce630dd1c0f6f0cd25dcde3ed5bc59",
-    "semantic_hash": ""
-  },
-  "docs/RAG_PLAN.md": {
-    "mtime": 1783919421.330916,
-    "ast_hash": "c92f38a62cb5bf99b2476983b60d25b1",
-    "semantic_hash": ""
-  },
   "docs/README.md": {
-    "mtime": 1784268192.6554163,
-    "ast_hash": "bf55b85908013fb2246fba5a945516e1",
+    "mtime": 1784269274.4062514,
+    "ast_hash": "3e171692e2ec8d44b59c4381e3753659",
     "semantic_hash": ""
   },
   "docs/archive/01_PROBLEM_AND_SOLUTION.md": {
@@ -925,63 +915,8 @@
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
-    "mtime": 1783339384.4853814,
-    "ast_hash": "9a6ff9734f393066f25fcadffc61f238",
-    "semantic_hash": ""
-  },
-  "docs/rag/00_BASELINE_AND_MEASUREMENT.md": {
-    "mtime": 1783227162.085247,
-    "ast_hash": "25e36f7f512006d5572af4c1f60bae7b",
-    "semantic_hash": ""
-  },
-  "docs/rag/00_TODAY_PLAN.md": {
-    "mtime": 1783226908.0871646,
-    "ast_hash": "90653c97629ce97e42e1706b9d4f089d",
-    "semantic_hash": ""
-  },
-  "docs/rag/01_RECALL_LIFT.md": {
-    "mtime": 1781957372.4632702,
-    "ast_hash": "6d5941695fa6b065204c11b04e6e8398",
-    "semantic_hash": ""
-  },
-  "docs/rag/02_QUERY_UNDERSTANDING.md": {
-    "mtime": 1784088417.4280624,
-    "ast_hash": "5a12ceeaa63285f12de619fa4d088314",
-    "semantic_hash": ""
-  },
-  "docs/rag/03_HYBRID_RETRIEVAL_BM25.md": {
-    "mtime": 1781957372.463449,
-    "ast_hash": "5508bd97ad5597300edcc7a59f941771",
-    "semantic_hash": ""
-  },
-  "docs/rag/04_RERANKING.md": {
-    "mtime": 1781957372.4635355,
-    "ast_hash": "c58334e7d242a78ed150194896619f74",
-    "semantic_hash": ""
-  },
-  "docs/rag/05_CONTEXT_COMPRESSION.md": {
-    "mtime": 1781957372.4636245,
-    "ast_hash": "28c6bfe80abc72d1dd9e8b97d8b3cdfd",
-    "semantic_hash": ""
-  },
-  "docs/rag/06_INGESTION_ENRICHMENT.md": {
-    "mtime": 1784088417.5111659,
-    "ast_hash": "56edc3fd065d8f23807601b0a3592c31",
-    "semantic_hash": ""
-  },
-  "docs/rag/07_SHIP_CLOSEOUT.md": {
-    "mtime": 1783233443.7523105,
-    "ast_hash": "a974e3e302af3458900b80fe5c1104ac",
-    "semantic_hash": ""
-  },
-  "docs/rag/README.md": {
-    "mtime": 1783919091.5855565,
-    "ast_hash": "31b2b31c3a843d86661eb609f3952d4b",
-    "semantic_hash": ""
-  },
-  "docs/rag/RISKS.md": {
-    "mtime": 1781958348.8394117,
-    "ast_hash": "ba21af8cc0cff0ca279cf785a238b2af",
+    "mtime": 1784269350.1600058,
+    "ast_hash": "ec3c6378f9b1c984d086b111751b91c2",
     "semantic_hash": ""
   },
   "evals/tools/questions/fastapi.txt": {
@@ -1077,16 +1012,6 @@
   "evals/results/rag_phase5/httpx_baseline.json": {
     "mtime": 1783711526.369585,
     "ast_hash": "5e9579c0bfc3da72c974002a88a0058b",
-    "semantic_hash": ""
-  },
-  "docs/EVAL_SYSTEM.md": {
-    "mtime": 1783711526.3691108,
-    "ast_hash": "59bda6fa5632276ef158395a3b731268",
-    "semantic_hash": ""
-  },
-  "docs/EVAL_SYSTEM_EXPLAINED.md": {
-    "mtime": 1783711526.3692808,
-    "ast_hash": "59fce5da3138345f9b2bf22a1c9e6f84",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/_before.json": {
@@ -1190,8 +1115,8 @@
     "semantic_hash": ""
   },
   "docs/STARTUP_GUIDE.md": {
-    "mtime": 1784269110.3442168,
-    "ast_hash": "98556bbde3e289a2a185bcc61febdf1a",
+    "mtime": 1784269274.4884825,
+    "ast_hash": "5c78b6d1ac805ae9879ce069d94e6481",
     "semantic_hash": ""
   }
 }

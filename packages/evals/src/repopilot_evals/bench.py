@@ -217,9 +217,9 @@ LATENCY_P95_BUDGET = 1.5
 def write_delta(phase: int, after: dict[str, object]) -> None:
     """Compare ``_after`` to ``_before`` per repo; fail on guardrail breaches.
 
-    Guardrail (RAG_PLAN + rag/01 §5): ``latency_p95_ms`` may not regress
-    beyond 1.5× the before-number. The recall/grounding gates need human
-    judgment + the significance runner, so they are printed, not asserted.
+    Guardrail: ``latency_p95_ms`` may not regress beyond 1.5× the
+    before-number. The recall/grounding gates need human judgment + the
+    significance runner, so they are printed, not asserted.
     """
     out_dir = results_dir(phase)
     before_path = out_dir / "_before.json"

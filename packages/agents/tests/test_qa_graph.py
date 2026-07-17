@@ -94,6 +94,7 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(qa_graph, "read_chunks", fake_read_chunks)
     monkeypatch.setattr(qa_graph, "graph_traverse", fake_graph_traverse)
     monkeypatch.setattr(qa_graph, "verify_claims", fake_verify_claims)
+
     async def fake_build_query_spec(question: str, **kw: Any) -> Any:
         return qa_graph.fallback_query_spec(question)
 

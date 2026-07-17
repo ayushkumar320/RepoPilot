@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1781598341.4783678,
-    "ast_hash": "6b652bdafa25382a887e8e0e78334005",
+    "mtime": 1784267626.8240633,
+    "ast_hash": "4ab90a007850ef179f6445af5e383205",
     "semantic_hash": ""
   },
   ".github/workflows/eval-main.yml": {
@@ -900,8 +900,8 @@
     "semantic_hash": ""
   },
   "docs/CURRENT_PHASE.md": {
-    "mtime": 1784214789.0011117,
-    "ast_hash": "200f3dd8fb11ef60249e899ce8935498",
+    "mtime": 1784267626.9876978,
+    "ast_hash": "b9ce630dd1c0f6f0cd25dcde3ed5bc59",
     "semantic_hash": ""
   },
   "docs/RAG_PLAN.md": {
@@ -1110,38 +1110,38 @@
     "semantic_hash": ""
   },
   "evals/results/rag_phase2/httpx_baseline.json": {
-    "mtime": 1784088360.4751177,
-    "ast_hash": "01e7b232ea21adb015e72ac73a82eef2",
+    "mtime": 1784215449.9543872,
+    "ast_hash": "429f44be3aea826f5b941af3bd6e4517",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/_after.json": {
-    "mtime": 1784030814.7459443,
-    "ast_hash": "9a1b1647c7ff1bfd7e85a33aed13b8a1",
+    "mtime": 1784267411.6793978,
+    "ast_hash": "d1006adcef4ca1c3d90879a523380da8",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/baseline.json": {
-    "mtime": 1784030814.746138,
-    "ast_hash": "9a1b1647c7ff1bfd7e85a33aed13b8a1",
+    "mtime": 1784267411.6796408,
+    "ast_hash": "d1006adcef4ca1c3d90879a523380da8",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/delta.json": {
-    "mtime": 1784030814.7462249,
-    "ast_hash": "61f1334a9cdac95d90772b76162fdcc4",
+    "mtime": 1784267411.6797612,
+    "ast_hash": "a0c95f29dddaa0bb8d730135f5ceafb6",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/fastapi_baseline.json": {
-    "mtime": 1784030814.7463076,
-    "ast_hash": "d95c17f9e46d893f31c396dd92f2abd0",
+    "mtime": 1784267411.6798806,
+    "ast_hash": "cecd21c16d57333fc9af591765f7f308",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/flask_baseline.json": {
-    "mtime": 1784030814.7463899,
-    "ast_hash": "8afd935cc3937de80856aed3769fa1ee",
+    "mtime": 1784267411.680002,
+    "ast_hash": "86ad1fb5436a31983605c4fbd6f76f4a",
     "semantic_hash": ""
   },
   "evals/results/rag_phase6/httpx_baseline.json": {
-    "mtime": 1784030814.746481,
-    "ast_hash": "7dfc36d02b4c13087a7ece1f022b9b78",
+    "mtime": 1784267411.6803405,
+    "ast_hash": "029f0b42b7a5c77f55a62e4ea10b7d08",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/query_spec.py": {
@@ -1167,6 +1167,26 @@
   "httpx_index_time.txt": {
     "mtime": 1784030814.7465649,
     "ast_hash": "40deaf2f2619d0164d8fe0c52f600797",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase2/_after.json": {
+    "mtime": 1784215673.670274,
+    "ast_hash": "edcd1fbdc4524950cb25a54e89b93835",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase2/baseline.json": {
+    "mtime": 1784215673.6700656,
+    "ast_hash": "edcd1fbdc4524950cb25a54e89b93835",
+    "semantic_hash": ""
+  },
+  "evals/results/rag_phase2/delta.json": {
+    "mtime": 1784215673.6705585,
+    "ast_hash": "4e5d96ea07f06e303ecf9a101203d9ed",
+    "semantic_hash": ""
+  },
+  "evals/results/SHIP_REPORT.md": {
+    "mtime": 1784267626.9062264,
+    "ast_hash": "bb2400cbe852f8a1ac850add89665679",
     "semantic_hash": ""
   }
 }

@@ -10,6 +10,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  retrieval-eval-artifact-gate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require fresh RAG after artifact for retrieval changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}")"
+          retrieval_changed="$(printf '%s\n' "$changed_files" | grep -E '^(packages/agents/src/repopilot_agents/(tools|qa|rerank)/|packages/ingestion/)' || true)"
+
+          if [[ -z "$retrieval_changed" ]]; then
+            echo "No retrieval-path changes detected."
+            exit 0
+          fi
+
+          after_changed="$(printf '%s\n' "$changed_files" | grep -E '^evals/results/rag_phase[0-9]+/_after\.json$' || true)"
+
+          if [[ -n "$after_changed" ]]; then
+            echo "Retrieval changes include a fresh RAG _after.json artifact:"
+            printf '%s\n' "$after_changed"
+            exit 0
+          fi
+
+          echo "::error title=Missing RAG eval artifact::Retrieval-path changes must include evals/results/rag_phaseN/_after.json from a fresh bench run."
+          echo "Changed retrieval files:"
+          printf '%s\n' "$retrieval_changed"
+          exit 1
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15

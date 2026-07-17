@@ -133,7 +133,9 @@ def _merge_fallback_hints(spec: QuerySpec, fallback: QuerySpec) -> QuerySpec:
             "extracted_symbols": QuerySpec(
                 raw_text=spec.raw_text, extracted_symbols=symbols
             ).extracted_symbols,
-            "extracted_paths": QuerySpec(raw_text=spec.raw_text, extracted_paths=paths).extracted_paths,
+            "extracted_paths": QuerySpec(
+                raw_text=spec.raw_text, extracted_paths=paths
+            ).extracted_paths,
             "needs_multi_hop": spec.needs_multi_hop or fallback.needs_multi_hop,
         }
     )

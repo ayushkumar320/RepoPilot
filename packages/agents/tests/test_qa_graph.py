@@ -14,6 +14,7 @@ import pytest
 
 from repopilot_agents.qa import graph as qa_graph
 from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, answer_question
+from repopilot_agents.qa.query_spec import fallback_query_spec
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef, Path
 
 
@@ -96,7 +97,7 @@ def _patch_tools(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(qa_graph, "verify_claims", fake_verify_claims)
 
     async def fake_build_query_spec(question: str, **kw: Any) -> Any:
-        return qa_graph.fallback_query_spec(question)
+        return fallback_query_spec(question)
 
     monkeypatch.setattr(qa_graph, "build_query_spec", fake_build_query_spec)
 

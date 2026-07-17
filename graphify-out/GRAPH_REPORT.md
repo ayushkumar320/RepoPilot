@@ -1,16 +1,16 @@
 # Graph Report - CodebaseArchiologist  (2026-07-17)
 
 ## Corpus Check
-- 225 files · ~135,965 words
+- 225 files · ~136,073 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2153 nodes · 5264 edges · 136 communities (117 shown, 19 thin omitted)
+- 2154 nodes · 5265 edges · 129 communities (109 shown, 20 thin omitted)
 - Extraction: 65% EXTRACTED · 35% INFERRED · 0% AMBIGUOUS · INFERRED: 1850 edges (avg confidence: 0.54)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `abebe03a`
+- Built from commit: `7d76d50c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -97,15 +97,12 @@
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
-- [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY__patch_read_chunks|_patch_read_chunks]]
-- [[_COMMUNITY_load_graph|load_graph]]
 - [[_COMMUNITY_Community 89|Community 89]]
 - [[_COMMUNITY_Community 90|Community 90]]
-- [[_COMMUNITY_Community 91|Community 91]]
 - [[_COMMUNITY_detect_quality_opportunities|detect_quality_opportunities]]
 - [[_COMMUNITY_graph_query.py|graph_query.py]]
 - [[_COMMUNITY_Community 94|Community 94]]
@@ -130,13 +127,9 @@
 - [[_COMMUNITY_Contribute Elicitation|Contribute Elicitation]]
 - [[_COMMUNITY_Flow Tracer|Flow Tracer]]
 - [[_COMMUNITY_Intent Router|Intent Router]]
-- [[_COMMUNITY_Community 127|Community 127]]
-- [[_COMMUNITY_Community 128|Community 128]]
-- [[_COMMUNITY_Community 129|Community 129]]
 - [[_COMMUNITY_Community 130|Community 130]]
 - [[_COMMUNITY_Community 131|Community 131]]
 - [[_COMMUNITY_Community 132|Community 132]]
-- [[_COMMUNITY_build_opportunity_briefing|build_opportunity_briefing]]
 - [[_COMMUNITY_test_qa_multi_query.py|test_qa_multi_query.py]]
 - [[_COMMUNITY_patched_carto_tools|patched_carto_tools]]
 
@@ -167,7 +160,7 @@
 ## Import Cycles
 - 1-file cycle: `apps/api/src/repopilot_api/app.py -> apps/api/src/repopilot_api/app.py`
 
-## Communities (136 total, 19 thin omitted)
+## Communities (129 total, 20 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.07
@@ -182,8 +175,8 @@ Cohesion: 0.07
 Nodes (36): api, ChunkPayload, ClaimEvent, ClaimStatus, CodeRef, CreateRepoResponse, CreateTourResponse, DiagramEvent (+28 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.12
-Nodes (21): Path, Path, Any, Path, parse_file(), TDD gate: chunks land on AST boundaries; content matches source exactly., Every function/class/method chunk starts on a def/class line., For non-class chunks, ``chunk.content`` is the exact source slice. (+13 more)
+Cohesion: 0.13
+Nodes (20): Path, Path, Any, Path, parse_file(), TDD gate: chunks land on AST boundaries; content matches source exactly., Every function/class/method chunk starts on a def/class line., For non-class chunks, ``chunk.content`` is the exact source slice. (+12 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.29
@@ -191,15 +184,15 @@ Nodes (7): ModelBinding, ModelId, ProviderName, Logical model identifiers and th
 
 ### Community 5 - "Community 5"
 Cohesion: 0.09
-Nodes (49): _build_fact_bundle_for_test(), _fact_bundle(), Cartographer — produces ``system_map`` Insights from the call graph.  The Cartog, Run the Cartographer once.      Returns the state diff for the LangGraph reducer, Render the fact bundle as a compact text block.      We deliberately avoid prose, Resolve each symbol's CodeRef from graph_metrics's underlying lookup.      The m, _refs_for_symbols(), _resolve_refs() (+41 more)
+Nodes (65): _format_paths(), Flow Tracer — produces ``traced_flows`` Insights from call-graph paths.  Reads `, Choose which symbols to trace. Prefer the planner's explicit     targets; otherw, Run the Flow Tracer once.      Returns ``{"traced_flows": [Insight, …]}``. Empty, run_flow_tracer(), _seed_targets(), _coerce_output_shape(), IntentClass (+57 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.06
 Nodes (42): ChunkHit, AsyncEngine, ChunkHit, AsyncEngine, ChunkHit, LLMProvider, Any, ChunkHit (+34 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (39): approachability_score(), Lane A — issue triage backed by graph approachability., Score issue approachability from graph facts, not GitHub labels., Rank issues and keep the next three rejected reasons., _ref_for_issue(), run_lane_a_triage(), triage_issues(), detect_quality_opportunities() (+31 more)
+Cohesion: 0.08
+Nodes (45): build_opportunity_briefing(), ranker_rationale(), Teacher-facing briefing helpers for Phase 5 opportunity cards., Attach the UI-visible Phase 5 briefing surfaces without reranking., Plain-English explanation of planner-derived ranker weights., approachability_score(), Lane A — issue triage backed by graph approachability., Score issue approachability from graph facts, not GitHub labels. (+37 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.17
@@ -211,39 +204,39 @@ Nodes (25): dependencies, next, react, react-dom, devDependencies, lighthouse, @
 
 ### Community 10 - "Community 10"
 Cohesion: 0.11
-Nodes (28): IntentProfileEvalRow, Path, Settings, Settings, PlannerEvalRow, bench_repo(), dataset_path(), FileMappingEvalRow (+20 more)
+Nodes (28): IntentProfileEvalRow, Path, Settings, PlannerEvalRow, bench_repo(), dataset_path(), FileMappingEvalRow, IntentProfileEvalRow (+20 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.08
-Nodes (28): Path, AsyncEngine, ChunkHit, LLMProvider, Any, RAG Phase 1: ``vector_search`` pool widening + metadata filters.  The pgvector S, _RecordingConn, _RecordingEngine (+20 more)
+Cohesion: 0.10
+Nodes (22): AsyncEngine, ChunkHit, LLMProvider, Any, RAG Phase 1: ``vector_search`` pool widening + metadata filters.  The pgvector S, _RecordingConn, _RecordingEngine, _run() (+14 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.07
-Nodes (30): Any, EventDict, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, Build arq RedisSettings from Settings.redis_url.      Without this, arq falls ba, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, _redis_settings_from_url() (+22 more)
+Cohesion: 0.10
+Nodes (20): Any, EventDict, index_repo(), arq worker function for the Phase 1 ingestion pipeline.  The actual pipeline log, Build arq RedisSettings from Settings.redis_url.      Without this, arq falls ba, arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict., arq discovery target. Run with: ``arq repopilot_api.jobs.index_repo.WorkerSettin, _redis_settings_from_url() (+12 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.23
-Nodes (13): Any, MonkeyPatch, CodeRef, Pointer into the repo. Every factual claim must carry at least one., The semaphore must cap in-flight verifier calls at max_concurrency., _StubEngine, _StubProvider, test_verify_claim_parse_fail_rejects() (+5 more)
+Cohesion: 0.27
+Nodes (12): MonkeyPatch, CodeRef, Pointer into the repo. Every factual claim must carry at least one., The semaphore must cap in-flight verifier calls at max_concurrency., _StubEngine, _StubProvider, test_verify_claim_parse_fail_rejects(), test_verify_claim_provider_error_rejects_instead_of_crashing() (+4 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.12
 Nodes (29): _derive_ranker_weights(), _infer_flow_targets(), _infer_shape(), _pick_hub_bias(), plan(), Capability Planner — deterministic ``IntentProfile`` → ``CapabilityPlan``.  The, Deterministic planner. See ``docs/03_ARCHITECTURE.md`` § "The     Capability Pla, Pick a hub-bias tilt for the Cartographer.      Data-heavy intents → "data_hubs" (+21 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.29
-Nodes (6): AsyncEngine, Settings, build_eval_context(), EvalContext, Shared runtime helpers for eval runners., resolve_repo_id()
+Cohesion: 0.15
+Nodes (16): Path, AsyncEngine, Settings, build_eval_context(), EvalContext, resolve_repo_id(), _patched_read_chunks(), Verifier-quality eval runner for the Phase 2 gate. (+8 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.28
-Nodes (12): ChunkContent, LLMProvider, _clip_ranges(), compress_chunk(), compress_chunks(), _compression_user_prompt(), _merge_ranges(), _parse_keep_ranges() (+4 more)
+Cohesion: 0.10
+Nodes (28): ChunkContent, LLMProvider, Any, ChunkContent, Any, ChunkContent, _clip_ranges(), compress_chunk() (+20 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.21
 Nodes (23): Node, _class_base_names(), _class_method_names(), _decorators(), _docstring_tokens(), _extract_imports(), _extract_symbols(), _first_docstring() (+15 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.07
-Nodes (53): ArchaeologistState, lane_c_language_violation(), _matches_focus(), Lane C — guarded structural suspicions., Return the banned phrase when Lane C language is too certain., Build guarded suspicion opportunities from deterministic candidates.      Phase, run_lane_c_suspicion(), _lane_weight() (+45 more)
+Cohesion: 0.08
+Nodes (50): ArchaeologistState, lane_c_language_violation(), _matches_focus(), Lane C — guarded structural suspicions., Return the banned phrase when Lane C language is too certain., Build guarded suspicion opportunities from deterministic candidates.      Phase, run_lane_c_suspicion(), _lane_weight() (+42 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.10
@@ -258,12 +251,12 @@ Cohesion: 0.16
 Nodes (29): AsyncEngine, ChunkContent, ChunkHit, Claim, LLMProvider, QuerySpec, answer_question(), _Context (+21 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.18
-Nodes (19): MonkeyPatch, Path, GroundingEvalRow, VerifierEvalRow, _async_return(), _dataset_path(), _DummyContext, _DummyEngine (+11 more)
+Cohesion: 0.17
+Nodes (19): MonkeyPatch, Path, ChunkContent, Result of ``read_chunks``: a CodeRef paired with the source text it points at., GroundingEvalRow, VerifierEvalRow, _async_return(), _dataset_path() (+11 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.11
-Nodes (27): CloneResult, ModuleSource, Chunk, LLMProvider, Settings, Chunk, LLMProvider, Path (+19 more)
+Cohesion: 0.08
+Nodes (31): CloneResult, ModuleSource, Path, Chunk, LLMProvider, Path, Settings, clone_to_tempdir() (+23 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.10
@@ -271,23 +264,23 @@ Nodes (20): compilerOptions, allowImportingTsExtensions, allowJs, esModuleIntero
 
 ### Community 25 - "Community 25"
 Cohesion: 0.13
-Nodes (14): GroundingEvalRow, CodeRef, QAResult, Settings, _contains_all_keywords(), GroundingEvalCaseResult, GroundingEvalMetrics, _has_expected_refs() (+6 more)
+Nodes (15): GroundingEvalRow, CodeRef, QAResult, Settings, _contains_all_keywords(), GroundingEvalCaseResult, GroundingEvalMetrics, _has_expected_refs() (+7 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.12
 Nodes (16): Agent Graph, API Surface, Architecture At A Glance, Current Build State, Design Principles, Development Workflow, Documentation Map, Graph Connections That Matter (+8 more)
 
 ### Community 27 - "Community 27"
-Cohesion: 0.19
-Nodes (16): EvalSpec, GroundingEvalMetrics, Namespace, Path, _cmd_list(), _grounding_markdown(), main(), _print_grounding() (+8 more)
+Cohesion: 0.17
+Nodes (18): EvalSpec, GroundingEvalMetrics, Namespace, Path, _cmd_list(), _cmd_status(), _grounding_markdown(), main() (+10 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.15
-Nodes (23): Path, ParsedFile, ParsedSymbol, _build_enriched_text(), Chunk, chunk_file(), _class_header_content(), _class_header_end_line() (+15 more)
+Cohesion: 0.10
+Nodes (31): Path, LLMProvider, Settings, Path, ParsedFile, ParsedSymbol, _build_enriched_text(), Chunk (+23 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.15
-Nodes (25): Any, _claim(), engine(), _patch_read_chunks(), Verifier-loop tests: actionability rubric + retry budget + flagging.  The ground, Queues responses keyed on which prompt is being graded.      The verifier loop i, Bypass DB-backed ``read_chunks`` — grounding loops over them but     the bodies, _ref() (+17 more)
+Cohesion: 0.17
+Nodes (24): Any, _claim(), engine(), _patch_read_chunks(), Verifier-loop tests: actionability rubric + retry budget + flagging.  The ground, Queues responses keyed on which prompt is being graded.      The verifier loop i, Bypass DB-backed ``read_chunks`` — grounding loops over them but     the bodies, _ref() (+16 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.20
@@ -310,28 +303,28 @@ Cohesion: 0.20
 Nodes (10): Architecture, Design invariants, Part 2 — Technical Explanation, Read next, The `_before`/`_after`/`delta` protocol, The four runners, in detail, The phase gate, mechanically, The problem, restated in system terms (+2 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.27
-Nodes (5): Connection, Thread-safe SQLite cache keyed on the canonical request hash., Embed ``text`` via the in-process sentence-transformers embedder.          No HT, _SQLiteCache, Path
+Cohesion: 0.16
+Nodes (12): Connection, EmbeddingResponse, Provider-agnostic embedding shape., Thread-safe SQLite cache keyed on the canonical request hash., Embed ``text`` via the in-process sentence-transformers embedder.          No HT, _SQLiteCache, Path, Chunk (+4 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.09
-Nodes (35): IntentProfile, CapabilityPlan, CapabilityPlan, IntentProfile, Any, CodeRef, MonkeyPatch, TourSection (+27 more)
+Cohesion: 0.12
+Nodes (26): AsyncEngine, IntentProfile, Any, MonkeyPatch, build_graph(), Build + compile the full ``ArchaeologistState`` LangGraph.      Pass a Postgres, ArchaeologistState, The single shared LangGraph state. See ``docs/03_ARCHITECTURE.md``. (+18 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.17
-Nodes (18): CodeRef, QAExchange, One completed Q&A turn. v1 keeps the last 8; the prompt only consumes     the cu, Validator tests for ``ArchaeologistState`` and its sub-models.  These tests pin, _ref(), test_claim_defaults_unverified(), test_claim_rejects_relevance_out_of_unit_interval(), test_claim_requires_at_least_one_ref() (+10 more)
+Cohesion: 0.14
+Nodes (20): QAExchange, One completed Q&A turn. v1 keeps the last 8; the prompt only consumes     the cu, Validator tests for ``ArchaeologistState`` and its sub-models.  These tests pin, _ref(), test_claim_defaults_unverified(), test_claim_rejects_relevance_out_of_unit_interval(), test_claim_requires_at_least_one_ref(), test_insight_accepts_complete_fields() (+12 more)
 
 ### Community 38 - "Community 38"
-Cohesion: 0.29
-Nodes (12): AsyncEngine, QueryKind, _prime_cache(), Tests for ``graph_query``: entry points, hubs, callers/callees, layers.  Exercis, test_callees_of_a(), test_callers_of_c(), test_callers_requires_symbol(), test_entry_points() (+4 more)
+Cohesion: 0.07
+Nodes (46): AsyncEngine, DiGraph, AsyncEngine, SymbolMetrics, AsyncEngine, DiGraph, GraphQueryResult, AsyncEngine (+38 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.15
 Nodes (15): ChunkContent, CodeRef, ChunkContent, MonkeyPatch, attribute_refs(), Claim → ref attribution via the Phase 4 cross-encoder.  The verifier judges each, Return the refs of the ``k`` chunks most relevant to ``claim_text``.      Best-f, _chunk() (+7 more)
 
 ### Community 41 - "Community 41"
-Cohesion: 0.36
-Nodes (7): MonkeyPatch, Idempotency + staleness — exercised against a stubbed DB and stubbed clone.  The, When the remote HEAD has moved past the indexed SHA → status=stale., _StubEngine, test_revisit_unknown_repo_returns_stale(), test_revisit_with_advanced_remote_returns_stale_status(), test_revisit_with_matching_remote_returns_already_indexed()
+Cohesion: 0.24
+Nodes (11): MonkeyPatch, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, remote_head_sha(), Decide whether ``repo_url`` is already-current, stale, or unknown.      Cheap —, revisit_status(), Idempotency + staleness — exercised against a stubbed DB and stubbed clone.  The, When the remote HEAD has moved past the indexed SHA → status=stale., _StubEngine (+3 more)
 
 ### Community 42 - "Community 42"
 Cohesion: 0.16
@@ -362,16 +355,16 @@ Cohesion: 0.21
 Nodes (13): jaccard(), mmr_select(), Maximal Marginal Relevance — diversity-aware top-k selection (pure).  ``MMR(c) =, Return indices of up to ``k`` items, MMR-ordered (pure function).      ``relevan, _tokens(), RAG Phase 4: MMR diversity selection (pure function)., test_constant_relevance_normalises_safely(), test_empty_and_zero_k() (+5 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.11
-Nodes (17): Path, clone_to_tempdir(), parse_github_url(), GitHub clone + HEAD-SHA helpers for Phase 1 ingestion.  Two entry points:  * :fu, Return ``(owner, name)`` for a public GitHub URL.      Raises ``ValueError`` for, Return the current default-branch HEAD SHA via ``git ls-remote HEAD``.      Used, Shallow-clone ``repo_url`` into a tempdir; clean up on exit.      The yielded :c, remote_head_sha() (+9 more)
+Cohesion: 0.20
+Nodes (10): CodeRef, CodeRef, 1/0 per ranked hit; each expected ref credits at most one hit., ref_matches(), relevance_vector(), Unit tests for the pure retrieval-metric math (no DB, no LLM)., _ref(), TestRefMatches (+2 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.22
 Nodes (13): Verifier tests: JSON parsing, parse-fail rejection (D4), caching (M1)., test_parse_verdict_accepts_clean_json(), test_parse_verdict_extracts_json_from_prose(), test_parse_verdict_ignores_decoy_json_without_decision(), test_parse_verdict_returns_none_on_garbage(), test_parse_verdict_returns_none_on_invalid_decision(), test_parse_verdict_returns_none_when_only_think_block(), test_parse_verdict_strips_closed_think_block() (+5 more)
 
 ### Community 51 - "Community 51"
-Cohesion: 0.24
-Nodes (5): LatencyEvalMetrics, percentile(), Latency runner: p50/p95 wall-clock timings around ``answer_question``., Nearest-rank percentile over a pre-sorted list., TestPercentile
+Cohesion: 0.28
+Nodes (4): LatencyEvalMetrics, percentile(), Nearest-rank percentile over a pre-sorted list., TestPercentile
 
 ### Community 52 - "Community 52"
 Cohesion: 0.14
@@ -386,8 +379,8 @@ Cohesion: 0.16
 Nodes (23): _coerce_keywords(), _coerce_modality_weights(), _coerce_optional_str(), _fallback_profile(), _parse_json(), profile_intent(), Intent Profiler — free-text intent → structured ``IntentProfile``.  The Profiler, The minimal-but-valid profile used when the LLM fails us.      Matches the "inte (+15 more)
 
 ### Community 55 - "Community 55"
-Cohesion: 0.30
-Nodes (9): Settings, Eval runners for the phase gates., _patched_read_chunks(), Verifier-quality eval runner for the Phase 2 gate., run_verifier_eval(), run_verifier_eval_rows(), VerifierEvalCaseResult, VerifierEvalMetrics (+1 more)
+Cohesion: 0.29
+Nodes (7): _build_fact_bundle_for_test(), _fact_bundle(), Cartographer — produces ``system_map`` Insights from the call graph.  The Cartog, Render the fact bundle as a compact text block.      We deliberately avoid prose, Resolve each symbol's CodeRef from graph_metrics's underlying lookup.      The m, _refs_for_symbols(), _resolve_refs()
 
 ### Community 56 - "Community 56"
 Cohesion: 0.15
@@ -398,32 +391,32 @@ Cohesion: 0.18
 Nodes (11): Definition of Done (for the whole plan), Eval datasets we will use, For contributors, Metrics, in priority order, Per-phase doc template (what every `docs/rag/<n>_*.md` looks like), RAG Quality Plan — RepoPilot Retrieval Upgrade, Sequencing rationale (why this order), The 7 phases at a glance (+3 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.28
-Nodes (7): _OpenAICompatibleClient, Speaks the OpenAI chat-completions shape. Used for Groq and Cerebras., Default wiring used by the app. Tests pass `clients` for full control., AsyncClient, ProviderName, Settings, Self
+Cohesion: 0.33
+Nodes (5): Default wiring used by the app. Tests pass `clients` for full control., AsyncClient, ProviderName, Settings, Self
 
 ### Community 59 - "Community 59"
 Cohesion: 0.28
 Nodes (5): Any, MonkeyPatch, CrossEncoderReranker, Lazy-loading, score-caching wrapper around ``fastembed.TextCrossEncoder``., Relevance score per text (higher = more relevant). Cached per pair.
 
 ### Community 60 - "Community 60"
-Cohesion: 0.08
-Nodes (27): ChunkHit, CodeRef, QuerySpec, CodeRef, _apply_rerank(), mrr(), ndcg_at_k(), _query_lane_weights() (+19 more)
+Cohesion: 0.12
+Nodes (19): ChunkHit, QuerySpec, Settings, _apply_rerank(), mrr(), ndcg_at_k(), _query_lane_weights(), Pure-retrieval metrics: recall@k, NDCG@k, MRR over a labeled QA dataset.  Runs t (+11 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.32
-Nodes (5): Any, Path, _chunk(), FailingProvider, test_summarise_chunks_opens_circuit_after_provider_failure()
+Cohesion: 0.40
+Nodes (4): ProviderError, All providers in the fallback chain failed., Any, Any
 
 ### Community 62 - "Community 62"
 Cohesion: 0.15
 Nodes (12): 1. Goal, 2. Why now, 3. What changes in the code, 4. What changes in the eval, 5. Gate, 6. Stop conditions, 7. Implementation order, Honest notes (+4 more)
 
 ### Community 63 - "Community 63"
-Cohesion: 0.26
-Nodes (11): Any, Path, _cmd_status(), _coerce(), _ensure_reports_dir(), find_latest_report(), _now_stamp(), Persisted eval reports.  Each eval run writes a timestamped JSON + Markdown pair (+3 more)
+Cohesion: 0.29
+Nodes (10): Any, Path, _coerce(), _ensure_reports_dir(), find_latest_report(), _now_stamp(), Persisted eval reports.  Each eval run writes a timestamped JSON + Markdown pair, Write a JSON + Markdown report pair. Returns ``(json_path, md_path)``. (+2 more)
 
 ### Community 64 - "Community 64"
-Cohesion: 0.27
-Nodes (9): Any, ChunkContent, _chunk(), Phase 5 compression tests: safe parsing, clipping, and answerer-only view., _StubProvider, test_answer_prompt_uses_compressed_view_only(), test_compress_chunk_falls_back_on_invalid_json(), test_compress_chunk_keeps_clipped_merged_ranges() (+1 more)
+Cohesion: 0.29
+Nodes (6): Path, _find_repo_env(), Walk up from this file to the repo root and return the ``.env`` path.      Lets, Test 5 from the Phase 0 TDD checklist., `.env.example` shipped at the repo root must be a valid pydantic-settings source, test_settings_loads_from_env_example()
 
 ### Community 65 - "Community 65"
 Cohesion: 0.15
@@ -446,12 +439,12 @@ Cohesion: 0.22
 Nodes (9): 1. What this project is, 2. How project knowledge is organized, 3. Knowledge Graph first (Graphify), 4. Graph maintenance (mandatory), 5. Claude Code harness (`.claude/`), 6. Engineering conventions, 7. Definition of Done, 8. For contributors (human or AI) (+1 more)
 
 ### Community 70 - "Community 70"
-Cohesion: 0.10
-Nodes (18): LangGraph nodes + capability library.  Phase 2 surface: the six deterministic to, ChunkContent, ChunkHit, GraphQueryResult, Path, Shared Pydantic types used across tools, verifier, and Q&A.  These are the typed, Result of ``read_chunks``: a CodeRef paired with the source text it points at., Result of ``vector_search``: a chunk with retrieval metadata. (+10 more)
+Cohesion: 0.12
+Nodes (16): LangGraph nodes + capability library.  Phase 2 surface: the six deterministic to, ChunkHit, GraphQueryResult, Path, Shared Pydantic types used across tools, verifier, and Q&A.  These are the typed, Result of ``vector_search``: a chunk with retrieval metadata., Result of ``graph_traverse``: an ordered chain of CodeRefs., Result of ``graph_metrics``: per-symbol metric pack. (+8 more)
 
 ### Community 71 - "Community 71"
-Cohesion: 0.15
-Nodes (18): EmbeddedChunk, AsyncEngine, Chunk, LLMProvider, Message, Settings, known_head_sha(), persist_index() (+10 more)
+Cohesion: 0.09
+Nodes (24): EmbeddedChunk, Alembic environment — uses Settings.postgres_dsn so dev + CI agree., AsyncEngine, Settings, Shared core: settings, logging, and the LLMProvider abstraction., Application settings, loaded from environment / `.env` via pydantic-settings., Parse a comma-separated env var into a cleaned list., _split_csv() (+16 more)
 
 ### Community 72 - "Community 72"
 Cohesion: 0.17
@@ -474,12 +467,12 @@ Cohesion: 0.24
 Nodes (8): BaseException, Any, _Provider, Tests for Phase 2 query understanding., test_build_query_spec_falls_back_on_parse_error(), test_build_query_spec_falls_back_on_provider_error(), test_build_query_spec_parses_json_and_preserves_raw_question(), test_retrieval_queries_dedupes_and_caps_rewrites()
 
 ### Community 77 - "Community 77"
-Cohesion: 0.13
-Nodes (15): _backoff_delay(), _extract_openai_compatible_text(), _parse_retry_after(), ProviderError, The single LLMProvider every agent goes through.  Responsibilities (Phase 0 deli, Exponential backoff with full jitter. attempt=0 is the first retry., Parse a ``Retry-After`` header (delta-seconds or HTTP-date) into seconds.      P, Extract assistant text from OpenAI-compatible payload variants.      Some provid (+7 more)
+Cohesion: 0.14
+Nodes (13): _backoff_delay(), _extract_openai_compatible_text(), _parse_retry_after(), The single LLMProvider every agent goes through.  Responsibilities (Phase 0 deli, Exponential backoff with full jitter. attempt=0 is the first retry., Parse a ``Retry-After`` header (delta-seconds or HTTP-date) into seconds.      P, Extract assistant text from OpenAI-compatible payload variants.      Some provid, test_backoff_delay_is_bounded() (+5 more)
 
 ### Community 78 - "Community 78"
-Cohesion: 0.15
-Nodes (32): ClaimStatus, AsyncEngine, Claim, IntentProfile, LLMProvider, TourSection, CodeRef, MonkeyPatch (+24 more)
+Cohesion: 0.13
+Nodes (37): ClaimStatus, AsyncEngine, Claim, IntentProfile, LLMProvider, TourSection, CodeRef, CodeRef (+29 more)
 
 ### Community 79 - "Community 79"
 Cohesion: 0.20
@@ -497,17 +490,13 @@ Nodes (4): Layout, Read in order (cold pickup), RepoPilot — Docs, The one-para
 Cohesion: 0.50
 Nodes (7): ChunkContent, answer_user_prompt(), _chunk_view(), Q&A prompt templates.  Three prompts, all under the 2000-token budget from ``doc, _render_chunks(), _render_numbered_chunk(), sufficiency_user_prompt()
 
-### Community 83 - "Community 83"
-Cohesion: 0.27
-Nodes (7): Any, ChunkContent, _chunk(), Phase 5 safety invariant: verifier must always see the full chunk content.  The, _StubProvider, test_compress_chunks_runs_in_parallel_and_handles_errors(), test_verifier_sees_full_content_after_compression()
-
 ### Community 84 - "Community 84"
-Cohesion: 0.17
-Nodes (11): 1. Install Dependencies, 2. Configure Environment, 3. Start Local Services, 4. Run The API, 5. Run The Web App, 6. Use The App Locally, 7. Run Checks, 8. Eval And Graph Maintenance (+3 more)
+Cohesion: 0.15
+Nodes (12): 1. Install Dependencies, 2. Configure Environment, 3. Start Local Services, 4. Run The App, 6. Use The App Locally, 7. Run Checks, 8. Eval And Graph Maintenance, Commands You Actually Use (+4 more)
 
 ### Community 85 - "Community 85"
-Cohesion: 0.20
-Nodes (6): Path, Settings, Shared fixtures for the core package's tests., FakeEmbedder, Test double for the sentence-transformers in-process embedder.      Returns dete, tmp_settings()
+Cohesion: 0.15
+Nodes (8): Any, EmbeddingResponse, Path, Settings, Shared fixtures for the core package's tests., FakeEmbedder, Test double for the sentence-transformers in-process embedder.      Returns dete, tmp_settings()
 
 ### Community 86 - "Community 86"
 Cohesion: 0.29
@@ -517,10 +506,6 @@ Nodes (6): Authoring, Engineering conventions, Graph maintenance (mandatory), Kn
 Cohesion: 0.33
 Nodes (5): Build Prompt — Ship Closeout (Definition of Done), Build the regression gate, Final protocol, Verify (report each with the actual number, no hedging), Write the ship report
 
-### Community 88 - "load_graph"
-Cohesion: 0.27
-Nodes (10): AsyncEngine, SymbolMetrics, _chunk_content(), _cyclomatic(), graph_metrics(), _has_tests(), ``graph_metrics`` — per-symbol metric pack used by Cartographer, Lanes A/B/C.  F, Return the metric pack for ``symbol``. Missing symbol → zeroed pack. (+2 more)
-
 ### Community 89 - "Community 89"
 Cohesion: 0.50
 Nodes (4): Path, _iter_source_files(), Hard CI rule: nothing in the source tree may branch on a ``purpose`` enum.  Phas, test_no_purpose_enum_in_source_tree()
@@ -529,45 +514,25 @@ Nodes (4): Path, _iter_source_files(), Hard CI rule: nothing in the source tree 
 Cohesion: 0.40
 Nodes (4): Bench commands (referee, unchanged since Phase 0), Iron rules (baked into every spec), Order of execution, RAG Phase Ladder — README
 
-### Community 91 - "Community 91"
-Cohesion: 0.31
-Nodes (10): _coerce_section(), _collect_refs(), _format_source_bundle(), Teacher — weaves Insights into goal-anchored ``TourSection``s.  The Teacher is t, Run the Teacher once.      Returns ``{"draft_tour": [TourSection, …]}``. Empty l, Index every CodeRef from upstream insights by symbol so the Teacher     can only, run_teacher(), CodeRef (+2 more)
-
 ### Community 92 - "detect_quality_opportunities"
 Cohesion: 0.50
 Nodes (3): Constraints, Mandatory order of operations, What to return
 
 ### Community 104 - "Community 104"
 Cohesion: 0.16
-Nodes (16): AsyncEngine, ChunkContent, LLMProvider, _apply(), _Cache, _objection_if_rejected(), Per-claim grounding check against ``read_chunks``.  The Verifier is the single l, Test helper — clear the verifier verdict cache. (+8 more)
-
-### Community 108 - "__init__.py"
-Cohesion: 0.20
-Nodes (4): Alembic environment — uses Settings.postgres_dsn so dev + CI agree., SQLAlchemy schema for Phase 1 ingestion.  Tables:     repos              one row, Minimal pgvector type so alembic can emit `vector(N)` without importing     the, Vector
+Nodes (18): AsyncEngine, ChunkContent, LLMProvider, _apply(), _Cache, _objection_if_rejected(), Per-claim grounding check against ``read_chunks``.  The Verifier is the single l, Test helper — clear the verifier verdict cache. (+10 more)
 
 ### Community 111 - "._refs_non_empty"
 Cohesion: 0.29
 Nodes (6): Cumulative Picture, Deferred Entry States, Executive Status, Permanent Regression Gate, Phase Scorecard, RAG Ship Report
 
 ### Community 113 - "__init__.py"
-Cohesion: 0.15
-Nodes (14): EmbeddingResponse, Provider-agnostic embedding shape., LLMResponse, Any, EmbeddingResponse, LLMProvider, Any, EmbeddingResponse (+6 more)
+Cohesion: 0.26
+Nodes (8): Any, EmbeddingResponse, ModelBinding, FakeEmbedder, Tests for ``LLMProvider.embed()`` — cache hit, fresh embed, dim contract., Test double — bypasses the sentence-transformers model load and     returns cann, test_embed_cache_hit_skips_provider(), test_embed_returns_vector()
 
 ### Community 118 - "Contribute Elicitation"
-Cohesion: 0.15
-Nodes (12): _BaseClient, _cache_key(), LLMResponse, Common interface for provider HTTP shims., In-process embedder using sentence-transformers (Hugging Face weights).      No, Generate a completion. Hits cache first; otherwise walks the fallback chain., Per-binding 429 retry loop with exponential backoff + jitter., Provider-agnostic response shape. (+4 more)
-
-### Community 127 - "Community 127"
-Cohesion: 0.20
-Nodes (9): AsyncEngine, DiGraph, invalidate(), load_graph(), Shared loader/cache for the per-repo NetworkX graph.  Per Phase 2 decision **D5*, Return the cached NetworkX graph for ``repo_id``; build it on miss., Drop the cached graph for ``repo_id``. Call when re-indexing., Test helper — clear all cached graphs. (+1 more)
-
-### Community 128 - "Community 128"
-Cohesion: 0.47
-Nodes (8): DiGraph, GraphQueryResult, _call_subgraph(), _entry_points(), _hubs(), _layers(), _neighbours(), ``graph_query`` — structural queries against the per-repo NetworkX graph.  Five
-
-### Community 129 - "Community 129"
-Cohesion: 0.36
-Nodes (7): AsyncEngine, CodeRef, Path, graph_traverse(), ``graph_traverse`` — BFS over the per-repo dependency graph.  The "complete-the-, BFS from ``start`` along the requested edge types; return all paths up to depth., _resolve_refs()
+Cohesion: 0.14
+Nodes (14): _BaseClient, _cache_key(), LLMResponse, _OpenAICompatibleClient, Common interface for provider HTTP shims., Speaks the OpenAI chat-completions shape. Used for Groq and Cerebras., In-process embedder using sentence-transformers (Hugging Face weights).      No, Generate a completion. Hits cache first; otherwise walks the fallback chain. (+6 more)
 
 ### Community 130 - "Community 130"
 Cohesion: 0.40
@@ -577,31 +542,27 @@ Nodes (5): Design decisions & deviations from spec, How it landed — the λ × 
 Cohesion: 0.50
 Nodes (4): Iteration 1 — Contribute lanes, in detail, Lane A — Issue Triage, Lane B — Quality Scanner, Lane C — Suspicion Scanner
 
-### Community 137 - "build_opportunity_briefing"
-Cohesion: 0.16
-Nodes (17): build_opportunity_briefing(), ranker_rationale(), Teacher-facing briefing helpers for Phase 5 opportunity cards., Attach the UI-visible Phase 5 briefing surfaces without reranking., Plain-English explanation of planner-derived ranker weights., _coerce_output_shape(), Modality, CapabilityPlan (+9 more)
-
 ### Community 141 - "test_qa_multi_query.py"
 Cohesion: 0.33
 Nodes (6): ChunkHit, MonkeyPatch, _hit(), Fast-lane tests for Phase 2 multi-query retrieval fan-out., test_initial_retrieval_applies_single_extracted_path(), test_initial_retrieval_fuses_rewrite_lanes()
 
 ### Community 144 - "patched_carto_tools"
-Cohesion: 0.12
-Nodes (34): coerce_claim(), coerce_insight(), _coerce_ref(), coerce_refs(), extract_json_list(), Shared LLM-output coercion helpers for capability nodes.  Every node asks the LL, Pull the first JSON array out of ``raw`` and return it as a list of     dicts. R, Validate a ref. If the LLM names a symbol, prefer the known CodeRef     for that (+26 more)
+Cohesion: 0.10
+Nodes (43): Run the Cartographer once.      Returns the state diff for the LangGraph reducer, run_cartographer(), coerce_claim(), coerce_insight(), _coerce_ref(), coerce_refs(), extract_json_list(), Shared LLM-output coercion helpers for capability nodes.  Every node asks the LL (+35 more)
 
 ## Knowledge Gaps
-- **358 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `type` (+353 more)
+- **359 isolated node(s):** `nextConfig`, `name`, `private`, `version`, `type` (+354 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `LLMProvider` connect `Community 5` to `Community 0`, `Community 6`, `Community 8`, `build_opportunity_briefing`, `Community 11`, `Community 12`, `Community 15`, `Community 16`, `patched_carto_tools`, `Community 18`, `Community 21`, `Community 22`, `Community 23`, `Community 29`, `Community 33`, `Community 35`, `Community 36`, `Community 54`, `Community 58`, `Community 71`, `Community 77`, `Community 78`, `Community 85`, `Community 91`, `Community 104`, `__init__.py`, `Contribute Elicitation`?**
+- **Why does `LLMProvider` connect `Community 5` to `Community 0`, `Community 6`, `Community 8`, `Community 11`, `Community 12`, `Community 15`, `Community 16`, `patched_carto_tools`, `Community 18`, `Community 21`, `Community 23`, `Community 28`, `Community 29`, `Community 33`, `Community 35`, `Community 36`, `Community 54`, `Community 58`, `Community 71`, `Community 77`, `Community 78`, `Community 85`, `Community 104`, `Contribute Elicitation`?**
   _High betweenness centrality (0.100) - this node is a cross-community bridge._
-- **Why does `IntentProfile` connect `build_opportunity_briefing` to `Community 0`, `Community 36`, `Community 5`, `Community 37`, `Community 7`, `Community 78`, `Community 14`, `patched_carto_tools`, `Community 18`, `Community 54`, `Community 91`, `Community 29`, `Community 30`?**
+- **Why does `IntentProfile` connect `Community 5` to `Community 0`, `Community 36`, `Community 37`, `Community 7`, `Community 78`, `Community 14`, `patched_carto_tools`, `Community 18`, `Community 54`, `Community 29`, `Community 30`?**
   _High betweenness centrality (0.070) - this node is a cross-community bridge._
-- **Why does `Settings` connect `Community 0` to `Community 3`, `Community 5`, `Community 8`, `Community 10`, `Community 12`, `Community 15`, `Community 23`, `Community 25`, `Community 35`, `Community 51`, `Community 55`, `Community 58`, `Community 60`, `Community 61`, `Community 71`, `Community 77`, `Community 85`, `__init__.py`, `Contribute Elicitation`?**
+- **Why does `Settings` connect `Community 0` to `Community 3`, `Community 5`, `Community 8`, `Community 10`, `Community 12`, `Community 15`, `Community 23`, `Community 25`, `Community 27`, `Community 28`, `Community 35`, `Community 49`, `Community 51`, `Community 58`, `Community 60`, `Community 61`, `Community 64`, `Community 71`, `Community 85`, `Contribute Elicitation`?**
   _High betweenness centrality (0.066) - this node is a cross-community bridge._
 - **Are the 147 inferred relationships involving `IntentProfile` (e.g. with `Any` and `TourEventType`) actually correct?**
   _`IntentProfile` has 147 INFERRED edges - model-reasoned connections that need verification._

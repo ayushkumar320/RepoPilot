@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_qa_graph.py": {
-    "mtime": 1784267798.2891774,
-    "ast_hash": "0a59c7f465d6d1dc52eb426c4a19831d",
+    "mtime": 1784268466.7970726,
+    "ast_hash": "5507829d7e9cb66207519a0f6ea81b51",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_state.py": {
@@ -885,8 +885,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1784268192.4994946,
-    "ast_hash": "da0a5935ee28e6d67fa90e03ec9b61a0",
+    "mtime": 1784269110.42371,
+    "ast_hash": "b147cc17f68b6889a38343c8850cee75",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -1190,8 +1190,8 @@
     "semantic_hash": ""
   },
   "docs/STARTUP_GUIDE.md": {
-    "mtime": 1784268192.578145,
-    "ast_hash": "9da5ed106a2f32451396ff81d332cb81",
+    "mtime": 1784269110.3442168,
+    "ast_hash": "98556bbde3e289a2a185bcc61febdf1a",
     "semantic_hash": ""
   }
 }

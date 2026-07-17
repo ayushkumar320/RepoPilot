@@ -257,22 +257,13 @@ In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.
 Use the dedicated [local startup guide](docs/STARTUP_GUIDE.md). The short version is:
 
 ```bash
-uv sync --all-packages --all-groups
-cd apps/web && npm install && cd ../..
+make setup
 cp .env.example .env
-make docker-up
-make db-migrate
-uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
+make services
+make dev
 ```
 
-In a second terminal:
-
-```bash
-cd apps/web
-npm run dev
-```
-
-Open `http://127.0.0.1:3000`.
+Open `http://127.0.0.1:3000`. `make dev` runs the backend at `http://127.0.0.1:8000` and the frontend at `http://127.0.0.1:3000`.
 
 ## Development Workflow
 

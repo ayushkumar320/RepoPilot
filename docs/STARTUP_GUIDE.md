@@ -1,6 +1,30 @@
 # RepoPilot Startup Guide
 
-This guide is the local operator runbook for RepoPilot. It covers a fresh clone, local services, the API, the web app, and the checks to run before handing the project to someone else.
+This is the simple local runbook. In normal development you only need four commands.
+
+## The Short Version
+
+From the repo root:
+
+```bash
+make setup
+cp .env.example .env
+make services
+make dev
+```
+
+Then open:
+
+```text
+http://127.0.0.1:3000
+```
+
+That is it. `make dev` runs both:
+
+- Backend API: `http://127.0.0.1:8000`
+- Frontend app: `http://127.0.0.1:3000`
+
+For real tours, put at least one LLM provider key in `.env` before using the app.
 
 ## Prerequisites
 
@@ -12,15 +36,24 @@ This guide is the local operator runbook for RepoPilot. It covers a fresh clone,
 - Git
 - Optional: `graphify` for repo-knowledge graph updates
 
+## Commands You Actually Use
+
+| Command | What it does |
+|---|---|
+| `make setup` | Installs Python workspace deps and frontend npm deps. |
+| `make services` | Starts Postgres/Redis and runs DB migrations. |
+| `make backend` | Runs only the FastAPI backend. |
+| `make frontend` | Runs only the Next.js frontend. |
+| `make dev` | Runs backend and frontend together. |
+| `make test` | Runs the fast Python test lane. |
+| `make lint` | Runs Ruff lint and format checks. |
+
 ## 1. Install Dependencies
 
 From the repository root:
 
 ```bash
-uv sync --all-packages --all-groups
-cd apps/web
-npm install
-cd ../..
+make setup
 ```
 
 ## 2. Configure Environment
@@ -56,8 +89,7 @@ REPOPILOT_WEB_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
 ## 3. Start Local Services
 
 ```bash
-make docker-up
-make db-migrate
+make services
 ```
 
 This starts:
@@ -71,36 +103,41 @@ To stop and clear local service volumes:
 make docker-down
 ```
 
-## 4. Run The API
+## 4. Run The App
+
+The easiest path is one command:
+
+```bash
+make dev
+```
+
+Open the app:
+
+```text
+http://127.0.0.1:3000
+```
+
+If you prefer separate terminals:
 
 Terminal 1:
 
 ```bash
-uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
+make backend
 ```
 
-Open the API docs at:
+Terminal 2:
+
+```bash
+make frontend
+```
+
+API docs are available at:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
 The local API indexes submitted repositories in-process through the runtime service layer. No separate worker process is required for the normal dev flow.
-
-## 5. Run The Web App
-
-Terminal 2:
-
-```bash
-cd apps/web
-npm run dev
-```
-
-Open:
-
-```text
-http://127.0.0.1:3000
-```
 
 ## 6. Use The App Locally
 
@@ -125,6 +162,11 @@ Common Make targets:
 
 ```bash
 make install
+make setup
+make services
+make backend
+make frontend
+make dev
 make lint
 make typecheck
 make test

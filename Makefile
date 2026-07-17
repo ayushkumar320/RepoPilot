@@ -1,7 +1,12 @@
-.PHONY: help install lint typecheck test test-slow test-eval-sampled test-eval-full cov ci precommit fmt clean docker-up docker-down db-migrate
+.PHONY: help setup services backend frontend dev install lint typecheck test test-slow test-eval-sampled test-eval-full cov ci precommit fmt clean docker-up docker-down db-migrate
 
 help:
 	@echo "RepoPilot — common targets"
+	@echo "  setup        install Python + web dependencies"
+	@echo "  services     start Postgres/Redis and run DB migrations"
+	@echo "  backend      run FastAPI at http://127.0.0.1:8000"
+	@echo "  frontend     run Next.js at http://127.0.0.1:3000"
+	@echo "  dev          run backend + frontend together"
 	@echo "  install      uv sync (install workspace + dev deps)"
 	@echo "  lint         ruff check"
 	@echo "  fmt          ruff format"
@@ -16,6 +21,27 @@ help:
 	@echo "  docker-up    docker compose up -d (Postgres+pgvector, Redis)"
 	@echo "  docker-down  docker compose down -v"
 	@echo "  db-migrate   alembic upgrade head (runs ingestion migrations)"
+
+setup:
+	uv sync --all-packages --all-groups
+	cd apps/web && npm install
+
+services: docker-up db-migrate
+
+backend:
+	uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
+
+frontend:
+	cd apps/web && npm run dev
+
+dev:
+	@echo "Starting backend on http://127.0.0.1:8000 and frontend on http://127.0.0.1:3000"
+	@uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000 & \
+	api_pid=$$!; \
+	(cd apps/web && npm run dev) & \
+	web_pid=$$!; \
+	trap 'kill $$api_pid $$web_pid 2>/dev/null' INT TERM EXIT; \
+	wait $$api_pid $$web_pid
 
 install:
 	uv sync --all-packages --all-groups

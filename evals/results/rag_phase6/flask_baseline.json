@@ -1,11 +1,11 @@
 {
-  "mrr": 0.858288770053476,
-  "recall@5": 0.7745098039215685,
+  "mrr": 0.8037495700034399,
+  "recall@5": 0.7156862745098039,
   "recall@10": 0.8676470588235294,
   "recall@20": 1.0,
-  "ndcg@5": 0.728801390211714,
-  "ndcg@10": 0.7718771017228101,
-  "diversity_score": 0.5058823529411764,
+  "ndcg@5": 0.6718915088299982,
+  "ndcg@10": 0.7350623921684168,
+  "diversity_score": 0.5764705882352942,
   "per_question": {
     "recall@10": [
       0.5,
@@ -15,7 +15,7 @@
       1.0,
       1.0,
       1.0,
-      0.0,
+      1.0,
       1.0,
       0.75,
       1.0,
@@ -23,12 +23,12 @@
       1.0,
       1.0,
       1.0,
-      1.0,
+      0.0,
       0.5
     ],
     "ndcg@5": [
       0.6131471927654584,
-      0.9674679834891693,
+      1.0,
       0.6309297535714575,
       0.4776237035032179,
       0.7653606369886217,
@@ -42,7 +42,7 @@
       0.7039180890341347,
       0.8529278650606567,
       1.0,
-      1.0,
+      0.0,
       0.6131471927654584
     ],
     "mrr": [
@@ -53,7 +53,7 @@
       1.0,
       1.0,
       1.0,
-      0.09090909090909091,
+      0.1111111111111111,
       0.5,
       1.0,
       1.0,
@@ -61,18 +61,18 @@
       1.0,
       1.0,
       1.0,
-      1.0,
+      0.05263157894736842,
       1.0
     ]
   },
-  "recall@10_dense": 0.7843137254901961,
+  "recall@10_dense": 0.8823529411764706,
   "recall@10_sparse": 0.6813725490196079,
-  "recall@10_hybrid": 0.8676470588235294,
+  "recall@10_hybrid": 0.8284313725490197,
   "grounding_accuracy": 0.55,
-  "claim_grounding_rate": 0.875,
+  "claim_grounding_rate": 0.8938053097345132,
   "hallucination_rate": 0.0,
-  "keyword_accuracy": 0.25,
-  "input_tokens_per_question": 3186.0,
+  "keyword_accuracy": 0.3,
+  "input_tokens_per_question": 3313.25,
   "grounding_cases": [
     {
       "question": "How does Flask route a URL to its view function?",
@@ -81,41 +81,41 @@
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 4,
-      "n_verified": 4,
-      "answer_input_tokens": 3613
+      "n_claims": 7,
+      "n_verified": 7,
+      "answer_input_tokens": 4904
     },
     {
       "question": "Where does Flask create the application context?",
       "grounded": true,
       "keyword_match": false,
-      "ref_match": false,
+      "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 3,
-      "n_verified": 3,
-      "answer_input_tokens": 2288
+      "n_claims": 6,
+      "n_verified": 6,
+      "answer_input_tokens": 2447
     },
     {
       "question": "Where is the request object made available to view code?",
-      "grounded": true,
+      "grounded": false,
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 2,
-      "n_verified": 2,
-      "answer_input_tokens": 3266
+      "n_claims": 4,
+      "n_verified": 3,
+      "answer_input_tokens": 3734
     },
     {
       "question": "Where are Jinja templates rendered in Flask?",
       "grounded": true,
-      "keyword_match": false,
+      "keyword_match": true,
       "ref_match": false,
       "hallucination_pass": true,
-      "hops": 3,
-      "n_claims": 3,
-      "n_verified": 3,
+      "hops": 0,
+      "n_claims": 7,
+      "n_verified": 7,
       "answer_input_tokens": 1485
     },
     {
@@ -125,9 +125,9 @@
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 9,
-      "n_verified": 8,
-      "answer_input_tokens": 3654
+      "n_claims": 8,
+      "n_verified": 7,
+      "answer_input_tokens": 3759
     },
     {
       "question": "How is the session serialized and signed?",
@@ -144,34 +144,34 @@
       "question": "Where does Flask decide the response mimetype?",
       "grounded": false,
       "keyword_match": false,
-      "ref_match": true,
+      "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 6,
-      "n_verified": 3,
-      "answer_input_tokens": 3581
+      "n_claims": 5,
+      "n_verified": 1,
+      "answer_input_tokens": 2797
     },
     {
       "question": "How does the flask run CLI command start the dev server?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 6,
+      "n_claims": 5,
       "n_verified": 5,
-      "answer_input_tokens": 3139
+      "answer_input_tokens": 2519
     },
     {
       "question": "Where are before_request callbacks invoked?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 5,
-      "n_verified": 4,
-      "answer_input_tokens": 2209
+      "n_claims": 7,
+      "n_verified": 7,
+      "answer_input_tokens": 2553
     },
     {
       "question": "How does a request travel from WSGI entry to the view function and back to a response?",
@@ -180,53 +180,53 @@
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 8,
-      "n_verified": 5,
+      "n_claims": 7,
+      "n_verified": 6,
       "answer_input_tokens": 3526
     },
     {
       "question": "How do blueprints interact with url_for to build endpoint names?",
-      "grounded": false,
+      "grounded": true,
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 9,
+      "n_claims": 8,
       "n_verified": 8,
-      "answer_input_tokens": 4002
+      "answer_input_tokens": 3865
     },
     {
       "question": "How does the app context relate to the request context during a request?",
-      "grounded": true,
+      "grounded": false,
       "keyword_match": false,
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 10,
-      "n_verified": 10,
-      "answer_input_tokens": 2390
+      "n_claims": 9,
+      "n_verified": 8,
+      "answer_input_tokens": 2307
     },
     {
       "question": "How does Flask's test client construct a fake request environment through to dispatch?",
+      "grounded": false,
+      "keyword_match": false,
+      "ref_match": true,
+      "hallucination_pass": true,
+      "hops": 0,
+      "n_claims": 12,
+      "n_verified": 11,
+      "answer_input_tokens": 2747
+    },
+    {
+      "question": "How does error handling propagate from a view exception to a rendered error response?",
       "grounded": true,
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 7,
-      "n_verified": 7,
-      "answer_input_tokens": 3015
-    },
-    {
-      "question": "How does error handling propagate from a view exception to a rendered error response?",
-      "grounded": false,
-      "keyword_match": true,
-      "ref_match": true,
-      "hallucination_pass": true,
-      "hops": 0,
-      "n_claims": 9,
-      "n_verified": 8,
-      "answer_input_tokens": 4075
+      "n_claims": 10,
+      "n_verified": 10,
+      "answer_input_tokens": 3822
     },
     {
       "question": "How does Flask integrate with Redis for session storage?",
@@ -234,10 +234,10 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3,
+      "hops": 0,
       "n_claims": 0,
       "n_verified": 0,
-      "answer_input_tokens": 2549
+      "answer_input_tokens": 2352
     },
     {
       "question": "Where does Flask implement WebSocket support?",
@@ -245,10 +245,10 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3,
+      "hops": 0,
       "n_claims": 0,
       "n_verified": 0,
-      "answer_input_tokens": 6188
+      "answer_input_tokens": 5131
     },
     {
       "question": "How does Flask's built-in admin dashboard authenticate users?",
@@ -256,32 +256,32 @@
       "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3,
+      "hops": 0,
       "n_claims": 0,
       "n_verified": 0,
-      "answer_input_tokens": 2925
+      "answer_input_tokens": 5699
     },
     {
       "question": "How does Flask load configuration from an object?",
       "grounded": true,
-      "keyword_match": false,
+      "keyword_match": true,
       "ref_match": true,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 4,
-      "n_verified": 4,
-      "answer_input_tokens": 3250
+      "n_claims": 7,
+      "n_verified": 7,
+      "answer_input_tokens": 5568
     },
     {
       "question": "How does Flask handle a 404 error by default?",
-      "grounded": true,
+      "grounded": false,
       "keyword_match": false,
       "ref_match": true,
       "hallucination_pass": true,
-      "hops": 3,
-      "n_claims": 8,
-      "n_verified": 8,
-      "answer_input_tokens": 3580
+      "hops": 1,
+      "n_claims": 2,
+      "n_verified": 1,
+      "answer_input_tokens": 2594
     },
     {
       "question": "Where does Flask parse cookie data from the request?",
@@ -290,16 +290,17 @@
       "ref_match": false,
       "hallucination_pass": true,
       "hops": 0,
-      "n_claims": 5,
-      "n_verified": 4,
-      "answer_input_tokens": 2766
+      "n_claims": 3,
+      "n_verified": 2,
+      "answer_input_tokens": 2237
     }
   ],
-  "latency_p50_ms": 2539.6161249955185,
-  "latency_p95_ms": 4027.3574579914566,
+  "latency_p50_ms": 3601.5205830335617,
+  "latency_p95_ms": 5298.454666044563,
   "total": 17,
   "repo": "flask",
   "dataset": "flask_qa_v1.jsonl",
   "phase": 6,
-  "generated_at": "2026-07-16T16:05:07.234451+00:00"
+  "index_time_seconds": 62.41,
+  "generated_at": "2026-07-19T15:21:06.607076+00:00"
 }

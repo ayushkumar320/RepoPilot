@@ -14,7 +14,10 @@ expected by Phase 4's ``POST /repos``.
 
 from __future__ import annotations
 
+import asyncio
+import time
 from collections.abc import Iterable
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
@@ -30,9 +33,15 @@ from repopilot_ingestion.clone import (
     remote_head_sha,
 )
 from repopilot_ingestion.embed import EmbeddedChunk, embed_chunks
+from repopilot_ingestion.generic_chunk import (
+    SKIP_DIRECTORIES,
+    chunk_text_file,
+    iter_generic_files,
+)
 from repopilot_ingestion.graph import ModuleSource, build_graph, graph_to_adjacency
 from repopilot_ingestion.parse import parse_file
 from repopilot_ingestion.persist import (
+    delete_incomplete_index,
     known_head_sha,
     make_engine,
     persist_index,
@@ -48,6 +57,7 @@ PipelineStatus = Literal[
     "already_indexed",
     "stale",
     "too_large",
+    "unsupported",
 ]
 
 
@@ -61,6 +71,24 @@ class PipelineResult:
     loc_total: int | None = None
     chunk_count: int | None = None
     edge_count: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class _ScanJob:
+    order: int
+    path: Path
+    rel_path: Path
+    size: int
+    language: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class _ScannedFile:
+    order: int
+    rel_path: str
+    module_source: ModuleSource | None
+    chunks: tuple[Chunk, ...]
+    line_count: int
 
 
 async def revisit_status(*, repo_url: str, settings: Settings | None = None) -> PipelineResult:
@@ -98,8 +126,11 @@ async def index_repo(
     """Full ingestion pipeline. Idempotent on ``(repo_url, head_sha)``."""
     settings = settings or Settings()
     engine = make_engine(settings)
+    total_started = time.perf_counter()
     try:
+        clone_started = time.perf_counter()
         with clone_to_tempdir(repo_url, root=settings.ingestion_clone_root) as clone:
+            _log_stage("clone", clone_started, repo_url=repo_url)
             already = await repo_already_indexed(engine, repo_url=repo_url, head_sha=clone.head_sha)
             if already:
                 log.info(
@@ -113,7 +144,32 @@ async def index_repo(
                     head_sha=clone.head_sha,
                 )
 
-            modules, chunks, loc_total = _scan_python_files(clone)
+            await delete_incomplete_index(engine, repo_url=repo_url, head_sha=clone.head_sha)
+            scan_started = time.perf_counter()
+            modules, chunks, loc_total = await asyncio.to_thread(
+                _scan_repository_files,
+                clone,
+                settings=settings,
+            )
+            _log_stage(
+                "scan",
+                scan_started,
+                repo_url=repo_url,
+                files=len({chunk.file_path for chunk in chunks}),
+                chunks=len(chunks),
+                loc_total=loc_total,
+                workers=settings.ingestion_scan_workers,
+            )
+
+            if not chunks:
+                log.warning("pipeline.unsupported", repo_url=repo_url, head_sha=clone.head_sha)
+                return PipelineResult(
+                    status="unsupported",
+                    repo_id=clone.repo_id,
+                    head_sha=clone.head_sha,
+                    loc_total=loc_total,
+                    chunk_count=0,
+                )
 
             if loc_total > settings.ingestion_max_repo_loc:
                 log.warning(
@@ -129,17 +185,36 @@ async def index_repo(
                     loc_total=loc_total,
                 )
 
+            graph_started = time.perf_counter()
             graph = build_graph(modules)
             adjacency = graph_to_adjacency(graph)
             chunks = enrich_chunks_with_neighbors(chunks, adjacency)
+            _log_stage(
+                "graph_and_enrichment",
+                graph_started,
+                repo_url=repo_url,
+                modules=len(modules),
+                nodes=len(adjacency),
+            )
 
-            summarised = await summarise_chunks(chunks, provider=provider, settings=settings)
-            embedded = await embed_chunks(chunks, provider=provider, settings=settings)
+            model_started = time.perf_counter()
+            summarised, embedded = await asyncio.gather(
+                summarise_chunks(chunks, provider=provider, settings=settings),
+                embed_chunks(chunks, provider=provider, settings=settings),
+            )
+            _log_stage(
+                "summary_and_embedding",
+                model_started,
+                repo_url=repo_url,
+                chunks=len(chunks),
+                embed_batch_size=settings.ingestion_embed_batch_size,
+            )
 
             embed_index: dict[tuple[str, int, int], EmbeddedChunk] = {
                 (e.chunk.file_path, e.chunk.start_line, e.chunk.end_line): e for e in embedded
             }
 
+            persist_started = time.perf_counter()
             persist_result = await persist_index(
                 engine=engine,
                 repo_id=clone.repo_id,
@@ -150,6 +225,13 @@ async def index_repo(
                 adjacency=adjacency,
                 loc_total=loc_total,
             )
+            _log_stage(
+                "persist",
+                persist_started,
+                repo_url=repo_url,
+                chunks=persist_result.chunk_count,
+            )
+            _log_stage("total", total_started, repo_url=repo_url)
             return PipelineResult(
                 status="indexed",
                 repo_id=persist_result.repo_id,
@@ -182,10 +264,162 @@ def _scan_python_files(
     return modules, chunks, loc_total
 
 
+def _scan_repository_files(
+    clone: CloneResult,
+    *,
+    settings: Settings,
+) -> tuple[list[ModuleSource], list[Chunk], int]:
+    """Scan supported files concurrently and reassemble canonical output order."""
+    jobs = _discover_scan_jobs(clone.path)
+    results = _run_scan_jobs(
+        jobs,
+        root=clone.path,
+        settings=settings,
+        workers=settings.ingestion_scan_workers,
+    )
+    modules: list[ModuleSource] = []
+    chunks: list[Chunk] = []
+    loc_total = 0
+    for result in results:
+        if result.module_source is not None:
+            modules.append(result.module_source)
+        chunks.extend(result.chunks)
+        loc_total += result.line_count
+    return modules, chunks, loc_total
+
+
+def _discover_scan_jobs(root: Path) -> list[_ScanJob]:
+    discovered: list[tuple[Path, str | None]] = [
+        *((path, None) for path in _iter_python_files(root)),
+        *iter_generic_files(root),
+    ]
+    canonical = sorted(discovered, key=lambda item: item[0].relative_to(root).as_posix())
+    jobs: list[_ScanJob] = []
+    for order, (path, language) in enumerate(canonical):
+        rel = path.relative_to(root)
+        try:
+            size = path.stat().st_size
+        except OSError as exc:
+            raise RuntimeError(f"could not stat indexable file {rel.as_posix()}: {exc}") from exc
+        jobs.append(
+            _ScanJob(
+                order=order,
+                path=path,
+                rel_path=rel,
+                size=size,
+                language=language,
+            )
+        )
+    return jobs
+
+
+def _run_scan_jobs(
+    jobs: list[_ScanJob],
+    *,
+    root: Path,
+    settings: Settings,
+    workers: int,
+) -> list[_ScannedFile]:
+    scheduled = sorted(jobs, key=lambda job: (-job.size, job.rel_path.as_posix()))
+    if workers == 1 or len(scheduled) <= 1:
+        serial_results: list[_ScannedFile] = []
+        for job in scheduled:
+            try:
+                serial_results.append(_scan_one_file(job, root=root, settings=settings))
+            except Exception as exc:
+                raise RuntimeError(
+                    f"failed to scan {job.rel_path.as_posix()}: {exc}"
+                ) from exc
+        return sorted(serial_results, key=lambda result: result.order)
+
+    results: dict[int, _ScannedFile] = {}
+    pending: dict[Future[_ScannedFile], _ScanJob] = {}
+    iterator = iter(scheduled)
+    max_pending = max(workers, workers * 2)
+    executor = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="repopilot-scan")
+    try:
+        while len(pending) < max_pending:
+            candidate = next(iterator, None)
+            if candidate is None:
+                break
+            pending[
+                executor.submit(_scan_one_file, candidate, root=root, settings=settings)
+            ] = candidate
+
+        while pending:
+            completed, _ = wait(pending, return_when=FIRST_COMPLETED)
+            for future in completed:
+                job = pending.pop(future)
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    for outstanding in pending:
+                        outstanding.cancel()
+                    raise RuntimeError(
+                        f"failed to scan {job.rel_path.as_posix()}: {exc}"
+                    ) from exc
+                results[result.order] = result
+
+            while len(pending) < max_pending:
+                candidate = next(iterator, None)
+                if candidate is None:
+                    break
+                pending[
+                    executor.submit(_scan_one_file, candidate, root=root, settings=settings)
+                ] = candidate
+    finally:
+        executor.shutdown(wait=True, cancel_futures=True)
+
+    return [results[index] for index in range(len(jobs))]
+
+
+def _scan_one_file(job: _ScanJob, *, root: Path, settings: Settings) -> _ScannedFile:
+    rel = job.rel_path
+    if job.language is None:
+        module = _path_to_module(rel)
+        parsed = parse_file(job.path, module=module)
+        return _ScannedFile(
+            order=job.order,
+            rel_path=rel.as_posix(),
+            module_source=ModuleSource(module=module, rel_path=rel.as_posix(), source=parsed.source),
+            chunks=tuple(chunk_file(parsed, rel_path=rel)),
+            line_count=parsed.line_count,
+        )
+
+    file_chunks, line_count = chunk_text_file(
+        job.path,
+        root=root,
+        language=job.language,
+        max_file_bytes=settings.ingestion_max_file_bytes,
+        max_chunk_lines=settings.ingestion_text_chunk_lines,
+        max_chunk_chars=settings.ingestion_text_chunk_chars,
+        overlap_lines=min(
+            settings.ingestion_text_chunk_overlap_lines,
+            settings.ingestion_text_chunk_lines - 1,
+        ),
+    )
+    return _ScannedFile(
+        order=job.order,
+        rel_path=rel.as_posix(),
+        module_source=None,
+        chunks=tuple(file_chunks),
+        line_count=line_count,
+    )
+
+
+def _log_stage(stage: str, started: float, **fields: object) -> None:
+    log.info(
+        "pipeline.stage_done",
+        stage=stage,
+        elapsed_ms=round((time.perf_counter() - started) * 1000, 2),
+        **fields,
+    )
+
+
 def _iter_python_files(root: Path) -> Iterable[Path]:
-    skip_dirs = {".git", ".venv", "venv", "node_modules", "__pycache__"}
     for path in root.rglob("*.py"):
-        if any(part in skip_dirs for part in path.parts):
+        rel = path.relative_to(root)
+        if path.is_symlink() or any(part in SKIP_DIRECTORIES for part in rel.parts[:-1]):
             continue
         yield path
 

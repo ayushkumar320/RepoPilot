@@ -81,7 +81,7 @@ def sufficiency_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> st
 
 
 ANSWER_SYSTEM = (
-    "You answer questions about a Python codebase. You must:\n"
+    "You answer questions about a software repository that may contain multiple languages. You must:\n"
     "1. ONLY use facts present in the supplied code chunks.\n"
     "2. If the chunks don't contain the answer, reply EXACTLY: "
     '"I couldn\'t find that in the repo."\n'
@@ -92,7 +92,7 @@ ANSWER_SYSTEM = (
 )
 
 COMPRESS_SYSTEM = (
-    "You see one Python code chunk and a user question. Return ONLY JSON with "
+    "You see one repository source chunk and a user question. Return ONLY JSON with "
     'this schema: {"keep":[[start_line,end_line], ...]}. Select the smallest '
     "set of line ranges needed to answer the question. If unsure, keep the "
     "line. If the chunk is irrelevant, return an empty keep list. Never "
@@ -108,7 +108,7 @@ QUERY_SPEC_SYSTEM = (
     "Use 2-3 short rewrites that preserve the user's meaning. Extract exact "
     "symbols or file paths only when the question names them. Prefer Python "
     "identifier-shaped retrieval terms in rewrites: include plausible class, "
-    "method, and constant spellings from the user's words, such as "
+    "method, function, package, dependency, and constant spellings from the user's words, such as "
     "`DigestAuth auth_flow 401 www-authenticate`, `BasicAuth Authorization`, "
     "`max_redirects TooManyRedirects redirect`, `SSL create_ssl_context`, or "
     "`Limits max_connections HTTPTransport`. Do not invent file paths or "

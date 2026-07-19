@@ -7,8 +7,16 @@ final ranking.
 
 from __future__ import annotations
 
+import importlib
+from typing import Any, cast
+
+import pytest
+
 from repopilot_agents.qa.union import reciprocal_rank_fusion
+from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.types import ChunkHit, CodeRef
+
+hybrid_module = importlib.import_module("repopilot_agents.tools.hybrid_search")
 
 
 def _hit(path: str, line: int, symbol: str | None = None, distance: float = 0.5) -> ChunkHit:
@@ -97,3 +105,39 @@ def test_k_constant_flattens_rank_advantage() -> None:
     # Symmetric input → both appear; order stable and deduped.
     assert {h.ref.file_path for h in fused} == {"x.py", "y.py"}
     assert len(fused) == 2
+
+
+@pytest.mark.asyncio
+async def test_empty_filtered_lanes_retry_without_exclusions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, tuple[str, ...]]] = []
+
+    async def fake_vector(query: str, **kwargs: Any) -> list[ChunkHit]:
+        excluded = tuple(kwargs.get("exclude_path_prefixes", ()))
+        calls.append(("dense", excluded))
+        return [] if excluded else [_hit("tests/relevant.ts", 1)]
+
+    async def fake_sparse(query: str, **kwargs: Any) -> list[ChunkHit]:
+        excluded = tuple(kwargs.get("exclude_path_prefixes", ()))
+        calls.append(("sparse", excluded))
+        return []
+
+    monkeypatch.setattr(hybrid_module, "vector_search", fake_vector)
+    monkeypatch.setattr(hybrid_module, "bm25_search", fake_sparse)
+
+    hits = await hybrid_search(
+        "tech stack",
+        engine=cast(Any, None),
+        provider=cast(Any, None),
+        repo_id="repo",
+        exclude_path_prefixes=("tests/",),
+    )
+
+    assert [hit.ref.file_path for hit in hits] == ["tests/relevant.ts"]
+    assert calls == [
+        ("dense", ("tests/",)),
+        ("sparse", ("tests/",)),
+        ("dense", ()),
+        ("sparse", ()),
+    ]

@@ -30,6 +30,8 @@ def test_default_sql_filters_only_by_repo() -> None:
     assert "SIMILAR TO" not in sql
     assert "NOT LIKE" not in sql
     assert "LIMIT :limit" in sql
+    assert "WITH candidates AS MATERIALIZED" in sql
+    assert sql.index("c.repo_id = :repo_id") < sql.index("ORDER BY embedding")
 
 
 def test_kind_and_path_filters_compose() -> None:

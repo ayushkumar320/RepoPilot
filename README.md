@@ -1,6 +1,6 @@
 # RepoPilot
 
-RepoPilot is a purpose-driven codebase onboarding tool for public Python repositories. A user pastes a GitHub URL, explains what they are trying to do, and gets a grounded tour of the codebase where every factual claim is tied back to concrete `file:line` references.
+RepoPilot is a purpose-driven codebase onboarding tool for public software repositories. A user pastes a GitHub URL, explains what they are trying to do, and gets a grounded tour of the codebase where every factual claim is tied back to concrete `file:line` references. Python receives AST-level structural analysis; other supported languages receive line-aware retrieval chunks.
 
 The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
@@ -10,9 +10,11 @@ The project is built around one bet: the system should ask *why you are here* be
 
 RepoPilot turns a repository into a purpose-aware map:
 
-- Clones and indexes a public Python GitHub repository.
+- Clones and indexes a public GitHub repository.
 - Parses Python with tree-sitter and builds a deterministic code graph with NetworkX.
-- Chunks source at structural boundaries and stores exact source spans in Postgres.
+- Indexes TypeScript/JavaScript, Java/Kotlin, Go, Rust, C/C++, C#, Ruby, PHP, Swift, Scala, Vue/Svelte, and shell using bounded line-aware chunks.
+- Indexes high-value repository context including README and dependency/build manifests.
+- Stores exact source spans in Postgres for grounded citations.
 - Embeds chunks into pgvector for semantic retrieval.
 - Captures the user's free-text intent and converts it into an `IntentProfile`.
 - Plans which agent capabilities should run using deterministic planner rules.
@@ -141,7 +143,9 @@ The target-repo code graph powers product behavior:
 ```mermaid
 flowchart TB
     clone["Git clone"]
-    parse["tree-sitter parse"]
+    classify["Language and context discovery"]
+    parse["Python tree-sitter parse"]
+    text["Multilingual line-aware chunks"]
     chunks["Structural chunks<br/>functions/classes/modules"]
     refs["CodeRef spans<br/>file_path:start-end:symbol"]
     nx["NetworkX graph"]
@@ -150,8 +154,11 @@ flowchart TB
     pgemb[("chunk_embeddings<br/>pgvector")]
     pggraph[("graph_adjacency<br/>JSONB")]
 
-    clone --> parse
+    clone --> classify
+    classify --> parse
+    classify --> text
     parse --> chunks
+    text --> chunks
     chunks --> refs
     refs --> pgchunks
     chunks --> embed
@@ -309,7 +316,7 @@ RepoPilot follows a few hard rules:
 
 ## Known Limitations
 
-- Python-only target repos for v1.
+- AST dependency graphs are currently Python-only; other supported languages use grounded textual retrieval without invented graph edges.
 - Public GitHub repos only.
 - Large live repo demos depend on external model/provider quotas.
 - Query Understanding and Ingestion Enrichment are implemented/evaluated but deferred because their gates missed.

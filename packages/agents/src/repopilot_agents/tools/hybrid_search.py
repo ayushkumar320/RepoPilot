@@ -74,6 +74,32 @@ async def hybrid_search(
         ),
     )
 
+    if not dense and not sparse and exclude_path_prefixes:
+        log.warning(
+            "hybrid_search.retry_without_path_exclusions",
+            repo_id=repo_id,
+            excluded=list(exclude_path_prefixes),
+        )
+        dense, sparse = await asyncio.gather(
+            vector_search(
+                query,
+                engine=engine,
+                provider=provider,
+                repo_id=repo_id,
+                recall_k=recall_k,
+                kind=kind,
+                path_prefix=path_prefix,
+            ),
+            bm25_search(
+                query,
+                engine=engine,
+                repo_id=repo_id,
+                k=recall_k,
+                kind=kind,
+                path_prefix=path_prefix,
+            ),
+        )
+
     fused = reciprocal_rank_fusion(
         [dense, sparse],
         k_constant=k_constant,

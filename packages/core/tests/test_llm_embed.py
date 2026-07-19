@@ -36,6 +36,34 @@ class FakeEmbedder(_BaseClient):
         )
 
 
+class BatchEmbedder(_BaseClient):
+    provider = ProviderName.HUGGINGFACE
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[list[str], int]] = []
+
+    async def chat(self, *args: Any, **kwargs: Any) -> Any:  # pragma: no cover
+        raise AssertionError("chat not expected during embed test")
+
+    async def embed_many(
+        self,
+        binding: ModelBinding,
+        texts: list[str],
+        *,
+        batch_size: int,
+    ) -> list[EmbeddingResponse]:
+        self.calls.append((list(texts), batch_size))
+        return [
+            EmbeddingResponse(
+                vector=[float(len(text)), float(index)],
+                model=ModelId.EMBEDDINGS,
+                provider=self.provider,
+                physical_model=binding.physical_model,
+            )
+            for index, text in enumerate(texts)
+        ]
+
+
 @pytest.mark.asyncio
 async def test_embed_returns_vector(tmp_settings: Any) -> None:
     fake = FakeEmbedder(vectors=[[0.1, 0.2, 0.3]])
@@ -65,4 +93,31 @@ async def test_embed_cache_hit_skips_provider(tmp_settings: Any) -> None:
     assert second.cached is True
     # FakeEmbedder would raise on a second call because the queue is empty.
     assert len(fake.calls) == 1
+    await provider.aclose()
+
+
+@pytest.mark.asyncio
+async def test_embed_many_batches_unique_misses_and_preserves_order(tmp_settings: Any) -> None:
+    fake = BatchEmbedder()
+    provider = make_provider(tmp_settings, clients={}, embedder=fake)
+
+    first = await provider.embed_many(["alpha", "beta", "alpha"], batch_size=8)
+    second = await provider.embed_many(["beta", "gamma"], batch_size=4)
+
+    assert [response.vector[0] for response in first] == [5.0, 4.0, 5.0]
+    assert [response.vector[0] for response in second] == [4.0, 5.0]
+    assert second[0].cached is True
+    assert fake.calls == [(["alpha", "beta"], 8), (["gamma"], 4)]
+    await provider.aclose()
+
+
+@pytest.mark.asyncio
+async def test_embed_many_empty_does_not_touch_backend(tmp_settings: Any) -> None:
+    fake = BatchEmbedder()
+    provider = make_provider(tmp_settings, clients={}, embedder=fake)
+
+    assert await provider.embed_many([], batch_size=8) == []
+    assert fake.calls == []
+    with pytest.raises(ValueError, match="batch_size"):
+        await provider.embed_many(["text"], batch_size=0)
     await provider.aclose()

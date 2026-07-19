@@ -16,10 +16,13 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 import structlog
-from sqlalchemy import insert, select, text
+from sqlalchemy import delete, func, insert, select, text
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 from repopilot_core.settings import Settings
+from repopilot_ingestion.db import (
+    chunk_embeddings as embeddings_table,
+)
 from repopilot_ingestion.db import (
     chunks as chunks_table,
 )
@@ -60,27 +63,74 @@ def make_engine(settings: Settings) -> AsyncEngine:
 
 
 async def repo_already_indexed(engine: AsyncEngine, *, repo_url: str, head_sha: str) -> bool:
+    """Return whether the snapshot has chunks and one embedding per chunk."""
     async with engine.connect() as conn:
         row = await conn.execute(
-            select(repos_table.c.id).where(
-                repos_table.c.url == repo_url,
-                repos_table.c.head_sha == head_sha,
-            )
+            select(repos_table.c.id)
+            .join(chunks_table, chunks_table.c.repo_id == repos_table.c.id)
+            .outerjoin(embeddings_table, embeddings_table.c.chunk_id == chunks_table.c.id)
+            .where(repos_table.c.url == repo_url, repos_table.c.head_sha == head_sha)
+            .group_by(repos_table.c.id)
+            .having(func.count(chunks_table.c.id) > 0)
+            .having(func.count(embeddings_table.c.chunk_id) == func.count(chunks_table.c.id))
         )
         return row.first() is not None
 
 
 async def known_head_sha(engine: AsyncEngine, *, repo_url: str) -> str | None:
-    """Return the most recently indexed head_sha for ``repo_url``, if any."""
+    """Return the newest complete snapshot SHA, excluding empty/partial indexes."""
     async with engine.connect() as conn:
         row = await conn.execute(
             select(repos_table.c.head_sha)
+            .join(chunks_table, chunks_table.c.repo_id == repos_table.c.id)
+            .outerjoin(embeddings_table, embeddings_table.c.chunk_id == chunks_table.c.id)
             .where(repos_table.c.url == repo_url)
+            .group_by(repos_table.c.id, repos_table.c.head_sha, repos_table.c.indexed_at)
+            .having(func.count(chunks_table.c.id) > 0)
+            .having(func.count(embeddings_table.c.chunk_id) == func.count(chunks_table.c.id))
             .order_by(repos_table.c.indexed_at.desc())
             .limit(1)
         )
         first = row.first()
         return None if first is None else str(first[0])
+
+
+async def delete_incomplete_index(
+    engine: AsyncEngine,
+    *,
+    repo_url: str,
+    head_sha: str,
+) -> None:
+    """Delete a same-SHA snapshot only when it is empty or missing embeddings."""
+    chunk_exists = (
+        select(chunks_table.c.id)
+        .where(chunks_table.c.repo_id == repos_table.c.id)
+        .exists()
+    )
+    missing_embedding_exists = (
+        select(chunks_table.c.id)
+        .outerjoin(embeddings_table, embeddings_table.c.chunk_id == chunks_table.c.id)
+        .where(
+            chunks_table.c.repo_id == repos_table.c.id,
+            embeddings_table.c.chunk_id.is_(None),
+        )
+        .exists()
+    )
+    async with engine.begin() as conn:
+        result = await conn.execute(
+            delete(repos_table).where(
+                repos_table.c.url == repo_url,
+                repos_table.c.head_sha == head_sha,
+                (~chunk_exists) | missing_embedding_exists,
+            )
+        )
+    if result.rowcount:
+        log.warning(
+            "persist.incomplete_snapshot_deleted",
+            repo_url=repo_url,
+            head_sha=head_sha,
+            rows=result.rowcount,
+        )
 
 
 async def persist_index(
@@ -100,6 +150,8 @@ async def persist_index(
     chunk row's primary key can be paired with its vector after insertion.
     """
     summarised_list = list(summarised)
+    if not summarised_list:
+        raise ValueError("refusing to persist an empty repository index")
     chunk_count = 0
     edge_count = sum(len(v.get("calls", [])) for v in adjacency.values())
 
@@ -187,6 +239,7 @@ async def persist_index(
 
 __all__ = [
     "PersistResult",
+    "delete_incomplete_index",
     "known_head_sha",
     "make_engine",
     "persist_index",

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 
+from repopilot_core.llm.models import ModelId, ProviderName
+from repopilot_core.llm.provider import EmbeddingResponse, ProviderError
 from repopilot_core.settings import Settings
 from repopilot_ingestion.chunk import chunk_file, enrich_chunks_with_neighbors
 from repopilot_ingestion.embed import embed_chunks
@@ -16,10 +17,25 @@ FIXTURE = Path(__file__).parent / "fixtures" / "sample_module.py"
 class RecordingEmbedProvider:
     def __init__(self) -> None:
         self.texts: list[str] = []
+        self.batch_sizes: list[int] = []
 
-    async def embed(self, text: str) -> Any:
-        self.texts.append(text)
-        return type("Embedding", (), {"vector": [0.0] * 768})()
+    async def embed_many(
+        self,
+        texts: list[str],
+        *,
+        batch_size: int,
+    ) -> list[EmbeddingResponse]:
+        self.texts.extend(texts)
+        self.batch_sizes.append(batch_size)
+        return [
+            EmbeddingResponse(
+                vector=[0.0] * 768,
+                model=ModelId.EMBEDDINGS,
+                provider=ProviderName.HUGGINGFACE,
+                physical_model="test",
+            )
+            for _ in texts
+        ]
 
 
 def test_parse_extracts_decorators_signature_and_docstring_tokens() -> None:
@@ -92,6 +108,7 @@ async def test_embed_chunks_uses_raw_content_by_default(tmp_path: Path) -> None:
     )
 
     assert provider.texts == [login.content]
+    assert provider.batch_sizes == [8]
 
 
 @pytest.mark.asyncio
@@ -114,3 +131,46 @@ async def test_embed_chunks_can_opt_into_enriched_text(tmp_path: Path) -> None:
 
     assert provider.texts == [login.enriched_text]
     assert provider.texts[0] != login.content
+
+
+@pytest.mark.asyncio
+async def test_embed_batch_failure_isolates_only_bad_chunk(tmp_path: Path) -> None:
+    parsed = parse_file(FIXTURE, module="sample")
+    chunks = chunk_file(parsed, rel_path=FIXTURE.name)[:3]
+
+    class SelectiveProvider(RecordingEmbedProvider):
+        async def embed_many(
+            self,
+            texts: list[str],
+            *,
+            batch_size: int,
+        ) -> list[EmbeddingResponse]:
+            self.texts.extend(texts)
+            self.batch_sizes.append(batch_size)
+            if chunks[1].content in texts:
+                raise ProviderError("bad chunk")
+            return [
+                EmbeddingResponse(
+                    vector=[0.25] * 768,
+                    model=ModelId.EMBEDDINGS,
+                    provider=ProviderName.HUGGINGFACE,
+                    physical_model="test",
+                )
+                for _ in texts
+            ]
+
+    provider = SelectiveProvider()
+    embedded = await embed_chunks(
+        chunks,
+        provider=provider,  # type: ignore[arg-type]
+        settings=Settings(
+            repopilot_env="test",
+            llm_cache_path=tmp_path / "llm.sqlite",
+            ingestion_embed_batch_size=16,
+        ),
+    )
+
+    assert len(embedded) == len(chunks)
+    assert embedded[0].vector == [0.25] * 768
+    assert embedded[1].vector != [0.25] * 768
+    assert embedded[2].vector == [0.25] * 768

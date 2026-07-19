@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/services.py": {
-    "mtime": 1781929630.2642407,
-    "ast_hash": "7b29cd8c51bd3defeb3708017b6f4b15",
+    "mtime": 1784453006.323686,
+    "ast_hash": "33455503d87a18eac7b3751a3a86c33e",
     "semantic_hash": ""
   },
   "apps/api/src/repopilot_api/sse.py": {
@@ -355,13 +355,13 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/graph.py": {
-    "mtime": 1784088441.7299788,
-    "ast_hash": "aa888beac478be2f7174a27585141a42",
+    "mtime": 1784453264.3723426,
+    "ast_hash": "c4c57ac89e713d8fbef0d3bccc1068ab",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/prompts.py": {
-    "mtime": 1784088308.992623,
-    "ast_hash": "f9c0736d00335c53524968d38dd51f9b",
+    "mtime": 1784453264.2912016,
+    "ast_hash": "0e1ba1f67476828d2701f20a57071822",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/qa/types.py": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/hybrid_search.py": {
-    "mtime": 1784269350.7293446,
-    "ast_hash": "34410ffff269350d5a79fc497c5af1af",
+    "mtime": 1784452896.77201,
+    "ast_hash": "677b3b3d70aaa37a3fb9f1f7b3e87fa4",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/read_chunks.py": {
@@ -445,8 +445,8 @@
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/tools/vector_search.py": {
-    "mtime": 1783362112.4185557,
-    "ast_hash": "f5dead0991f308d6293545cb1b12fe07",
+    "mtime": 1784452896.6939552,
+    "ast_hash": "35b5f9ae695106cfb5d9e80f0338c6b3",
     "semantic_hash": ""
   },
   "packages/agents/src/repopilot_agents/types.py": {
@@ -515,8 +515,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_hybrid_search.py": {
-    "mtime": 1783675897.3703237,
-    "ast_hash": "d6f2199fe8430a4c7ecd597d770816c2",
+    "mtime": 1784453006.32308,
+    "ast_hash": "cf38fdce7f73978f0f71f5389c636235",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_intent_profiler.py": {
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_qa_graph.py": {
-    "mtime": 1784268466.7970726,
-    "ast_hash": "5507829d7e9cb66207519a0f6ea81b51",
+    "mtime": 1784453275.3054862,
+    "ast_hash": "99dc65c2facb631ff0ee32150b7a43e0",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_state.py": {
@@ -555,8 +555,8 @@
     "semantic_hash": ""
   },
   "packages/agents/tests/test_vector_search_filters.py": {
-    "mtime": 1783362112.4186642,
-    "ast_hash": "ee51ad06fa7b0863dff60c23c9c5a416",
+    "mtime": 1784452943.7274804,
+    "ast_hash": "76ce3ad9713346c437079fb0dfd79c3c",
     "semantic_hash": ""
   },
   "packages/agents/tests/test_verifier_grounding.py": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/provider.py": {
-    "mtime": 1784030814.7468188,
-    "ast_hash": "fac596196e46b709f2b8ab7784adff54",
+    "mtime": 1784453854.312154,
+    "ast_hash": "36940b98e8ce23d61d3569e3082ed8c8",
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/logging.py": {
@@ -595,8 +595,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/settings.py": {
-    "mtime": 1784088429.0508556,
-    "ast_hash": "3479ed3692f65f03ebeeda1a7dda8cd8",
+    "mtime": 1784454630.6857595,
+    "ast_hash": "f402f62687361fa432d91d26ff8c6d53",
     "semantic_hash": ""
   },
   "packages/core/tests/__init__.py": {
@@ -610,8 +610,8 @@
     "semantic_hash": ""
   },
   "packages/core/tests/test_llm_embed.py": {
-    "mtime": 1781599025.1225295,
-    "ast_hash": "cb99c44aceeb33216b56c5e87cf67b8d",
+    "mtime": 1784453962.3546708,
+    "ast_hash": "f5d750fcfeee7f3707542cac10ac914e",
     "semantic_hash": ""
   },
   "packages/core/tests/test_llm_provider.py": {
@@ -725,8 +725,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/embed.py": {
-    "mtime": 1784087573.045642,
-    "ast_hash": "58f351f17ace4b7189e997adf45bf339",
+    "mtime": 1784453880.6071079,
+    "ast_hash": "f8080ab215129ef3d311e6deffdf4397",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/graph.py": {
@@ -760,23 +760,23 @@
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/parse.py": {
-    "mtime": 1783919386.4593246,
-    "ast_hash": "8d782390c1f165e3701558b58c2c48bf",
+    "mtime": 1784453815.785519,
+    "ast_hash": "a47d5c8f29323bab4c31ef6ff566d650",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/persist.py": {
-    "mtime": 1784030814.7472582,
-    "ast_hash": "2e88b2b886f22002fd1f6d9af1e50702",
+    "mtime": 1784452847.8840132,
+    "ast_hash": "e21436b3764a5a0d547b8ff97c550585",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/pipeline.py": {
-    "mtime": 1783919212.6275995,
-    "ast_hash": "abe6235e30c45f093b33827c0c54e11f",
+    "mtime": 1784454149.6145844,
+    "ast_hash": "82f19ce193ef959e8bdcf098f05913a6",
     "semantic_hash": ""
   },
   "packages/ingestion/src/repopilot_ingestion/summary.py": {
-    "mtime": 1784030814.7478476,
-    "ast_hash": "75495d33b1a4667855600d91694e8ebe",
+    "mtime": 1784453902.575216,
+    "ast_hash": "05c7d363814f799b29a633358c458614",
     "semantic_hash": ""
   },
   "packages/ingestion/tests/fixtures/sample_module.py": {
@@ -885,8 +885,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1784269274.3215635,
-    "ast_hash": "76aad03db9af0ebc357598a6ffd65853",
+    "mtime": 1784453345.5396128,
+    "ast_hash": "14ab599830f053278db7034d71b45794",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -900,8 +900,8 @@
     "semantic_hash": ""
   },
   "docs/README.md": {
-    "mtime": 1784269274.4062514,
-    "ast_hash": "3e171692e2ec8d44b59c4381e3753659",
+    "mtime": 1784451989.0153852,
+    "ast_hash": "f60f1f4464f698994c1e50a7bcc4fe71",
     "semantic_hash": ""
   },
   "docs/archive/01_PROBLEM_AND_SOLUTION.md": {
@@ -1025,8 +1025,8 @@
     "semantic_hash": ""
   },
   "packages/ingestion/tests/test_enrichment.py": {
-    "mtime": 1784087573.12335,
-    "ast_hash": "1121c8b6cd6704c977ddd08f15e76259",
+    "mtime": 1784454643.5453963,
+    "ast_hash": "97830e24ba5a4a96b6e04cb3d77f5314",
     "semantic_hash": ""
   },
   "evals/results/rag_phase2/_before.json": {
@@ -1117,6 +1117,21 @@
   "docs/STARTUP_GUIDE.md": {
     "mtime": 1784269274.4884825,
     "ast_hash": "5c78b6d1ac805ae9879ce069d94e6481",
+    "semantic_hash": ""
+  },
+  "docs/INGESTION_PARALLELIZATION_CODEX_PROMPT.md": {
+    "mtime": 1784452131.1845498,
+    "ast_hash": "9e82f9277a17985f2c4ae32287e61385",
+    "semantic_hash": ""
+  },
+  "packages/ingestion/src/repopilot_ingestion/generic_chunk.py": {
+    "mtime": 1784452825.5772974,
+    "ast_hash": "ebee7a6b050796faf727aad474e4046d",
+    "semantic_hash": ""
+  },
+  "packages/ingestion/tests/test_generic_chunk.py": {
+    "mtime": 1784454028.5811548,
+    "ast_hash": "755824a93c830cecffa3cbe0136a7ad2",
     "semantic_hash": ""
   }
 }

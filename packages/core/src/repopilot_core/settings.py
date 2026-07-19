@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
@@ -29,6 +30,10 @@ def _find_repo_env() -> Path:
 def _split_csv(value: str) -> list[str]:
     """Parse a comma-separated env var into a cleaned list."""
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _default_scan_workers() -> int:
+    return min(8, max(1, os.cpu_count() or 1))
 
 
 class Settings(BaseSettings):
@@ -120,8 +125,18 @@ class Settings(BaseSettings):
     # ── Ingestion (Phase 1) ──────────────────────────────────────────────────
     ingestion_clone_root: Path = Field(default_factory=lambda: Path(".cache/clones"))
     ingestion_max_repo_loc: int = 200_000
+    ingestion_scan_workers: int = Field(default_factory=_default_scan_workers, ge=1, le=32)
+    ingestion_max_file_bytes: int = Field(default=512_000, ge=1)
+    ingestion_text_chunk_lines: int = Field(default=120, ge=1)
+    ingestion_text_chunk_chars: int = Field(default=6_000, ge=256)
+    ingestion_text_chunk_overlap_lines: int = Field(default=10, ge=0)
     ingestion_summary_concurrency: int = 8
-    ingestion_embed_batch_size: int = 32
+    # Measured on the local nomic backend: 8 outperformed 16/32 for realistic
+    # code chunks while avoiding the memory spikes of larger batches.
+    ingestion_embed_batch_size: int = Field(default=8, ge=1)
+    # Retained for environment compatibility. Local sentence-transformer
+    # throughput comes from ``ingestion_embed_batch_size`` rather than running
+    # concurrent model.encode calls against one model instance.
     ingestion_embed_concurrency: int = 4
     # Phase 6 found synthetic prefixes can hurt dense ordering. Keep raw-source
     # embeddings by default; ``enriched_text`` still feeds the BM25 tsvector.

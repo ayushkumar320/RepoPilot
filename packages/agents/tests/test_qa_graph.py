@@ -163,6 +163,33 @@ async def test_hop_budget_enforced_at_three() -> None:
 
 
 @pytest.mark.asyncio
+async def test_empty_graph_expansion_stops_without_repeating(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def empty_graph_traverse(start: str, **kw: Any) -> list[Path]:
+        return []
+
+    monkeypatch.setattr(qa_graph, "graph_traverse", empty_graph_traverse)
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"insufficient","reason":"more needed","next_symbol":"tech_stack"}',
+            "The repository uses TypeScript. [0]",
+        ]
+    )
+
+    result = await answer_question(
+        "what is the tech stack?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+
+    assert result.hops == 0
+    assert result.retrieval_path.count("graph_traverse:empty") == 1
+    assert provider.call_count == 2
+
+
+@pytest.mark.asyncio
 async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_compress_chunks(question: str, chunks: Any, **kw: Any) -> list[ChunkContent]:
         return [

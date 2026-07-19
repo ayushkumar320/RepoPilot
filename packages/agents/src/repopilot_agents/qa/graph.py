@@ -195,6 +195,9 @@ async def answer_question(
             edge_types=("calls", "imports", "inherits"),
             max_depth=2,
         )
+        if not paths:
+            ctx.retrieval_path.append("graph_traverse:empty")
+            break
         new_refs: list[CodeRef] = []
         for path in paths:
             for ref in path.steps:

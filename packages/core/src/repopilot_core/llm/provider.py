@@ -249,6 +249,15 @@ def _cache_key(model: ModelId, messages: Sequence[Message], kwargs: dict[str, An
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def _embedding_cache_key(model: ModelId, text: str) -> str:
+    canonical = json.dumps(
+        {"model": model.value, "text": text},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 # ─── Backoff ────────────────────────────────────────────────────────────────
 
 
@@ -431,19 +440,41 @@ class _SentenceTransformersEmbedder(_BaseClient):
         return SentenceTransformer(self._model_name, trust_remote_code=True)
 
     async def embed(self, binding: ModelBinding, text: str) -> EmbeddingResponse:
+        responses = await self.embed_many(binding, [text], batch_size=1)
+        return responses[0]
+
+    async def embed_many(
+        self,
+        binding: ModelBinding,
+        texts: Sequence[str],
+        *,
+        batch_size: int,
+    ) -> list[EmbeddingResponse]:
+        if not texts:
+            return []
         model = await self._ensure_loaded()
         async with self._encode_lock:
-            vector = model.encode(
-                text,
+            encoded = await asyncio.to_thread(
+                model.encode,
+                list(texts),
+                batch_size=batch_size,
                 normalize_embeddings=True,
                 convert_to_numpy=True,
-            ).tolist()
-        return EmbeddingResponse(
-            vector=list(vector),
-            model=ModelId.EMBEDDINGS,
-            provider=self.provider,
-            physical_model=binding.physical_model,
-        )
+            )
+        vectors = encoded.tolist()
+        if len(vectors) != len(texts):
+            raise RuntimeError(
+                f"embedding backend returned {len(vectors)} vectors for {len(texts)} texts"
+            )
+        return [
+            EmbeddingResponse(
+                vector=list(vector),
+                model=ModelId.EMBEDDINGS,
+                provider=self.provider,
+                physical_model=binding.physical_model,
+            )
+            for vector in vectors
+        ]
 
     async def chat(
         self,
@@ -588,34 +619,77 @@ class LLMProvider:
         Hugging Face on first use into the local hub cache. Cached by
         ``sha256(model + text)`` in SQLite.
         """
-        canonical = json.dumps(
-            {"model": model.value, "text": text}, sort_keys=True, separators=(",", ":")
-        )
-        key = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+        return (await self.embed_many([text], model=model, batch_size=1))[0]
 
-        cached = await self.cache.get_embedding(key)
-        if cached is not None:
-            cached.model = model
-            return cached
+    async def embed_many(
+        self,
+        texts: Sequence[str],
+        *,
+        model: ModelId = ModelId.EMBEDDINGS,
+        batch_size: int = 32,
+    ) -> list[EmbeddingResponse]:
+        """Embed texts in backend batches while caching each distinct text independently."""
+        if not texts:
+            return []
+        if batch_size < 1:
+            raise ValueError("batch_size must be at least 1")
 
         chain = RESOLUTION.get(model)
         if not chain:
             raise ProviderError(f"no resolution chain for {model.value}")
-        # In v1 the chain has a single binding pointing at the in-process
-        # sentence-transformers embedder. We pass the binding through so the
-        # embedder knows which HF model id to load.
         binding = chain[0]
-        embed_method = getattr(self.embedder, "embed", None)
-        if embed_method is None:
-            raise ProviderError("embedder does not support embed()")
-        try:
-            response: EmbeddingResponse = await embed_method(binding, text)
-        except (OSError, RuntimeError) as exc:
-            raise ProviderError(f"embedding failed for {model.value}: {exc!r}") from exc
+        keys = [_embedding_cache_key(model, text) for text in texts]
+        unique: dict[str, str] = {}
+        for key, text in zip(keys, texts, strict=True):
+            unique.setdefault(key, text)
 
-        response.model = model
-        await self.cache.put_embedding(key, response)
-        return response
+        resolved: dict[str, EmbeddingResponse] = {}
+        misses: list[tuple[str, str]] = []
+        for key, text in unique.items():
+            cached = await self.cache.get_embedding(key)
+            if cached is None:
+                misses.append((key, text))
+            else:
+                cached.model = model
+                resolved[key] = cached
+
+        if misses:
+            miss_texts = [text for _, text in misses]
+            embed_many_method = getattr(self.embedder, "embed_many", None)
+            try:
+                if embed_many_method is not None:
+                    responses: list[EmbeddingResponse] = await embed_many_method(
+                        binding,
+                        miss_texts,
+                        batch_size=batch_size,
+                    )
+                else:
+                    embed_method = getattr(self.embedder, "embed", None)
+                    if embed_method is None:
+                        raise ProviderError("embedder does not support embed()")
+                    responses = [await embed_method(binding, text) for text in miss_texts]
+            except (OSError, RuntimeError) as exc:
+                raise ProviderError(f"embedding failed for {model.value}: {exc!r}") from exc
+
+            if len(responses) != len(misses):
+                raise ProviderError(
+                    f"embedding backend returned {len(responses)} responses "
+                    f"for {len(misses)} cache misses"
+                )
+            for (key, _), response in zip(misses, responses, strict=True):
+                response.model = model
+                resolved[key] = response
+                await self.cache.put_embedding(key, response)
+
+        log.debug(
+            "embedding.batch_done",
+            total=len(texts),
+            unique=len(unique),
+            cache_hits=len(unique) - len(misses),
+            cache_misses=len(misses),
+            batch_size=batch_size,
+        )
+        return [resolved[key] for key in keys]
 
     # ── helpers ────────────────────────────────────────────────────────────
 

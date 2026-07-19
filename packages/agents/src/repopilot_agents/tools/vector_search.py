@@ -68,12 +68,17 @@ def build_search_sql(
         clauses.append(f"c.file_path NOT LIKE :exclude_{i} || '%'")
     where = "\n          AND ".join(clauses)
     return f"""
-        SELECT c.file_path, c.start_line, c.end_line, c.symbol, c.kind, c.summary,
-               (ce.embedding <=> CAST(:vec AS vector)) AS distance
-        FROM chunks c
-        JOIN chunk_embeddings ce ON ce.chunk_id = c.id
-        WHERE {where}
-        ORDER BY ce.embedding <=> CAST(:vec AS vector)
+        WITH candidates AS MATERIALIZED (
+            SELECT c.file_path, c.start_line, c.end_line, c.symbol, c.kind, c.summary,
+                   ce.embedding
+            FROM chunks c
+            JOIN chunk_embeddings ce ON ce.chunk_id = c.id
+            WHERE {where}
+        )
+        SELECT file_path, start_line, end_line, symbol, kind, summary,
+               (embedding <=> CAST(:vec AS vector)) AS distance
+        FROM candidates
+        ORDER BY embedding <=> CAST(:vec AS vector)
         LIMIT :limit
         """
 
@@ -107,8 +112,10 @@ async def vector_search(
     embedding = await provider.embed(query)
     literal = "[" + ",".join(repr(float(x)) for x in embedding.vector) + "]"
 
-    # Cosine distance via pgvector's `<=>` operator. We need the vector cast
-    # done in SQL so the planner can use the ivfflat index.
+    # Filter and materialize the target corpus before cosine ranking. A global
+    # IVFFlat scan can choose neighbours from other repositories and only then
+    # apply ``repo_id``/path filters, producing a false empty result. Exact
+    # ranking over the bounded per-repository candidate set prioritizes recall.
     sql = text(
         build_search_sql(
             kind=kind,

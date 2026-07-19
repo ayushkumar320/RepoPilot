@@ -14,7 +14,7 @@ from typing import Protocol
 from urllib.parse import quote, unquote
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_agents.qa import QAResult, answer_question
@@ -43,6 +43,7 @@ from repopilot_api.models import (
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
+from repopilot_ingestion.db import chunk_embeddings as embeddings_table
 from repopilot_ingestion.db import chunks as chunks_table
 from repopilot_ingestion.db import repos as repos_table
 from repopilot_ingestion.persist import make_engine
@@ -203,6 +204,19 @@ class LiveRepoService:
                 repo_url, provider=self.runtime.provider, settings=self.runtime.settings
             )
             progress_task.cancel()
+            if result.status == "too_large":
+                record.status = "error"
+                record.progress = None
+                record.error = (
+                    f"Repository has {result.loc_total or 0} indexable lines, exceeding the "
+                    f"configured limit of {self.runtime.settings.ingestion_max_repo_loc}."
+                )
+                return
+            if result.status == "unsupported":
+                record.status = "error"
+                record.progress = None
+                record.error = "Repository contains no supported source or context files."
+                return
             record.progress = 100
             record.indexed_sha = result.head_sha
             record.remote_sha = result.head_sha
@@ -287,7 +301,18 @@ class LiveRepoService:
             row = (
                 await conn.execute(
                     select(repos_table.c.id)
+                    .join(chunks_table, chunks_table.c.repo_id == repos_table.c.id)
+                    .outerjoin(
+                        embeddings_table,
+                        embeddings_table.c.chunk_id == chunks_table.c.id,
+                    )
                     .where(repos_table.c.url == repo_url)
+                    .group_by(repos_table.c.id, repos_table.c.indexed_at)
+                    .having(func.count(chunks_table.c.id) > 0)
+                    .having(
+                        func.count(embeddings_table.c.chunk_id)
+                        == func.count(chunks_table.c.id)
+                    )
                     .order_by(repos_table.c.indexed_at.desc())
                     .limit(1)
                 )
@@ -321,7 +346,7 @@ class LiveRepoService:
             ", ".join(e.symbol.rsplit(".", 1)[-1] for e in entry_points) or "no clear entry points"
         )
         return (
-            f"Python-heavy snapshot across {file_count} files and {loc_total} lines. "
+            f"Indexed snapshot across {file_count} files and {loc_total} lines. "
             f"Primary entry points: {entry_names}. Structural hubs: {hub_names}."
         )
 

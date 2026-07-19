@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ast
 import re
+import threading
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -28,7 +29,7 @@ from tree_sitter import Language, Node, Parser
 SymbolKind = Literal["function", "class", "method"]
 
 _LANGUAGE = Language(tree_sitter_python.language())
-_PARSER = Parser(_LANGUAGE)
+_PARSER_LOCAL = threading.local()
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,7 +76,7 @@ class ParsedFile:
 
 def parse_file(path: Path, *, module: str = "") -> ParsedFile:
     source = path.read_text(encoding="utf-8", errors="replace")
-    tree = _PARSER.parse(source.encode("utf-8"))
+    tree = _get_parser().parse(source.encode("utf-8"))
     root = tree.root_node
 
     imports = tuple(_extract_imports(root, source))
@@ -89,6 +90,15 @@ def parse_file(path: Path, *, module: str = "") -> ParsedFile:
         imports=imports,
         symbols=symbols,
     )
+
+
+def _get_parser() -> Parser:
+    """Return one tree-sitter parser per scanning thread."""
+    parser = getattr(_PARSER_LOCAL, "parser", None)
+    if parser is None:
+        parser = Parser(_LANGUAGE)
+        _PARSER_LOCAL.parser = parser
+    return parser
 
 
 # ── internals ───────────────────────────────────────────────────────────────

@@ -23,7 +23,7 @@ log = structlog.get_logger(__name__)
 
 _SYSTEM = (
     "You are a code summariser. Produce a single sentence that names what the "
-    "given Python symbol does and why a reader would care. No markdown. No "
+    "given repository chunk does and why a reader would care. No markdown. No "
     "filler. If you cannot tell from the snippet, say 'unknown'."
 )
 
@@ -40,7 +40,7 @@ def _prompt(chunk: Chunk) -> list[Message]:
         f"Kind: {chunk.kind}\n"
         f"File: {chunk.file_path}\n"
         f"Lines: {chunk.start_line}-{chunk.end_line}\n\n"
-        f"```python\n{chunk.content.rstrip()}\n```"
+        f"```text\n{chunk.content.rstrip()}\n```"
     )
     return [Message("system", _SYSTEM), Message("user", user)]
 
@@ -59,43 +59,72 @@ async def summarise_chunks(
     Summaries are helpful but not critical for indexing, so we degrade each
     failed chunk to ``"unknown"`` instead of aborting the whole pipeline.
     """
-    sem = asyncio.Semaphore(max(1, settings.ingestion_summary_concurrency))
+    concurrency = max(1, settings.ingestion_summary_concurrency)
     circuit_open = False
     circuit_lock = asyncio.Lock()
 
     async def one(chunk: Chunk) -> SummarisedChunk:
         nonlocal circuit_open
-        async with sem:
+        async with circuit_lock:
+            if circuit_open:
+                return SummarisedChunk(chunk=chunk, summary="unknown")
+        try:
+            response = await provider.generate(
+                ModelId.CODE_HEALTH,
+                _prompt(chunk),
+                retry_429_attempts=1,
+                temperature=0.0,
+                max_tokens=120,
+            )
+            summary = response.text.strip() or "unknown"
+        except ProviderError as exc:
             async with circuit_lock:
-                if circuit_open:
-                    return SummarisedChunk(chunk=chunk, summary="unknown")
+                circuit_open = True
+            log.warning(
+                "summary.chunk_fallback_unknown",
+                file_path=chunk.file_path,
+                start_line=chunk.start_line,
+                end_line=chunk.end_line,
+                symbol=chunk.symbol,
+                error=str(exc),
+            )
+            summary = "unknown"
+        return SummarisedChunk(chunk=chunk, summary=summary)
+
+    queue: asyncio.Queue[tuple[int, Chunk] | None] = asyncio.Queue(maxsize=concurrency * 2)
+    results: list[SummarisedChunk | None] = [None] * len(chunks)
+
+    async def worker() -> None:
+        while True:
+            item = await queue.get()
             try:
-                response = await provider.generate(
-                    ModelId.CODE_HEALTH,
-                    _prompt(chunk),
-                    retry_429_attempts=1,
-                    temperature=0.0,
-                    max_tokens=120,
-                )
-                summary = response.text.strip() or "unknown"
-            except ProviderError as exc:
-                async with circuit_lock:
-                    circuit_open = True
-                log.warning(
-                    "summary.chunk_fallback_unknown",
-                    file_path=chunk.file_path,
-                    start_line=chunk.start_line,
-                    end_line=chunk.end_line,
-                    symbol=chunk.symbol,
-                    error=str(exc),
-                )
-                summary = "unknown"
-            return SummarisedChunk(chunk=chunk, summary=summary)
+                if item is None:
+                    return
+                index, chunk = item
+                results[index] = await one(chunk)
+            finally:
+                queue.task_done()
 
     log.info("summary.start", count=len(chunks))
-    out = await asyncio.gather(*(one(c) for c in chunks))
+    workers = [asyncio.create_task(worker()) for _ in range(min(concurrency, len(chunks)))]
+    try:
+        for index, chunk in enumerate(chunks):
+            await queue.put((index, chunk))
+        for _ in workers:
+            await queue.put(None)
+        await queue.join()
+        await asyncio.gather(*workers)
+    finally:
+        for task in workers:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*workers, return_exceptions=True)
+
+    if any(result is None for result in results):
+        raise RuntimeError("summary worker queue completed with missing results")
+    out = [result for result in results if result is not None]
     log.info("summary.done", count=len(out))
-    return list(out)
+    return out
 
 
 __all__ = ["SummarisedChunk", "summarise_chunks"]

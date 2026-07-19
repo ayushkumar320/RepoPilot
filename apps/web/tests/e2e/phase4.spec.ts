@@ -73,14 +73,15 @@ test("phase 4 tour starts and shows synchronized viewer shell", async ({ page })
 
   await page.goto("/");
 
-  await page.getByLabel("Repo URL").fill(repoUrl);
-  await page.getByRole("button", { name: "Index And Continue" }).click();
+  await page.getByLabel("Public GitHub URL").fill(repoUrl);
+  await page.getByRole("button", { name: "Analyze" }).click();
 
-  await expect(page.getByText("Why Are You Here?")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What do you need?" })).toBeVisible();
 
-  await page.getByRole("button", { name: "I want to learn this codebase" }).click();
-  await page.getByRole("button", { name: "Start Tour" }).click();
+  await page.getByRole("button", { name: "Learn the codebase" }).click();
+  await page.getByRole("button", { name: "Open guided tour" }).click();
 
-  await expect(page.getByText("Tour View")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Guided repository tour" })).toBeVisible();
   await expect(page.getByText("Synchronized Code Viewer")).toBeVisible();
+  await expect(page.getByText("class Flask:")).toBeVisible();
 });

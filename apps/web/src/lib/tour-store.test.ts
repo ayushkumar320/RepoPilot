@@ -61,3 +61,43 @@ test("viewer hydration carries chunk content", () => {
   assert.equal(hydrated.viewer.content, "class Flask:");
   assert.equal(hydrated.viewer.summary, "Flask application object");
 });
+
+test("selecting another claim clears stale viewer content", () => {
+  const repoId = "pallets/flask";
+  let state = applyTourEvent(
+    initialTourStoreState,
+    { event: "section_start", v: 1, order: 0, title: "Entry points" },
+    repoId,
+  );
+  for (const [id, filePath] of [
+    ["claim-1", "src/flask/app.py"],
+    ["claim-2", "src/flask/cli.py"],
+  ] as const) {
+    state = applyTourEvent(
+      state,
+      {
+        event: "claim",
+        v: 1,
+        id,
+        text: `Read ${filePath}`,
+        refs: [{ file_path: filePath, start_line: 1, end_line: 10 }],
+        status: "verified",
+        retrieval_path: ["hybrid_search"],
+      },
+      repoId,
+    );
+  }
+  state = hydrateViewer(state, {
+    chunk_id: state.claimsById["claim-1"].chunkId,
+    repo_id: repoId,
+    ref: { file_path: "src/flask/app.py", start_line: 1, end_line: 10 },
+    content: "class Flask:",
+    summary: "Application object",
+  });
+
+  const selected = selectClaim(state, "claim-2");
+
+  assert.equal(selected.viewer.filePath, "src/flask/cli.py");
+  assert.equal(selected.viewer.content, undefined);
+  assert.equal(selected.viewer.summary, undefined);
+});

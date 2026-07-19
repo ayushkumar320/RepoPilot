@@ -159,11 +159,12 @@ export function selectClaim(state: TourStoreState, claimId: string): TourStoreSt
     ...state,
     selectedClaimId: claimId,
     viewer: {
-      ...state.viewer,
       chunkId: claim.chunkId,
       filePath: claim.refs[0].file_path,
       startLine: claim.refs[0].start_line,
       endLine: claim.refs[0].end_line,
+      content: undefined,
+      summary: undefined,
     },
   };
 }

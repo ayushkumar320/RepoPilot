@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1781783214.2998931,
-    "ast_hash": "47d798348fc381f8ea24e74ae92fb1c3",
+    "mtime": 1784456035.454783,
+    "ast_hash": "c3d99b9c83f8533de8886a4912326480",
     "semantic_hash": ""
   },
   "apps/web/playwright.config.ts": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/layout.tsx": {
-    "mtime": 1781748852.0186627,
-    "ast_hash": "a90b56d790d96335b9b3b0e2ddaefc5f",
+    "mtime": 1784455219.5091488,
+    "ast_hash": "5cdcfef06ef13767b2ea9b01940b891d",
     "semantic_hash": ""
   },
   "apps/web/src/app/page.tsx": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/repopilot-app.tsx": {
-    "mtime": 1781777163.5125148,
-    "ast_hash": "46d691102754866037d0b3821e706fc8",
+    "mtime": 1784455408.0477083,
+    "ast_hash": "30acaab2c8458f7dfef87bcdc907ee3b",
     "semantic_hash": ""
   },
   "apps/web/src/lib/api/generated.ts": {
@@ -105,13 +105,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/lib/tour-store.test.ts": {
-    "mtime": 1781729221.5238898,
-    "ast_hash": "dc795895cf38f32af2f709a13de22f27",
+    "mtime": 1784455636.186702,
+    "ast_hash": "e144287a8be324ddfdebaffebef73fbe",
     "semantic_hash": ""
   },
   "apps/web/src/lib/tour-store.ts": {
-    "mtime": 1781729196.9291646,
-    "ast_hash": "91a2dd7b5170bb0361e78cd03307dfb7",
+    "mtime": 1784455238.7628667,
+    "ast_hash": "7d1b95c0b3978299b00ecbb802bb3587",
     "semantic_hash": ""
   },
   "apps/web/src/types/styles.d.ts": {
@@ -120,13 +120,13 @@
     "semantic_hash": ""
   },
   "apps/web/test-results/.last-run.json": {
-    "mtime": 1781783503.5968118,
+    "mtime": 1784456107.8544624,
     "ast_hash": "f196824657d8858bc7fa44eecbba38b1",
     "semantic_hash": ""
   },
   "apps/web/tests/e2e/phase4.spec.ts": {
-    "mtime": 1781783367.881458,
-    "ast_hash": "24d94eb8f5f6d00e6c54d4dacfef5746",
+    "mtime": 1784455887.8231876,
+    "ast_hash": "fd046609fc4f1d8ef9f8452689564a26",
     "semantic_hash": ""
   },
   "apps/web/tsconfig.json": {

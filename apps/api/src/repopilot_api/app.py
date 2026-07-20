@@ -3,15 +3,20 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import hmac
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import cast
+from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from repopilot_api.access import AccountUsage, AllowanceExceededError
 from repopilot_api.models import (
+    AccountUsageResponse,
     AskTourRequest,
     BaseTourEvent,
     ChunkPayload,
@@ -19,6 +24,7 @@ from repopilot_api.models import (
     CreateRepoResponse,
     CreateTourRequest,
     CreateTourResponse,
+    ProviderCredentialsRequest,
     QAAnswerResponse,
     RepoStatusResponse,
 )
@@ -27,6 +33,7 @@ from repopilot_api.services import (
     RepoNotReadyError,
     close_live_services,
     create_live_services,
+    repo_slug,
 )
 from repopilot_api.sse import with_heartbeats
 from repopilot_core.logging import configure_logging
@@ -66,13 +73,117 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
     def get_services() -> AppServices:
         return cast(AppServices, app.state.services)
 
+    session_cookie = "repopilot_session"
+
+    def signed_session(session_id: str) -> str:
+        signature = hmac.new(
+            settings.repopilot_session_secret.encode(),
+            session_id.encode(),
+            hashlib.sha256,
+        ).hexdigest()
+        return f"{session_id}.{signature}"
+
+    def resolve_session(request: Request, response: Response) -> str:
+        raw = request.cookies.get(session_cookie, "")
+        session_id, separator, signature = raw.partition(".")
+        expected = signed_session(session_id).partition(".")[2] if session_id else ""
+        if not separator or not signature or not hmac.compare_digest(signature, expected):
+            session_id = str(uuid4())
+            response.set_cookie(
+                session_cookie,
+                signed_session(session_id),
+                httponly=True,
+                secure=settings.repopilot_session_cookie_secure,
+                samesite="none" if settings.repopilot_session_cookie_secure else "lax",
+                max_age=60 * 60 * 24 * 30,
+                path="/",
+            )
+        return session_id
+
+    def usage_response(usage: AccountUsage) -> AccountUsageResponse:
+        return AccountUsageResponse(
+            free_repositories_remaining=usage.free_repositories_remaining,
+            free_questions_remaining=usage.free_questions_remaining,
+            provider_connected=usage.provider_connected,
+            groq_connected=usage.groq_connected,
+            huggingface_connected=usage.huggingface_connected,
+        )
+
+    def allowance_error(exc: AllowanceExceededError) -> HTTPException:
+        return HTTPException(
+            status_code=402,
+            detail={
+                "code": "PROVIDER_KEY_REQUIRED",
+                "action": exc.action,
+                "message": (
+                    "Your free repository is used. Connect your Groq key to analyze another."
+                    if exc.action == "repository"
+                    else "Your five free questions are used. Connect your Groq key to continue."
+                ),
+            },
+        )
+
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok", "env": settings.repopilot_env}
 
+    @app.get("/account/usage", response_model=AccountUsageResponse)
+    async def account_usage(
+        session_id: str = Depends(resolve_session),
+    ) -> AccountUsageResponse:
+        return usage_response(await get_services().access.status(session_id))
+
+    @app.post("/account/provider", response_model=AccountUsageResponse)
+    async def connect_provider(
+        request: ProviderCredentialsRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> AccountUsageResponse:
+        try:
+            usage = await get_services().access.connect_provider(
+                session_id,
+                groq_api_key=request.groq_api_key.get_secret_value(),
+                huggingface_api_key=(
+                    request.huggingface_api_key.get_secret_value()
+                    if request.huggingface_api_key is not None
+                    else None
+                ),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return usage_response(usage)
+
+    @app.delete("/account/provider", response_model=AccountUsageResponse)
+    async def disconnect_provider(
+        session_id: str = Depends(resolve_session),
+    ) -> AccountUsageResponse:
+        return usage_response(await get_services().access.disconnect_provider(session_id))
+
     @app.post("/repos", response_model=CreateRepoResponse, status_code=202)
-    async def create_repo(request: CreateRepoRequest) -> CreateRepoResponse:
-        record = await get_services().repos.enqueue(request.repo_url)
+    async def create_repo(
+        request: CreateRepoRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> CreateRepoResponse:
+        try:
+            normalized_repo_id = repo_slug(request.repo_url)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        try:
+            reservation = await get_services().access.reserve_repository(
+                session_id, normalized_repo_id
+            )
+        except AllowanceExceededError as exc:
+            raise allowance_error(exc) from exc
+        provider = (
+            await get_services().access.provider_for(session_id)
+            if reservation.source == "user"
+            else None
+        )
+        try:
+            record = await get_services().repos.enqueue(request.repo_url, provider=provider)
+        except Exception:
+            await get_services().access.release(reservation)
+            raise
+        await get_services().access.complete(reservation)
         return CreateRepoResponse(repo_id=record.repo_id, status=record.status)
 
     @app.get("/repos/{repo_id:path}/status", response_model=RepoStatusResponse)
@@ -106,9 +217,17 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         )
 
     @app.post("/tours", response_model=CreateTourResponse, status_code=201)
-    async def create_tour(request: CreateTourRequest) -> CreateTourResponse:
+    async def create_tour(
+        request: CreateTourRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> CreateTourResponse:
+        await get_services().access.status(session_id)
         try:
-            record = await get_services().tours.create(request.repo_id, request.intent_profile)
+            record = await get_services().tours.create(
+                request.repo_id,
+                request.intent_profile,
+                session_id=session_id,
+            )
         except RepoNotReadyError as exc:
             raise HTTPException(
                 status_code=409,
@@ -121,13 +240,20 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             ) from exc
         except KeyError as exc:
             raise HTTPException(status_code=404, detail="repo not found") from exc
+        await get_services().access.bind_tour(session_id, record.tour_id)
         return CreateTourResponse(
             tour_id=record.tour_id,
             stream_url=f"/tours/{record.tour_id}/stream",
         )
 
     @app.get("/tours/{tour_id}/stream")
-    async def stream_tour(tour_id: str) -> StreamingResponse:
+    async def stream_tour(
+        tour_id: str,
+        session_id: str = Depends(resolve_session),
+    ) -> StreamingResponse:
+        if not await get_services().access.can_access_tour(session_id, tour_id):
+            raise HTTPException(status_code=404, detail="tour not found")
+
         async def event_source() -> AsyncIterator[BaseTourEvent]:
             try:
                 async for event in get_services().tours.stream(tour_id):
@@ -142,11 +268,36 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         )
 
     @app.post("/tours/{tour_id}/ask", response_model=QAAnswerResponse)
-    async def ask_tour(tour_id: str, request: AskTourRequest) -> QAAnswerResponse:
+    async def ask_tour(
+        tour_id: str,
+        request: AskTourRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> QAAnswerResponse:
+        if not await get_services().access.can_access_tour(session_id, tour_id):
+            raise HTTPException(status_code=404, detail="tour not found")
         try:
-            return await get_services().tours.ask(tour_id, request.question)
+            reservation = await get_services().access.reserve_question(session_id, tour_id)
+        except AllowanceExceededError as exc:
+            raise allowance_error(exc) from exc
+        provider = (
+            await get_services().access.provider_for(session_id)
+            if reservation.source == "user"
+            else None
+        )
+        try:
+            answer = await get_services().tours.ask(
+                tour_id,
+                request.question,
+                provider=provider,
+            )
         except KeyError as exc:
+            await get_services().access.release(reservation)
             raise HTTPException(status_code=404, detail="tour not found") from exc
+        except Exception:
+            await get_services().access.release(reservation)
+            raise
+        await get_services().access.complete(reservation)
+        return answer
 
     @app.get("/chunks/{chunk_id:path}", response_model=ChunkPayload)
     async def get_chunk(chunk_id: str) -> ChunkPayload:

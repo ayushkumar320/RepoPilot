@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from repopilot_core.settings import Settings
 
 
@@ -25,3 +27,15 @@ def test_settings_loads_from_env_example() -> None:
     assert settings.huggingface_base_url.startswith("https://router.huggingface.co/")
     assert settings.llm_max_429_retries == 5
     assert settings.huggingface_embedding_model == "nomic-ai/nomic-embed-text-v1.5"
+
+
+def test_production_requires_a_non_default_session_secret() -> None:
+    with pytest.raises(ValueError, match="REPOPILOT_SESSION_SECRET"):
+        Settings(repopilot_env="production")
+
+    settings = Settings(
+        repopilot_env="production",
+        repopilot_session_secret="a-production-secret-generated-outside-source-control",
+        repopilot_session_cookie_secure=True,
+    )
+    assert settings.repopilot_session_cookie_secure is True

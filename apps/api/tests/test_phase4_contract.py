@@ -53,7 +53,8 @@ class FakeRepoService:
         }
         self.enqueued: list[str] = []
 
-    async def enqueue(self, repo_url: str) -> RepoRecord:
+    async def enqueue(self, repo_url: str, *, provider: Any = None) -> RepoRecord:
+        del provider
         self.enqueued.append(repo_url)
         record = RepoRecord(repo_id="repo-new", repo_url=repo_url, status="queued")
         self.records[record.repo_id] = record
@@ -99,7 +100,14 @@ class FakeTourService:
         self.ask_calls: list[tuple[str, str]] = []
         self.claim = claim
 
-    async def create(self, repo_id: str, intent_profile: IntentProfile) -> TourRecord:
+    async def create(
+        self,
+        repo_id: str,
+        intent_profile: IntentProfile,
+        *,
+        session_id: str | None = None,
+    ) -> TourRecord:
+        del session_id
         if repo_id == "repo-indexing":
             raise RepoNotReadyError(repo_id, "indexing")
         if repo_id not in self.repo_service.records:
@@ -121,7 +129,8 @@ class FakeTourService:
         assert tour_id in self.records
         yield TourSectionStartEvent(order=0, title="Entry points")
 
-    async def ask(self, tour_id: str, question: str) -> QAAnswerResponse:
+    async def ask(self, tour_id: str, question: str, *, provider: Any = None) -> QAAnswerResponse:
+        del provider
         self.ask_calls.append((tour_id, question))
         return QAAnswerResponse(
             answer="Start with the Flask class in `app.py`.",
@@ -298,6 +307,65 @@ async def test_post_tour_ask_returns_answer_and_claims(api_client: AsyncClient) 
     payload = QAAnswerResponse.model_validate(response.json())
     assert payload.claims[0].refs[0].file_path == "src/flask/app.py"
     assert payload.retrieval_path == ["vector_search:k=8", "graph_traverse:Flask"]
+
+
+@pytest.mark.asyncio
+async def test_account_starts_with_one_repo_and_five_questions(api_client: AsyncClient) -> None:
+    response = await api_client.get("/account/usage")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "free_repositories_remaining": 1,
+        "free_questions_remaining": 5,
+        "provider_connected": False,
+        "groq_connected": False,
+        "huggingface_connected": False,
+        "credential_storage": "session_only",
+    }
+
+
+@pytest.mark.asyncio
+async def test_sixth_question_requires_user_provider(api_client: AsyncClient) -> None:
+    for index in range(5):
+        response = await api_client.post(
+            "/tours/tour-123/ask",
+            json={"question": f"Question {index}?"},
+        )
+        assert response.status_code == 200
+
+    response = await api_client.post(
+        "/tours/tour-123/ask",
+        json={"question": "Question six?"},
+    )
+
+    assert response.status_code == 402
+    assert response.json()["detail"]["code"] == "PROVIDER_KEY_REQUIRED"
+
+
+@pytest.mark.asyncio
+async def test_connected_provider_continues_after_free_questions(api_client: AsyncClient) -> None:
+    for index in range(5):
+        await api_client.post(
+            "/tours/tour-123/ask",
+            json={"question": f"Question {index}?"},
+        )
+
+    connected = await api_client.post(
+        "/account/provider",
+        json={
+            "groq_api_key": "gsk_test_key_long_enough",
+            "huggingface_api_key": "hf_test_key",
+        },
+    )
+    response = await api_client.post(
+        "/tours/tour-123/ask",
+        json={"question": "Question six?"},
+    )
+
+    assert connected.status_code == 200
+    assert connected.json()["provider_connected"] is True
+    assert "gsk_test_key_long_enough" not in connected.text
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio

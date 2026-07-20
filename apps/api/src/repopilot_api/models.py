@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import BaseModel, Field, SecretStr, TypeAdapter
 
 from repopilot_agents.state import ClaimStatus, IntentProfile
 from repopilot_agents.types import CodeRef
@@ -43,6 +43,20 @@ class CreateTourResponse(BaseModel):
 
 class AskTourRequest(BaseModel):
     question: str = Field(min_length=1)
+
+
+class ProviderCredentialsRequest(BaseModel):
+    groq_api_key: SecretStr
+    huggingface_api_key: SecretStr | None = None
+
+
+class AccountUsageResponse(BaseModel):
+    free_repositories_remaining: int = Field(ge=0)
+    free_questions_remaining: int = Field(ge=0)
+    provider_connected: bool
+    groq_connected: bool
+    huggingface_connected: bool
+    credential_storage: Literal["session_only"] = "session_only"
 
 
 class TourClaimPayload(BaseModel):
@@ -156,6 +170,7 @@ def event_payload(event: BaseTourEvent) -> dict[str, Any]:
 
 
 __all__ = [
+    "AccountUsageResponse",
     "AskTourRequest",
     "BaseTourEvent",
     "ChunkPayload",
@@ -163,6 +178,7 @@ __all__ = [
     "CreateRepoResponse",
     "CreateTourRequest",
     "CreateTourResponse",
+    "ProviderCredentialsRequest",
     "QAAnswerResponse",
     "RepoStatus",
     "RepoStatusResponse",

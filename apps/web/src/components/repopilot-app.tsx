@@ -7,21 +7,27 @@ import {
   CaretRight,
   CheckCircle,
   ClockCountdown,
+  Eye,
+  EyeSlash,
   FileCode,
   GitBranch,
   GithubLogo,
   ListBullets,
+  LockKey,
   MagnifyingGlass,
   PaperPlaneTilt,
   ShieldCheck,
   WarningCircle,
   Wrench,
+  X,
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useReducer, useState } from "react";
 
 import {
+  ApiError,
   api,
+  type AccountUsage,
   type ClaimEvent,
   type ClaimStatus,
   type IntentProfile,
@@ -203,6 +209,147 @@ function validPublicGithubUrl(repoUrl: string): boolean {
   }
 }
 
+interface ProviderDialogProps {
+  error: string | null;
+  onClose: () => void;
+  onConnect: (groqKey: string, huggingfaceKey: string) => Promise<void>;
+  onDisconnect: () => Promise<void>;
+  open: boolean;
+  saving: boolean;
+  usage: AccountUsage | null;
+}
+
+function ProviderDialog({
+  error,
+  onClose,
+  onConnect,
+  onDisconnect,
+  open,
+  saving,
+  usage,
+}: ProviderDialogProps) {
+  const [groqKey, setGroqKey] = useState("");
+  const [huggingfaceKey, setHuggingfaceKey] = useState("");
+  const [showGroq, setShowGroq] = useState(false);
+  const [showHuggingface, setShowHuggingface] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setGroqKey("");
+      setHuggingfaceKey("");
+      setShowGroq(false);
+      setShowHuggingface(false);
+    }
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="dialog-backdrop" role="presentation">
+      <section
+        className="provider-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="provider-dialog-title"
+      >
+        <div className="dialog-heading">
+          <div className="dialog-icon" aria-hidden="true">
+            <LockKey size={21} weight="fill" />
+          </div>
+          <div>
+            <h2 id="provider-dialog-title">
+              {usage?.provider_connected ? "Provider connected" : "Continue with your Groq limit"}
+            </h2>
+            <p>
+              Keys go directly to the API and remain only in this server session. They are never
+              stored in the browser or database.
+            </p>
+          </div>
+          <button className="icon-button dialog-close" type="button" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        {usage?.provider_connected ? (
+          <div className="connected-provider">
+            <div>
+              <strong>Groq</strong>
+              <span>Connected for repository analysis and questions</span>
+            </div>
+            <div>
+              <strong>Hugging Face</strong>
+              <span>{usage.huggingface_connected ? "Connected as fallback" : "Not connected"}</span>
+            </div>
+            <button className="button button-secondary" type="button" disabled={saving} onClick={() => void onDisconnect()}>
+              {saving ? "Disconnecting" : "Disconnect keys"}
+            </button>
+          </div>
+        ) : (
+          <form
+            className="provider-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void onConnect(groqKey, huggingfaceKey);
+            }}
+          >
+            <div className="credential-field">
+              <label htmlFor="groq-api-key">Groq API key</label>
+              <div className="secret-input-wrap">
+                <input
+                  id="groq-api-key"
+                  className="text-input"
+                  type={showGroq ? "text" : "password"}
+                  value={groqKey}
+                  onChange={(event) => setGroqKey(event.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="gsk_..."
+                  aria-describedby="groq-key-help"
+                  required
+                />
+                <button type="button" onClick={() => setShowGroq((value) => !value)} aria-label={showGroq ? "Hide Groq key" : "Show Groq key"}>
+                  {showGroq ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <p id="groq-key-help">Required. Usage is charged against your Groq account limits.</p>
+            </div>
+
+            <div className="credential-field">
+              <label htmlFor="huggingface-api-key">Hugging Face token <span>Optional</span></label>
+              <div className="secret-input-wrap">
+                <input
+                  id="huggingface-api-key"
+                  className="text-input"
+                  type={showHuggingface ? "text" : "password"}
+                  value={huggingfaceKey}
+                  onChange={(event) => setHuggingfaceKey(event.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="hf_..."
+                  aria-describedby="hf-key-help"
+                />
+                <button type="button" onClick={() => setShowHuggingface((value) => !value)} aria-label={showHuggingface ? "Hide Hugging Face token" : "Show Hugging Face token"}>
+                  {showHuggingface ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <p id="hf-key-help">Used only as a fallback when the Groq request cannot complete.</p>
+            </div>
+
+            {error ? <div className="dialog-error" role="alert">{error}</div> : null}
+
+            <div className="dialog-actions">
+              <button className="button button-secondary" type="button" onClick={onClose}>Not now</button>
+              <button className="button button-primary" type="submit" disabled={saving || groqKey.trim().length < 12}>
+                {saving ? "Connecting" : "Connect keys"}
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
+    </div>
+  );
+}
+
 export default function RepoPilotApp() {
   const router = useRouter();
   const [repoUrl, setRepoUrl] = useState("https://github.com/pallets/flask");
@@ -218,6 +365,10 @@ export default function RepoPilotApp() {
   const [asking, setAsking] = useState(false);
   const [viewerLoading, setViewerLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [usage, setUsage] = useState<AccountUsage | null>(null);
+  const [providerDialogOpen, setProviderDialogOpen] = useState(false);
+  const [providerSaving, setProviderSaving] = useState(false);
+  const [providerError, setProviderError] = useState<string | null>(null);
   const [stage, setStage] = useState<"capture" | "tour">("capture");
   const [store, setStore] = useState<TourStoreState>(initialTourStoreState);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
@@ -232,8 +383,25 @@ export default function RepoPilotApp() {
   const repoDisplayName = repositoryName(repoUrl);
 
   useEffect(() => {
+    void api.getAccountUsage().then(setUsage).catch(() => {
+      setErrorMessage("Could not load the free usage allowance.");
+    });
+  }, []);
+
+  useEffect(() => {
+    if (tourId && repoId) return;
+    const params = new URLSearchParams(window.location.search);
+    const routeTourId = params.get("tour");
+    const routeRepoId = params.get("repo");
+    if (!routeTourId || !routeRepoId) return;
+    setTourId(routeTourId);
+    setRepoId(routeRepoId);
+    setStage("tour");
+  }, [repoId, tourId]);
+
+  useEffect(() => {
     if (!repoId || stage !== "capture") return;
-    const eventSource = new EventSource(api.firstImpressionUrl(repoId));
+    const eventSource = new EventSource(api.firstImpressionUrl(repoId), { withCredentials: true });
     const onMessage = (event: MessageEvent<string>) => {
       const parsed = JSON.parse(event.data) as TourEvent;
       setStore((current) => applyTourEvent(current, parsed, repoId));
@@ -257,6 +425,52 @@ export default function RepoPilotApp() {
     }, 1500);
     return () => window.clearTimeout(timeout);
   }, [repoError, repoId, repoReady, pollTick, stage]);
+
+  useEffect(() => {
+    if (!tourId || !repoId || stage !== "tour") return;
+    const controller = new AbortController();
+    let active = true;
+
+    const consumeTourStream = async () => {
+      try {
+        const response = await fetch(api.tourStreamUrl(tourId), {
+          cache: "no-store",
+          credentials: "include",
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(await response.text());
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("Tour stream did not return a readable response.");
+
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (active) {
+          const result = await reader.read();
+          if (result.done) break;
+          buffer += decoder.decode(result.value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() ?? "";
+          for (const part of parts) {
+            for (const tourEvent of parseSseFrame(`${part}\n\n`)) {
+              if (active) {
+                setStore((current) => applyTourEvent(current, tourEvent, repoId));
+              }
+            }
+          }
+        }
+      } catch (error) {
+        if (active && !controller.signal.aborted) {
+          setErrorMessage(error instanceof Error ? error.message : "Unable to stream the tour.");
+        }
+      }
+    };
+
+    void consumeTourStream();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [repoId, stage, tourId]);
 
   useEffect(() => {
     const chunkId = store.viewer.chunkId;
@@ -294,6 +508,7 @@ export default function RepoPilotApp() {
     setStore(initialTourStoreState);
     try {
       const created = await api.createRepo(repoUrl.trim());
+      setUsage(await api.getAccountUsage());
       setRepoId(created.repo_id);
       setStore((current) =>
         applyRepoStatus(current, {
@@ -302,6 +517,9 @@ export default function RepoPilotApp() {
         }),
       );
     } catch (error) {
+      if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
+        setProviderDialogOpen(true);
+      }
       setErrorMessage(error instanceof Error ? error.message : "Unable to reach the RepoPilot API.");
     } finally {
       setBusy(false);
@@ -314,28 +532,10 @@ export default function RepoPilotApp() {
     setErrorMessage(null);
     try {
       const created = await api.createTour(repoId, profile);
+      setStore(initialTourStoreState);
       setTourId(created.tour_id);
       setStage("tour");
       router.push(`/?tour=${created.tour_id}&repo=${encodeURIComponent(repoId)}`);
-      const response = await fetch(api.tourStreamUrl(created.tour_id), { cache: "no-store" });
-      if (!response.ok) throw new Error(await response.text());
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("Tour stream did not return a readable response.");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-      while (true) {
-        const result = await reader.read();
-        if (result.done) break;
-        buffer += decoder.decode(result.value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() ?? "";
-        for (const part of parts) {
-          for (const tourEvent of parseSseFrame(`${part}\n\n`)) {
-            setStore((current) => applyTourEvent(current, tourEvent, repoId));
-          }
-        }
-      }
     } catch (error) {
       setStage("capture");
       setErrorMessage(error instanceof Error ? error.message : "Unable to start the tour.");
@@ -352,6 +552,7 @@ export default function RepoPilotApp() {
     try {
       const prompt = askPrompt.trim();
       const answer = await api.askTour(tourId, prompt);
+      setUsage(await api.getAccountUsage());
       const claims: ClaimEvent[] = answer.claims.map((claim) => ({
         ...claim,
         event: "claim",
@@ -362,6 +563,9 @@ export default function RepoPilotApp() {
       if (first) setStore((current) => selectClaim(current, first.id));
       setAskPrompt("");
     } catch (error) {
+      if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
+        setProviderDialogOpen(true);
+      }
       setErrorMessage(error instanceof Error ? error.message : "Unable to query this snapshot.");
     } finally {
       setAsking(false);
@@ -373,6 +577,34 @@ export default function RepoPilotApp() {
     return splitLines(store.viewer.content, store.viewer.startLine, store.viewer.endLine);
   }, [store.viewer.content, store.viewer.endLine, store.viewer.startLine]);
 
+  const connectProvider = async (groqKey: string, huggingfaceKey: string) => {
+    setProviderSaving(true);
+    setProviderError(null);
+    try {
+      const nextUsage = await api.connectProvider(groqKey.trim(), huggingfaceKey.trim());
+      setUsage(nextUsage);
+      setProviderDialogOpen(false);
+      setErrorMessage(null);
+    } catch (error) {
+      setProviderError(error instanceof Error ? error.message : "Could not connect these keys.");
+    } finally {
+      setProviderSaving(false);
+    }
+  };
+
+  const disconnectProvider = async () => {
+    setProviderSaving(true);
+    setProviderError(null);
+    try {
+      setUsage(await api.disconnectProvider());
+      setProviderDialogOpen(false);
+    } catch (error) {
+      setProviderError(error instanceof Error ? error.message : "Could not disconnect these keys.");
+    } finally {
+      setProviderSaving(false);
+    }
+  };
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -382,10 +614,14 @@ export default function RepoPilotApp() {
           </span>
           <span>RepoPilot</span>
         </a>
-        <div className="header-context" aria-label="Product capability">
-          <GithubLogo size={17} aria-hidden="true" />
-          <span>Public GitHub repositories</span>
-        </div>
+        <button className="usage-control" type="button" onClick={() => setProviderDialogOpen(true)}>
+          <LockKey size={17} weight={usage?.provider_connected ? "fill" : "regular"} aria-hidden="true" />
+          <span>
+            {usage?.provider_connected
+              ? "Your provider is connected"
+              : `${usage?.free_questions_remaining ?? 5} free questions`}
+          </span>
+        </button>
       </header>
 
       {stage === "capture" ? (
@@ -734,7 +970,15 @@ export default function RepoPilotApp() {
               )}
 
               <form className="ask-panel" onSubmit={askAnything}>
-                <label htmlFor="ask-repository">Ask this repository</label>
+                <div className="ask-heading">
+                  <label htmlFor="ask-repository">Ask this repository</label>
+                  <button type="button" onClick={() => setProviderDialogOpen(true)}>
+                    <LockKey size={15} aria-hidden="true" />
+                    {usage?.provider_connected
+                      ? "Using your provider"
+                      : `${usage?.free_questions_remaining ?? 5} free remaining`}
+                  </button>
+                </div>
                 <div className="ask-row">
                   <input
                     id="ask-repository"
@@ -803,6 +1047,18 @@ export default function RepoPilotApp() {
           </div>
         </div>
       )}
+      <ProviderDialog
+        error={providerError}
+        onClose={() => {
+          setProviderDialogOpen(false);
+          setProviderError(null);
+        }}
+        onConnect={connectProvider}
+        onDisconnect={disconnectProvider}
+        open={providerDialogOpen}
+        saving={providerSaving}
+        usage={usage}
+      />
     </main>
   );
 }

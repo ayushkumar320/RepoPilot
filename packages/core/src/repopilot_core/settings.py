@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     # ── Environment ──────────────────────────────────────────────────────────
     repopilot_env: str = "development"
     repopilot_log_level: str = "INFO"
+    repopilot_session_secret: str = "repopilot-development-session-secret"
+    repopilot_session_cookie_secure: bool = False
     repopilot_web_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://127.0.0.1:3000", "http://localhost:3000"]
     )
@@ -156,6 +158,17 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return _split_csv(value)
         return value
+
+    @model_validator(mode="after")
+    def _require_production_session_secret(self) -> Settings:
+        if (
+            self.repopilot_env == "production"
+            and self.repopilot_session_secret == "repopilot-development-session-secret"
+        ):
+            raise ValueError("REPOPILOT_SESSION_SECRET must be set in production")
+        if self.repopilot_env == "production" and not self.repopilot_session_cookie_secure:
+            raise ValueError("REPOPILOT_SESSION_COOKIE_SECURE must be true in production")
+        return self
 
 
 @lru_cache(maxsize=1)

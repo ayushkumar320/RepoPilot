@@ -8,6 +8,21 @@ function apiRoute(path: string): string {
 }
 
 test("phase 4 tour starts and shows synchronized viewer shell", async ({ page }) => {
+  let tourStreamRequests = 0;
+  await page.route(apiRoute("/account/usage"), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        free_repositories_remaining: 1,
+        free_questions_remaining: 5,
+        provider_connected: false,
+        groq_connected: false,
+        huggingface_connected: false,
+        credential_storage: "session_only",
+      }),
+    });
+  });
   await page.route(apiRoute("/repos"), async (route) => {
     await route.fulfill({
       status: 202,
@@ -40,6 +55,7 @@ test("phase 4 tour starts and shows synchronized viewer shell", async ({ page })
     });
   });
   await page.route(apiRoute("/tours/tour-123/stream"), async (route) => {
+    tourStreamRequests += 1;
     await route.fulfill({
       status: 200,
       contentType: "text/event-stream",
@@ -84,4 +100,11 @@ test("phase 4 tour starts and shows synchronized viewer shell", async ({ page })
   await expect(page.getByRole("heading", { name: "Guided repository tour" })).toBeVisible();
   await expect(page.getByText("Synchronized Code Viewer")).toBeVisible();
   await expect(page.getByText("class Flask:")).toBeVisible();
+
+  await page.reload();
+
+  await expect(page.getByRole("heading", { name: "Guided repository tour" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entry points" })).toBeVisible();
+  await expect(page.getByText("class Flask:")).toBeVisible();
+  expect(tourStreamRequests).toBeGreaterThanOrEqual(2);
 });

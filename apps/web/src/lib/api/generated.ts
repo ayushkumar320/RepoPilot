@@ -1,4 +1,24 @@
 export type RepoStatus = "queued" | "indexing" | "ready" | "error" | "stale";
+
+export interface AccountUsage {
+  free_repositories_remaining: number;
+  free_questions_remaining: number;
+  provider_connected: boolean;
+  groq_connected: boolean;
+  huggingface_connected: boolean;
+  credential_storage: "session_only";
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
 export type ClaimStatus = "unverified" | "verified" | "rejected" | "flagged";
 
 export interface CodeRef {
@@ -128,14 +148,45 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
       ...(init?.headers ?? {}),
     },
     cache: "no-store",
+    credentials: "include",
   });
   if (!response.ok) {
-    throw new Error(await response.text());
+    const text = await response.text();
+    let message = text || `Request failed with status ${response.status}.`;
+    let code: string | undefined;
+    try {
+      const payload = JSON.parse(text) as {
+        detail?: string | { code?: string; message?: string };
+      };
+      if (typeof payload.detail === "string") message = payload.detail;
+      if (typeof payload.detail === "object" && payload.detail) {
+        message = payload.detail.message ?? message;
+        code = payload.detail.code;
+      }
+    } catch {
+      // Preserve the response body when an upstream proxy returns plain text.
+    }
+    throw new ApiError(message, response.status, code);
   }
   return (await response.json()) as T;
 }
 
 export const api = {
+  getAccountUsage(): Promise<AccountUsage> {
+    return http("/account/usage");
+  },
+  connectProvider(groqApiKey: string, huggingfaceApiKey?: string): Promise<AccountUsage> {
+    return http("/account/provider", {
+      method: "POST",
+      body: JSON.stringify({
+        groq_api_key: groqApiKey,
+        huggingface_api_key: huggingfaceApiKey || null,
+      }),
+    });
+  },
+  disconnectProvider(): Promise<AccountUsage> {
+    return http("/account/provider", { method: "DELETE" });
+  },
   createRepo(repoUrl: string): Promise<CreateRepoResponse> {
     return http("/repos", {
       method: "POST",

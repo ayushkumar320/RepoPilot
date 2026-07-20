@@ -82,6 +82,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Typecheck web
+        run: npm run typecheck
+
+      - name: Build web
+        run: npm run build
+
   # The eval runner has been split into two dedicated workflows:
   #   - .github/workflows/eval-pr.yml    (PR-time, sampled, ≤5 min)
   #   - .github/workflows/eval-main.yml  (post-merge, full matrix, ≤30 min)

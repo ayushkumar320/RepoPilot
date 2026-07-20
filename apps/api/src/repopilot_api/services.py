@@ -14,7 +14,9 @@ from typing import Protocol
 from urllib.parse import quote, unquote
 from uuid import uuid4
 
-from sqlalchemy import func, select
+from arq.connections import ArqRedis, RedisSettings, create_pool
+from arq.jobs import Job
+from sqlalchemy import func, insert, select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_agents.qa import QAResult, answer_question
@@ -24,6 +26,7 @@ from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.types import CodeRef
 from repopilot_agents.verifier.grounding import Claim as QAClaim
+from repopilot_api.access import AccessService, InMemoryAccessService, ProductAccessService
 from repopilot_api.models import (
     BaseTourEvent,
     ChunkPayload,
@@ -40,6 +43,7 @@ from repopilot_api.models import (
     TourSectionStartEvent,
     TourTokenEvent,
 )
+from repopilot_api.product_db import product_tours
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
@@ -101,7 +105,9 @@ class SectionClaimData:
 
 
 class RepoService(Protocol):
-    async def enqueue(self, repo_url: str) -> RepoRecord: ...
+    async def enqueue(
+        self, repo_url: str, *, provider: LLMProvider | None = None
+    ) -> RepoRecord: ...
 
     async def get(self, repo_id: str) -> RepoRecord: ...
 
@@ -109,13 +115,17 @@ class RepoService(Protocol):
 
 
 class TourService(Protocol):
-    async def create(self, repo_id: str, intent_profile: IntentProfile) -> TourRecord: ...
+    async def create(
+        self, repo_id: str, intent_profile: IntentProfile, *, session_id: str | None = None
+    ) -> TourRecord: ...
 
     async def get(self, tour_id: str) -> TourRecord: ...
 
     def stream(self, tour_id: str) -> AsyncIterator[BaseTourEvent]: ...
 
-    async def ask(self, tour_id: str, question: str) -> QAAnswerResponse: ...
+    async def ask(
+        self, tour_id: str, question: str, *, provider: LLMProvider | None = None
+    ) -> QAAnswerResponse: ...
 
 
 class ChunkService(Protocol):
@@ -136,6 +146,7 @@ class AppServices:
     repos: RepoService
     tours: TourService
     chunks: ChunkService
+    access: AccessService = field(default_factory=InMemoryAccessService)
 
 
 @dataclass(slots=True)
@@ -166,8 +177,9 @@ class LiveRepoService:
     runtime: Runtime
     records: dict[str, RepoRecord] = field(default_factory=dict)
     tasks: dict[str, asyncio.Task[None]] = field(default_factory=dict)
+    redis: ArqRedis | None = None
 
-    async def enqueue(self, repo_url: str) -> RepoRecord:
+    async def enqueue(self, repo_url: str, *, provider: LLMProvider | None = None) -> RepoRecord:
         slug = repo_slug(repo_url)
         existing = await self._load_record_from_db(slug, repo_url=repo_url)
         if existing is not None and existing.status in {"ready", "stale"}:
@@ -179,8 +191,64 @@ class LiveRepoService:
             record = RepoRecord(repo_id=slug, repo_url=repo_url, status="queued", progress=5)
             self.records[slug] = record
         if slug not in self.tasks or self.tasks[slug].done():
-            self.tasks[slug] = asyncio.create_task(self._index(slug, repo_url))
+            if self.runtime.settings.repopilot_env == "production" and provider is None:
+                self.tasks[slug] = asyncio.create_task(self._enqueue_worker(slug, repo_url))
+            else:
+                self.tasks[slug] = asyncio.create_task(
+                    self._index(slug, repo_url, provider=provider)
+                )
         return record
+
+    async def _enqueue_worker(self, slug: str, repo_url: str) -> None:
+        record = self.records[slug]
+        record.status = "indexing"
+        record.progress = 15
+        record.first_impression = "Repository indexing is running in the background."
+        progress_task = asyncio.create_task(self._advance_progress(record))
+        try:
+            if self.redis is None:
+                self.redis = await create_pool(
+                    RedisSettings.from_dsn(self.runtime.settings.redis_url)
+                )
+            job = await self.redis.enqueue_job("index_repo", repo_url)
+            if job is None:
+                raise RuntimeError("repository indexing job could not be enqueued")
+            await self._apply_worker_result(record, job)
+        except Exception as exc:
+            record.status = "error"
+            record.progress = None
+            record.error = str(exc)
+        finally:
+            progress_task.cancel()
+
+    async def _apply_worker_result(self, record: RepoRecord, job: Job) -> None:
+        payload = await job.result(timeout=60 * 60, poll_delay=1.0)
+        if not isinstance(payload, dict):
+            raise RuntimeError("repository indexing worker returned an invalid result")
+        status = str(payload.get("status", "error"))
+        if status == "too_large":
+            record.status = "error"
+            record.progress = None
+            record.error = "Repository exceeds the configured indexing size limit."
+            return
+        if status == "unsupported":
+            record.status = "error"
+            record.progress = None
+            record.error = "Repository contains no supported source or context files."
+            return
+        snapshot_repo_id = payload.get("repo_id")
+        if not isinstance(snapshot_repo_id, str) or not snapshot_repo_id:
+            raise RuntimeError("repository indexing worker returned no snapshot id")
+        record.progress = 100
+        record.indexed_sha = str(payload.get("indexed_sha") or payload.get("head_sha") or "")
+        record.remote_sha = str(payload.get("remote_sha") or payload.get("head_sha") or "")
+        record.indexed_repo_id = snapshot_repo_id
+        engine = make_engine(self.runtime.settings)
+        try:
+            record.first_impression = await self._compose_first_impression(engine, snapshot_repo_id)
+        finally:
+            await engine.dispose()
+        record.status = "ready"
 
     async def get(self, repo_id: str) -> RepoRecord:
         normalized_repo_id = normalize_repo_id(repo_id)
@@ -193,7 +261,9 @@ class LiveRepoService:
         self.records[normalized_repo_id] = loaded
         return loaded
 
-    async def _index(self, slug: str, repo_url: str) -> None:
+    async def _index(
+        self, slug: str, repo_url: str, *, provider: LLMProvider | None = None
+    ) -> None:
         record = self.records[slug]
         record.status = "indexing"
         record.progress = 15
@@ -201,7 +271,9 @@ class LiveRepoService:
         progress_task = asyncio.create_task(self._advance_progress(record))
         try:
             result = await index_repo(
-                repo_url, provider=self.runtime.provider, settings=self.runtime.settings
+                repo_url,
+                provider=provider or self.runtime.provider,
+                settings=self.runtime.settings,
             )
             progress_task.cancel()
             if result.status == "too_large":
@@ -310,8 +382,7 @@ class LiveRepoService:
                     .group_by(repos_table.c.id, repos_table.c.indexed_at)
                     .having(func.count(chunks_table.c.id) > 0)
                     .having(
-                        func.count(embeddings_table.c.chunk_id)
-                        == func.count(chunks_table.c.id)
+                        func.count(embeddings_table.c.chunk_id) == func.count(chunks_table.c.id)
                     )
                     .order_by(repos_table.c.indexed_at.desc())
                     .limit(1)
@@ -372,7 +443,9 @@ class LiveTourService:
     repos: LiveRepoService
     records: dict[str, TourRecord] = field(default_factory=dict)
 
-    async def create(self, repo_id: str, intent_profile: IntentProfile) -> TourRecord:
+    async def create(
+        self, repo_id: str, intent_profile: IntentProfile, *, session_id: str | None = None
+    ) -> TourRecord:
         repo = await self.repos.get(repo_id)
         snapshot_repo_id = repo.indexed_repo_id
         if snapshot_repo_id is None:
@@ -385,10 +458,55 @@ class LiveTourService:
             snapshot_repo_id=snapshot_repo_id,
         )
         self.records[record.tour_id] = record
+        if session_id is not None:
+            engine = make_engine(self.runtime.settings)
+            try:
+                async with engine.begin() as conn:
+                    await conn.execute(
+                        insert(product_tours).values(
+                            tour_id=record.tour_id,
+                            session_id=session_id,
+                            repo_id=record.repo_id,
+                            snapshot_repo_id=record.snapshot_repo_id,
+                            intent_profile=record.intent_profile.model_dump(mode="json"),
+                            created_at=record.created_at,
+                        )
+                    )
+            finally:
+                await engine.dispose()
         return record
 
     async def get(self, tour_id: str) -> TourRecord:
-        return self.records[tour_id]
+        record = self.records.get(tour_id)
+        if record is not None:
+            return record
+        engine = make_engine(self.runtime.settings)
+        try:
+            async with engine.connect() as conn:
+                row = (
+                    await conn.execute(
+                        select(
+                            product_tours.c.tour_id,
+                            product_tours.c.repo_id,
+                            product_tours.c.created_at,
+                            product_tours.c.intent_profile,
+                            product_tours.c.snapshot_repo_id,
+                        ).where(product_tours.c.tour_id == tour_id)
+                    )
+                ).first()
+        finally:
+            await engine.dispose()
+        if row is None:
+            raise KeyError(tour_id)
+        record = TourRecord(
+            tour_id=str(row[0]),
+            repo_id=str(row[1]),
+            created_at=row[2],
+            intent_profile=IntentProfile.model_validate(row[3]),
+            snapshot_repo_id=str(row[4]),
+        )
+        self.records[tour_id] = record
+        return record
 
     async def _build_sections(self, record: TourRecord) -> list[TourSectionData]:
         engine = make_engine(self.runtime.settings)
@@ -481,7 +599,9 @@ class LiveTourService:
     def stream(self, tour_id: str) -> AsyncIterator[TourEventType]:
         return self._stream_impl(tour_id)
 
-    async def ask(self, tour_id: str, question: str) -> QAAnswerResponse:
+    async def ask(
+        self, tour_id: str, question: str, *, provider: LLMProvider | None = None
+    ) -> QAAnswerResponse:
         record = await self.get(tour_id)
         engine = make_engine(self.runtime.settings)
         try:
@@ -489,7 +609,7 @@ class LiveTourService:
                 result = await answer_question(
                     question,
                     engine=engine,
-                    provider=self.runtime.provider,
+                    provider=provider or self.runtime.provider,
                     repo_id=record.snapshot_repo_id,
                 )
             except Exception as exc:
@@ -543,19 +663,30 @@ class LiveChunkService:
 
 async def create_live_services() -> AppServices:
     runtime = await build_runtime()
+    access = ProductAccessService(
+        engine=make_engine(runtime.settings),
+        settings=runtime.settings,
+    )
     repos = LiveRepoService(runtime=runtime)
     tours = LiveTourService(runtime=runtime, repos=repos)
     chunks = LiveChunkService(runtime=runtime)
-    return AppServices(repos=repos, tours=tours, chunks=chunks)
+    return AppServices(repos=repos, tours=tours, chunks=chunks, access=access)
 
 
 async def close_live_services(services: AppServices) -> None:
     repo_service = services.repos
     if isinstance(repo_service, LiveRepoService):
+        active_tasks: list[asyncio.Task[None]] = []
         for task in repo_service.tasks.values():
             if not task.done():
                 task.cancel()
+                active_tasks.append(task)
+        if active_tasks:
+            await asyncio.gather(*active_tasks, return_exceptions=True)
+        if repo_service.redis is not None:
+            await repo_service.redis.aclose()
         await shutdown_runtime(repo_service.runtime)
+    await services.access.aclose()
 
 
 async def load_snapshot(engine: AsyncEngine, snapshot_repo_id: str) -> RepoSnapshot:

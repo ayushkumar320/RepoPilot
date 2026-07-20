@@ -575,8 +575,8 @@
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/models.py": {
-    "mtime": 1783918577.0819788,
-    "ast_hash": "bef14e7fbc139898aa83675ef00da798",
+    "mtime": 1784568007.7200754,
+    "ast_hash": "667f2c0fdbf07ba2f9534d9f9ef4090d",
     "semantic_hash": ""
   },
   "packages/core/src/repopilot_core/llm/provider.py": {

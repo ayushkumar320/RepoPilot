@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/repopilot-app.tsx": {
-    "mtime": 1784559643.8365333,
-    "ast_hash": "cc044cd4a39dbc48d848de84724d4568",
+    "mtime": 1784576780.2443662,
+    "ast_hash": "5f061239a200ffa0cc3a367c16615295",
     "semantic_hash": ""
   },
   "apps/web/src/lib/api/generated.ts": {

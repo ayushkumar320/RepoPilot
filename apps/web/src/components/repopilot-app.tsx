@@ -103,27 +103,6 @@ const contributeChoices: Array<{
   },
 ];
 
-function parseSseFrame(chunk: string): TourEvent[] {
-  const frames = chunk.split("\n\n").filter(Boolean);
-  const events: TourEvent[] = [];
-  for (const frame of frames) {
-    const lines = frame.split("\n");
-    let eventName = "";
-    const dataLines: string[] = [];
-    for (const line of lines) {
-      if (line.startsWith("event:")) {
-        eventName = line.slice(6).trim();
-      }
-      if (line.startsWith("data:")) {
-        dataLines.push(line.slice(5).trim());
-      }
-    }
-    if (eventName && dataLines.length > 0) {
-      events.push(JSON.parse(dataLines.join("\n")) as TourEvent);
-    }
-  }
-  return events;
-}
 
 function buildProfile(
   mode: Mode,
@@ -371,6 +350,7 @@ export default function RepoPilotApp() {
   const [providerError, setProviderError] = useState<string | null>(null);
   const [stage, setStage] = useState<"capture" | "tour">("capture");
   const [store, setStore] = useState<TourStoreState>(initialTourStoreState);
+  const [tourStreamFailed, setTourStreamFailed] = useState(false);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
 
   const profile = useMemo(
@@ -428,49 +408,59 @@ export default function RepoPilotApp() {
 
   useEffect(() => {
     if (!tourId || !repoId || stage !== "tour") return;
-    const controller = new AbortController();
-    let active = true;
+    let receivedEvent = false;
 
-    const consumeTourStream = async () => {
+    // Fail loudly instead of showing the "Building guided tour" skeleton forever
+    // if the stream never delivers any events.
+    const stallTimer = window.setTimeout(() => {
+      if (!receivedEvent) {
+        setTourStreamFailed(true);
+        setErrorMessage(
+          "The tour stream did not respond. Confirm the API is reachable and try again.",
+        );
+      }
+    }, 30000);
+
+    // Use EventSource (not fetch + getReader) so the stream survives React Strict
+    // Mode remounts and Next.js soft navigations — same pattern as first-impression.
+    const source = new EventSource(api.tourStreamUrl(tourId), { withCredentials: true });
+    const applyNamedEvent = (name: string, raw: string) => {
+      receivedEvent = true;
       try {
-        const response = await fetch(api.tourStreamUrl(tourId), {
-          cache: "no-store",
-          credentials: "include",
-          signal: controller.signal,
-        });
-        if (!response.ok) throw new Error(await response.text());
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error("Tour stream did not return a readable response.");
-
-        const decoder = new TextDecoder();
-        let buffer = "";
-        while (active) {
-          const result = await reader.read();
-          if (result.done) break;
-          buffer += decoder.decode(result.value, { stream: true });
-          const parts = buffer.split("\n\n");
-          buffer = parts.pop() ?? "";
-          for (const part of parts) {
-            for (const tourEvent of parseSseFrame(`${part}\n\n`)) {
-              if (active) {
-                setStore((current) => applyTourEvent(current, tourEvent, repoId));
-              }
-            }
-          }
-        }
-      } catch (error) {
-        if (active && !controller.signal.aborted) {
-          setErrorMessage(error instanceof Error ? error.message : "Unable to stream the tour.");
-        }
+        // The SSE frame carries the event type in its `event:` line, not in the
+        // JSON body (e.g. {"v":1,"order":0,"title":"…"}), but applyTourEvent
+        // discriminates on `event.event` — so inject the event name here.
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        const tourEvent = { ...parsed, event: name } as unknown as TourEvent;
+        setStore((current) => applyTourEvent(current, tourEvent, repoId));
+      } catch {
+        // Ignore malformed frames; the stall timer surfaces a total failure.
       }
     };
+    for (const name of ["section_start", "token", "claim", "diagram", "section_end"]) {
+      source.addEventListener(name, (event) => {
+        applyNamedEvent(name, (event as MessageEvent<string>).data);
+      });
+    }
+    source.addEventListener("done", (event) => {
+      applyNamedEvent("done", (event as MessageEvent<string>).data);
+      source.close();
+    });
+    source.addEventListener("error", () => {
+      // A normal close after "done" is already handled; only surface real failures.
+      if (!receivedEvent) {
+        setTourStreamFailed(true);
+        setErrorMessage("Unable to stream the tour.");
+      }
+      source.close();
+    });
 
-    void consumeTourStream();
+    setTourStreamFailed(false);
     return () => {
-      active = false;
-      controller.abort();
+      window.clearTimeout(stallTimer);
+      source.close();
     };
-  }, [repoId, stage, tourId]);
+  }, [repoId, stage, tourId, pollTick]);
 
   useEffect(() => {
     const chunkId = store.viewer.chunkId;
@@ -535,7 +525,15 @@ export default function RepoPilotApp() {
       setStore(initialTourStoreState);
       setTourId(created.tour_id);
       setStage("tour");
-      router.push(`/?tour=${created.tour_id}&repo=${encodeURIComponent(repoId)}`);
+      // Update the URL WITHOUT a router navigation: router.push triggers an RSC
+      // soft-navigation that remounts this client tree and tears down the tour
+      // EventSource mid-stream. history.replaceState keeps the component (and the
+      // open stream) alive while still making the tour deep-linkable.
+      window.history.replaceState(
+        null,
+        "",
+        `/?tour=${created.tour_id}&repo=${encodeURIComponent(repoId)}`,
+      );
     } catch (error) {
       setStage("capture");
       setErrorMessage(error instanceof Error ? error.message : "Unable to start the tour.");
@@ -898,7 +896,22 @@ export default function RepoPilotApp() {
             </aside>
 
             <section className="tour-content" aria-label="Guided tour" aria-live="polite">
-              {store.sections.length === 0 ? (
+              {store.sections.length === 0 && tourStreamFailed ? (
+                <div className="tour-error" role="alert">
+                  <p>{errorMessage ?? "The guided tour could not be loaded."}</p>
+                  <button
+                    className="button button-secondary"
+                    type="button"
+                    onClick={() => {
+                      setErrorMessage(null);
+                      setTourStreamFailed(false);
+                      forcePoll();
+                    }}
+                  >
+                    Retry tour
+                  </button>
+                </div>
+              ) : store.sections.length === 0 ? (
                 <div className="tour-loading" aria-label="Building guided tour">
                   <div className="skeleton skeleton-heading" />
                   <div className="skeleton skeleton-copy" />

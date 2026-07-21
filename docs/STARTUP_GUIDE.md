@@ -217,3 +217,15 @@ make db-migrate
 ```
 
 If first indexing is slow, check whether sentence-transformers is downloading embedding weights and whether the configured LLM provider is rate-limiting.
+
+### "Internal Server Error" on submit (`POST /api/repos` returns 500)
+
+**Dev only.** The web app talks to the backend through the same-origin Next.js proxy (`/api/*` → uvicorn, see `apps/web/next.config.mjs`). The Next dev server keeps a pool of keep-alive sockets to uvicorn. If uvicorn closes an idle socket (its default `--timeout-keep-alive` is 5s) while that socket still sits in the proxy's pool, the next request reuses the dead socket and the hop fails with `ECONNRESET` / `socket hang up`. The proxy turns that into a **500** and the UI shows "Internal Server Error"; the backend logs no error because the failure is on the proxy→uvicorn hop, not in FastAPI. It is intermittent (timing-dependent) and a plain page reload usually clears it.
+
+This is fixed by running uvicorn with a keep-alive window wider than the proxy's socket reuse gap — `make backend` / `make dev` now pass `--timeout-keep-alive 75`. The web API client (`apps/web/src/lib/api/generated.ts`) also retries idempotent requests once on a transient 5xx. If you run uvicorn by hand, add the flag:
+
+```bash
+uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --host 127.0.0.1 --port 8000 --timeout-keep-alive 75
+```
+
+This does not occur in production, which sits behind a real reverse proxy rather than the Next dev server.

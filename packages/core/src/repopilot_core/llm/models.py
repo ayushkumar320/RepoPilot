@@ -72,9 +72,9 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
         ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
     ),
     ModelId.FLOW_TRACER: (
-        ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
+        ModelBinding(ProviderName.GROQ, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.TEACHER: (
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
@@ -90,25 +90,25 @@ RESOLUTION: dict[ModelId, tuple[ModelBinding, ...]] = {
         ModelBinding(ProviderName.GROQ, "llama-3.3-70b-versatile"),
         ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
         ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
-        ModelBinding(ProviderName.GROQ, "openai/gpt-oss-20b"),
+        ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
     ),
     ModelId.QA_FALLBACK: (
-        ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
+        ModelBinding(ProviderName.GROQ, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     ModelId.CODE_HEALTH: (
         ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
         ModelBinding(ProviderName.CEREBRAS, "llama-4-scout-17b-16e-instruct"),
-        ModelBinding(ProviderName.GROQ, "openai/gpt-oss-20b"),
+        ModelBinding(ProviderName.GROQ, "llama-3.1-8b-instant"),
     ),
     # Verifier is the highest call-volume agent. Groq qwen3-32b is the primary
     # for its strict-JSON discipline; Cerebras qwen-3-32b matches semantics for
     # the failover, and gpt-oss-120b is the last-resort shim.
     ModelId.VERIFIER: (
-        ModelBinding(ProviderName.GROQ, "qwen/qwen3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "qwen-3-32b"),
-        ModelBinding(ProviderName.CEREBRAS, "gpt-oss-120b"),
+        ModelBinding(ProviderName.GROQ, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "qwen-2.5-32b"),
+        ModelBinding(ProviderName.CEREBRAS, "llama-3.3-70b"),
     ),
     # Embeddings run in-process via sentence-transformers (HF model weights).
     # physical_model is the HF model id passed to SentenceTransformer().

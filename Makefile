@@ -29,14 +29,14 @@ setup:
 services: docker-up db-migrate
 
 backend:
-	uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000
+	uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --reload-dir apps/api/src --host 127.0.0.1 --port 8000
 
 frontend:
 	cd apps/web && npm run dev
 
 dev:
 	@echo "Starting backend on http://127.0.0.1:8000 and frontend on http://127.0.0.1:3000"
-	@uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --host 127.0.0.1 --port 8000 & \
+	@uv run uvicorn repopilot_api.app:app --app-dir apps/api/src --reload --reload-dir apps/api/src --host 127.0.0.1 --port 8000 & \
 	api_pid=$$!; \
 	(cd apps/web && npm run dev) & \
 	web_pid=$$!; \

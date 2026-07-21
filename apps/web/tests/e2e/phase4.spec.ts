@@ -2,11 +2,11 @@ import { expect, test } from "@playwright/test";
 
 const repoUrl = process.env.PLAYWRIGHT_REPO_URL ?? "https://github.com/pallets/flask";
 
-// The app reads NEXT_PUBLIC_API_BASE_URL from .env.local at build time.
-// In dev, this is typically "http://localhost:8000" (direct to backend),
-// while the test default fallback is "/api" (Next.js rewrite proxy).
-// We must match whatever the running app actually uses.
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+// The app reads NEXT_PUBLIC_API_BASE_URL from .env.local at build time. The
+// committed default is "/api" (the same-origin Next.js rewrite proxy in
+// next.config.mjs) so the session cookie survives; we must match whatever the
+// running app actually uses.
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
 function apiRoute(path: string): string {
   if (apiBaseUrl.startsWith("http")) {
@@ -22,13 +22,17 @@ const sseHeaders = {
   "Connection": "keep-alive",
 };
 
+// Mirror the REAL backend SSE contract: the event type lives in the `event:`
+// line only; the JSON `data:` body carries NO `event` field. (An earlier mock
+// baked `"event"` into the body, which masked a real render bug where the web
+// store discriminates on the event name that the consumer must inject.)
 function tourStreamBody(): string {
   return [
-    'event: section_start\ndata: {"event":"section_start","v":1,"order":0,"title":"Entry points"}\n\n',
-    'event: token\ndata: {"event":"token","v":1,"text":"Start with the Flask app object."}\n\n',
-    'event: claim\ndata: {"event":"claim","v":1,"id":"claim-1","text":"The Flask class is the main app entry.","refs":[{"file_path":"src/flask/app.py","start_line":1,"end_line":20,"symbol":"Flask"}],"status":"verified","retrieval_path":["vector_search:k=8"],"verifier_note":"Grounded against app.py."}\n\n',
-    'event: section_end\ndata: {"event":"section_end","v":1,"order":0}\n\n',
-    'event: done\ndata: {"event":"done","v":1}\n\n',
+    'event: section_start\ndata: {"v":1,"order":0,"title":"Entry points"}\n\n',
+    'event: token\ndata: {"v":1,"text":"Start with the Flask app object."}\n\n',
+    'event: claim\ndata: {"v":1,"id":"claim-1","text":"The Flask class is the main app entry.","refs":[{"file_path":"src/flask/app.py","start_line":1,"end_line":20,"symbol":"Flask"}],"status":"verified","retrieval_path":["vector_search:k=8"],"verifier_note":"Grounded against app.py."}\n\n',
+    'event: section_end\ndata: {"v":1,"order":0}\n\n',
+    'event: done\ndata: {"v":1}\n\n',
   ].join("");
 }
 
@@ -48,9 +52,9 @@ const chunkResponse = JSON.stringify({
 test("phase 4 tour starts and shows synchronized viewer shell", async ({ page }) => {
   let tourStreamRequests = 0;
 
-  // Single dispatcher that intercepts all requests to the API backend.
-  // The app's .env.local sets NEXT_PUBLIC_API_BASE_URL=http://localhost:8000,
-  // so client-side fetches go directly to the backend, not through /api/ rewrite.
+  // Single dispatcher that intercepts all requests to the API backend. The app
+  // uses the same-origin `/api` base, so these intercept the browser's requests
+  // before the Next.js rewrite forwards them upstream.
   await page.route(new RegExp(apiBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
@@ -97,8 +101,8 @@ test("phase 4 tour starts and shows synchronized viewer shell", async ({ page })
         contentType: "text/event-stream",
         headers: sseHeaders,
         body: [
-          'event: first_impression\ndata: {"event":"first_impression","v":1,"text":"Flask looks routing-heavy."}\n\n',
-          'event: done\ndata: {"event":"done","v":1}\n\n',
+          'event: first_impression\ndata: {"v":1,"text":"Flask looks routing-heavy."}\n\n',
+          'event: done\ndata: {"v":1}\n\n',
         ].join(""),
       });
     }

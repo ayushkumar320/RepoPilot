@@ -641,12 +641,23 @@ class LiveTourService:
 @dataclass(slots=True)
 class LiveChunkService:
     runtime: Runtime
+    repos: LiveRepoService
 
     async def get(self, chunk_id: str) -> ChunkPayload:
         repo_id, ref = decode_chunk_id(chunk_id)
+        # Chunk ids embed the user-facing repo id (e.g. "owner/repo"), but chunks
+        # are keyed by the indexed snapshot id ("owner/repo@<head_sha>"). Resolve
+        # the display id to its snapshot before looking the chunk up, otherwise a
+        # perfectly valid claim ref resolves to nothing ("chunk not found").
+        snapshot_repo_id = repo_id
+        if "@" not in repo_id:
+            repo = await self.repos.get(repo_id)
+            if repo.indexed_repo_id is None:
+                raise KeyError(chunk_id)
+            snapshot_repo_id = repo.indexed_repo_id
         engine = make_engine(self.runtime.settings)
         try:
-            chunks = await read_chunks([ref], engine=engine, repo_id=repo_id)
+            chunks = await read_chunks([ref], engine=engine, repo_id=snapshot_repo_id)
         finally:
             await engine.dispose()
         if not chunks:
@@ -654,7 +665,7 @@ class LiveChunkService:
         chunk = chunks[0]
         return ChunkPayload(
             chunk_id=chunk_id,
-            repo_id=repo_id,
+            repo_id=snapshot_repo_id,
             ref=chunk.ref,
             content=chunk.content,
             summary=chunk.summary,
@@ -669,7 +680,7 @@ async def create_live_services() -> AppServices:
     )
     repos = LiveRepoService(runtime=runtime)
     tours = LiveTourService(runtime=runtime, repos=repos)
-    chunks = LiveChunkService(runtime=runtime)
+    chunks = LiveChunkService(runtime=runtime, repos=repos)
     return AppServices(repos=repos, tours=tours, chunks=chunks, access=access)
 
 

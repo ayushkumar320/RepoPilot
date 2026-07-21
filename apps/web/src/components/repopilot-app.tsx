@@ -156,9 +156,21 @@ function splitLines(content: string, startLine: number, endLine: number): Viewer
 }
 
 function claimBadgeClass(status: ClaimStatus): string {
-  return status === "flagged" || status === "rejected"
-    ? "status-badge status-badge-warning"
-    : "status-badge status-badge-success";
+  if (status === "flagged" || status === "rejected") {
+    return "status-badge status-badge-warning";
+  }
+  // "unverified" = the verifier could not run (e.g. every provider was
+  // exhausted). Neutral treatment — neither confirmed nor found wanting.
+  if (status === "unverified") {
+    return "status-badge status-badge-neutral";
+  }
+  return "status-badge status-badge-success";
+}
+
+function claimBadgeLabel(status: ClaimStatus): string {
+  if (status === "flagged" || status === "rejected") return "Review";
+  if (status === "unverified") return "Unverified";
+  return "Verified";
 }
 
 function statusLabel(status?: RepoStatus): string {
@@ -947,6 +959,7 @@ export default function RepoPilotApp() {
                         {section.claimIds.map((claimId) => {
                           const claim = store.claimsById[claimId];
                           const flagged = claim.status === "flagged" || claim.status === "rejected";
+                          const unverified = claim.status === "unverified";
                           return (
                             <button
                               key={claimId}
@@ -954,10 +967,11 @@ export default function RepoPilotApp() {
                               className="claim-row"
                               data-active={store.selectedClaimId === claimId}
                               data-flagged={flagged}
+                              data-unverified={unverified}
                               onClick={() => setStore((current) => selectClaim(current, claimId))}
                             >
                               <span className="claim-icon" aria-hidden="true">
-                                {flagged ? (
+                                {flagged || unverified ? (
                                   <WarningCircle size={19} weight="fill" />
                                 ) : (
                                   <ShieldCheck size={19} weight="fill" />
@@ -971,7 +985,7 @@ export default function RepoPilotApp() {
                                 {claim.verifier_note ? <small>{claim.verifier_note}</small> : null}
                               </span>
                               <span className={claimBadgeClass(claim.status)}>
-                                {flagged ? "Review" : "Verified"}
+                                {claimBadgeLabel(claim.status)}
                               </span>
                             </button>
                           );

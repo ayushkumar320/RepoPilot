@@ -45,6 +45,16 @@ def _prompt(chunk: Chunk) -> list[Message]:
     return [Message("system", _SYSTEM), Message("user", user)]
 
 
+def _fallback_summary(chunk: Chunk) -> str:
+    """Deterministic stand-in when the summariser can't run (e.g. every provider
+    is exhausted). More useful than the literal ``"unknown"`` — it still tells
+    the reader what the chunk is, from AST facts we already have.
+    """
+    name = chunk.symbol.rsplit(".", 1)[-1] if chunk.symbol else chunk.file_path
+    kind = chunk.kind.replace("_", " ")
+    return f"{kind} `{name}` in {chunk.file_path} (summary unavailable)"
+
+
 async def summarise_chunks(
     chunks: Sequence[Chunk],
     *,
@@ -52,7 +62,7 @@ async def summarise_chunks(
     settings: Settings,
 ) -> list[SummarisedChunk]:
     if provider is None:
-        return [SummarisedChunk(chunk=c, summary="unknown") for c in chunks]
+        return [SummarisedChunk(chunk=c, summary=_fallback_summary(c)) for c in chunks]
     """Summarise every chunk concurrently, bounded by the configured semaphore.
 
     In local/dev usage the chat providers may be rate-limited or out of quota.
@@ -67,7 +77,7 @@ async def summarise_chunks(
         nonlocal circuit_open
         async with circuit_lock:
             if circuit_open:
-                return SummarisedChunk(chunk=chunk, summary="unknown")
+                return SummarisedChunk(chunk=chunk, summary=_fallback_summary(chunk))
         try:
             response = await provider.generate(
                 ModelId.CODE_HEALTH,
@@ -76,7 +86,7 @@ async def summarise_chunks(
                 temperature=0.0,
                 max_tokens=120,
             )
-            summary = response.text.strip() or "unknown"
+            summary = response.text.strip() or _fallback_summary(chunk)
         except ProviderError as exc:
             async with circuit_lock:
                 circuit_open = True
@@ -88,7 +98,7 @@ async def summarise_chunks(
                 symbol=chunk.symbol,
                 error=str(exc),
             )
-            summary = "unknown"
+            summary = _fallback_summary(chunk)
         return SummarisedChunk(chunk=chunk, summary=summary)
 
     queue: asyncio.Queue[tuple[int, Chunk] | None] = asyncio.Queue(maxsize=concurrency * 2)

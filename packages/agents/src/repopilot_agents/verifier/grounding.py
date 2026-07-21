@@ -46,6 +46,12 @@ log = structlog.get_logger(__name__)
 ClaimStatus = Literal["unverified", "verified", "rejected", "flagged"]
 Decision = Literal["supported", "rejected"]
 
+# Marker reason for a claim whose verification could NOT run because every
+# verifier provider was exhausted/unavailable. This is a transient infrastructure
+# failure — NOT a grounding rejection — so the render layers surface it as
+# ``"unverified"`` (retry) rather than ``"flagged"`` (checked and found wanting).
+VERIFIER_PROVIDER_ERROR_REASON = "verifier_provider_error"
+
 
 class Claim(BaseModel):
     """Phase 2 view of a claim. Phase 3 will move this into the state schema."""
@@ -232,7 +238,7 @@ async def verify_claim(
             claim=claim.text[:80],
             error=repr(exc),
         )
-        err_verdict = VerifierVerdict(decision="rejected", reason="verifier_provider_error")
+        err_verdict = VerifierVerdict(decision="rejected", reason=VERIFIER_PROVIDER_ERROR_REASON)
         _apply(claim, err_verdict)
         return _VerifyResult(
             claim=claim,
@@ -298,17 +304,28 @@ async def verify_claims(
 
 
 def _apply(claim: Claim, verdict: VerifierVerdict) -> None:
-    claim.status = "verified" if verdict.decision == "supported" else "rejected"
+    if verdict.decision == "supported":
+        claim.status = "verified"
+    elif verdict.reason == VERIFIER_PROVIDER_ERROR_REASON:
+        # The verifier could not run (every provider was exhausted). Mark the
+        # claim "unverified" (retryable) rather than "rejected" — the latter
+        # renders as "flagged", implying the claim was checked and found
+        # wanting, which is untrue and erodes trust in genuine flags.
+        claim.status = "unverified"
+    else:
+        claim.status = "rejected"
     claim.verifier_note = verdict.reason
 
 
 def _objection_if_rejected(claim: Claim, verdict: VerifierVerdict) -> VerifierObjection | None:
-    if verdict.decision == "supported":
+    # A provider outage is not a grounding rejection, so it raises no objection.
+    if verdict.decision == "supported" or verdict.reason == VERIFIER_PROVIDER_ERROR_REASON:
         return None
     return VerifierObjection(claim_text=claim.text, reason=verdict.reason)
 
 
 __all__ = [
+    "VERIFIER_PROVIDER_ERROR_REASON",
     "Claim",
     "ClaimStatus",
     "VerifierObjection",

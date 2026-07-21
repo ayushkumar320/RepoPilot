@@ -188,7 +188,7 @@ async def test_verify_claim_parse_fail_rejects(
 
 
 @pytest.mark.asyncio
-async def test_verify_claim_provider_error_rejects_instead_of_crashing(
+async def test_verify_claim_provider_error_marks_unverified_not_rejected(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     async def fake_read_chunks(refs: Any, *, engine: Any, repo_id: str) -> list[ChunkContent]:
@@ -221,7 +221,10 @@ async def test_verify_claim_provider_error_rejects_instead_of_crashing(
     )
     assert result.verdict.decision == "rejected"
     assert result.verdict.reason == "verifier_provider_error"
-    assert claim.status == "rejected"
+    # A provider outage is transient infra, not a grounding failure: the claim
+    # is marked "unverified" (retryable), NOT "rejected"/"flagged".
+    assert claim.status == "unverified"
+    assert result.objection is None
 
 
 @pytest.mark.asyncio

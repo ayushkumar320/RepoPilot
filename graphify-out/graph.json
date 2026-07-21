@@ -750,7 +750,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "basemodel",
-      "community": 19,
+      "community": 7,
       "norm_label": "basemodel"
     },
     {
@@ -960,7 +960,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "repopilot_api_models_tourevent_parse_sse_frame",
-      "community": 0,
+      "community": 85,
       "norm_label": ".parse_sse_frame()"
     },
     {
@@ -1010,7 +1010,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_api_product_db",
-      "community": 5,
+      "community": 12,
       "norm_label": "product_db.py"
     },
     {
@@ -1020,7 +1020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_api_product_db_rationale_1",
-      "community": 5,
+      "community": 12,
       "norm_label": "product-layer tables for sessions, entitlements, usage, and tours."
     },
     {
@@ -1460,7 +1460,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_py_asyncengine",
-      "community": 12,
+      "community": 0,
       "norm_label": "asyncengine"
     },
     {
@@ -1557,7 +1557,7 @@
       "label": "._stream_impl()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L574",
+      "source_location": "L585",
       "_origin": "ast",
       "id": "repopilot_api_services_livetourservice_stream_impl",
       "community": 0,
@@ -1567,7 +1567,7 @@
       "label": ".stream()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L599",
+      "source_location": "L610",
       "_origin": "ast",
       "id": "repopilot_api_services_livetourservice_stream",
       "community": 0,
@@ -1577,7 +1577,7 @@
       "label": ".ask()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L602",
+      "source_location": "L613",
       "_origin": "ast",
       "id": "repopilot_api_services_livetourservice_ask",
       "community": 12,
@@ -1587,7 +1587,7 @@
       "label": "LiveChunkService",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L642",
+      "source_location": "L653",
       "_origin": "ast",
       "id": "repopilot_api_services_livechunkservice",
       "community": 0,
@@ -1597,7 +1597,7 @@
       "label": ".get()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L646",
+      "source_location": "L657",
       "_origin": "ast",
       "id": "repopilot_api_services_livechunkservice_get",
       "community": 12,
@@ -1607,7 +1607,7 @@
       "label": "create_live_services()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L675",
+      "source_location": "L686",
       "_origin": "ast",
       "id": "repopilot_api_services_create_live_services",
       "community": 12,
@@ -1617,7 +1617,7 @@
       "label": "close_live_services()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L687",
+      "source_location": "L698",
       "_origin": "ast",
       "id": "repopilot_api_services_close_live_services",
       "community": 12,
@@ -1627,7 +1627,7 @@
       "label": "load_snapshot()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L703",
+      "source_location": "L714",
       "_origin": "ast",
       "id": "repopilot_api_services_load_snapshot",
       "community": 12,
@@ -1637,7 +1637,7 @@
       "label": "build_claims_for_symbols()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L717",
+      "source_location": "L728",
       "_origin": "ast",
       "id": "repopilot_api_services_build_claims_for_symbols",
       "community": 12,
@@ -1647,7 +1647,7 @@
       "label": "resolve_symbol_refs()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L747",
+      "source_location": "L758",
       "_origin": "ast",
       "id": "repopilot_api_services_resolve_symbol_refs",
       "community": 12,
@@ -1657,17 +1657,47 @@
       "label": "CodeRef",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L747",
+      "source_location": "L758",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_py_coderef",
       "community": 0,
       "norm_label": "coderef"
     },
     {
+      "label": "_focus_score()",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L794",
+      "_origin": "ast",
+      "id": "repopilot_api_services_focus_score",
+      "community": 12,
+      "norm_label": "_focus_score()"
+    },
+    {
+      "label": "_rank_symbols_by_focus()",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L816",
+      "_origin": "ast",
+      "id": "repopilot_api_services_rank_symbols_by_focus",
+      "community": 12,
+      "norm_label": "_rank_symbols_by_focus()"
+    },
+    {
+      "label": "GraphQueryResult",
+      "file_type": "code",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L816",
+      "_origin": "ast",
+      "id": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "community": 0,
+      "norm_label": "graphqueryresult"
+    },
+    {
       "label": "build_mermaid()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L783",
+      "source_location": "L841",
       "_origin": "ast",
       "id": "repopilot_api_services_build_mermaid",
       "community": 12,
@@ -1677,7 +1707,7 @@
       "label": "split_sentences()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L794",
+      "source_location": "L852",
       "_origin": "ast",
       "id": "repopilot_api_services_split_sentences",
       "community": 12,
@@ -1687,7 +1717,7 @@
       "label": "encode_chunk_id()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L799",
+      "source_location": "L857",
       "_origin": "ast",
       "id": "repopilot_api_services_encode_chunk_id",
       "community": 12,
@@ -1697,7 +1727,7 @@
       "label": "decode_chunk_id()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L810",
+      "source_location": "L868",
       "_origin": "ast",
       "id": "repopilot_api_services_decode_chunk_id",
       "community": 12,
@@ -1707,17 +1737,17 @@
       "label": "answer_deterministically()",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L826",
+      "source_location": "L884",
       "_origin": "ast",
       "id": "repopilot_api_services_answer_deterministically",
-      "community": 12,
+      "community": 0,
       "norm_label": "answer_deterministically()"
     },
     {
       "label": "QAResult",
       "file_type": "code",
       "source_file": "apps/api/src/repopilot_api/services.py",
-      "source_location": "L826",
+      "source_location": "L884",
       "_origin": "ast",
       "id": "apps_api_src_repopilot_api_services_py_qaresult",
       "community": 0,
@@ -1742,6 +1772,26 @@
       "id": "repopilot_api_services_rationale_136",
       "community": 85,
       "norm_label": "raised when a tour is requested before a repo has an indexed snapshot."
+    },
+    {
+      "label": "How strongly a symbol matches the user's focus keywords.      The leaf name (e.g",
+      "file_type": "rationale",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L795",
+      "_origin": "ast",
+      "id": "repopilot_api_services_rationale_795",
+      "community": 12,
+      "norm_label": "how strongly a symbol matches the user's focus keywords.      the leaf name (e.g"
+    },
+    {
+      "label": "Bias graph candidates toward the user's intent: focus-matching symbols     lead,",
+      "file_type": "rationale",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L819",
+      "_origin": "ast",
+      "id": "repopilot_api_services_rationale_819",
+      "community": 12,
+      "norm_label": "bias graph candidates toward the user's intent: focus-matching symbols     lead,"
     },
     {
       "label": "sse.py",
@@ -2230,7 +2280,7 @@
       "source_location": "L397",
       "_origin": "ast",
       "id": "tests_test_phase4_contract_test_deterministic_qa_result_accepts_grounding_claims",
-      "community": 12,
+      "community": 10,
       "norm_label": "test_deterministic_qa_result_accepts_grounding_claims()"
     },
     {
@@ -2854,10 +2904,20 @@
       "norm_label": "claimbadgeclass()"
     },
     {
+      "label": "claimBadgeLabel()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/repopilot-app.tsx",
+      "source_location": "L170",
+      "_origin": "ast",
+      "id": "components_repopilot_app_claimbadgelabel",
+      "community": 2,
+      "norm_label": "claimbadgelabel()"
+    },
+    {
       "label": "statusLabel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L164",
+      "source_location": "L176",
       "_origin": "ast",
       "id": "components_repopilot_app_statuslabel",
       "community": 2,
@@ -2867,7 +2927,7 @@
       "label": "repositoryName()",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L173",
+      "source_location": "L185",
       "_origin": "ast",
       "id": "components_repopilot_app_repositoryname",
       "community": 2,
@@ -2877,7 +2937,7 @@
       "label": "validPublicGithubUrl()",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L182",
+      "source_location": "L194",
       "_origin": "ast",
       "id": "components_repopilot_app_validpublicgithuburl",
       "community": 2,
@@ -2887,7 +2947,7 @@
       "label": "ProviderDialogProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L191",
+      "source_location": "L203",
       "_origin": "ast",
       "id": "components_repopilot_app_providerdialogprops",
       "community": 2,
@@ -2897,7 +2957,7 @@
       "label": "ProviderDialog()",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L201",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "components_repopilot_app_providerdialog",
       "community": 2,
@@ -2907,7 +2967,7 @@
       "label": "RepoPilotApp()",
       "file_type": "code",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
-      "source_location": "L332",
+      "source_location": "L344",
       "_origin": "ast",
       "id": "components_repopilot_app_repopilotapp",
       "community": 2,
@@ -3144,10 +3204,30 @@
       "norm_label": "tourevent"
     },
     {
-      "label": "http()",
+      "label": "RETRYABLE_STATUS",
       "file_type": "code",
       "source_file": "apps/web/src/lib/api/generated.ts",
       "source_location": "L143",
+      "_origin": "ast",
+      "id": "api_generated_retryable_status",
+      "community": 2,
+      "norm_label": "retryable_status"
+    },
+    {
+      "label": "isIdempotent()",
+      "file_type": "code",
+      "source_file": "apps/web/src/lib/api/generated.ts",
+      "source_location": "L148",
+      "_origin": "ast",
+      "id": "api_generated_isidempotent",
+      "community": 2,
+      "norm_label": "isidempotent()"
+    },
+    {
+      "label": "http()",
+      "file_type": "code",
+      "source_file": "apps/web/src/lib/api/generated.ts",
+      "source_location": "L153",
       "_origin": "ast",
       "id": "api_generated_http",
       "community": 2,
@@ -3157,7 +3237,7 @@
       "label": "api",
       "file_type": "code",
       "source_file": "apps/web/src/lib/api/generated.ts",
-      "source_location": "L174",
+      "source_location": "L199",
       "_origin": "ast",
       "id": "api_generated_api",
       "community": 2,
@@ -3600,7 +3680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_propose_labels",
-      "community": 11,
+      "community": 43,
       "norm_label": "propose_labels.py"
     },
     {
@@ -3610,7 +3690,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "tools_propose_labels_is_noise",
-      "community": 11,
+      "community": 43,
       "norm_label": "_is_noise()"
     },
     {
@@ -3620,7 +3700,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "tools_propose_labels_load_questions",
-      "community": 11,
+      "community": 43,
       "norm_label": "_load_questions()"
     },
     {
@@ -3630,7 +3710,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "evals_tools_propose_labels_py_path",
-      "community": 11,
+      "community": 43,
       "norm_label": "path"
     },
     {
@@ -3640,7 +3720,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "tools_propose_labels_propose",
-      "community": 11,
+      "community": 43,
       "norm_label": "propose()"
     },
     {
@@ -3650,7 +3730,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "tools_propose_labels_main",
-      "community": 11,
+      "community": 43,
       "norm_label": "main()"
     },
     {
@@ -3660,7 +3740,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_propose_labels_rationale_1",
-      "community": 11,
+      "community": 43,
       "norm_label": "propose candidate labels for a qa eval dataset (phase 0, option a).  mechanical"
     },
     {
@@ -3800,7 +3880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "capabilities_coerce",
-      "community": 55,
+      "community": 72,
       "norm_label": "_coerce.py"
     },
     {
@@ -3820,7 +3900,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_py_any",
-      "community": 55,
+      "community": 72,
       "norm_label": "any"
     },
     {
@@ -3830,7 +3910,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "capabilities_coerce_coerce_ref",
-      "community": 55,
+      "community": 72,
       "norm_label": "_coerce_ref()"
     },
     {
@@ -3840,7 +3920,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_py_coderef",
-      "community": 55,
+      "community": 72,
       "norm_label": "coderef"
     },
     {
@@ -3850,7 +3930,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "capabilities_coerce_coerce_refs",
-      "community": 55,
+      "community": 72,
       "norm_label": "coerce_refs()"
     },
     {
@@ -3860,7 +3940,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "capabilities_coerce_coerce_insight",
-      "community": 55,
+      "community": 72,
       "norm_label": "coerce_insight()"
     },
     {
@@ -3870,7 +3950,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_py_insight",
-      "community": 55,
+      "community": 9,
       "norm_label": "insight"
     },
     {
@@ -3880,7 +3960,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "capabilities_coerce_coerce_claim",
-      "community": 55,
+      "community": 72,
       "norm_label": "coerce_claim()"
     },
     {
@@ -3890,7 +3970,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_coerce_py_claim",
-      "community": 55,
+      "community": 9,
       "norm_label": "claim"
     },
     {
@@ -3900,7 +3980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "capabilities_coerce_rationale_1",
-      "community": 55,
+      "community": 72,
       "norm_label": "shared llm-output coercion helpers for capability nodes.  every node asks the ll"
     },
     {
@@ -3920,7 +4000,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "capabilities_coerce_rationale_39",
-      "community": 55,
+      "community": 72,
       "norm_label": "validate a ref. if the llm names a symbol, prefer the known coderef     for that"
     },
     {
@@ -3930,7 +4010,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "capabilities_coerce_rationale_72",
-      "community": 55,
+      "community": 72,
       "norm_label": "validate a single ``insight`` payload. returns ``none`` if any     required fiel"
     },
     {
@@ -4120,7 +4200,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "capabilities_flow_tracer",
-      "community": 9,
+      "community": 72,
       "norm_label": "flow_tracer.py"
     },
     {
@@ -4130,7 +4210,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_format_paths",
-      "community": 9,
+      "community": 72,
       "norm_label": "_format_paths()"
     },
     {
@@ -4150,7 +4230,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_seed_targets",
-      "community": 9,
+      "community": 72,
       "norm_label": "_seed_targets()"
     },
     {
@@ -4170,7 +4250,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_run_flow_tracer",
-      "community": 9,
+      "community": 72,
       "norm_label": "run_flow_tracer()"
     },
     {
@@ -4220,7 +4300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_rationale_1",
-      "community": 9,
+      "community": 72,
       "norm_label": "flow tracer \u2014 produces ``traced_flows`` insights from call-graph paths.  reads `"
     },
     {
@@ -4230,7 +4310,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_rationale_62",
-      "community": 9,
+      "community": 72,
       "norm_label": "choose which symbols to trace. prefer the planner's explicit     targets; otherw"
     },
     {
@@ -4240,7 +4320,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "capabilities_flow_tracer_rationale_80",
-      "community": 9,
+      "community": 72,
       "norm_label": "run the flow tracer once.      returns ``{\"traced_flows\": [insight, ...]}``. empty"
     },
     {
@@ -4270,7 +4350,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_teacher_py_insight",
-      "community": 72,
+      "community": 9,
       "norm_label": "insight"
     },
     {
@@ -4290,7 +4370,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_teacher_py_coderef",
-      "community": 72,
+      "community": 9,
       "norm_label": "coderef"
     },
     {
@@ -4310,7 +4390,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_capabilities_teacher_py_toursection",
-      "community": 72,
+      "community": 9,
       "norm_label": "toursection"
     },
     {
@@ -4460,7 +4540,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_contribute_briefing_py_opportunity",
-      "community": 7,
+      "community": 100,
       "norm_label": "opportunity"
     },
     {
@@ -4970,7 +5050,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_graph_py_intentprofile",
-      "community": 37,
+      "community": 36,
       "norm_label": "intentprofile"
     },
     {
@@ -5300,7 +5380,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_intent_planner_py_capabilityplan",
-      "community": 37,
+      "community": 9,
       "norm_label": "capabilityplan"
     },
     {
@@ -5550,7 +5630,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "prompts_goal_anchor",
-      "community": 30,
+      "community": 72,
       "norm_label": "goal_anchor.py"
     },
     {
@@ -5560,7 +5640,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "prompts_goal_anchor_format_weights",
-      "community": 30,
+      "community": 72,
       "norm_label": "_format_weights()"
     },
     {
@@ -5570,7 +5650,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "prompts_goal_anchor_format_keywords",
-      "community": 30,
+      "community": 72,
       "norm_label": "_format_keywords()"
     },
     {
@@ -5580,7 +5660,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "prompts_goal_anchor_format_active",
-      "community": 30,
+      "community": 72,
       "norm_label": "_format_active()"
     },
     {
@@ -5590,7 +5670,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_prompts_goal_anchor_py_capabilityplan",
-      "community": 30,
+      "community": 72,
       "norm_label": "capabilityplan"
     },
     {
@@ -5600,7 +5680,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "prompts_goal_anchor_format_tilt_line",
-      "community": 30,
+      "community": 72,
       "norm_label": "_format_tilt_line()"
     },
     {
@@ -5610,7 +5690,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "prompts_goal_anchor_render_goal_anchor",
-      "community": 30,
+      "community": 72,
       "norm_label": "render_goal_anchor()"
     },
     {
@@ -5620,7 +5700,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_prompts_goal_anchor_py_intentprofile",
-      "community": 37,
+      "community": 9,
       "norm_label": "intentprofile"
     },
     {
@@ -5630,7 +5710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "prompts_goal_anchor_rationale_1",
-      "community": 30,
+      "community": 72,
       "norm_label": "goal-anchor prompt block \u2014 shared across every generation node.  every generatio"
     },
     {
@@ -5640,7 +5720,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "prompts_goal_anchor_rationale_64",
-      "community": 30,
+      "community": 72,
       "norm_label": "render the goal-anchor block for the given (profile, plan) pair.      output is"
     },
     {
@@ -5680,7 +5760,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "qa_compress_keepranges",
-      "community": 9,
+      "community": 7,
       "norm_label": "_keepranges"
     },
     {
@@ -5690,7 +5770,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "qa_compress_keepranges_ordered_ranges",
-      "community": 9,
+      "community": 7,
       "norm_label": "._ordered_ranges()"
     },
     {
@@ -5820,34 +5900,34 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "qa_graph",
-      "community": 71,
+      "community": 45,
       "norm_label": "graph.py"
     },
     {
       "label": "QAResult",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L74",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "qa_graph_qaresult",
-      "community": 71,
+      "community": 45,
       "norm_label": "qaresult"
     },
     {
       "label": "_Context",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L87",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "qa_graph_context",
-      "community": 71,
+      "community": 45,
       "norm_label": "_context"
     },
     {
       "label": "answer_question()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L96",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "qa_graph_answer_question",
       "community": 21,
@@ -5857,7 +5937,7 @@
       "label": "AsyncEngine",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L96",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_asyncengine",
       "community": 45,
@@ -5867,7 +5947,7 @@
       "label": "LLMProvider",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L96",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_llmprovider",
       "community": 45,
@@ -5877,17 +5957,17 @@
       "label": "_extend_context()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L259",
+      "source_location": "L267",
       "_origin": "ast",
       "id": "qa_graph_extend_context",
-      "community": 71,
+      "community": 45,
       "norm_label": "_extend_context()"
     },
     {
       "label": "ChunkContent",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L259",
+      "source_location": "L267",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_chunkcontent",
       "community": 45,
@@ -5897,17 +5977,17 @@
       "label": "_estimate_tokens()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L268",
+      "source_location": "L276",
       "_origin": "ast",
       "id": "qa_graph_estimate_tokens",
-      "community": 71,
+      "community": 21,
       "norm_label": "_estimate_tokens()"
     },
     {
       "label": "_initial_retrieval()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L273",
+      "source_location": "L281",
       "_origin": "ast",
       "id": "qa_graph_initial_retrieval",
       "community": 45,
@@ -5917,7 +5997,7 @@
       "label": "ChunkHit",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L273",
+      "source_location": "L281",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_chunkhit",
       "community": 45,
@@ -5927,7 +6007,7 @@
       "label": "_retrieve_one()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L338",
+      "source_location": "L346",
       "_origin": "ast",
       "id": "qa_graph_retrieve_one",
       "community": 45,
@@ -5937,7 +6017,7 @@
       "label": "_single_path_prefix()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L372",
+      "source_location": "L380",
       "_origin": "ast",
       "id": "qa_graph_single_path_prefix",
       "community": 45,
@@ -5947,7 +6027,7 @@
       "label": "QuerySpec",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L372",
+      "source_location": "L380",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_queryspec",
       "community": 45,
@@ -5957,17 +6037,17 @@
       "label": "_query_lane_weights()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L383",
+      "source_location": "L391",
       "_origin": "ast",
       "id": "qa_graph_query_lane_weights",
-      "community": 71,
+      "community": 45,
       "norm_label": "_query_lane_weights()"
     },
     {
       "label": "_judge_sufficiency()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L389",
+      "source_location": "L397",
       "_origin": "ast",
       "id": "qa_graph_judge_sufficiency",
       "community": 45,
@@ -5977,7 +6057,7 @@
       "label": "SufficiencyVerdict",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L389",
+      "source_location": "L397",
       "_origin": "ast",
       "id": "sufficiencyverdict",
       "community": 45,
@@ -5987,7 +6067,7 @@
       "label": "_generate_answer()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L414",
+      "source_location": "L422",
       "_origin": "ast",
       "id": "qa_graph_generate_answer",
       "community": 45,
@@ -5997,17 +6077,17 @@
       "label": "_is_not_found()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L432",
+      "source_location": "L440",
       "_origin": "ast",
       "id": "qa_graph_is_not_found",
-      "community": 71,
+      "community": 45,
       "norm_label": "_is_not_found()"
     },
     {
       "label": "_parse_claims()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L437",
+      "source_location": "L445",
       "_origin": "ast",
       "id": "qa_graph_parse_claims",
       "community": 45,
@@ -6017,7 +6097,7 @@
       "label": "Claim",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L437",
+      "source_location": "L445",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_qa_graph_py_claim",
       "community": 45,
@@ -6030,26 +6110,26 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "qa_graph_rationale_1",
-      "community": 71,
+      "community": 45,
       "norm_label": "q&a langgraph mini-graph \u2014 the phase 2 spine.  ``` vector_search \u2192 graph_travers"
     },
     {
       "label": "The end-to-end output of one Q&A run.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L75",
+      "source_location": "L76",
       "_origin": "ast",
-      "id": "qa_graph_rationale_75",
-      "community": 71,
+      "id": "qa_graph_rationale_76",
+      "community": 45,
       "norm_label": "the end-to-end output of one q&a run."
     },
     {
       "label": "Run the hybrid-retrieval Q&A loop for ``question``.      ``recall_k`` / ``exclud",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L111",
+      "source_location": "L112",
       "_origin": "ast",
-      "id": "qa_graph_rationale_111",
+      "id": "qa_graph_rationale_112",
       "community": 21,
       "norm_label": "run the hybrid-retrieval q&a loop for ``question``.      ``recall_k`` / ``exclud"
     },
@@ -6057,19 +6137,19 @@
       "label": "Cheap, stable token estimate for relative Phase 5 prompt-size gating.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L269",
+      "source_location": "L277",
       "_origin": "ast",
-      "id": "qa_graph_rationale_269",
-      "community": 71,
+      "id": "qa_graph_rationale_277",
+      "community": 21,
       "norm_label": "cheap, stable token estimate for relative phase 5 prompt-size gating."
     },
     {
       "label": "One sentence per line \u2192 one Claim per line.      Extracts explicit [X] citations",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L438",
+      "source_location": "L446",
       "_origin": "ast",
-      "id": "qa_graph_rationale_438",
+      "id": "qa_graph_rationale_446",
       "community": 45,
       "norm_label": "one sentence per line \u2192 one claim per line.      extracts explicit [x] citations"
     },
@@ -6140,7 +6220,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "qa_prompts_query_spec_user_prompt",
-      "community": 47,
+      "community": 28,
       "norm_label": "query_spec_user_prompt()"
     },
     {
@@ -6180,7 +6260,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "qa_query_spec_queryspec",
-      "community": 47,
+      "community": 60,
       "norm_label": "queryspec"
     },
     {
@@ -6190,7 +6270,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "qa_query_spec_queryspec_raw_not_empty",
-      "community": 47,
+      "community": 60,
       "norm_label": "._raw_not_empty()"
     },
     {
@@ -6200,7 +6280,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "qa_query_spec_queryspec_clean_unique_strings",
-      "community": 47,
+      "community": 60,
       "norm_label": "._clean_unique_strings()"
     },
     {
@@ -6210,7 +6290,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "qa_query_spec_queryspec_retrieval_queries",
-      "community": 47,
+      "community": 60,
       "norm_label": ".retrieval_queries()"
     },
     {
@@ -6320,7 +6400,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "qa_query_spec_rationale_29",
-      "community": 47,
+      "community": 60,
       "norm_label": "structured retrieval plan for one user question."
     },
     {
@@ -6330,7 +6410,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "qa_query_spec_rationale_60",
-      "community": 47,
+      "community": 60,
       "norm_label": "return raw question + deduped rewrites, capped for latency."
     },
     {
@@ -6380,7 +6460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "qa_types_qaclaim",
-      "community": 12,
+      "community": 10,
       "norm_label": "qaclaim"
     },
     {
@@ -6410,7 +6490,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "qa_types_rationale_21",
-      "community": 12,
+      "community": 10,
       "norm_label": "a single grounded claim in the q&a answer."
     },
     {
@@ -6840,7 +6920,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "repopilot_agents_state_claim",
-      "community": 85,
+      "community": 37,
       "norm_label": "claim"
     },
     {
@@ -6850,7 +6930,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "repopilot_agents_state_claim_refs_non_empty",
-      "community": 7,
+      "community": 37,
       "norm_label": "._refs_non_empty()"
     },
     {
@@ -6860,7 +6940,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_state_py_coderef",
-      "community": 7,
+      "community": 9,
       "norm_label": "coderef"
     },
     {
@@ -6910,7 +6990,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "repopilot_agents_state_toursection",
-      "community": 1,
+      "community": 29,
       "norm_label": "toursection"
     },
     {
@@ -6930,7 +7010,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "repopilot_agents_state_verifierobjection",
-      "community": 1,
+      "community": 29,
       "norm_label": "verifierobjection"
     },
     {
@@ -6940,7 +7020,7 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "repopilot_agents_state_intentprofile",
-      "community": 7,
+      "community": 9,
       "norm_label": "intentprofile"
     },
     {
@@ -6970,7 +7050,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "repopilot_agents_state_capabilityplan",
-      "community": 37,
+      "community": 9,
       "norm_label": "capabilityplan"
     },
     {
@@ -7020,7 +7100,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "repopilot_agents_state_archaeologiststate",
-      "community": 37,
+      "community": 36,
       "norm_label": "archaeologiststate"
     },
     {
@@ -7040,7 +7120,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "repopilot_agents_state_rationale_47",
-      "community": 85,
+      "community": 37,
       "norm_label": "a factual assertion produced by an agent. must carry refs."
     },
     {
@@ -7090,7 +7170,7 @@
       "source_location": "L164",
       "_origin": "ast",
       "id": "repopilot_agents_state_rationale_164",
-      "community": 7,
+      "community": 9,
       "norm_label": "free-text intent in, structured tilt out. no fixed purpose enum."
     },
     {
@@ -7100,7 +7180,7 @@
       "source_location": "L195",
       "_origin": "ast",
       "id": "repopilot_agents_state_rationale_195",
-      "community": 37,
+      "community": 9,
       "norm_label": "deterministic planner output. verifiable in ci."
     },
     {
@@ -7120,7 +7200,7 @@
       "source_location": "L239",
       "_origin": "ast",
       "id": "repopilot_agents_state_rationale_239",
-      "community": 37,
+      "community": 36,
       "norm_label": "the single shared langgraph state. see ``docs/03_architecture.md``."
     },
     {
@@ -7520,7 +7600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_graph_query",
-      "community": 114,
+      "community": 30,
       "norm_label": "graph_query.py"
     },
     {
@@ -7530,7 +7610,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "tools_graph_query_graph_query",
-      "community": 114,
+      "community": 30,
       "norm_label": "graph_query()"
     },
     {
@@ -7540,7 +7620,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "querykind",
-      "community": 114,
+      "community": 30,
       "norm_label": "querykind"
     },
     {
@@ -7550,7 +7630,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_py_asyncengine",
-      "community": 114,
+      "community": 30,
       "norm_label": "asyncengine"
     },
     {
@@ -7560,7 +7640,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_py_graphqueryresult",
-      "community": 114,
+      "community": 30,
       "norm_label": "graphqueryresult"
     },
     {
@@ -7570,7 +7650,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "tools_graph_query_call_subgraph",
-      "community": 114,
+      "community": 30,
       "norm_label": "_call_subgraph()"
     },
     {
@@ -7580,7 +7660,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_tools_graph_query_py_digraph",
-      "community": 114,
+      "community": 30,
       "norm_label": "digraph"
     },
     {
@@ -7590,7 +7670,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "tools_graph_query_entry_points",
-      "community": 114,
+      "community": 30,
       "norm_label": "_entry_points()"
     },
     {
@@ -7600,7 +7680,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "tools_graph_query_hubs",
-      "community": 114,
+      "community": 30,
       "norm_label": "_hubs()"
     },
     {
@@ -7610,7 +7690,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "tools_graph_query_layers",
-      "community": 114,
+      "community": 30,
       "norm_label": "_layers()"
     },
     {
@@ -7620,7 +7700,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "tools_graph_query_neighbours",
-      "community": 114,
+      "community": 30,
       "norm_label": "_neighbours()"
     },
     {
@@ -7630,7 +7710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_graph_query_rationale_1",
-      "community": 114,
+      "community": 30,
       "norm_label": "``graph_query`` \u2014 structural queries against the per-repo networkx graph.  five"
     },
     {
@@ -7640,7 +7720,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "tools_graph_query_rationale_43",
-      "community": 114,
+      "community": 30,
       "norm_label": "run one of the five structural queries against the cached graph."
     },
     {
@@ -7800,7 +7880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_read_chunks",
-      "community": 119,
+      "community": 114,
       "norm_label": "read_chunks.py"
     },
     {
@@ -7850,7 +7930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tools_read_chunks_rationale_1",
-      "community": 119,
+      "community": 114,
       "norm_label": "``read_chunks`` \u2014 the only tool that returns source text.  per phase 2 decision"
     },
     {
@@ -7970,7 +8050,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "repopilot_agents_types_coderef",
-      "community": 32,
+      "community": 49,
       "norm_label": "coderef"
     },
     {
@@ -7980,7 +8060,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "repopilot_agents_types_coderef_end_after_start",
-      "community": 32,
+      "community": 49,
       "norm_label": "._end_after_start()"
     },
     {
@@ -8060,7 +8140,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "repopilot_agents_types_rationale_19",
-      "community": 32,
+      "community": 49,
       "norm_label": "pointer into the repo. every factual claim must carry at least one."
     },
     {
@@ -8147,7 +8227,7 @@
       "label": "Claim",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L50",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "verifier_grounding_claim",
       "community": 0,
@@ -8157,37 +8237,37 @@
       "label": "._refs_non_empty()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L60",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "verifier_grounding_claim_refs_non_empty",
-      "community": 9,
+      "community": 13,
       "norm_label": "._refs_non_empty()"
     },
     {
       "label": "CodeRef",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L60",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_grounding_py_coderef",
-      "community": 9,
+      "community": 13,
       "norm_label": "coderef"
     },
     {
       "label": "VerifierObjection",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L66",
+      "source_location": "L72",
       "_origin": "ast",
       "id": "verifier_grounding_verifierobjection",
-      "community": 45,
+      "community": 13,
       "norm_label": "verifierobjection"
     },
     {
       "label": "VerifierVerdict",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L74",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "verifier_grounding_verifierverdict",
       "community": 13,
@@ -8197,7 +8277,7 @@
       "label": "_VerifyResult",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L82",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "verifier_grounding_verifyresult",
       "community": 13,
@@ -8207,7 +8287,7 @@
       "label": "_Cache",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L90",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "verifier_grounding_cache",
       "community": 13,
@@ -8217,7 +8297,7 @@
       "label": ".key()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L95",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "verifier_grounding_cache_key",
       "community": 13,
@@ -8227,7 +8307,7 @@
       "label": "ChunkContent",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L95",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_grounding_py_chunkcontent",
       "community": 13,
@@ -8237,7 +8317,7 @@
       "label": ".get()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L100",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "verifier_grounding_cache_get",
       "community": 13,
@@ -8247,7 +8327,7 @@
       "label": ".put()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L103",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "verifier_grounding_cache_put",
       "community": 13,
@@ -8257,7 +8337,7 @@
       "label": "reset_cache()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L110",
+      "source_location": "L116",
       "_origin": "ast",
       "id": "verifier_grounding_reset_cache",
       "community": 13,
@@ -8267,7 +8347,7 @@
       "label": "_user_prompt()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L129",
+      "source_location": "L135",
       "_origin": "ast",
       "id": "verifier_grounding_user_prompt",
       "community": 13,
@@ -8277,27 +8357,27 @@
       "label": "_strip_reasoning()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L152",
+      "source_location": "L158",
       "_origin": "ast",
       "id": "verifier_grounding_strip_reasoning",
-      "community": 13,
+      "community": 53,
       "norm_label": "_strip_reasoning()"
     },
     {
       "label": "_parse_verdict()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L158",
+      "source_location": "L164",
       "_origin": "ast",
       "id": "verifier_grounding_parse_verdict",
-      "community": 49,
+      "community": 53,
       "norm_label": "_parse_verdict()"
     },
     {
       "label": "verify_claim()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L184",
+      "source_location": "L190",
       "_origin": "ast",
       "id": "verifier_grounding_verify_claim",
       "community": 13,
@@ -8307,7 +8387,7 @@
       "label": "LLMProvider",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L184",
+      "source_location": "L190",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_grounding_py_llmprovider",
       "community": 13,
@@ -8317,7 +8397,7 @@
       "label": "AsyncEngine",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L184",
+      "source_location": "L190",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_grounding_py_asyncengine",
       "community": 13,
@@ -8327,7 +8407,7 @@
       "label": "verify_claims()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L262",
+      "source_location": "L268",
       "_origin": "ast",
       "id": "verifier_grounding_verify_claims",
       "community": 13,
@@ -8337,7 +8417,7 @@
       "label": "_apply()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L300",
+      "source_location": "L306",
       "_origin": "ast",
       "id": "verifier_grounding_apply",
       "community": 13,
@@ -8347,7 +8427,7 @@
       "label": "_objection_if_rejected()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L305",
+      "source_location": "L320",
       "_origin": "ast",
       "id": "verifier_grounding_objection_if_rejected",
       "community": 13,
@@ -8367,9 +8447,9 @@
       "label": "Phase 2 view of a claim. Phase 3 will move this into the state schema.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L51",
+      "source_location": "L57",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_51",
+      "id": "verifier_grounding_rationale_57",
       "community": 0,
       "norm_label": "phase 2 view of a claim. phase 3 will move this into the state schema."
     },
@@ -8377,19 +8457,19 @@
       "label": "Why a claim was rejected. Appended to the LangGraph state.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L67",
+      "source_location": "L73",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_67",
-      "community": 45,
+      "id": "verifier_grounding_rationale_73",
+      "community": 13,
       "norm_label": "why a claim was rejected. appended to the langgraph state."
     },
     {
       "label": "The structured response we require from the verifier model.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L75",
+      "source_location": "L81",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_75",
+      "id": "verifier_grounding_rationale_81",
       "community": 13,
       "norm_label": "the structured response we require from the verifier model."
     },
@@ -8397,9 +8477,9 @@
       "label": "In-process cache keyed by sha256(claim_text + chunk_hashes).",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L91",
+      "source_location": "L97",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_91",
+      "id": "verifier_grounding_rationale_97",
       "community": 13,
       "norm_label": "in-process cache keyed by sha256(claim_text + chunk_hashes)."
     },
@@ -8407,9 +8487,9 @@
       "label": "Test helper \u2014 clear the verifier verdict cache.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L111",
+      "source_location": "L117",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_111",
+      "id": "verifier_grounding_rationale_117",
       "community": 13,
       "norm_label": "test helper \u2014 clear the verifier verdict cache."
     },
@@ -8417,29 +8497,29 @@
       "label": "Remove ``<think>`` reasoning so only the answer payload remains.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L153",
+      "source_location": "L159",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_153",
-      "community": 13,
+      "id": "verifier_grounding_rationale_159",
+      "community": 53,
       "norm_label": "remove ``<think>`` reasoning so only the answer payload remains."
     },
     {
       "label": "Pull the verdict JSON out of ``raw`` and validate it.      Prefers the JSON obje",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L159",
+      "source_location": "L165",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_159",
-      "community": 49,
+      "id": "verifier_grounding_rationale_165",
+      "community": 53,
       "norm_label": "pull the verdict json out of ``raw`` and validate it.      prefers the json obje"
     },
     {
       "label": "Verify one claim. Updates ``claim.status`` and ``claim.verifier_note`` in place.",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L191",
+      "source_location": "L197",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_191",
+      "id": "verifier_grounding_rationale_197",
       "community": 13,
       "norm_label": "verify one claim. updates ``claim.status`` and ``claim.verifier_note`` in place."
     },
@@ -8447,9 +8527,9 @@
       "label": "Verify N claims concurrently, bounded to avoid 429 stampedes (M1).      ``max_co",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L270",
+      "source_location": "L276",
       "_origin": "ast",
-      "id": "verifier_grounding_rationale_270",
+      "id": "verifier_grounding_rationale_276",
       "community": 13,
       "norm_label": "verify n claims concurrently, bounded to avoid 429 stampedes (m1).      ``max_co"
     },
@@ -8460,7 +8540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "verifier_loop",
-      "community": 1,
+      "community": 29,
       "norm_label": "loop.py"
     },
     {
@@ -8470,7 +8550,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "verifier_loop_actionability_user_prompt",
-      "community": 1,
+      "community": 29,
       "norm_label": "_actionability_user_prompt()"
     },
     {
@@ -8480,7 +8560,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_py_intentprofile",
-      "community": 1,
+      "community": 29,
       "norm_label": "intentprofile"
     },
     {
@@ -8510,7 +8590,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "verifier_loop_check_actionability",
-      "community": 1,
+      "community": 29,
       "norm_label": "_check_actionability()"
     },
     {
@@ -8520,7 +8600,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_py_llmprovider",
-      "community": 1,
+      "community": 29,
       "norm_label": "llmprovider"
     },
     {
@@ -8530,7 +8610,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "verifier_loop_sectionverificationresult",
-      "community": 1,
+      "community": 29,
       "norm_label": "sectionverificationresult"
     },
     {
@@ -8540,7 +8620,7 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "verifier_loop_sectionverificationresult_passed",
-      "community": 1,
+      "community": 29,
       "norm_label": ".passed()"
     },
     {
@@ -8550,7 +8630,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "verifier_loop_to_phase2_claim",
-      "community": 1,
+      "community": 29,
       "norm_label": "_to_phase2_claim()"
     },
     {
@@ -8560,7 +8640,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_py_claim",
-      "community": 1,
+      "community": 29,
       "norm_label": "claim"
     },
     {
@@ -8570,7 +8650,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "phase2claim",
-      "community": 1,
+      "community": 29,
       "norm_label": "phase2claim"
     },
     {
@@ -8580,7 +8660,7 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "verifier_loop_apply_status",
-      "community": 1,
+      "community": 29,
       "norm_label": "_apply_status()"
     },
     {
@@ -8590,7 +8670,7 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "claimstatus",
-      "community": 1,
+      "community": 29,
       "norm_label": "claimstatus"
     },
     {
@@ -8600,7 +8680,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "verifier_loop_verify_section",
-      "community": 1,
+      "community": 29,
       "norm_label": "verify_section()"
     },
     {
@@ -8610,7 +8690,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_py_toursection",
-      "community": 1,
+      "community": 29,
       "norm_label": "toursection"
     },
     {
@@ -8620,7 +8700,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "packages_agents_src_repopilot_agents_verifier_loop_py_asyncengine",
-      "community": 1,
+      "community": 29,
       "norm_label": "asyncengine"
     },
     {
@@ -8630,7 +8710,7 @@
       "source_location": "L261",
       "_origin": "ast",
       "id": "verifier_loop_verify_section_with_retries",
-      "community": 1,
+      "community": 29,
       "norm_label": "verify_section_with_retries()"
     },
     {
@@ -8640,7 +8720,7 @@
       "source_location": "L261",
       "_origin": "ast",
       "id": "sourceretry",
-      "community": 1,
+      "community": 29,
       "norm_label": "sourceretry"
     },
     {
@@ -8650,27 +8730,27 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "verifier_loop_finalize",
-      "community": 1,
+      "community": 29,
       "norm_label": "_finalize()"
     },
     {
       "label": "verify_claims_grounded()",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/loop.py",
-      "source_location": "L336",
+      "source_location": "L342",
       "_origin": "ast",
       "id": "verifier_loop_verify_claims_grounded",
-      "community": 1,
+      "community": 29,
       "norm_label": "verify_claims_grounded()"
     },
     {
       "label": "VerifierObjection",
       "file_type": "code",
       "source_file": "packages/agents/src/repopilot_agents/verifier/loop.py",
-      "source_location": "L336",
+      "source_location": "L342",
       "_origin": "ast",
       "id": "verifierobjection",
-      "community": 1,
+      "community": 29,
       "norm_label": "verifierobjection"
     },
     {
@@ -8680,7 +8760,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "verifier_loop_rationale_1",
-      "community": 1,
+      "community": 29,
       "norm_label": "verifier loop \u2014 phase 2 grounding **plus** the iteration-2 actionability rubric."
     },
     {
@@ -8690,7 +8770,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "verifier_loop_rationale_113",
-      "community": 1,
+      "community": 29,
       "norm_label": "one actionability call. parse-fail = not_actionable (mirrors d4)."
     },
     {
@@ -8700,7 +8780,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "verifier_loop_rationale_136",
-      "community": 1,
+      "community": 29,
       "norm_label": "one section's verification verdict.      ``objections`` is empty when every clai"
     },
     {
@@ -8710,7 +8790,7 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "verifier_loop_rationale_154",
-      "community": 1,
+      "community": 29,
       "norm_label": "bridge: phase-2 ``verify_claim`` consumes its own ``claim`` shape."
     },
     {
@@ -8720,7 +8800,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "verifier_loop_rationale_177",
-      "community": 1,
+      "community": 29,
       "norm_label": "verify one section's claims: grounding + actionability, in parallel.      each c"
     },
     {
@@ -8730,7 +8810,7 @@
       "source_location": "L271",
       "_origin": "ast",
       "id": "verifier_loop_rationale_271",
-      "community": 1,
+      "community": 29,
       "norm_label": "top-level verifier loop.      calls ``verify_section`` once; if any claim fails,"
     },
     {
@@ -8740,17 +8820,17 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "verifier_loop_rationale_318",
-      "community": 1,
+      "community": 29,
       "norm_label": "if the retry budget is spent and claims are still rejected, flag them.      flag"
     },
     {
       "label": "Standalone grounding pass \u2014 useful for Q&A which produces claims     outside the",
       "file_type": "rationale",
       "source_file": "packages/agents/src/repopilot_agents/verifier/loop.py",
-      "source_location": "L343",
+      "source_location": "L349",
       "_origin": "ast",
-      "id": "verifier_loop_rationale_343",
-      "community": 1,
+      "id": "verifier_loop_rationale_349",
+      "community": 29,
       "norm_label": "standalone grounding pass \u2014 useful for q&a which produces claims     outside the"
     },
     {
@@ -9270,7 +9350,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "tests_test_capabilities_stubresponse",
-      "community": 29,
+      "community": 9,
       "norm_label": "_stubresponse"
     },
     {
@@ -9280,7 +9360,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "tests_test_capabilities_stubresponse_total_tokens",
-      "community": 29,
+      "community": 9,
       "norm_label": ".total_tokens()"
     },
     {
@@ -9310,7 +9390,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "tests_test_capabilities_scriptedprovider_generate",
-      "community": 29,
+      "community": 9,
       "norm_label": ".generate()"
     },
     {
@@ -9320,7 +9400,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_py_any",
-      "community": 29,
+      "community": 9,
       "norm_label": "any"
     },
     {
@@ -9340,7 +9420,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_py_intentprofile",
-      "community": 72,
+      "community": 9,
       "norm_label": "intentprofile"
     },
     {
@@ -9360,7 +9440,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_py_capabilityplan",
-      "community": 72,
+      "community": 9,
       "norm_label": "capabilityplan"
     },
     {
@@ -9400,7 +9480,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "tests_test_capabilities_test_coerce_insight_rejects_unknown_symbol",
-      "community": 55,
+      "community": 72,
       "norm_label": "test_coerce_insight_rejects_unknown_symbol()"
     },
     {
@@ -9410,7 +9490,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "tests_test_capabilities_test_coerce_insight_accepts_symbol_strings",
-      "community": 55,
+      "community": 72,
       "norm_label": "test_coerce_insight_accepts_symbol_strings()"
     },
     {
@@ -9420,7 +9500,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "tests_test_capabilities_test_coerce_insight_rejects_empty_so_what",
-      "community": 55,
+      "community": 72,
       "norm_label": "test_coerce_insight_rejects_empty_so_what()"
     },
     {
@@ -9440,7 +9520,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "packages_agents_tests_test_capabilities_py_monkeypatch",
-      "community": 72,
+      "community": 9,
       "norm_label": "monkeypatch"
     },
     {
@@ -10160,7 +10240,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_goal_anchor",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_goal_anchor.py"
     },
     {
@@ -10170,7 +10250,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_profile",
-      "community": 30,
+      "community": 72,
       "norm_label": "_profile()"
     },
     {
@@ -10180,7 +10260,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "packages_agents_tests_test_goal_anchor_py_intentprofile",
-      "community": 30,
+      "community": 72,
       "norm_label": "intentprofile"
     },
     {
@@ -10190,7 +10270,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_snapshot_for_a_canonical_understand_intent",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_snapshot_for_a_canonical_understand_intent()"
     },
     {
@@ -10200,7 +10280,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_goal_anchor_includes_raw_text_verbatim",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_goal_anchor_includes_raw_text_verbatim()"
     },
     {
@@ -10210,7 +10290,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_goal_anchor_starts_with_user_goal_block",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_goal_anchor_starts_with_user_goal_block()"
     },
     {
@@ -10220,7 +10300,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_three_laws_appear_at_the_end",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_three_laws_appear_at_the_end()"
     },
     {
@@ -10230,7 +10310,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_minimal_profile_does_not_render_optional_lines",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_minimal_profile_does_not_render_optional_lines()"
     },
     {
@@ -10240,7 +10320,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_compare_intent_renders_comparison_table_shape",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_compare_intent_renders_comparison_table_shape()"
     },
     {
@@ -10250,7 +10330,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_capabilities_appear_in_planner_order",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_capabilities_appear_in_planner_order()"
     },
     {
@@ -10260,7 +10340,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_test_render_accepts_explicit_plan_objects",
-      "community": 30,
+      "community": 72,
       "norm_label": "test_render_accepts_explicit_plan_objects()"
     },
     {
@@ -10270,7 +10350,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_goal_anchor_rationale_1",
-      "community": 30,
+      "community": 72,
       "norm_label": "snapshot + invariant tests for the shared goal-anchor block.  these tests are de"
     },
     {
@@ -10280,7 +10360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_graph_query",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_graph_query.py"
     },
     {
@@ -10290,7 +10370,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "tests_test_graph_query_prime_cache",
-      "community": 114,
+      "community": 30,
       "norm_label": "_prime_cache()"
     },
     {
@@ -10300,7 +10380,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_entry_points",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_entry_points()"
     },
     {
@@ -10310,7 +10390,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_hubs_ranked_by_fan_in",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_hubs_ranked_by_fan_in()"
     },
     {
@@ -10320,7 +10400,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_callers_of_c",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_callers_of_c()"
     },
     {
@@ -10330,7 +10410,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_callees_of_a",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_callees_of_a()"
     },
     {
@@ -10340,7 +10420,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_callers_requires_symbol",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_callers_requires_symbol()"
     },
     {
@@ -10350,7 +10430,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "tests_test_graph_query_test_layers_returns_one_row_per_node",
-      "community": 114,
+      "community": 30,
       "norm_label": "test_layers_returns_one_row_per_node()"
     },
     {
@@ -10360,7 +10440,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_graph_query_rationale_1",
-      "community": 114,
+      "community": 30,
       "norm_label": "tests for ``graph_query``: entry points, hubs, callers/callees, layers.  exercis"
     },
     {
@@ -10450,7 +10530,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_coderef",
-      "community": 7,
+      "community": 9,
       "norm_label": "coderef"
     },
     {
@@ -10480,7 +10560,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "packages_agents_tests_test_graph_wiring_py_toursection",
-      "community": 7,
+      "community": 9,
       "norm_label": "toursection"
     },
     {
@@ -11120,7 +11200,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "packages_agents_tests_test_planner_py_intentprofile",
-      "community": 37,
+      "community": 9,
       "norm_label": "intentprofile"
     },
     {
@@ -11510,7 +11590,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_query_spec",
-      "community": 53,
+      "community": 47,
       "norm_label": "test_query_spec.py"
     },
     {
@@ -11520,7 +11600,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "tests_test_query_spec_provider",
-      "community": 53,
+      "community": 47,
       "norm_label": "_provider"
     },
     {
@@ -11530,7 +11610,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "tests_test_query_spec_provider_init",
-      "community": 53,
+      "community": 47,
       "norm_label": ".__init__()"
     },
     {
@@ -11540,7 +11620,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "baseexception",
-      "community": 53,
+      "community": 47,
       "norm_label": "baseexception"
     },
     {
@@ -11550,7 +11630,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "tests_test_query_spec_provider_generate",
-      "community": 53,
+      "community": 47,
       "norm_label": ".generate()"
     },
     {
@@ -11560,7 +11640,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "packages_agents_tests_test_query_spec_py_any",
-      "community": 53,
+      "community": 47,
       "norm_label": "any"
     },
     {
@@ -11570,7 +11650,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "tests_test_query_spec_test_build_query_spec_parses_json_and_preserves_raw_question",
-      "community": 53,
+      "community": 47,
       "norm_label": "test_build_query_spec_parses_json_and_preserves_raw_question()"
     },
     {
@@ -11580,7 +11660,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "tests_test_query_spec_test_build_query_spec_falls_back_on_parse_error",
-      "community": 53,
+      "community": 47,
       "norm_label": "test_build_query_spec_falls_back_on_parse_error()"
     },
     {
@@ -11590,7 +11670,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "tests_test_query_spec_test_build_query_spec_falls_back_on_provider_error",
-      "community": 53,
+      "community": 47,
       "norm_label": "test_build_query_spec_falls_back_on_provider_error()"
     },
     {
@@ -11610,7 +11690,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_query_spec_rationale_1",
-      "community": 53,
+      "community": 47,
       "norm_label": "tests for phase 2 query understanding."
     },
     {
@@ -11740,7 +11820,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "tests_test_state_test_intent_profile_rejects_out_of_unit_modality_weights",
-      "community": 37,
+      "community": 9,
       "norm_label": "test_intent_profile_rejects_out_of_unit_modality_weights()"
     },
     {
@@ -11750,7 +11830,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "tests_test_state_test_intent_profile_defaults",
-      "community": 37,
+      "community": 9,
       "norm_label": "test_intent_profile_defaults()"
     },
     {
@@ -11800,7 +11880,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "tests_test_state_test_state_defaults_are_empty",
-      "community": 37,
+      "community": 36,
       "norm_label": "test_state_defaults_are_empty()"
     },
     {
@@ -11810,7 +11890,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "tests_test_state_test_state_accepts_full_intent_layer",
-      "community": 37,
+      "community": 36,
       "norm_label": "test_state_accepts_full_intent_layer()"
     },
     {
@@ -12150,7 +12230,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_verifier_grounding.py"
     },
     {
@@ -12160,7 +12240,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_accepts_clean_json",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_accepts_clean_json()"
     },
     {
@@ -12170,7 +12250,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_extracts_json_from_prose",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_extracts_json_from_prose()"
     },
     {
@@ -12180,7 +12260,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_garbage",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_returns_none_on_garbage()"
     },
     {
@@ -12190,7 +12270,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_returns_none_on_invalid_decision",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_returns_none_on_invalid_decision()"
     },
     {
@@ -12200,7 +12280,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_strips_closed_think_block",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_strips_closed_think_block()"
     },
     {
@@ -12210,7 +12290,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_survives_unclosed_think_when_json_precedes",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_survives_unclosed_think_when_json_precedes()"
     },
     {
@@ -12220,7 +12300,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_ignores_decoy_json_without_decision",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_ignores_decoy_json_without_decision()"
     },
     {
@@ -12230,7 +12310,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_parse_verdict_returns_none_when_only_think_block",
-      "community": 49,
+      "community": 53,
       "norm_label": "test_parse_verdict_returns_none_when_only_think_block()"
     },
     {
@@ -12324,20 +12404,20 @@
       "norm_label": "test_verify_claim_parse_fail_rejects()"
     },
     {
-      "label": "test_verify_claim_provider_error_rejects_instead_of_crashing()",
+      "label": "test_verify_claim_provider_error_marks_unverified_not_rejected()",
       "file_type": "code",
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L191",
       "_origin": "ast",
-      "id": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing",
+      "id": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
       "community": 49,
-      "norm_label": "test_verify_claim_provider_error_rejects_instead_of_crashing()"
+      "norm_label": "test_verify_claim_provider_error_marks_unverified_not_rejected()"
     },
     {
       "label": "test_verify_claims_cache_hit_skips_provider()",
       "file_type": "code",
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
-      "source_location": "L228",
+      "source_location": "L231",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_verify_claims_cache_hit_skips_provider",
       "community": 49,
@@ -12347,7 +12427,7 @@
       "label": "test_verify_claim_uses_full_chunk_content_even_when_compressed()",
       "file_type": "code",
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
-      "source_location": "L263",
+      "source_location": "L266",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_test_verify_claim_uses_full_chunk_content_even_when_compressed",
       "community": 49,
@@ -12360,7 +12440,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_verifier_grounding_rationale_1",
-      "community": 49,
+      "community": 53,
       "norm_label": "verifier tests: json parsing, parse-fail rejection (d4), caching (m1)."
     },
     {
@@ -12820,7 +12900,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "llm_provider",
-      "community": 35,
+      "community": 121,
       "norm_label": "provider.py"
     },
     {
@@ -12830,7 +12910,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "llm_provider_providererror",
-      "community": 41,
+      "community": 13,
       "norm_label": "providererror"
     },
     {
@@ -13020,7 +13100,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "modelid",
-      "community": 35,
+      "community": 50,
       "norm_label": "modelid"
     },
     {
@@ -13040,7 +13120,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "llm_provider_embedding_cache_key",
-      "community": 35,
+      "community": 50,
       "norm_label": "_embedding_cache_key()"
     },
     {
@@ -13050,7 +13130,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "llm_provider_backoff_delay",
-      "community": 35,
+      "community": 121,
       "norm_label": "_backoff_delay()"
     },
     {
@@ -13060,7 +13140,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "llm_provider_parse_retry_after",
-      "community": 35,
+      "community": 121,
       "norm_label": "_parse_retry_after()"
     },
     {
@@ -13120,7 +13200,7 @@
       "source_location": "L313",
       "_origin": "ast",
       "id": "packages_core_src_repopilot_core_llm_provider_py_providername",
-      "community": 50,
+      "community": 121,
       "norm_label": "providername"
     },
     {
@@ -13330,7 +13410,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "llm_provider_rationale_1",
-      "community": 35,
+      "community": 121,
       "norm_label": "the single llmprovider every agent goes through.  responsibilities (phase 0 deli"
     },
     {
@@ -13340,7 +13420,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "llm_provider_rationale_67",
-      "community": 41,
+      "community": 13,
       "norm_label": "all providers in the fallback chain failed."
     },
     {
@@ -13390,7 +13470,7 @@
       "source_location": "L265",
       "_origin": "ast",
       "id": "llm_provider_rationale_265",
-      "community": 35,
+      "community": 121,
       "norm_label": "exponential backoff with full jitter. attempt=0 is the first retry."
     },
     {
@@ -13400,7 +13480,7 @@
       "source_location": "L271",
       "_origin": "ast",
       "id": "llm_provider_rationale_271",
-      "community": 35,
+      "community": 121,
       "norm_label": "parse a ``retry-after`` header (delta-seconds or http-date) into seconds.      p"
     },
     {
@@ -13770,7 +13850,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "tests_conftest_tmp_settings",
-      "community": 50,
+      "community": 61,
       "norm_label": "tmp_settings()"
     },
     {
@@ -13780,7 +13860,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_py_path",
-      "community": 50,
+      "community": 61,
       "norm_label": "path"
     },
     {
@@ -13790,7 +13870,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_py_settings",
-      "community": 50,
+      "community": 61,
       "norm_label": "settings"
     },
     {
@@ -13870,7 +13950,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "tests_conftest_fakeembedder_embed",
-      "community": 9,
+      "community": 61,
       "norm_label": ".embed()"
     },
     {
@@ -13880,7 +13960,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_py_any",
-      "community": 9,
+      "community": 61,
       "norm_label": "any"
     },
     {
@@ -13890,7 +13970,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_py_embeddingresponse",
-      "community": 9,
+      "community": 61,
       "norm_label": "embeddingresponse"
     },
     {
@@ -13910,7 +13990,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "packages_core_tests_conftest_py_llmprovider",
-      "community": 9,
+      "community": 50,
       "norm_label": "llmprovider"
     },
     {
@@ -14210,7 +14290,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_backoff_delay_is_bounded",
-      "community": 35,
+      "community": 121,
       "norm_label": "test_backoff_delay_is_bounded()"
     },
     {
@@ -14290,7 +14370,7 @@
       "source_location": "L338",
       "_origin": "ast",
       "id": "tests_test_llm_provider_test_parse_retry_after_variants",
-      "community": 35,
+      "community": 121,
       "norm_label": "test_parse_retry_after_variants()"
     },
     {
@@ -14640,7 +14720,7 @@
       "source_location": "L179",
       "_origin": "ast",
       "id": "repopilot_evals_main_cmd_status",
-      "community": 27,
+      "community": 63,
       "norm_label": "_cmd_status()"
     },
     {
@@ -14970,7 +15050,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "repopilot_evals_datasets_take_rows",
-      "community": 34,
+      "community": 55,
       "norm_label": "take_rows()"
     },
     {
@@ -14980,7 +15060,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "t",
-      "community": 34,
+      "community": 55,
       "norm_label": "t"
     },
     {
@@ -15220,7 +15300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_init",
-      "community": 66,
+      "community": 25,
       "norm_label": "__init__.py"
     },
     {
@@ -15230,7 +15310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_init_rationale_1",
-      "community": 66,
+      "community": 25,
       "norm_label": "eval runners for the phase gates."
     },
     {
@@ -15240,7 +15320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_common",
-      "community": 43,
+      "community": 113,
       "norm_label": "common.py"
     },
     {
@@ -15250,7 +15330,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "runners_common_evalcontext",
-      "community": 43,
+      "community": 113,
       "norm_label": "evalcontext"
     },
     {
@@ -15260,7 +15340,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "runners_common_evalcontext_aclose",
-      "community": 43,
+      "community": 113,
       "norm_label": ".aclose()"
     },
     {
@@ -15310,7 +15390,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_common_rationale_1",
-      "community": 43,
+      "community": 113,
       "norm_label": "shared runtime helpers for eval runners."
     },
     {
@@ -15540,7 +15620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_latency",
-      "community": 34,
+      "community": 65,
       "norm_label": "latency.py"
     },
     {
@@ -15600,7 +15680,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "runners_latency_run_latency_eval",
-      "community": 34,
+      "community": 65,
       "norm_label": "run_latency_eval()"
     },
     {
@@ -15610,7 +15690,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_latency_py_settings",
-      "community": 34,
+      "community": 65,
       "norm_label": "settings"
     },
     {
@@ -15620,7 +15700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_latency_rationale_1",
-      "community": 34,
+      "community": 65,
       "norm_label": "latency runner: p50/p95 wall-clock timings around ``answer_question``."
     },
     {
@@ -15660,7 +15740,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_py_coderef",
-      "community": 62,
+      "community": 76,
       "norm_label": "coderef"
     },
     {
@@ -15680,7 +15760,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "runners_retrieval_recall_at_k",
-      "community": 76,
+      "community": 116,
       "norm_label": "recall_at_k()"
     },
     {
@@ -15690,7 +15770,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "runners_retrieval_ndcg_at_k",
-      "community": 76,
+      "community": 116,
       "norm_label": "ndcg_at_k()"
     },
     {
@@ -15810,7 +15890,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_py_settings",
-      "community": 76,
+      "community": 60,
       "norm_label": "settings"
     },
     {
@@ -15870,7 +15950,7 @@
       "source_location": "L329",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_retrieval_py_queryspec",
-      "community": 76,
+      "community": 60,
       "norm_label": "queryspec"
     },
     {
@@ -15980,7 +16060,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_verifier",
-      "community": 66,
+      "community": 55,
       "norm_label": "verifier.py"
     },
     {
@@ -15990,7 +16070,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "runners_verifier_verifierevalcaseresult",
-      "community": 66,
+      "community": 55,
       "norm_label": "verifierevalcaseresult"
     },
     {
@@ -16000,7 +16080,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "runners_verifier_verifierevalmetrics",
-      "community": 66,
+      "community": 27,
       "norm_label": "verifierevalmetrics"
     },
     {
@@ -16010,7 +16090,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "runners_verifier_verifierevalmetrics_accuracy",
-      "community": 66,
+      "community": 27,
       "norm_label": ".accuracy()"
     },
     {
@@ -16020,7 +16100,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "runners_verifier_patched_read_chunks",
-      "community": 66,
+      "community": 55,
       "norm_label": "_patched_read_chunks()"
     },
     {
@@ -16030,7 +16110,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "verifierevalrow",
-      "community": 66,
+      "community": 55,
       "norm_label": "verifierevalrow"
     },
     {
@@ -16040,7 +16120,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "runners_verifier_run_verifier_eval",
-      "community": 66,
+      "community": 55,
       "norm_label": "run_verifier_eval()"
     },
     {
@@ -16050,7 +16130,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "packages_evals_src_repopilot_evals_runners_verifier_py_settings",
-      "community": 66,
+      "community": 55,
       "norm_label": "settings"
     },
     {
@@ -16060,7 +16140,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "runners_verifier_run_verifier_eval_rows",
-      "community": 66,
+      "community": 55,
       "norm_label": "run_verifier_eval_rows()"
     },
     {
@@ -16070,7 +16150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runners_verifier_rationale_1",
-      "community": 66,
+      "community": 55,
       "norm_label": "verifier-quality eval runner for the phase 2 gate."
     },
     {
@@ -16420,7 +16500,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics",
-      "community": 76,
+      "community": 116,
       "norm_label": "testmetrics"
     },
     {
@@ -16430,7 +16510,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics_test_perfect_recall",
-      "community": 76,
+      "community": 116,
       "norm_label": ".test_perfect_recall()"
     },
     {
@@ -16440,7 +16520,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics_test_partial_recall",
-      "community": 76,
+      "community": 116,
       "norm_label": ".test_partial_recall()"
     },
     {
@@ -16450,7 +16530,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics_test_no_expected_is_perfect",
-      "community": 76,
+      "community": 116,
       "norm_label": ".test_no_expected_is_perfect()"
     },
     {
@@ -16460,7 +16540,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics_test_ndcg_ideal_ranking_is_one",
-      "community": 76,
+      "community": 116,
       "norm_label": ".test_ndcg_ideal_ranking_is_one()"
     },
     {
@@ -16470,7 +16550,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "tests_test_retrieval_metrics_testmetrics_test_ndcg_penalizes_low_positions",
-      "community": 76,
+      "community": 116,
       "norm_label": ".test_ndcg_penalizes_low_positions()"
     },
     {
@@ -16600,7 +16680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_init",
-      "community": 44,
+      "community": 24,
       "norm_label": "__init__.py"
     },
     {
@@ -16610,7 +16690,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_init_rationale_1",
-      "community": 44,
+      "community": 24,
       "norm_label": "phase 1 \u2014 clone -> parse -> chunk -> graph -> embed -> persist."
     },
     {
@@ -16630,7 +16710,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "repopilot_ingestion_chunk_chunk",
-      "community": 51,
+      "community": 24,
       "norm_label": "chunk"
     },
     {
@@ -16770,7 +16850,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "repopilot_ingestion_chunk_rationale_29",
-      "community": 51,
+      "community": 24,
       "norm_label": "one indexable unit of source. line numbers are 1-based, inclusive."
     },
     {
@@ -16830,7 +16910,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone",
-      "community": 44,
+      "community": 24,
       "norm_label": "clone.py"
     },
     {
@@ -16900,7 +16980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_clone_rationale_1",
-      "community": 44,
+      "community": 24,
       "norm_label": "github clone + head-sha helpers for phase 1 ingestion.  two entry points:  * :fu"
     },
     {
@@ -17010,7 +17090,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed",
-      "community": 41,
+      "community": 4,
       "norm_label": "embed.py"
     },
     {
@@ -17020,7 +17100,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_embeddedchunk",
-      "community": 41,
+      "community": 24,
       "norm_label": "embeddedchunk"
     },
     {
@@ -17030,7 +17110,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_embed_chunks",
-      "community": 41,
+      "community": 4,
       "norm_label": "embed_chunks()"
     },
     {
@@ -17040,7 +17120,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_embed_py_chunk",
-      "community": 41,
+      "community": 4,
       "norm_label": "chunk"
     },
     {
@@ -17050,7 +17130,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_embed_py_llmprovider",
-      "community": 41,
+      "community": 4,
       "norm_label": "llmprovider"
     },
     {
@@ -17060,7 +17140,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_embed_py_settings",
-      "community": 41,
+      "community": 4,
       "norm_label": "settings"
     },
     {
@@ -17070,7 +17150,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_embed_items",
-      "community": 41,
+      "community": 4,
       "norm_label": "_embed_items()"
     },
     {
@@ -17080,7 +17160,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_stable_fallback_vector",
-      "community": 41,
+      "community": 4,
       "norm_label": "_stable_fallback_vector()"
     },
     {
@@ -17090,7 +17170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_rationale_1",
-      "community": 41,
+      "community": 4,
       "norm_label": "true batched embedding orchestration over repository chunks."
     },
     {
@@ -17100,7 +17180,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_rationale_32",
-      "community": 41,
+      "community": 4,
       "norm_label": "embed every chunk; results are returned in the same order as ``chunks``."
     },
     {
@@ -17110,7 +17190,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "repopilot_ingestion_embed_rationale_108",
-      "community": 41,
+      "community": 4,
       "norm_label": "return a deterministic normalized vector when the local embedder rejects a chunk"
     },
     {
@@ -18080,7 +18160,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_persist_py_settings",
-      "community": 41,
+      "community": 12,
       "norm_label": "settings"
     },
     {
@@ -18280,7 +18360,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "repopilot_ingestion_pipeline_index_repo",
-      "community": 24,
+      "community": 41,
       "norm_label": "index_repo()"
     },
     {
@@ -18390,7 +18470,7 @@
       "source_location": "L410",
       "_origin": "ast",
       "id": "repopilot_ingestion_pipeline_log_stage",
-      "community": 24,
+      "community": 41,
       "norm_label": "_log_stage()"
     },
     {
@@ -18440,7 +18520,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "repopilot_ingestion_pipeline_rationale_126",
-      "community": 24,
+      "community": 41,
       "norm_label": "full ingestion pipeline. idempotent on ``(repo_url, head_sha)``."
     },
     {
@@ -18500,14 +18580,24 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_message",
-      "community": 9,
+      "community": 41,
       "norm_label": "message"
+    },
+    {
+      "label": "_fallback_summary()",
+      "file_type": "code",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "repopilot_ingestion_summary_fallback_summary",
+      "community": 41,
+      "norm_label": "_fallback_summary()"
     },
     {
       "label": "summarise_chunks()",
       "file_type": "code",
       "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
-      "source_location": "L48",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "repopilot_ingestion_summary_summarise_chunks",
       "community": 41,
@@ -18517,17 +18607,17 @@
       "label": "LLMProvider",
       "file_type": "code",
       "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
-      "source_location": "L48",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_llmprovider",
-      "community": 9,
+      "community": 41,
       "norm_label": "llmprovider"
     },
     {
       "label": "Settings",
       "file_type": "code",
       "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
-      "source_location": "L48",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "packages_ingestion_src_repopilot_ingestion_summary_py_settings",
       "community": 41,
@@ -18542,6 +18632,16 @@
       "id": "repopilot_ingestion_summary_rationale_1",
       "community": 41,
       "norm_label": "chunk summaries via ``llama-3.1-8b-instant`` (modelid.code_health).  cached at t"
+    },
+    {
+      "label": "Deterministic stand-in when the summariser can't run (e.g. every provider     is",
+      "file_type": "rationale",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "repopilot_ingestion_summary_rationale_49",
+      "community": 41,
+      "norm_label": "deterministic stand-in when the summariser can't run (e.g. every provider     is"
     },
     {
       "label": "sample_module.py",
@@ -18720,7 +18820,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_chunk_boundaries.py"
     },
     {
@@ -18730,7 +18830,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_source_lines",
-      "community": 4,
+      "community": 51,
       "norm_label": "_source_lines()"
     },
     {
@@ -18740,7 +18840,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_chunk_boundaries_py_path",
-      "community": 4,
+      "community": 51,
       "norm_label": "path"
     },
     {
@@ -18750,7 +18850,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_test_chunks_on_ast_boundaries",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_chunks_on_ast_boundaries()"
     },
     {
@@ -18760,7 +18860,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_test_chunk_content_matches_source_for_functions_and_methods",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_chunk_content_matches_source_for_functions_and_methods()"
     },
     {
@@ -18770,7 +18870,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_test_class_chunk_omits_method_bodies",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_class_chunk_omits_method_bodies()"
     },
     {
@@ -18780,7 +18880,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_test_method_chunks_are_independent",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_method_chunks_are_independent()"
     },
     {
@@ -18790,7 +18890,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_test_top_level_functions_are_chunked",
-      "community": 4,
+      "community": 51,
       "norm_label": "test_top_level_functions_are_chunked()"
     },
     {
@@ -18800,7 +18900,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_rationale_1",
-      "community": 4,
+      "community": 51,
       "norm_label": "tdd gate: chunks land on ast boundaries; content matches source exactly."
     },
     {
@@ -18810,7 +18910,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_rationale_21",
-      "community": 4,
+      "community": 51,
       "norm_label": "every function/class/method chunk starts on a def/class line."
     },
     {
@@ -18820,7 +18920,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_rationale_38",
-      "community": 4,
+      "community": 51,
       "norm_label": "for non-class chunks, ``chunk.content`` is the exact source slice."
     },
     {
@@ -18830,7 +18930,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "tests_test_chunk_boundaries_rationale_63",
-      "community": 4,
+      "community": 51,
       "norm_label": "class chunks must not contain method bodies; the methods get their own."
     },
     {
@@ -19280,7 +19380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing",
-      "community": 44,
+      "community": 24,
       "norm_label": "test_httpx_indexing.py"
     },
     {
@@ -19290,7 +19390,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_test_indexing_under_90s",
-      "community": 44,
+      "community": 41,
       "norm_label": "test_indexing_under_90s()"
     },
     {
@@ -19310,7 +19410,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_rationale_1",
-      "community": 44,
+      "community": 24,
       "norm_label": "slow / integration: full phase 1 pipeline against the real ``httpx`` repo.  gate"
     },
     {
@@ -19320,7 +19420,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "tests_test_httpx_indexing_rationale_27",
-      "community": 44,
+      "community": 41,
       "norm_label": "phase 1 quality gate: httpx (~50 kloc) indexes in \u2264 90 s."
     },
     {
@@ -19430,7 +19530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_summary",
-      "community": 41,
+      "community": 71,
       "norm_label": "test_summary.py"
     },
     {
@@ -19440,7 +19540,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "tests_test_summary_failingprovider",
-      "community": 41,
+      "community": 71,
       "norm_label": "failingprovider"
     },
     {
@@ -19450,7 +19550,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "tests_test_summary_failingprovider_init",
-      "community": 41,
+      "community": 71,
       "norm_label": ".__init__()"
     },
     {
@@ -19460,7 +19560,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "tests_test_summary_failingprovider_generate",
-      "community": 41,
+      "community": 71,
       "norm_label": ".generate()"
     },
     {
@@ -19470,7 +19570,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_py_any",
-      "community": 41,
+      "community": 71,
       "norm_label": "any"
     },
     {
@@ -19480,7 +19580,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "tests_test_summary_chunk",
-      "community": 41,
+      "community": 71,
       "norm_label": "_chunk()"
     },
     {
@@ -19490,7 +19590,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "tests_test_summary_test_summarise_chunks_opens_circuit_after_provider_failure",
-      "community": 41,
+      "community": 71,
       "norm_label": "test_summarise_chunks_opens_circuit_after_provider_failure()"
     },
     {
@@ -19500,7 +19600,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "packages_ingestion_tests_test_summary_py_path",
-      "community": 41,
+      "community": 71,
       "norm_label": "path"
     },
     {
@@ -19510,7 +19610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_index",
-      "community": 24,
+      "community": 113,
       "norm_label": "scratch_index.py"
     },
     {
@@ -19520,7 +19620,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "scratch_index_main",
-      "community": 24,
+      "community": 113,
       "norm_label": "main()"
     },
     {
@@ -21713,6 +21813,16 @@
       "source_location": "L29",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_access_accessservice"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L29",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_access_accessservice"
     },
@@ -22177,6 +22287,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_access_productaccessservice"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L29",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_access_productaccessservice"
     },
     {
@@ -22740,6 +22860,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_access_inmemoryaccessservice"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L29",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_access_inmemoryaccessservice"
     },
     {
@@ -24779,6 +24909,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_tourclaimpayload"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_tourclaimpayload"
     },
@@ -25201,6 +25341,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_qaanswerresponse"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_qaanswerresponse"
     },
@@ -25601,6 +25751,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_chunkpayload"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_chunkpayload"
     },
@@ -25992,6 +26152,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_models_basetourevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_models_basetourevent"
     },
     {
@@ -26502,6 +26672,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_toursectionstartevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_toursectionstartevent"
     },
@@ -26935,6 +27115,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_tourtokenevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_tourtokenevent"
     },
@@ -27197,6 +27387,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_models_tourclaimevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_models_tourclaimevent"
     },
     {
@@ -27477,6 +27677,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_tourdiagramevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_tourdiagramevent"
     },
@@ -27748,6 +27958,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_toursectionendevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_toursectionendevent"
     },
@@ -28010,6 +28230,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_models_tourfirstimpressionevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_models_tourfirstimpressionevent"
     },
     {
@@ -28441,6 +28671,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_api_models_tourdoneevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "repopilot_api_models_tourdoneevent"
     },
@@ -28714,6 +28954,16 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_coderef",
+      "target": "repopilot_api_models_tourerrorevent"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
       "target": "repopilot_api_models_tourerrorevent"
     },
     {
@@ -29175,6 +29425,16 @@
       "source_location": "L30",
       "weight": 0.8,
       "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "apps_api_src_repopilot_api_models_py_toureventtype"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L30",
+      "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "apps_api_src_repopilot_api_services_py_intentprofile",
       "target": "apps_api_src_repopilot_api_models_py_toureventtype"
     },
@@ -29567,6 +29827,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L794",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services",
+      "target": "repopilot_api_services_focus_score"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
       "source_location": "L642",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -29612,6 +29882,16 @@
       "confidence_score": 1.0,
       "source": "repopilot_api_services",
       "target": "repopilot_api_services_normalize_repo_id"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L816",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services",
+      "target": "repopilot_api_services_rank_symbols_by_focus"
     },
     {
       "relation": "contains",
@@ -33010,6 +33290,17 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L532",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services_livetourservice_build_sections",
+      "target": "repopilot_api_services_rank_symbols_by_focus"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/repopilot_api/services.py",
       "source_location": "L512",
@@ -33357,6 +33648,98 @@
       "confidence_score": 1.0,
       "source": "repopilot_api_services_encode_chunk_id",
       "target": "apps_api_src_repopilot_api_services_py_coderef"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L833",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services_rank_symbols_by_focus",
+      "target": "repopilot_api_services_focus_score"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L795",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services_rationale_795",
+      "target": "repopilot_api_services_focus_score"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L816",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services_rank_symbols_by_focus",
+      "target": "apps_api_src_repopilot_api_services_py_graphqueryresult"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L819",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_api_services_rationale_819",
+      "target": "repopilot_api_services_rank_symbols_by_focus"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L47",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "llm_provider_llmprovider"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L23",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_agents_state_claim"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L24",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_agents_state_intentprofile"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L48",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "repopilot_core_settings_settings"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "apps/api/src/repopilot_api/services.py",
+      "source_location": "L28",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "apps_api_src_repopilot_api_services_py_graphqueryresult",
+      "target": "verifier_grounding_claim"
     },
     {
       "relation": "calls",
@@ -35596,6 +35979,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/repopilot-app.tsx",
+      "source_location": "L170",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_repopilot_app",
+      "target": "components_repopilot_app_claimbadgelabel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/repopilot-app.tsx",
       "source_location": "L48",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35997,6 +36390,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/lib/api/generated.ts",
+      "source_location": "L148",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_generated",
+      "target": "api_generated_isidempotent"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/lib/api/generated.ts",
       "source_location": "L68",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -36022,6 +36425,16 @@
       "confidence_score": 1.0,
       "source": "api_generated",
       "target": "api_generated_repostatusresponse"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/lib/api/generated.ts",
+      "source_location": "L143",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_generated",
+      "target": "api_generated_retryable_status"
     },
     {
       "relation": "contains",
@@ -36192,6 +36605,17 @@
       "confidence_score": 1.0,
       "source": "lib_tour_store",
       "target": "api_generated_tourevent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/lib/api/generated.ts",
+      "source_location": "L170",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_generated_http",
+      "target": "api_generated_isidempotent"
     },
     {
       "relation": "imports_from",
@@ -44204,10 +44628,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "qa_graph_rationale_75",
+      "source": "qa_graph_rationale_76",
       "target": "qa_graph_qaresult"
     },
     {
@@ -44461,10 +44885,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L111",
+      "source_location": "L112",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "qa_graph_rationale_111",
+      "source": "qa_graph_rationale_112",
       "target": "qa_graph_answer_question"
     },
     {
@@ -44838,10 +45262,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L269",
+      "source_location": "L277",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "qa_graph_rationale_269",
+      "source": "qa_graph_rationale_277",
       "target": "qa_graph_estimate_tokens"
     },
     {
@@ -45193,10 +45617,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/qa/graph.py",
-      "source_location": "L438",
+      "source_location": "L446",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "qa_graph_rationale_438",
+      "source": "qa_graph_rationale_446",
       "target": "qa_graph_parse_claims"
     },
     {
@@ -51645,7 +52069,7 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L214",
       "weight": 1.0,
-      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing",
+      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
       "target": "repopilot_agents_types_coderef"
     },
     {
@@ -52233,10 +52657,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L51",
+      "source_location": "L57",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_51",
+      "source": "verifier_grounding_rationale_57",
       "target": "verifier_grounding_claim"
     },
     {
@@ -52368,10 +52792,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L67",
+      "source_location": "L73",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_67",
+      "source": "verifier_grounding_rationale_73",
       "target": "verifier_grounding_verifierobjection"
     },
     {
@@ -52584,10 +53008,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L75",
+      "source_location": "L81",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_75",
+      "source": "verifier_grounding_rationale_81",
       "target": "verifier_grounding_verifierverdict"
     },
     {
@@ -52747,10 +53171,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L91",
+      "source_location": "L97",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_91",
+      "source": "verifier_grounding_rationale_97",
       "target": "verifier_grounding_cache"
     },
     {
@@ -52842,10 +53266,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L111",
+      "source_location": "L117",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_111",
+      "source": "verifier_grounding_rationale_117",
       "target": "verifier_grounding_reset_cache"
     },
     {
@@ -52874,10 +53298,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L153",
+      "source_location": "L159",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_153",
+      "source": "verifier_grounding_rationale_159",
       "target": "verifier_grounding_strip_reasoning"
     },
     {
@@ -52979,6 +53403,16 @@
       "target": "verifier_grounding_parse_verdict"
     },
     {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "verifier_grounding_rationale_165",
+      "target": "verifier_grounding_parse_verdict"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -53019,7 +53453,7 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L216",
       "weight": 1.0,
-      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing",
+      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
       "target": "verifier_grounding_verify_claim"
     },
     {
@@ -53048,10 +53482,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L191",
+      "source_location": "L197",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_191",
+      "source": "verifier_grounding_rationale_197",
       "target": "verifier_grounding_verify_claim"
     },
     {
@@ -53217,10 +53651,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/grounding.py",
-      "source_location": "L270",
+      "source_location": "L276",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_grounding_rationale_270",
+      "source": "verifier_grounding_rationale_276",
       "target": "verifier_grounding_verify_claims"
     },
     {
@@ -54183,10 +54617,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "packages/agents/src/repopilot_agents/verifier/loop.py",
-      "source_location": "L343",
+      "source_location": "L349",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "verifier_loop_rationale_343",
+      "source": "verifier_loop_rationale_349",
       "target": "verifier_loop_verify_claims_grounded"
     },
     {
@@ -59735,9 +60169,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L191",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_test_verifier_grounding",
-      "target": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing"
+      "target": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -59901,9 +60335,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L219",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing",
-      "target": "tests_test_verifier_grounding_stubengine"
+      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
+      "target": "tests_test_verifier_grounding_stubengine",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -59998,9 +60432,9 @@
       "source_file": "packages/agents/tests/test_verifier_grounding.py",
       "source_location": "L191",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_rejects_instead_of_crashing",
-      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch"
+      "source": "tests_test_verifier_grounding_test_verify_claim_provider_error_marks_unverified_not_rejected",
+      "target": "packages_agents_tests_test_verifier_grounding_py_monkeypatch",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -75798,6 +76232,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_ingestion_summary",
+      "target": "repopilot_ingestion_summary_fallback_summary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
       "source_location": "L37",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -75880,6 +76324,17 @@
     },
     {
       "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_ingestion_summary_fallback_summary",
+      "target": "packages_ingestion_src_repopilot_ingestion_summary_py_chunk"
+    },
+    {
+      "relation": "references",
       "context": "generic_arg",
       "confidence": "EXTRACTED",
       "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
@@ -75888,6 +76343,27 @@
       "confidence_score": 1.0,
       "source": "repopilot_ingestion_summary_summarise_chunks",
       "target": "packages_ingestion_src_repopilot_ingestion_summary_py_chunk"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_ingestion_summary_rationale_49",
+      "target": "repopilot_ingestion_summary_fallback_summary"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ingestion/src/repopilot_ingestion/summary.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repopilot_ingestion_summary_summarise_chunks",
+      "target": "repopilot_ingestion_summary_fallback_summary"
     },
     {
       "relation": "references",
@@ -78694,5 +79170,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9f2a9b3090c4795d37969dc848f90eedec49b24a"
+  "built_at_commit": "72c6132b2d8bccb41ea05564ae53fcce42ea72d0"
 }

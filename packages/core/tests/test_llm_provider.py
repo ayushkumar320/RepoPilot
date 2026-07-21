@@ -188,18 +188,18 @@ async def test_llm_retry_override_caps_provider_attempts(tmp_settings) -> None: 
 
 
 async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_settings) -> None:  # type: ignore[no-untyped-def]
-    # QA_PRIMARY chain (2026-07-11 broadened): Groq llama-3.3, Cerebras
-    # llama-3.3, Cerebras llama-4-scout, Groq openai/gpt-oss-20b. After the
+    # QA_PRIMARY chain (2026-07-21, catalog-verified): Groq llama-3.3, Cerebras
+    # zai-glm-4.7, Cerebras gemma-4-31b, Groq llama-3.1-8b-instant. After the
     # full chain 429s the caller spills to QA_FALLBACK, which starts on Groq
-    # qwen3-32b.
+    # qwen/qwen3.6-27b.
     groq = FakeClient(
         ProviderName.GROQ,
         [
             RateLimitError("storm"),  # QA_PRIMARY: llama-3.3-70b-versatile
-            RateLimitError("storm"),  # QA_PRIMARY: openai/gpt-oss-20b
+            RateLimitError("storm"),  # QA_PRIMARY: llama-3.1-8b-instant
             make_response(
                 provider=ProviderName.GROQ,
-                physical_model="qwen/qwen3-32b",
+                physical_model="qwen/qwen3.6-27b",
                 text="fallback-answer",
                 prompt_tokens=9,
                 completion_tokens=4,
@@ -209,8 +209,8 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
     cerebras = FakeClient(
         ProviderName.CEREBRAS,
         [
-            RateLimitError("storm"),  # QA_PRIMARY: llama-3.3-70b
-            RateLimitError("storm"),  # QA_PRIMARY: llama-4-scout-17b-16e-instruct
+            RateLimitError("storm"),  # QA_PRIMARY: zai-glm-4.7
+            RateLimitError("storm"),  # QA_PRIMARY: gemma-4-31b
         ],
     )
     provider = make_provider(
@@ -226,16 +226,16 @@ async def test_qa_primary_spills_to_qa_fallback_after_chain_exhaustion(tmp_setti
     assert response.text == "fallback-answer"
     assert response.model == ModelId.QA_PRIMARY
     assert response.provider == ProviderName.GROQ
-    assert response.physical_model == "qwen/qwen3-32b"
+    assert response.physical_model == "qwen/qwen3.6-27b"
     assert provider.tokens_used[ModelId.QA_PRIMARY] == 13
     assert [call[0] for call in groq.calls] == [
         "llama-3.3-70b-versatile",
-        "openai/gpt-oss-20b",
-        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "qwen/qwen3.6-27b",
     ]
     assert [call[0] for call in cerebras.calls] == [
-        "llama-3.3-70b",
-        "llama-4-scout-17b-16e-instruct",
+        "zai-glm-4.7",
+        "gemma-4-31b",
     ]
 
 

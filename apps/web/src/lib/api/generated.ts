@@ -140,16 +140,41 @@ export type TourEvent =
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
 
+const RETRYABLE_STATUS = new Set([500, 502, 503, 504]);
+
+// Only idempotent requests may be auto-retried: reads (GET) and repo submission
+// (POST /repos is idempotent on repo_url). We must NOT retry POST /tours or
+// /ask — those create tours or consume the free-question quota.
+function isIdempotent(path: string, init?: RequestInit): boolean {
+  const method = (init?.method ?? "GET").toUpperCase();
+  return method === "GET" || path === "/repos";
+}
+
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-    credentials: "include",
-  });
+  const send = (): Promise<Response> =>
+    fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+      cache: "no-store",
+      credentials: "include",
+    });
+
+  let response: Response;
+  try {
+    response = await send();
+    // The Next.js dev proxy can surface a transient upstream connection reset
+    // (ECONNRESET / socket hang up) as a 5xx; retry idempotent requests once.
+    if (RETRYABLE_STATUS.has(response.status) && isIdempotent(path, init)) {
+      response = await send();
+    }
+  } catch (error) {
+    if (!isIdempotent(path, init)) throw error;
+    response = await send();
+  }
+
   if (!response.ok) {
     const text = await response.text();
     let message = text || `Request failed with status ${response.status}.`;

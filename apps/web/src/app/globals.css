@@ -992,6 +992,14 @@ a {
   background: var(--warning-soft);
 }
 
+/* Verification could not run (e.g. all providers exhausted) — neutral, not a
+   grounding pass or failure. Distinct from success (green) and warning (amber). */
+.status-badge-neutral {
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+}
+
 .ask-panel {
   margin-top: 24px;
   padding: 18px;

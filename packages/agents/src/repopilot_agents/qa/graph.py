@@ -52,6 +52,7 @@ from repopilot_agents.tools.read_chunks import read_chunks
 from repopilot_agents.tools.vector_search import NON_SOURCE_PATH_PREFIXES, vector_search
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef
 from repopilot_agents.verifier.grounding import (
+    VERIFIER_PROVIDER_ERROR_REASON,
     Claim,
     VerifierObjection,
     verify_claims,
@@ -237,10 +238,17 @@ async def answer_question(
     verify_results = await verify_claims(claims, provider=provider, engine=engine, repo_id=repo_id)
     objections = [r.objection for r in verify_results if r.objection is not None]
 
-    # Flag the rejected ones (still shipped, but visually marked).
+    # Flag the rejected ones (still shipped, but visually marked). A claim whose
+    # verification could not run because every provider was exhausted is a
+    # transient infra failure, not a grounding rejection — surface it as
+    # "unverified" (retry) rather than "flagged" (checked and found wanting).
     for verified in verify_results:
         if verified.claim.status == "rejected":
-            verified.claim.status = "flagged"
+            verified.claim.status = (
+                "unverified"
+                if verified.claim.verifier_note == VERIFIER_PROVIDER_ERROR_REASON
+                else "flagged"
+            )
 
     return QAResult(
         question=question,

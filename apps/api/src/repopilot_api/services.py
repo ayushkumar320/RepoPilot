@@ -24,7 +24,7 @@ from repopilot_agents.state import Claim as StateClaim
 from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
-from repopilot_agents.types import CodeRef
+from repopilot_agents.types import CodeRef, GraphQueryResult
 from repopilot_agents.verifier.grounding import Claim as QAClaim
 from repopilot_api.access import AccessService, InMemoryAccessService, ProductAccessService
 from repopilot_api.models import (
@@ -512,19 +512,28 @@ class LiveTourService:
         engine = make_engine(self.runtime.settings)
         try:
             snapshot = await load_snapshot(engine, record.snapshot_repo_id)
+            # Fetch wider candidate pools so the intent's focus keywords have
+            # something to rank. Hubs stay on pure fan-in (a structural fact);
+            # the "start here" and "reading path" sections are intent-tilted.
+            keywords = record.intent_profile.focus_keywords
             hubs = await graph_query("hubs", engine=engine, repo_id=snapshot.repo_id, top_n=4)
             entry_points = await graph_query(
-                "entry_points", engine=engine, repo_id=snapshot.repo_id, top_n=4
+                "entry_points", engine=engine, repo_id=snapshot.repo_id, top_n=12
             )
-            layers = await graph_query("layers", engine=engine, repo_id=snapshot.repo_id, top_n=6)
+            layers = await graph_query("layers", engine=engine, repo_id=snapshot.repo_id, top_n=12)
 
-            entry_claims = await build_claims_for_symbols(
-                engine,
-                snapshot.repo_id,
-                [item.symbol for item in entry_points[:3]],
-                note="Identified from graph entry points.",
-                path=["graph_query:entry_points", "chunks:symbol_lookup"],
-            )
+            # Rank a wider set (6) but cap claims at 3: build_claims_for_symbols
+            # drops symbols with no backing chunk, so over-fetching keeps the
+            # section full even when the top-ranked symbols don't resolve.
+            entry_claims = (
+                await build_claims_for_symbols(
+                    engine,
+                    snapshot.repo_id,
+                    [item.symbol for item in _rank_symbols_by_focus(entry_points, keywords, 12)],
+                    note="Identified from graph entry points.",
+                    path=["graph_query:entry_points", "focus_rank", "chunks:symbol_lookup"],
+                )
+            )[:3]
             hub_claims = await build_claims_for_symbols(
                 engine,
                 snapshot.repo_id,
@@ -532,13 +541,15 @@ class LiveTourService:
                 note="Identified from graph hubs.",
                 path=["graph_query:hubs", "chunks:symbol_lookup"],
             )
-            layer_claims = await build_claims_for_symbols(
-                engine,
-                snapshot.repo_id,
-                [item.symbol for item in layers[:3]],
-                note="Representative symbols from structural layers.",
-                path=["graph_query:layers", "chunks:symbol_lookup"],
-            )
+            layer_claims = (
+                await build_claims_for_symbols(
+                    engine,
+                    snapshot.repo_id,
+                    [item.symbol for item in _rank_symbols_by_focus(layers, keywords, 12)],
+                    note="Representative symbols from structural layers.",
+                    path=["graph_query:layers", "focus_rank", "chunks:symbol_lookup"],
+                )
+            )[:3]
         finally:
             await engine.dispose()
 
@@ -778,6 +789,53 @@ async def resolve_symbol_refs(
             ),
         )
     return [by_symbol[symbol] for symbol in symbols if symbol in by_symbol]
+
+
+def _focus_score(symbol: str, keywords: Sequence[str]) -> int:
+    """How strongly a symbol matches the user's focus keywords.
+
+    The leaf name (e.g. ``connect``) is weighted above the dotted path so a
+    test module named ``test_databases`` doesn't score as "database"-relevant.
+    A 6-char token stem lets "connection" match ``connect``, "pooling" match
+    ``pool``, etc., without a full stemmer.
+    """
+    leaf = symbol.rsplit(".", 1)[-1].lower()
+    haystack = symbol.lower()
+    is_test = "test" in haystack
+    score = 0
+    for keyword in keywords:
+        for token in re.findall(r"[a-z0-9]{4,}", keyword.lower()):
+            stem = token[:6]
+            if stem in leaf:
+                score += 2  # strong: the symbol's own name matches
+            elif stem in haystack and not is_test:
+                score += 1  # weak: only the module/path matches (never test modules)
+    return score
+
+
+def _rank_symbols_by_focus(
+    items: Sequence[GraphQueryResult], keywords: Sequence[str], limit: int
+) -> list[GraphQueryResult]:
+    """Bias graph candidates toward the user's intent: focus-matching symbols
+    lead, with the graph's own ordering as the tiebreaker. When keywords are
+    given, prefer non-test symbols (a "how does X work" intent almost never
+    wants test fixtures) as long as enough non-test candidates exist. No-op
+    when no keywords are given.
+    """
+    if not keywords:
+        return list(items[:limit])
+    # Sort by: focus score (desc), then non-test before test, then graph order.
+    # Soft down-ranking (not exclusion) keeps sections populated even when the
+    # only chunk-backed candidates happen to live in tests.
+    ranked = sorted(
+        enumerate(items),
+        key=lambda pair: (
+            -_focus_score(pair[1].symbol, keywords),
+            "test" in pair[1].symbol.lower(),
+            pair[0],
+        ),
+    )
+    return [item for _, item in ranked[:limit]]
 
 
 def build_mermaid(hubs: Sequence[object]) -> str:

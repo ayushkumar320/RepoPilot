@@ -326,7 +326,13 @@ def _finalize(
 
     for claim in result.claims:
         if claim.status == "rejected":
-            claim.status = "flagged"
+            # A provider-exhaustion failure is transient infra, not a grounding
+            # rejection — surface it as "unverified" (retry) not "flagged".
+            claim.status = (
+                "unverified"
+                if claim.verifier_note == grounding_mod.VERIFIER_PROVIDER_ERROR_REASON
+                else "flagged"
+            )
     return result
 
 

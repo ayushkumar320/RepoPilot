@@ -121,6 +121,13 @@ class Settings(BaseSettings):
     query_understanding_enabled: bool = False
     query_understanding_max_rewrites: int = 3
 
+    # ── Interactive Q&A ─────────────────────────────────────────────────────
+    # UI asks should fail over quickly instead of spending a click-and-wait path
+    # on the long retry budget used by indexing/evals. Compression is still
+    # available to offline callers via ``answer_question(..., use_compress=True)``.
+    qa_llm_max_429_retries: int = 2
+    qa_compress_enabled: bool = False
+
     # ── GitHub ───────────────────────────────────────────────────────────────
     github_pat: str | None = None
 

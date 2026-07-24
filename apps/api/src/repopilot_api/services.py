@@ -622,6 +622,8 @@ class LiveTourService:
                     engine=engine,
                     provider=provider or self.runtime.provider,
                     repo_id=record.snapshot_repo_id,
+                    use_compress=self.runtime.settings.qa_compress_enabled,
+                    retry_429_attempts=self.runtime.settings.qa_llm_max_429_retries,
                 )
             except Exception as exc:
                 result = await answer_deterministically(

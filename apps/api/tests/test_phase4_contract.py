@@ -132,6 +132,8 @@ class FakeTourService:
     async def ask(self, tour_id: str, question: str, *, provider: Any = None) -> QAAnswerResponse:
         del provider
         self.ask_calls.append((tour_id, question))
+        if question == "explode":
+            raise RuntimeError("qa exploded")
         return QAAnswerResponse(
             answer="Start with the Flask class in `app.py`.",
             claims=[
@@ -310,6 +312,17 @@ async def test_post_tour_ask_returns_answer_and_claims(api_client: AsyncClient) 
 
 
 @pytest.mark.asyncio
+async def test_post_tour_ask_failure_returns_structured_503(api_client: AsyncClient) -> None:
+    response = await api_client.post(
+        "/tours/tour-123/ask",
+        json={"question": "explode"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "QA_FAILED"
+
+
+@pytest.mark.asyncio
 async def test_account_starts_with_one_repo_and_five_questions(api_client: AsyncClient) -> None:
     response = await api_client.get("/account/usage")
 
@@ -423,8 +436,18 @@ async def test_live_tour_ask_uses_rag_answer_question(
         repo_id: str,
         k: int = 8,
         max_hops: int = 3,
+        use_compress: bool = True,
+        retry_429_attempts: int | None = None,
     ) -> QAResult:
-        calls.append({"question": question, "repo_id": repo_id, "k": str(k)})
+        calls.append(
+            {
+                "question": question,
+                "repo_id": repo_id,
+                "k": str(k),
+                "use_compress": str(use_compress),
+                "retry_429_attempts": str(retry_429_attempts),
+            }
+        )
         ref = CodeRef(file_path="app.py", start_line=1, end_line=20, symbol="app")
         return QAResult(
             question=question,
@@ -456,6 +479,8 @@ async def test_live_tour_ask_uses_rag_answer_question(
             "question": "is rag getting used here?",
             "repo_id": "repo-123@abc",
             "k": "8",
+            "use_compress": "False",
+            "retry_429_attempts": "2",
         }
     ]
     assert response.retrieval_path == ["vector_search:k=8:hits=1"]

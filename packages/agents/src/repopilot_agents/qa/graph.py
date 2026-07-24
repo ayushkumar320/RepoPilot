@@ -108,6 +108,7 @@ async def answer_question(
     use_query_understanding: bool | None = None,
     use_rerank: bool = True,
     use_compress: bool = True,
+    retry_429_attempts: int | None = None,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -177,6 +178,7 @@ async def answer_question(
             initial_chunks,
             provider=provider,
             min_lines=settings.compress_min_chunk_lines,
+            retry_429_attempts=retry_429_attempts,
         )
         ctx.retrieval_path.append(f"compress:k={len(initial_chunks)}")
     _extend_context(ctx, initial_chunks)
@@ -184,7 +186,12 @@ async def answer_question(
     # Outer loop: sufficiency judge → optional traverse expansion.
     hops = 0
     while hops < max_hops:
-        verdict = await _judge_sufficiency(provider, question, ctx.chunks)
+        verdict = await _judge_sufficiency(
+            provider,
+            question,
+            ctx.chunks,
+            retry_429_attempts=retry_429_attempts,
+        )
         if verdict.decision == "sufficient" or verdict.next_symbol is None:
             break
 
@@ -210,7 +217,12 @@ async def answer_question(
         hops += 1
 
     answer_prompt_tokens = _estimate_tokens(answer_user_prompt(question, ctx.chunks))
-    answer_text = await _generate_answer(provider, question, ctx.chunks)
+    answer_text = await _generate_answer(
+        provider,
+        question,
+        ctx.chunks,
+        retry_429_attempts=retry_429_attempts,
+    )
 
     if _is_not_found(answer_text):
         return QAResult(
@@ -235,7 +247,13 @@ async def answer_question(
             answer_input_tokens=answer_prompt_tokens,
         )
 
-    verify_results = await verify_claims(claims, provider=provider, engine=engine, repo_id=repo_id)
+    verify_results = await verify_claims(
+        claims,
+        provider=provider,
+        engine=engine,
+        repo_id=repo_id,
+        retry_429_attempts=retry_429_attempts,
+    )
     objections = [r.objection for r in verify_results if r.objection is not None]
 
     # Flag the rejected ones (still shipped, but visually marked). A claim whose
@@ -395,7 +413,11 @@ def _query_lane_weights(count: int) -> list[float]:
 
 
 async def _judge_sufficiency(
-    provider: LLMProvider, question: str, chunks: list[ChunkContent]
+    provider: LLMProvider,
+    question: str,
+    chunks: list[ChunkContent],
+    *,
+    retry_429_attempts: int | None,
 ) -> SufficiencyVerdict:
     response = await provider.generate(
         ModelId.QA_PRIMARY,
@@ -405,6 +427,7 @@ async def _judge_sufficiency(
         ],
         temperature=0.0,
         max_tokens=1024,
+        retry_429_attempts=retry_429_attempts,
     )
     match = _JSON_RE.search(response.text)
     if match is None:
@@ -419,7 +442,13 @@ async def _judge_sufficiency(
         return SufficiencyVerdict(decision="sufficient", reason="schema_error")
 
 
-async def _generate_answer(provider: LLMProvider, question: str, chunks: list[ChunkContent]) -> str:
+async def _generate_answer(
+    provider: LLMProvider,
+    question: str,
+    chunks: list[ChunkContent],
+    *,
+    retry_429_attempts: int | None,
+) -> str:
     user_prompt = answer_user_prompt(question, chunks)
     response = await provider.generate(
         ModelId.QA_PRIMARY,
@@ -433,6 +462,7 @@ async def _generate_answer(provider: LLMProvider, question: str, chunks: list[Ch
         # multi-step question was observed burning 1021 reasoning tokens and
         # dying at 1024 with no content at all. 4096 gives real room.
         max_tokens=4096,
+        retry_429_attempts=retry_429_attempts,
     )
     return response.text.strip()
 

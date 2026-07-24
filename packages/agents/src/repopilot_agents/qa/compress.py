@@ -105,6 +105,7 @@ async def compress_chunk(
     *,
     provider: LLMProvider,
     min_lines: int = 15,
+    retry_429_attempts: int | None = None,
 ) -> ChunkContent:
     """Return a chunk annotated with kept spans, or the original on safe skip."""
     if chunk.kind == "module":
@@ -121,6 +122,7 @@ async def compress_chunk(
         ],
         temperature=0.0,
         max_tokens=120,
+        retry_429_attempts=retry_429_attempts,
     )
     keep = _parse_keep_ranges(response.text)
     if keep is None:
@@ -137,12 +139,19 @@ async def compress_chunks(
     *,
     provider: LLMProvider,
     min_lines: int = 15,
+    retry_429_attempts: int | None = None,
 ) -> list[ChunkContent]:
     if not chunks:
         return []
     results = await asyncio.gather(
         *(
-            compress_chunk(question, chunk, provider=provider, min_lines=min_lines)
+            compress_chunk(
+                question,
+                chunk,
+                provider=provider,
+                min_lines=min_lines,
+                retry_429_attempts=retry_429_attempts,
+            )
             for chunk in chunks
         ),
         return_exceptions=True,

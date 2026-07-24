@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from typing import cast
 from uuid import uuid4
 
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -38,6 +39,8 @@ from repopilot_api.services import (
 from repopilot_api.sse import with_heartbeats
 from repopilot_core.logging import configure_logging
 from repopilot_core.settings import get_settings
+
+log = structlog.get_logger(__name__)
 
 
 def create_app(*, services: AppServices | None = None) -> FastAPI:
@@ -293,9 +296,19 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         except KeyError as exc:
             await get_services().access.release(reservation)
             raise HTTPException(status_code=404, detail="tour not found") from exc
-        except Exception:
+        except Exception as exc:
             await get_services().access.release(reservation)
-            raise
+            log.exception("tour.ask_failed", tour_id=tour_id)
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "code": "QA_FAILED",
+                    "message": (
+                        "RepoPilot could not answer that question right now. "
+                        "Try again, or ask about a concrete symbol or file."
+                    ),
+                },
+            ) from exc
         await get_services().access.complete(reservation)
         return answer
 

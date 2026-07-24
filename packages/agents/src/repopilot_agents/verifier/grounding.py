@@ -193,6 +193,7 @@ async def verify_claim(
     provider: LLMProvider,
     engine: AsyncEngine,
     repo_id: str,
+    retry_429_attempts: int | None = None,
 ) -> _VerifyResult:
     """Verify one claim. Updates ``claim.status`` and ``claim.verifier_note`` in place."""
     chunks = await read_chunks(claim.refs, engine=engine, repo_id=repo_id)
@@ -226,6 +227,7 @@ async def verify_claim(
             # Headroom for reasoning models: qwen3 spends its budget in a
             # <think> block first, so 200 tokens starved the JSON entirely.
             max_tokens=1024,
+            retry_429_attempts=retry_429_attempts,
         )
     except ProviderError as exc:
         # Safe failure: if every verifier provider is exhausted, reject the
@@ -272,6 +274,7 @@ async def verify_claims(
     engine: AsyncEngine,
     repo_id: str,
     max_concurrency: int | None = None,
+    retry_429_attempts: int | None = None,
 ) -> list[_VerifyResult]:
     """Verify N claims concurrently, bounded to avoid 429 stampedes (M1).
 
@@ -290,13 +293,28 @@ async def verify_claims(
         limit = getattr(settings, "llm_verifier_max_concurrency", 0) if settings else 0
 
     if limit <= 0:
-        coros = [verify_claim(c, provider=provider, engine=engine, repo_id=repo_id) for c in claims]
+        coros = [
+            verify_claim(
+                c,
+                provider=provider,
+                engine=engine,
+                repo_id=repo_id,
+                retry_429_attempts=retry_429_attempts,
+            )
+            for c in claims
+        ]
     else:
         sem = asyncio.Semaphore(limit)
 
         async def _bounded(claim: Claim) -> _VerifyResult:
             async with sem:
-                return await verify_claim(claim, provider=provider, engine=engine, repo_id=repo_id)
+                return await verify_claim(
+                    claim,
+                    provider=provider,
+                    engine=engine,
+                    repo_id=repo_id,
+                    retry_429_attempts=retry_429_attempts,
+                )
 
         coros = [_bounded(c) for c in claims]
 

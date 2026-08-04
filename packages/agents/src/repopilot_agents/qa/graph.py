@@ -46,7 +46,6 @@ from repopilot_agents.qa.prompts import (
 from repopilot_agents.qa.query_spec import QuerySpec, build_query_spec, fallback_query_spec
 from repopilot_agents.qa.types import SufficiencyVerdict
 from repopilot_agents.qa.union import reciprocal_rank_fusion
-from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_traverse import graph_traverse
@@ -212,12 +211,25 @@ async def answer_question(
         # Phase 4: fetch the top of the pool, cross-encoder rerank + MMR
         # diversify, and let the reranked order decide the prompt slice.
         with _timed(ctx, "rerank"):
-            pool_hits = hits[:RERANK_MAX_POOL]
+            # Pool size and lambda come from settings, not the module constants:
+            # until 2026-08-04 this read rerank.pipeline's DEFAULT_MAX_POOL and
+            # ``Settings.rerank_max_pool`` was dead config that silently did
+            # nothing. Pool size is the single biggest latency lever here --
+            # it costs a read_chunks over the pool *and* a cross-encoder pass.
+            max_pool = settings.rerank_max_pool
+            pool_hits = hits[:max_pool]
             pool_chunks = await read_chunks(
                 [h.ref for h in pool_hits], engine=engine, repo_id=repo_id
             )
             if len(pool_chunks) == len(pool_hits):
-                ranked = rerank_and_diversify(question, pool_hits, pool_chunks, k=k)
+                ranked = rerank_and_diversify(
+                    question,
+                    pool_hits,
+                    pool_chunks,
+                    k=k,
+                    lambda_=settings.rerank_lambda,
+                    max_pool=max_pool,
+                )
                 ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
                 initial_chunks = [content for _, content in ranked]
             else:

@@ -105,12 +105,25 @@ class Settings(BaseSettings):
     # Cross-encoder over the post-retrieval pool. MiniLM-L-6-v2 is 80 MB ONNX,
     # ~460 pairs/s on CPU; BAAI/bge-reranker-base (1 GB) is the quality
     # fallback if the pairwise self-test flags MiniLM as code-mismatched.
-    # Defaults benched in Phase 4 (lambda x pool sweep): pool=50 reranks the
-    # full hybrid pool (fastapi rare recall@10 0.583 -> 0.917); lambda=0.9 is
-    # the min-regret diversity setting (recall up on every dataset).
+    # Defaults benched in Phase 4 (lambda x pool sweep); lambda=0.9 is the
+    # min-regret diversity setting (recall up on every dataset).
+    #
+    # pool 50 -> 25 on 2026-08-04. Rerank was measured as the dominant latency
+    # stage (~2.1s/query, 53% of wall-clock: ~990ms reading the pool, ~1265ms
+    # scoring it). Sweeping 50/35/25/15 held retrieval quality flat down to 25
+    # while saving ~933ms/query:
+    #
+    #   pool | httpx r@10 (n=13) | flask r@10 (n=17) | rare r@10 (n=12) | rerank ms
+    #     50 |             0.974 |             0.868 |            1.000 |      2082
+    #     25 |             0.974 |             0.868 |            1.000 |      1149
+    #     15 |             0.949 |             0.917 |            1.000 |       873
+    #
+    # 15 is not safe: it costs httpx recall. Phase 4's rare-symbol win survives
+    # at every pool size, but that set is saturated at 1.000 and could not have
+    # detected damage -- the choice rests on httpx and flask.
     rerank_enabled: bool = True
     rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
-    rerank_max_pool: int = 50
+    rerank_max_pool: int = 25
     rerank_lambda: float = 0.9
 
     # ── Context compression (RAG Phase 5) ───────────────────────────────────

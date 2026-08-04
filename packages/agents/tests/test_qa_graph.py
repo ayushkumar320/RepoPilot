@@ -265,6 +265,62 @@ async def test_empty_graph_expansion_stops_without_repeating(
 
 @pytest.mark.asyncio
 @pytest.mark.asyncio
+async def test_rerank_pool_size_comes_from_settings(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``Settings.rerank_max_pool`` must actually reach the rerank call.
+
+    Regression test for dead config: until 2026-08-04 the QA path read
+    ``rerank.pipeline.DEFAULT_MAX_POOL`` directly, so changing the setting
+    silently did nothing and the pool was pinned at 50 regardless. Pool size
+    is the dominant latency lever, so "the knob does nothing" was expensive.
+    """
+    seen: dict[str, object] = {}
+
+    async def many_hits(question: str, **kw: Any) -> list[ChunkHit]:
+        return [
+            ChunkHit(ref=_ref(f"sym{i}", line=i + 1), distance=0.01 * i, kind="function")
+            for i in range(40)
+        ]
+
+    def spy_rerank(
+        query: str, hits: Any, contents: Any, **kw: Any
+    ) -> list[tuple[ChunkHit, ChunkContent]]:
+        seen["n_hits"] = len(hits)
+        seen["max_pool"] = kw.get("max_pool")
+        seen["lambda_"] = kw.get("lambda_")
+        return list(zip(hits, contents, strict=True))[: kw.get("k", 8)]
+
+    monkeypatch.setattr(qa_graph, "hybrid_search", many_hits)
+    monkeypatch.setattr(qa_graph, "vector_search", many_hits)
+    monkeypatch.setattr(qa_graph, "rerank_and_diversify", spy_rerank)
+    base = get_settings()
+    monkeypatch.setattr(
+        qa_graph,
+        "get_settings",
+        lambda: base.model_copy(update={"rerank_max_pool": 12, "rerank_lambda": 0.5}),
+    )
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "sym0 returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does sym0 return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        k=8,
+        recall_k=50,
+    )
+
+    assert seen["n_hits"] == 12, "pool slice ignored settings.rerank_max_pool"
+    assert seen["max_pool"] == 12
+    assert seen["lambda_"] == 0.5, "settings.rerank_lambda ignored"
+    assert "rerank:pool=12:k=8" in result.retrieval_path
+
+
+@pytest.mark.asyncio
 async def test_compression_is_off_by_default_even_when_requested(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

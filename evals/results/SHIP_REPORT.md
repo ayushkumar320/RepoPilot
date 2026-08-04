@@ -62,8 +62,11 @@ rerank is `~2.1 s`/query (53% of wall-clock), not verifier concurrency, which me
 rerank, reading the 50-chunk pool costs `~990 ms`/query and cross-encoder scoring
 `~1265 ms`/query — the latter against a documented `~460 pairs/s` (`~110 ms`) budget, i.e.
 roughly `11x` slower than assumed. A pool sweep (50/35/25/15) found pool `25` holds
-recall@10 flat on httpx (`0.974`) and flask (`0.868`) while saving `~933 ms`/query; **not
-yet landed.**
+recall@10 flat on httpx (`0.974`) and flask (`0.868`) while saving `~933 ms`/query.
+**Landed 2026-08-04**: `Settings.rerank_max_pool` now defaults to `25` and — for the first
+time — is actually read by the QA path, which previously used
+`rerank.pipeline.DEFAULT_MAX_POOL` and ignored the setting entirely. No end-to-end p95
+re-bench has been run against the new default yet.
 
 ## Deferred Entry States
 

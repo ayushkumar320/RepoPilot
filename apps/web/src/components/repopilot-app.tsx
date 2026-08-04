@@ -560,6 +560,10 @@ export default function RepoPilotApp({
     setErrorMessage(null);
     try {
       const tour = await api.getTour(id);
+      // Fetch the snapshot status up front: the workspace only opens once the
+      // repo reads as ready, and without this the resumed tour flashes the
+      // onboarding screen ("Not started") until the 1.5s status poll lands.
+      const status = await api.getRepoStatus(tour.repo_id).catch(() => undefined);
       const preset = tour.intent_profile
         ? PERSONAS.find((persona) => persona.profile.raw_text === tour.intent_profile?.raw_text)
         : undefined;
@@ -575,7 +579,8 @@ export default function RepoPilotApp({
       setTourId(tour.tour_id);
       setRepoId(tour.repo_id);
       setRepoUrl(`https://github.com/${decodeURIComponent(tour.repo_id)}`);
-      setStore(hydrateFromTour(tour));
+      const restored = hydrateFromTour(tour);
+      setStore(status ? applyRepoStatus(restored, status) : restored);
       window.history.replaceState(null, "", `/?repo=${encodeURIComponent(tour.repo_id)}`);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Could not reopen this tour.");

@@ -40,7 +40,7 @@ For real tours, put at least one LLM provider key in `.env` before using the app
 
 | Command | What it does |
 |---|---|
-| `make setup` | Installs Python workspace deps and frontend npm deps. |
+| `make setup` | Installs Python workspace deps, the pre-commit git hook, and frontend npm deps. |
 | `make services` | Starts Postgres/Redis and runs DB migrations. |
 | `make backend` | Runs only the FastAPI backend. |
 | `make frontend` | Runs only the Next.js frontend. |

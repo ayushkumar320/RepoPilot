@@ -103,9 +103,7 @@ async def delete_incomplete_index(
 ) -> None:
     """Delete a same-SHA snapshot only when it is empty or missing embeddings."""
     chunk_exists = (
-        select(chunks_table.c.id)
-        .where(chunks_table.c.repo_id == repos_table.c.id)
-        .exists()
+        select(chunks_table.c.id).where(chunks_table.c.repo_id == repos_table.c.id).exists()
     )
     missing_embedding_exists = (
         select(chunks_table.c.id)

@@ -68,7 +68,9 @@ async def _embed_items(
                 f"embed provider returned {len(responses)} responses for {len(items)} chunks"
             )
         if any(response.dim != EMBEDDING_DIM for response in responses):
-            raise ProviderError(f"embed provider returned a vector dimension other than {EMBEDDING_DIM}")
+            raise ProviderError(
+                f"embed provider returned a vector dimension other than {EMBEDDING_DIM}"
+            )
         return [
             EmbeddedChunk(chunk=chunk, vector=response.vector)
             for (chunk, _), response in zip(items, responses, strict=True)

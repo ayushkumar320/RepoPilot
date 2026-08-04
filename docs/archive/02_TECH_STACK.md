@@ -179,7 +179,7 @@ This is the layer where principle 1 (truthful) is actually purchased. **An LLM d
    │   indexing jobs   │   │   Qwen/Qwen2.5-Coder-7B-Instruct (verif)│   │   llama-3.3-70b / qwen3-32b /         │
    └───────────────────┘   │   nomic-ai/nomic-embed-text-v1.5 (emb) │   │   llama-3.1-8b-instant                │
                            └──────────────────────────┘   └───────────────────────────────────────┘
-                                                       
+
    ┌──────────────────────────┐    ┌──────────────────────────────────┐
    │  tree-sitter (parse)     │    │   LangSmith (tracing + evals)    │
    │  NetworkX  (graph)       │    │   ─ traces every node             │

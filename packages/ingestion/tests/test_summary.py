@@ -50,8 +50,6 @@ async def test_summarise_chunks_opens_circuit_after_provider_failure(tmp_path: P
 
     # On provider exhaustion each chunk degrades to a deterministic AST-derived
     # stand-in (not the opaque literal "unknown").
-    assert all(
-        summary.summary.endswith("(summary unavailable)") for summary in summaries
-    )
+    assert all(summary.summary.endswith("(summary unavailable)") for summary in summaries)
     assert provider.calls == 1
     assert provider.retry_attempts == [1]

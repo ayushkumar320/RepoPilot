@@ -83,9 +83,7 @@ class LatencyEvalMetrics:
         # token estimation, glue). A large value means the breakdown is
         # lying by omission and needs another timer.
         accounted = [sum(d.values()) for d in self.stage_timings_ms]
-        unaccounted = [
-            t - a for t, a in zip(self.timings_ms, accounted, strict=False) if t > 0
-        ]
+        unaccounted = [t - a for t, a in zip(self.timings_ms, accounted, strict=False) if t > 0]
         out["stage_unaccounted_p95_ms"] = percentile(sorted(unaccounted), 95)
         return out
 

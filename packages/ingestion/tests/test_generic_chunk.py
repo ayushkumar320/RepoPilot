@@ -8,11 +8,12 @@ import pytest
 
 from repopilot_core.settings import Settings
 from repopilot_ingestion import pipeline as pipeline_mod
+from repopilot_ingestion.chunk import Chunk
 from repopilot_ingestion.clone import CloneResult
 from repopilot_ingestion.generic_chunk import chunk_text_file, iter_generic_files
 
 
-def _chunk(path: Path, root: Path, *, language: str = "typescript"):
+def _chunk(path: Path, root: Path, *, language: str = "typescript") -> tuple[list[Chunk], int]:
     return chunk_text_file(
         path,
         root=root,
@@ -31,7 +32,10 @@ def test_discovers_supported_languages_and_repository_context(tmp_path: Path) ->
     (tmp_path / "package.json").write_text('{"name":"example"}\n', encoding="utf-8")
     (tmp_path / "image.png").write_bytes(b"not indexed")
 
-    found = [(path.relative_to(tmp_path).as_posix(), language) for path, language in iter_generic_files(tmp_path)]
+    found = [
+        (path.relative_to(tmp_path).as_posix(), language)
+        for path, language in iter_generic_files(tmp_path)
+    ]
 
     assert found == [
         ("README.md", "markdown"),
@@ -74,16 +78,23 @@ def test_rejects_oversized_binary_and_minified_files(tmp_path: Path) -> None:
     minified = tmp_path / "minified.js"
     minified.write_text("x" * 1_001, encoding="utf-8")
 
-    common = {
-        "root": tmp_path,
-        "language": "typescript",
-        "max_chunk_lines": 10,
-        "max_chunk_chars": 1_000,
-        "overlap_lines": 1,
-    }
-    assert chunk_text_file(oversized, max_file_bytes=100, **common) == ([], 0)
-    assert chunk_text_file(binary, max_file_bytes=10_000, **common) == ([], 0)
-    assert chunk_text_file(minified, max_file_bytes=10_000, **common) == ([], 0)
+    # Passed explicitly rather than via **kwargs: a dict of mixed value types
+    # widens to dict[str, object], which mypy cannot unpack against a typed
+    # signature.
+    def rejected(path: Path, *, max_file_bytes: int) -> tuple[list[Chunk], int]:
+        return chunk_text_file(
+            path,
+            root=tmp_path,
+            language="typescript",
+            max_file_bytes=max_file_bytes,
+            max_chunk_lines=10,
+            max_chunk_chars=1_000,
+            overlap_lines=1,
+        )
+
+    assert rejected(oversized, max_file_bytes=100) == ([], 0)
+    assert rejected(binary, max_file_bytes=10_000) == ([], 0)
+    assert rejected(minified, max_file_bytes=10_000) == ([], 0)
 
 
 def _clone(root: Path) -> CloneResult:
@@ -129,7 +140,9 @@ def test_scan_scheduler_is_bounded_by_worker_count(
     max_active = 0
     lock = threading.Lock()
 
-    def fake_scan(job, *, root, settings):  # type: ignore[no-untyped-def]
+    def fake_scan(
+        job: pipeline_mod._ScanJob, *, root: Path, settings: Settings
+    ) -> pipeline_mod._ScannedFile:
         nonlocal active, max_active
         with lock:
             active += 1
@@ -161,7 +174,9 @@ def test_scan_failure_names_repository_relative_path(
     settings = Settings(repopilot_env="test", llm_cache_path=tmp_path / "llm.sqlite")
     jobs = pipeline_mod._discover_scan_jobs(tmp_path)
 
-    def fail(job, *, root, settings):  # type: ignore[no-untyped-def]
+    def fail(
+        job: pipeline_mod._ScanJob, *, root: Path, settings: Settings
+    ) -> pipeline_mod._ScannedFile:
         raise ValueError("parse failed")
 
     monkeypatch.setattr(pipeline_mod, "_scan_one_file", fail)

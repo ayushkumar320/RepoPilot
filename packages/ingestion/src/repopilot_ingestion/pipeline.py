@@ -327,9 +327,7 @@ def _run_scan_jobs(
             try:
                 serial_results.append(_scan_one_file(job, root=root, settings=settings))
             except Exception as exc:
-                raise RuntimeError(
-                    f"failed to scan {job.rel_path.as_posix()}: {exc}"
-                ) from exc
+                raise RuntimeError(f"failed to scan {job.rel_path.as_posix()}: {exc}") from exc
         return sorted(serial_results, key=lambda result: result.order)
 
     results: dict[int, _ScannedFile] = {}
@@ -342,9 +340,9 @@ def _run_scan_jobs(
             candidate = next(iterator, None)
             if candidate is None:
                 break
-            pending[
-                executor.submit(_scan_one_file, candidate, root=root, settings=settings)
-            ] = candidate
+            pending[executor.submit(_scan_one_file, candidate, root=root, settings=settings)] = (
+                candidate
+            )
 
         while pending:
             completed, _ = wait(pending, return_when=FIRST_COMPLETED)
@@ -355,9 +353,7 @@ def _run_scan_jobs(
                 except Exception as exc:
                     for outstanding in pending:
                         outstanding.cancel()
-                    raise RuntimeError(
-                        f"failed to scan {job.rel_path.as_posix()}: {exc}"
-                    ) from exc
+                    raise RuntimeError(f"failed to scan {job.rel_path.as_posix()}: {exc}") from exc
                 results[result.order] = result
 
             while len(pending) < max_pending:
@@ -381,7 +377,9 @@ def _scan_one_file(job: _ScanJob, *, root: Path, settings: Settings) -> _Scanned
         return _ScannedFile(
             order=job.order,
             rel_path=rel.as_posix(),
-            module_source=ModuleSource(module=module, rel_path=rel.as_posix(), source=parsed.source),
+            module_source=ModuleSource(
+                module=module, rel_path=rel.as_posix(), source=parsed.source
+            ),
             chunks=tuple(chunk_file(parsed, rel_path=rel)),
             line_count=parsed.line_count,
         )

@@ -4,7 +4,7 @@ Generated: 2026-07-17
 
 ## Executive Status
 
-RepoPilot ships the measured retrieval stack through Phase 5: widened source retrieval, BM25 hybrid retrieval, cross-encoder reranking with MMR, and context-compression plumbing. Phase 2 and Phase 6 have completed eval artifacts, but both miss their gates and stay deferred/disabled for runtime. Phase 7's permanent CI forcing function is now in place: PRs touching retrieval paths must include a fresh `evals/results/rag_phaseN/_after.json`.
+RepoPilot ships the measured retrieval stack through Phase 4: widened source retrieval, BM25 hybrid retrieval, and cross-encoder reranking with MMR. Phase 5's context-compression plumbing exists but is switched off (see the post-ship note below). Phase 2 and Phase 6 have completed eval artifacts, but both miss their gates and stay deferred/disabled for runtime. Phase 7's permanent CI forcing function is now in place: PRs touching retrieval paths must include a fresh `evals/results/rag_phaseN/_after.json`.
 
 ## Phase Scorecard
 
@@ -15,7 +15,7 @@ RepoPilot ships the measured retrieval stack through Phase 5: widened source ret
 | 2 - Query Understanding | Deferred | multi-hop/httpx recall@10 `0.949 -> 0.817` vs Phase 1 artifact; documented raw dense comparison was `0.850 -> 0.817` | Gate missed. Runtime remains disabled by `query_understanding_enabled=False`. |
 | 3 - BM25 Hybrid | Landed | fastapi rare-symbol recall@10 `0.417 -> 0.583` (+17 pp) | Landed on primary rare-symbol gate; httpx general cost documented. |
 | 4 - Reranking | Landed | fastapi rare-symbol NDCG@5 `0.491 -> 0.917`; recall@10 `0.583 -> 0.917` | Landed. Also repaired httpx general recall to `0.974`. |
-| 5 - Compression | Landed by override | input tokens did not reach the -40% gate; Phase 5 after records httpx `2591`, flask `3439`, fastapi `14455` tokens/question | User explicitly overrode failed token-reduction gate; compression falls back safely on oversized provider payloads. |
+| 5 - Compression | **Disabled 2026-08-04** (was: landed by override) | input tokens did not reach the -40% gate; Phase 5 after records httpx `2591`, flask `3439`, fastapi `14455` tokens/question | Gate failed, was overridden, now switched off — see the Phase 5 note below. |
 | 6 - Ingestion Enrichment | Deferred | recall@10 unchanged: httpx `0.974 -> 0.974`, flask `0.868 -> 0.868`, fastapi `0.833 -> 0.833`; httpx NDCG@5 regressed `0.818 -> 0.800` | Gate missed. Keep raw dense embeddings; `enriched_text` remains available for BM25/FTS experiments. |
 | 7 - Ship Closeout | Landed | CI artifact gate added for retrieval-path PRs | Permanent regression guard installed. |
 
@@ -31,9 +31,39 @@ Grounding DoD status: the final measured values do not meet the stated product b
 
 Verifier DoD status: `verifier_quality_v1 = 1.00` on 30/30 after the parse fix.
 
-Trap-question DoD status: the committed QA datasets contain 8 `not_in_repo` trap rows, not 9: 3 httpx, 3 flask, 2 fastapi. The latest full Phase 6 run passed all 8 with `hallucination_rate = 0.0` for every repo.
+Trap-question DoD status: **met as of 2026-08-04.** The committed QA datasets contain 9 `not_in_repo` trap rows: 3 httpx, 3 flask, 3 fastapi. The 9th (fastapi, "built-in database migration system") was added after this report's original run and verified to abstain individually; the last full-bench figure remains the Phase 6 run, which passed all 8 then-committed traps with `hallucination_rate = 0.0` for every repo. The 9-trap set has not yet been through a full bench.
 
 Latency DoD status: the cumulative `1.5x` target is not met consistently. The clean Phase 5 landed run is acceptable for httpx and near-bound for flask/fastapi, but the Phase 6 run regressed latency heavily, especially fastapi (`12065 ms` p95). Phase 6 is deferred partly for this reason.
+
+## Post-Ship Notes
+
+These amend the report above; the phase artifacts themselves are unchanged.
+
+**Phase 5 compression — switched off 2026-08-04.** Re-measured on fastapi (3 answerable
+questions, A/B over identical retrieval): `+5.6%` input-token reduction against the `-40%`
+gate, at multiple seconds per question. Two claims in the original report do not survive
+re-measurement:
+
+- The `413 Payload Too Large` fallback story did not reproduce — **zero** payload errors
+  observed. Compression is not failing loudly on oversized chunks; it succeeds and barely
+  helps. Only 1 of 3 questions changed at all (`5942 -> 5309` tokens); the rest returned
+  identical because `compress_chunk` hands back the original whenever the model emits no
+  usable keep-ranges.
+- `Settings.compress_enabled` now defaults to `False` and is the single authority:
+  `use_compress=True` alone no longer enables compression for any caller. The code and the
+  `use_compress` kwarg are retained so the phase can be re-measured after prompt or
+  chunk-splitting work.
+
+**Latency attribution — instrumented 2026-08-04.** `QAResult.stage_timings_ms` now records
+wall-clock per pipeline stage, and a latency breach names the worst stages. First
+measurement on fastapi contradicts this report's diagnosis at "Latency DoD status" below:
+rerank is `~2.1 s`/query (53% of wall-clock), not verifier concurrency, which measured
+15.8%. That diagnosis predates `llm_verifier_max_concurrency` going `3 -> 10`. Within
+rerank, reading the 50-chunk pool costs `~990 ms`/query and cross-encoder scoring
+`~1265 ms`/query — the latter against a documented `~460 pairs/s` (`~110 ms`) budget, i.e.
+roughly `11x` slower than assumed. A pool sweep (50/35/25/15) found pool `25` holds
+recall@10 flat on httpx (`0.974`) and flask (`0.868`) while saving `~933 ms`/query; **not
+yet landed.**
 
 ## Deferred Entry States
 

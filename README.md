@@ -292,7 +292,7 @@ RepoPilot follows a few hard rules:
 - AST dependency graphs are currently Python-only; other supported languages use grounded textual retrieval without invented graph edges.
 - Public GitHub repos only.
 - Large live repo demos depend on external model/provider quotas.
-- Query Understanding and Ingestion Enrichment are implemented/evaluated but deferred because their gates missed.
+- Query Understanding, Ingestion Enrichment, and Context Compression are implemented/evaluated but switched off because their gates missed.
 - Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
 - Docker Compose is for local data services; the app dev flow runs API/web directly.
 

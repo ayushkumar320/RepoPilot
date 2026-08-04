@@ -125,7 +125,7 @@ async def test_grounded_answer_produces_verified_claims() -> None:
     provider = _ScriptedProvider(
         [
             '{"decision":"sufficient","reason":"enough","next_symbol":""}',
-            "alpha returns one.\nbeta also returns one.",
+            "alpha returns one. [0]\nbeta also returns one. [1]",
         ]
     )
     result = await answer_question(
@@ -138,6 +138,33 @@ async def test_grounded_answer_produces_verified_claims() -> None:
     assert len(result.claims) == 2
     assert all(c.status == "verified" for c in result.claims)
     assert any(entry.startswith("hybrid_search:") for entry in result.retrieval_path)
+
+
+@pytest.mark.asyncio
+async def test_uncited_claim_is_unverified_and_skips_verifier() -> None:
+    """A claim with no [N] citation must not be pinned to pool[0] and
+    verified against it — it should come back "unverified" without ever
+    reaching the verifier, and raise no objection."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]\nbeta does something else entirely.",
+        ]
+    )
+    result = await answer_question(
+        "What do alpha and beta return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert len(result.claims) == 2
+    cited, uncited = result.claims
+    assert cited.status == "verified"
+    assert uncited.status == "unverified"
+    assert uncited.verifier_note == qa_graph.UNCITED_CLAIM_REASON
+    # Still schema-valid: refs non-empty, just not checked against them.
+    assert uncited.refs
+    assert result.objections == []
 
 
 @pytest.mark.asyncio

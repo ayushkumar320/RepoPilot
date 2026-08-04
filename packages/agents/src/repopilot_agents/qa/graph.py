@@ -70,6 +70,12 @@ MAX_HOPS = 3
 # graph trims the top-k itself.
 RECALL_K = 50
 NOT_FOUND_SENTINEL = "I couldn't find that in the repo."
+# The answer prompt requires a [N] citation on every claim line (see
+# ``answer_user_prompt``). When the model drops one anyway, we used to pin
+# the claim to ``pool[0]`` and run it through the verifier — which then
+# rejected it for not matching a chunk it was never about, mislabeling a
+# possibly-true claim as "flagged". Skip verification for these instead.
+UNCITED_CLAIM_REASON = "no_citation_in_answer"
 
 
 class QAResult(BaseModel):
@@ -247,8 +253,11 @@ async def answer_question(
             answer_input_tokens=answer_prompt_tokens,
         )
 
+    # Uncited claims were already marked "unverified" in _parse_claims and
+    # skip the verifier entirely — there's no chunk to check them against.
+    to_verify = [c for c in claims if c.verifier_note != UNCITED_CLAIM_REASON]
     verify_results = await verify_claims(
-        claims,
+        to_verify,
         provider=provider,
         engine=engine,
         repo_id=repo_id,
@@ -271,7 +280,10 @@ async def answer_question(
     return QAResult(
         question=question,
         answer=answer_text,
-        claims=[r.claim for r in verify_results],
+        # ``claims`` (not verify_results) — verify_claim mutates in place, and
+        # this preserves original line order including the uncited claims
+        # that were filtered out of to_verify.
+        claims=claims,
         objections=objections,
         hops=hops,
         retrieval_path=ctx.retrieval_path,
@@ -494,7 +506,12 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
 
         clean_text = re.sub(r"\s*\[\d+\]\s*", "", text).strip()
 
+        cited = bool(refs)
         if not refs and pool:
+            # The model dropped its required citation. Still attach a ref —
+            # Claim.refs must be non-empty — but pool[0] is an arbitrary
+            # attribution, not a real source, so this claim must not be run
+            # through the verifier against it (see UNCITED_CLAIM_REASON).
             refs = [pool[0].ref]
 
         if refs:
@@ -505,7 +522,11 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
                 if key not in seen:
                     seen.add(key)
                     unique_refs.append(r)
-            out.append(Claim(text=clean_text or text, refs=unique_refs))
+            claim = Claim(text=clean_text or text, refs=unique_refs)
+            if not cited:
+                claim.status = "unverified"
+                claim.verifier_note = UNCITED_CLAIM_REASON
+            out.append(claim)
     return out
 
 

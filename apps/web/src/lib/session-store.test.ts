@@ -6,6 +6,7 @@ import {
   appendExchange,
   applyRepoStatus,
   encodeChunkId,
+  hydrateFromTour,
   hydrateViewer,
   initialSessionState,
   personaLabel,
@@ -150,4 +151,40 @@ test("personaLabel prefers audience framing, falls back to raw text", () => {
   assert.equal(personaLabel({ raw_text: "raw", audience_framing: "a reviewer" }), "a reviewer");
   assert.equal(personaLabel({ raw_text: "raw" }), "raw");
   assert.equal(personaLabel(null), "No lens");
+});
+
+test("hydrateFromTour replays persisted exchanges in ask order", () => {
+  const state = hydrateFromTour(
+    {
+      repo_id: REPO_ID,
+      messages: [
+        {
+          ordinal: 0,
+          question: "q1",
+          answer: "a1",
+          claims: [claim("c1", 1)],
+          persona_label: "a learner",
+        },
+        {
+          ordinal: 1,
+          question: "q2",
+          answer: "a2",
+          claims: [claim("c2", 30)],
+          persona_label: "a maintainer",
+        },
+      ],
+    },
+    "Indexed snapshot.",
+  );
+
+  assert.equal(state.firstImpression, "Indexed snapshot.");
+  assert.deepEqual(
+    state.exchanges.map((exchange) => [exchange.question, exchange.personaLabel]),
+    [
+      ["q1", "a learner"],
+      ["q2", "a maintainer"],
+    ],
+  );
+  assert.deepEqual(Object.keys(state.claimsById).sort(), ["c1", "c2"]);
+  assert.equal(state.selectedClaimId, "c2");
 });

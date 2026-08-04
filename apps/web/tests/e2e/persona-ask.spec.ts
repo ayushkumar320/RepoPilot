@@ -49,6 +49,7 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
   // Captures what the app actually sent, so the test proves the persona
   // reaches the backend rather than merely rendering in the sidebar.
   const askedFramings: (string | null)[] = [];
+  const savedQuestions: string[] = [];
 
   await page.route(
     new RegExp(apiBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
@@ -113,6 +114,40 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
         });
       }
 
+      // Tour history is write-through and never blocks the ask path, but it
+      // must not fall through to the network either or the test depends on a
+      // running API.
+      if (path.endsWith("/me")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ session_id: "anon", authenticated: false }),
+        });
+      }
+
+      if (path.endsWith("/tours") && method === "GET") {
+        return route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+      }
+
+      if (path.endsWith("/tours") && method === "POST") {
+        return route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({ tour_id: "tour-123" }),
+        });
+      }
+
+      if (path.endsWith("/tours/tour-123/messages") && method === "POST") {
+        savedQuestions.push(
+          (route.request().postDataJSON() as { question: string }).question,
+        );
+        return route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({ ordinal: savedQuestions.length - 1 }),
+        });
+      }
+
       if (path.includes("/chunks/")) {
         return route.fulfill({
           status: 200,
@@ -158,4 +193,8 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
     "a first-time outside contributor preparing a pull request",
     "a product strategist at a competing company",
   ]);
+
+  await expect
+    .poll(() => savedQuestions)
+    .toEqual(["What is the tech stack?", "What is the tech stack?"]);
 });

@@ -29,6 +29,40 @@ NEXT_PUBLIC_API_BASE_URL=/api
 
 `REPOPILOT_SESSION_SECRET` must be stable across API deployments. Changing it signs every browser out. User provider keys are deliberately session-only and users must reconnect them after an API restart.
 
+### Optional: GitHub sign-in (web service)
+
+Set these on the **web** service only, alongside the same
+`REPOPILOT_SESSION_SECRET` the API uses:
+
+```bash
+AUTH_SECRET=<openssl-rand-hex-32>
+AUTH_GITHUB_ID=<oauth app client id>
+AUTH_GITHUB_SECRET=<oauth app client secret>
+NEXTAUTH_URL=https://your-domain.example
+REPOPILOT_SESSION_SECRET=<same value as the API>
+REPOPILOT_SESSION_COOKIE_SECURE=true
+```
+
+OAuth callback URL: `https://your-domain.example/api/auth/callback/github`.
+
+The web app signs a stable, GitHub-derived session id with
+`REPOPILOT_SESSION_SECRET` and writes it to the same `repopilot_session`
+cookie the API already verifies — there is no second token format and no
+bearer plumbing. The two values must match byte for byte; a mismatch degrades
+silently to anonymous sessions rather than erroring. Leaving `AUTH_GITHUB_ID`
+unset disables sign-in and the product behaves exactly as it did before.
+
+### Managed Postgres (Aiven)
+
+Any Postgres with `pgvector` works. For Aiven:
+
+1. Create a Postgres service (a Hobbyist/Startup plan is enough).
+2. Enable the extension: `CREATE EXTENSION IF NOT EXISTS vector;`
+3. Copy the *service URI* into `POSTGRES_DSN` unchanged, keeping
+   `sslmode=require`. `make_engine` rewrites `postgresql://` to
+   `postgresql+psycopg://`, so no edit is needed.
+4. Run the migration job (`alembic upgrade head`) against it.
+
 ## Release sequence
 
 1. GitHub Actions runs Python lint, formatting, strict MyPy, tests, secret scanning, frontend typechecking, and the production Next.js build.

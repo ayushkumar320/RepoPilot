@@ -10,6 +10,7 @@ first-impression stream.
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field, SecretStr, TypeAdapter
@@ -85,6 +86,72 @@ class QAAnswerResponse(BaseModel):
     retrieval_path: list[str] = Field(default_factory=list)
 
 
+class CreateTourRequest(BaseModel):
+    """Start a history entry for one repo read through one persona."""
+
+    repo_id: str = Field(min_length=1)
+    intent_profile: IntentProfile | None = None
+    title: str | None = Field(default=None, max_length=200)
+
+
+class CreateTourResponse(BaseModel):
+    tour_id: str = Field(min_length=1)
+
+
+class TourMessagePayload(BaseModel):
+    ordinal: int = Field(ge=0)
+    question: str
+    answer: str
+    claims: list[ClaimPayload] = Field(default_factory=list)
+    persona_label: str
+
+
+class AppendTourMessageRequest(BaseModel):
+    question: str = Field(min_length=1)
+    answer: str = Field(min_length=1)
+    claims: list[ClaimPayload] = Field(default_factory=list)
+    persona_label: str = Field(min_length=1)
+
+
+class AppendTourMessageResponse(BaseModel):
+    ordinal: int = Field(ge=0)
+
+
+class TourSummaryResponse(BaseModel):
+    tour_id: str
+    repo_id: str
+    title: str | None = None
+    created_at: datetime
+    updated_at: datetime
+    message_count: int = Field(ge=0)
+
+
+class TourDetailResponse(TourSummaryResponse):
+    snapshot_repo_id: str | None = None
+    intent_profile: IntentProfile | None = None
+    messages: list[TourMessagePayload] = Field(default_factory=list)
+
+
+class IdentityRequest(BaseModel):
+    """Identity claimed by the web app after a completed OAuth sign-in."""
+
+    provider: str = Field(min_length=1, max_length=32)
+    provider_account_id: str = Field(min_length=1, max_length=128)
+    display_name: str | None = Field(default=None, max_length=200)
+    email: str | None = Field(default=None, max_length=320)
+    avatar_url: str | None = Field(default=None, max_length=2000)
+
+
+class IdentityResponse(BaseModel):
+    session_id: str
+    authenticated: bool
+    provider: str | None = None
+    provider_account_id: str | None = None
+    display_name: str | None = None
+    email: str | None = None
+    avatar_url: str | None = None
+
+
 class ChunkPayload(BaseModel):
     chunk_id: str = Field(min_length=1)
     repo_id: str = Field(min_length=1)
@@ -144,21 +211,30 @@ def event_payload(event: BaseTourEvent) -> dict[str, Any]:
 
 __all__ = [
     "AccountUsageResponse",
+    "AppendTourMessageRequest",
+    "AppendTourMessageResponse",
     "AskRequest",
     "BaseTourEvent",
     "ChunkPayload",
     "ClaimPayload",
     "CreateRepoRequest",
     "CreateRepoResponse",
+    "CreateTourRequest",
+    "CreateTourResponse",
+    "IdentityRequest",
+    "IdentityResponse",
     "IntentDraftRequest",
     "ProviderCredentialsRequest",
     "QAAnswerResponse",
     "RepoStatus",
     "RepoStatusResponse",
+    "TourDetailResponse",
     "TourDoneEvent",
     "TourErrorEvent",
     "TourEvent",
     "TourEventType",
     "TourFirstImpressionEvent",
+    "TourMessagePayload",
+    "TourSummaryResponse",
     "event_payload",
 ]

@@ -32,6 +32,20 @@ jobs:
             exit 0
           fi
 
+          # A migration alone cannot change retrieval quality, and product-layer
+          # migrations (product_tours, usage_events, ...) touch nothing the
+          # retrieval path reads. Exempt them only when they are the *only*
+          # retrieval-path change in the PR: a migration that does affect
+          # retrieval — a new index, a chunks column — lands with ingestion or
+          # agents code beside it, and that combination still trips the gate.
+          non_migration_changed="$(printf '%s\n' "$retrieval_changed" | grep -vE '^packages/ingestion/src/repopilot_ingestion/migrations/versions/[^/]+\.py$' || true)"
+
+          if [[ -z "$non_migration_changed" ]]; then
+            echo "Only migration files changed on the retrieval path; no bench artifact required:"
+            printf '%s\n' "$retrieval_changed"
+            exit 0
+          fi
+
           after_changed="$(printf '%s\n' "$changed_files" | grep -E '^evals/results/rag_phase[0-9]+/_after\.json$' || true)"
 
           if [[ -n "$after_changed" ]]; then
@@ -41,8 +55,8 @@ jobs:
           fi
 
           echo "::error title=Missing RAG eval artifact::Retrieval-path changes must include evals/results/rag_phaseN/_after.json from a fresh bench run."
-          echo "Changed retrieval files:"
-          printf '%s\n' "$retrieval_changed"
+          echo "Changed retrieval files (migration-only changes are exempt):"
+          printf '%s\n' "$non_migration_changed"
           exit 1
 
   build:

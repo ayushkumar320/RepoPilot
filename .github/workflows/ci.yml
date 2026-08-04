@@ -9,6 +9,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege, stated explicitly. `pull-requests: read` is required by
+# gitleaks-action, which lists a PR's commits to decide what to scan; without
+# it the default contents-only token 403s with "Resource not accessible by
+# integration" on every pull request.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   retrieval-eval-artifact-gate:
     if: github.event_name == 'pull_request'

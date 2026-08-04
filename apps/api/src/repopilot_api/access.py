@@ -11,7 +11,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from repopilot_api.product_db import product_accounts, product_tours, usage_events
+from repopilot_api.product_db import product_accounts, usage_events
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings
 
@@ -54,15 +54,11 @@ class AccessService(Protocol):
 
     async def reserve_repository(self, session_id: str, repo_id: str) -> UsageReservation: ...
 
-    async def reserve_question(self, session_id: str, tour_id: str) -> UsageReservation: ...
+    async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation: ...
 
     async def complete(self, reservation: UsageReservation) -> None: ...
 
     async def release(self, reservation: UsageReservation) -> None: ...
-
-    async def bind_tour(self, session_id: str, tour_id: str) -> None: ...
-
-    async def can_access_tour(self, session_id: str, tour_id: str) -> bool: ...
 
     async def aclose(self) -> None: ...
 
@@ -243,8 +239,8 @@ class ProductAccessService:
             session_id, action="repository", resource_id=repo_id, free_limit=1
         )
 
-    async def reserve_question(self, session_id: str, tour_id: str) -> UsageReservation:
-        return await self._reserve(session_id, action="question", resource_id=tour_id, free_limit=5)
+    async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation:
+        return await self._reserve(session_id, action="question", resource_id=repo_id, free_limit=5)
 
     async def complete(self, reservation: UsageReservation) -> None:
         async with self.engine.begin() as conn:
@@ -265,22 +261,6 @@ class ProductAccessService:
                 .values(status="failed")
             )
 
-    async def bind_tour(self, session_id: str, tour_id: str) -> None:
-        await self._ensure_account(session_id)
-        async with self.engine.begin() as conn:
-            await conn.execute(
-                update(product_tours)
-                .where(product_tours.c.tour_id == tour_id)
-                .values(session_id=session_id)
-            )
-
-    async def can_access_tour(self, session_id: str, tour_id: str) -> bool:
-        async with self.engine.connect() as conn:
-            owner = await conn.scalar(
-                select(product_tours.c.session_id).where(product_tours.c.tour_id == tour_id)
-            )
-        return owner == session_id
-
     async def aclose(self) -> None:
         for provider in self.providers.values():
             await provider.aclose()
@@ -295,7 +275,6 @@ class InMemoryAccessService:
 
     repository_events: dict[str, set[str]] = field(default_factory=dict)
     question_counts: dict[str, int] = field(default_factory=dict)
-    tour_owners: dict[str, str] = field(default_factory=dict)
     connected_sessions: dict[str, bool] = field(default_factory=dict)
 
     async def status(self, session_id: str) -> AccountUsage:
@@ -333,7 +312,7 @@ class InMemoryAccessService:
         repos.add(repo_id)
         return UsageReservation(str(uuid4()), "user" if connected else "platform")
 
-    async def reserve_question(self, session_id: str, tour_id: str) -> UsageReservation:
+    async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation:
         if session_id in self.connected_sessions:
             return UsageReservation(str(uuid4()), "user")
         used = self.question_counts.get(session_id, 0)
@@ -347,13 +326,6 @@ class InMemoryAccessService:
 
     async def release(self, reservation: UsageReservation) -> None:
         return None
-
-    async def bind_tour(self, session_id: str, tour_id: str) -> None:
-        self.tour_owners[tour_id] = session_id
-
-    async def can_access_tour(self, session_id: str, tour_id: str) -> bool:
-        owner = self.tour_owners.get(tour_id)
-        return owner is None or owner == session_id
 
     async def aclose(self) -> None:
         return None

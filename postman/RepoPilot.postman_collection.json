@@ -19,10 +19,6 @@
       "value": ""
     },
     {
-      "key": "tourId",
-      "value": ""
-    },
-    {
       "key": "chunkId",
       "value": "chunk-123"
     }
@@ -35,8 +31,12 @@
         "header": [],
         "url": {
           "raw": "{{baseUrl}}/health",
-          "host": ["{{baseUrl}}"],
-          "path": ["health"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
         }
       },
       "response": []
@@ -74,8 +74,12 @@
         },
         "url": {
           "raw": "{{baseUrl}}/repos",
-          "host": ["{{baseUrl}}"],
-          "path": ["repos"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "repos"
+          ]
         }
       },
       "response": []
@@ -87,8 +91,14 @@
         "header": [],
         "url": {
           "raw": "{{baseUrl}}/repos/{{repoId}}/status",
-          "host": ["{{baseUrl}}"],
-          "path": ["repos", "{{repoId}}", "status"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "repos",
+            "{{repoId}}",
+            "status"
+          ]
         }
       },
       "response": []
@@ -105,32 +115,21 @@
         ],
         "url": {
           "raw": "{{baseUrl}}/repos/{{repoId}}/first-impression",
-          "host": ["{{baseUrl}}"],
-          "path": ["repos", "{{repoId}}", "first-impression"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "repos",
+            "{{repoId}}",
+            "first-impression"
+          ]
         },
         "description": "SSE endpoint. In Postman, use Send and inspect the streamed response body."
       },
       "response": []
     },
     {
-      "name": "Create Tour",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('status is 201', function () {",
-              "  pm.response.to.have.status(201);",
-              "});",
-              "const data = pm.response.json();",
-              "if (data.tour_id) {",
-              "  pm.collectionVariables.set('tourId', data.tour_id);",
-              "}"
-            ]
-          }
-        }
-      ],
+      "name": "Draft Intent (free-text persona)",
       "request": {
         "method": "POST",
         "header": [
@@ -141,37 +140,23 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"repo_id\": \"{{repoId}}\",\n  \"intent_profile\": {\n    \"raw_text\": \"Help me learn Flask\",\n    \"modality_weights\": {\n      \"understand\": 1\n    },\n    \"focus_keywords\": [\"routing\"],\n    \"audience_framing\": \"casual contributor\",\n    \"output_shape_preference\": \"narrative\"\n  }\n}"
+          "raw": "{\n  \"raw_text\": \"I'm writing a migration guide and need the breaking changes\"\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/tours",
-          "host": ["{{baseUrl}}"],
-          "path": ["tours"]
-        }
+          "raw": "{{baseUrl}}/intent",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "intent"
+          ]
+        },
+        "description": "Turns a free-text persona into a structured IntentProfile you can send with /ask."
       },
       "response": []
     },
     {
-      "name": "Tour Stream",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "text/event-stream"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/tours/{{tourId}}/stream",
-          "host": ["{{baseUrl}}"],
-          "path": ["tours", "{{tourId}}", "stream"]
-        },
-        "description": "SSE endpoint. In Postman, use Send and inspect the streamed response body."
-      },
-      "response": []
-    },
-    {
-      "name": "Ask Tour",
+      "name": "Ask as Contributor",
       "request": {
         "method": "POST",
         "header": [
@@ -182,13 +167,49 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"question\": \"Where should I start if I care about routing?\"\n}"
+          "raw": "{\n  \"question\": \"Where should I start if I care about routing?\",\n  \"intent_profile\": {\n    \"raw_text\": \"I want to contribute to this project and need to know where a change would go\",\n    \"modality_weights\": {\n      \"change\": 1,\n      \"understand\": 0.6\n    },\n    \"focus_keywords\": [\n      \"entry points\",\n      \"tests\"\n    ],\n    \"audience_framing\": \"a first-time outside contributor preparing a pull request\",\n    \"output_shape_preference\": \"ranked_list\"\n  }\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/tours/{{tourId}}/ask",
-          "host": ["{{baseUrl}}"],
-          "path": ["tours", "{{tourId}}", "ask"]
-        }
+          "raw": "{{baseUrl}}/repos/{{repoId}}/ask",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "repos",
+            "{{repoId}}",
+            "ask"
+          ]
+        },
+        "description": "Same repo, same question \u2014 compare this answer with 'Ask as Competitor'."
+      },
+      "response": []
+    },
+    {
+      "name": "Ask as Competitor",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Where should I start if I care about routing?\",\n  \"intent_profile\": {\n    \"raw_text\": \"I am evaluating this project against a competing product\",\n    \"modality_weights\": {\n      \"evaluate\": 1,\n      \"compare\": 0.8\n    },\n    \"focus_keywords\": [\n      \"features\",\n      \"limits\",\n      \"integrations\"\n    ],\n    \"audience_framing\": \"a product strategist at a competing company\",\n    \"output_shape_preference\": \"ranked_list\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/repos/{{repoId}}/ask",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "repos",
+            "{{repoId}}",
+            "ask"
+          ]
+        },
+        "description": "The persona changes ordering and emphasis, never the underlying claims."
       },
       "response": []
     },
@@ -199,8 +220,13 @@
         "header": [],
         "url": {
           "raw": "{{baseUrl}}/chunks/{{chunkId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["chunks", "{{chunkId}}"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chunks",
+            "{{chunkId}}"
+          ]
         },
         "description": "Replace {{chunkId}} with a real chunk id returned by your running backend if needed."
       },
@@ -218,8 +244,13 @@
         ],
         "url": {
           "raw": "{{baseUrl}}/__dev/sse-idle",
-          "host": ["{{baseUrl}}"],
-          "path": ["__dev", "sse-idle"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "__dev",
+            "sse-idle"
+          ]
         },
         "description": "Development-only SSE endpoint for confirming event-stream behavior."
       },

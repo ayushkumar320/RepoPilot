@@ -18,7 +18,7 @@ RepoPilot turns a repository into a purpose-aware map:
 - Embeds chunks into pgvector for semantic retrieval.
 - Captures the user's free-text intent and converts it into an `IntentProfile`.
 - Plans which agent capabilities should run using deterministic planner rules.
-- Generates guided tours, Q&A answers, and contribute-mode opportunities.
+- Answers questions through the reader's persona, so a contributor and a competitor get the same verified facts ranked differently.
 - Verifies factual claims against retrieved source before showing them.
 - Streams results through a FastAPI SSE API into a Next.js synchronized code viewer.
 
@@ -44,7 +44,7 @@ The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md).
 flowchart TB
     user["User<br/>repo URL + free-text intent"]
     web["Next.js Web App<br/>intent capture + tour UI + code viewer"]
-    api["FastAPI API<br/>repos, tours, chunks, SSE"]
+    api["FastAPI API<br/>repos, ask, chunks, SSE"]
     worker["Indexing / Runtime Services"]
     db[("Postgres + pgvector<br/>repos, chunks, embeddings, graph adjacency")]
     redis[("Redis<br/>background job coordination")]
@@ -84,15 +84,15 @@ sequenceDiagram
     W->>A: POST /repos
     A->>I: enqueue indexing
     I->>DB: persist chunks, embeddings, graph adjacency
-    W->>U: Ask "What brings you to this repo?"
-    U->>W: Free-text intent
-    W->>A: POST /tours with intent profile
-    A->>G: run planned capabilities
+    W->>U: Ask "Who is asking?"
+    U->>W: Persona (preset or free text)
+    W->>A: POST /repos/{repo_id}/ask with question + intent profile
+    A->>G: retrieve, answer, verify
     G->>DB: read chunks / vector hits / graph facts
     G->>V: verify claims against source refs
     V-->>G: verified or flagged claims
-    G-->>A: tour sections and claim events
-    A-->>W: SSE stream
+    G-->>A: answer and verified claims
+    A-->>W: JSON answer + claim refs
     W-->>U: Tour + synchronized exact-line code viewer
 ```
 
@@ -252,9 +252,8 @@ The API exposes:
 | `POST` | `/repos` | Enqueue repo indexing |
 | `GET` | `/repos/{repo_id}/status` | Poll indexing/readiness state |
 | `GET` | `/repos/{repo_id}/first-impression` | SSE first-impression stream |
-| `POST` | `/tours` | Create a tour for a ready repo |
-| `GET` | `/tours/{tour_id}/stream` | SSE tour stream |
-| `POST` | `/tours/{tour_id}/ask` | Ask a grounded follow-up question |
+| `POST` | `/intent` | Structure a free-text persona into an `IntentProfile` |
+| `POST` | `/repos/{repo_id}/ask` | Ask a grounded question through a persona |
 | `GET` | `/chunks/{chunk_id}` | Fetch exact source for the code viewer |
 
 In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.

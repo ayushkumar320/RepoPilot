@@ -3,8 +3,6 @@
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpenText,
-  CaretRight,
   CheckCircle,
   ClockCountdown,
   Eye,
@@ -12,136 +10,46 @@ import {
   FileCode,
   GitBranch,
   GithubLogo,
-  ListBullets,
   LockKey,
   MagnifyingGlass,
   PaperPlaneTilt,
   ShieldCheck,
+  UserFocus,
   WarningCircle,
-  Wrench,
   X,
 } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useReducer, useState } from "react";
 
 import {
   ApiError,
   api,
   type AccountUsage,
-  type ClaimEvent,
   type ClaimStatus,
   type IntentProfile,
+  type RepoEvent,
   type RepoStatus,
-  type TourEvent,
 } from "@/lib/api/generated";
 import {
-  appendAnswerAsSection,
+  CUSTOM_PERSONA_ID,
+  PERSONAS,
+  fallbackCustomProfile,
+  personaById,
+} from "@/lib/personas";
+import {
+  appendExchange,
+  applyFirstImpression,
   applyRepoStatus,
-  applyTourEvent,
   hydrateViewer,
-  initialTourStoreState,
+  initialSessionState,
+  personaLabel,
   selectClaim,
-  type TourStoreState,
-} from "@/lib/tour-store";
-
-type LearnChoice = "overall structure" | "specific feature" | "data model";
-type ContributeChoice =
-  | "fix a reported issue"
-  | "improve code quality"
-  | "hunt for likely problems"
-  | "show all, ranked";
-type Mode = "learn" | "contribute";
+  type SessionState,
+} from "@/lib/session-store";
 
 interface ViewerLine {
   active: boolean;
   content: string;
   number: number;
-}
-
-const learnChoices: Array<{ value: LearnChoice; label: string; description: string }> = [
-  {
-    value: "overall structure",
-    label: "System overview",
-    description: "Map entry points, modules, and the main execution path.",
-  },
-  {
-    value: "specific feature",
-    label: "Specific feature",
-    description: "Trace one capability from its public surface into the implementation.",
-  },
-  {
-    value: "data model",
-    label: "Data model",
-    description: "Follow state, schemas, persistence, and ownership boundaries.",
-  },
-];
-
-const contributeChoices: Array<{
-  value: ContributeChoice;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "fix a reported issue",
-    label: "Fix an issue",
-    description: "Find the likely change surface and the tests that protect it.",
-  },
-  {
-    value: "improve code quality",
-    label: "Improve quality",
-    description: "Prioritize maintainability, coverage, and structural friction.",
-  },
-  {
-    value: "hunt for likely problems",
-    label: "Investigate risk",
-    description: "Surface guarded suspicions with concrete confirmation steps.",
-  },
-  {
-    value: "show all, ranked",
-    label: "Rank opportunities",
-    description: "Compare issue, quality, and risk-oriented contribution paths.",
-  },
-];
-
-
-function buildProfile(
-  mode: Mode,
-  learnChoice: LearnChoice,
-  contributeChoice: ContributeChoice,
-  featureText: string,
-): IntentProfile {
-  if (mode === "learn") {
-    const focus =
-      learnChoice === "specific feature" && featureText.trim()
-        ? [featureText.trim()]
-        : [learnChoice];
-    return {
-      raw_text:
-        learnChoice === "specific feature" && featureText.trim()
-          ? `I want to learn the ${featureText.trim()} feature`
-          : `I want to learn this codebase through its ${learnChoice}`,
-      modality_weights: { understand: 1 },
-      focus_keywords: focus,
-      audience_framing: "casual contributor",
-      output_shape_preference: "narrative",
-    };
-  }
-
-  const focusKeywords =
-    contributeChoice === "hunt for likely problems"
-      ? ["fragility", "risk"]
-      : contributeChoice === "improve code quality"
-        ? ["quality", "testing"]
-        : contributeChoice === "fix a reported issue"
-          ? ["issues", "bugs"]
-          : ["quality", "issues", "risk"];
-  return {
-    raw_text: `I want to contribute by helping with ${contributeChoice}`,
-    modality_weights: { change: 1, evaluate: 0.5 },
-    focus_keywords: focusKeywords,
-    audience_framing: "hands-on contributor",
-    output_shape_preference: "ranked_list",
-  };
 }
 
 function splitLines(content: string, startLine: number, endLine: number): ViewerLine[] {
@@ -194,7 +102,11 @@ function repositoryName(repoUrl: string): string {
 function validPublicGithubUrl(repoUrl: string): boolean {
   try {
     const url = new URL(repoUrl);
-    return url.protocol === "https:" && url.hostname === "github.com" && url.pathname.split("/").filter(Boolean).length === 2;
+    return (
+      url.protocol === "https:" &&
+      url.hostname === "github.com" &&
+      url.pathname.split("/").filter(Boolean).length === 2
+    );
   } catch {
     return false;
   }
@@ -256,7 +168,12 @@ function ProviderDialog({
               stored in the browser or database.
             </p>
           </div>
-          <button className="icon-button dialog-close" type="button" onClick={onClose} aria-label="Close">
+          <button
+            className="icon-button dialog-close"
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={18} />
           </button>
         </div>
@@ -271,7 +188,12 @@ function ProviderDialog({
               <strong>Hugging Face</strong>
               <span>{usage.huggingface_connected ? "Connected as fallback" : "Not connected"}</span>
             </div>
-            <button className="button button-secondary" type="button" disabled={saving} onClick={() => void onDisconnect()}>
+            <button
+              className="button button-secondary"
+              type="button"
+              disabled={saving}
+              onClick={() => void onDisconnect()}
+            >
               {saving ? "Disconnecting" : "Disconnect keys"}
             </button>
           </div>
@@ -298,7 +220,11 @@ function ProviderDialog({
                   aria-describedby="groq-key-help"
                   required
                 />
-                <button type="button" onClick={() => setShowGroq((value) => !value)} aria-label={showGroq ? "Hide Groq key" : "Show Groq key"}>
+                <button
+                  type="button"
+                  onClick={() => setShowGroq((value) => !value)}
+                  aria-label={showGroq ? "Hide Groq key" : "Show Groq key"}
+                >
                   {showGroq ? <EyeSlash size={18} /> : <Eye size={18} />}
                 </button>
               </div>
@@ -306,7 +232,9 @@ function ProviderDialog({
             </div>
 
             <div className="credential-field">
-              <label htmlFor="huggingface-api-key">Hugging Face token <span>Optional</span></label>
+              <label htmlFor="huggingface-api-key">
+                Hugging Face token <span>Optional</span>
+              </label>
               <div className="secret-input-wrap">
                 <input
                   id="huggingface-api-key"
@@ -319,18 +247,34 @@ function ProviderDialog({
                   placeholder="hf_..."
                   aria-describedby="hf-key-help"
                 />
-                <button type="button" onClick={() => setShowHuggingface((value) => !value)} aria-label={showHuggingface ? "Hide Hugging Face token" : "Show Hugging Face token"}>
+                <button
+                  type="button"
+                  onClick={() => setShowHuggingface((value) => !value)}
+                  aria-label={
+                    showHuggingface ? "Hide Hugging Face token" : "Show Hugging Face token"
+                  }
+                >
                   {showHuggingface ? <EyeSlash size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               <p id="hf-key-help">Used only as a fallback when the Groq request cannot complete.</p>
             </div>
 
-            {error ? <div className="dialog-error" role="alert">{error}</div> : null}
+            {error ? (
+              <div className="dialog-error" role="alert">
+                {error}
+              </div>
+            ) : null}
 
             <div className="dialog-actions">
-              <button className="button button-secondary" type="button" onClick={onClose}>Not now</button>
-              <button className="button button-primary" type="submit" disabled={saving || groqKey.trim().length < 12}>
+              <button className="button button-secondary" type="button" onClick={onClose}>
+                Not now
+              </button>
+              <button
+                className="button button-primary"
+                type="submit"
+                disabled={saving || groqKey.trim().length < 12}
+              >
                 {saving ? "Connecting" : "Connect keys"}
               </button>
             </div>
@@ -342,15 +286,12 @@ function ProviderDialog({
 }
 
 export default function RepoPilotApp() {
-  const router = useRouter();
   const [repoUrl, setRepoUrl] = useState("https://github.com/pallets/flask");
   const [repoId, setRepoId] = useState<string>();
-  const [tourId, setTourId] = useState<string>();
-  const [mode, setMode] = useState<Mode>("learn");
-  const [learnChoice, setLearnChoice] = useState<LearnChoice>("overall structure");
-  const [contributeChoice, setContributeChoice] =
-    useState<ContributeChoice>("improve code quality");
-  const [featureText, setFeatureText] = useState("");
+  const [personaId, setPersonaId] = useState<string>(PERSONAS[0].id);
+  const [customText, setCustomText] = useState("");
+  const [customProfile, setCustomProfile] = useState<IntentProfile | null>(null);
+  const [draftingIntent, setDraftingIntent] = useState(false);
   const [askPrompt, setAskPrompt] = useState("");
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(false);
@@ -360,119 +301,77 @@ export default function RepoPilotApp() {
   const [providerDialogOpen, setProviderDialogOpen] = useState(false);
   const [providerSaving, setProviderSaving] = useState(false);
   const [providerError, setProviderError] = useState<string | null>(null);
-  const [stage, setStage] = useState<"capture" | "tour">("capture");
-  const [store, setStore] = useState<TourStoreState>(initialTourStoreState);
-  const [tourStreamFailed, setTourStreamFailed] = useState(false);
+  const [store, setStore] = useState<SessionState>(initialSessionState);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
 
-  const profile = useMemo(
-    () => buildProfile(mode, learnChoice, contributeChoice, featureText),
-    [mode, learnChoice, contributeChoice, featureText],
-  );
+  const isCustom = personaId === CUSTOM_PERSONA_ID;
+  const profile: IntentProfile | null = useMemo(() => {
+    if (isCustom) {
+      if (customProfile) return customProfile;
+      return customText.trim() ? fallbackCustomProfile(customText) : null;
+    }
+    return personaById(personaId)?.profile ?? null;
+  }, [customProfile, customText, isCustom, personaId]);
+
   const repoReady = store.repoStatus?.status === "ready" || store.repoStatus?.status === "stale";
   const repoError = store.repoStatus?.status === "error";
   const progress = store.repoStatus?.progress ?? (repoId ? 5 : 0);
   const repoDisplayName = repositoryName(repoUrl);
+  // The workspace opens as soon as a snapshot exists — there is no separate
+  // "start" step to cross.
+  const inWorkspace = Boolean(repoId) && repoReady;
 
   useEffect(() => {
-    void api.getAccountUsage().then(setUsage).catch(() => {
-      setErrorMessage("Could not load the free usage allowance.");
-    });
+    void api
+      .getAccountUsage()
+      .then(setUsage)
+      .catch(() => {
+        setErrorMessage("Could not load the free usage allowance.");
+      });
   }, []);
 
+  // Deep link: ?repo=<id>&persona=<id> reopens a repo with the same lens.
   useEffect(() => {
-    if (tourId && repoId) return;
+    if (repoId) return;
     const params = new URLSearchParams(window.location.search);
-    const routeTourId = params.get("tour");
     const routeRepoId = params.get("repo");
-    if (!routeTourId || !routeRepoId) return;
-    setTourId(routeTourId);
+    if (!routeRepoId) return;
+    const routePersona = params.get("persona");
+    if (routePersona && personaById(routePersona)) setPersonaId(routePersona);
     setRepoId(routeRepoId);
-    setStage("tour");
-  }, [repoId, tourId]);
+    setRepoUrl(`https://github.com/${decodeURIComponent(routeRepoId)}`);
+  }, [repoId]);
 
   useEffect(() => {
-    if (!repoId || stage !== "capture") return;
+    if (!repoId) return;
     const eventSource = new EventSource(api.firstImpressionUrl(repoId), { withCredentials: true });
     const onMessage = (event: MessageEvent<string>) => {
-      const parsed = JSON.parse(event.data) as TourEvent;
-      setStore((current) => applyTourEvent(current, parsed, repoId));
+      const parsed = JSON.parse(event.data) as RepoEvent;
+      if (parsed.event === "first_impression") {
+        setStore((current) => applyFirstImpression(current, parsed));
+      }
     };
     eventSource.addEventListener("first_impression", onMessage as EventListener);
     eventSource.addEventListener("done", () => eventSource.close());
     eventSource.addEventListener("error", () => eventSource.close());
     return () => eventSource.close();
-  }, [repoId, stage]);
+  }, [repoId]);
 
   useEffect(() => {
-    if (!repoId || stage !== "capture" || repoReady || repoError) return;
+    if (!repoId || repoReady || repoError) return;
     const timeout = window.setTimeout(async () => {
       try {
         const status = await api.getRepoStatus(repoId);
         setStore((current) => applyRepoStatus(current, status));
         forcePoll();
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : "Could not refresh indexing status.");
+        setErrorMessage(
+          error instanceof Error ? error.message : "Could not refresh indexing status.",
+        );
       }
     }, 1500);
     return () => window.clearTimeout(timeout);
-  }, [repoError, repoId, repoReady, pollTick, stage]);
-
-  useEffect(() => {
-    if (!tourId || !repoId || stage !== "tour") return;
-    let receivedEvent = false;
-
-    // Fail loudly instead of showing the "Building guided tour" skeleton forever
-    // if the stream never delivers any events.
-    const stallTimer = window.setTimeout(() => {
-      if (!receivedEvent) {
-        setTourStreamFailed(true);
-        setErrorMessage(
-          "The tour stream did not respond. Confirm the API is reachable and try again.",
-        );
-      }
-    }, 30000);
-
-    // Use EventSource (not fetch + getReader) so the stream survives React Strict
-    // Mode remounts and Next.js soft navigations — same pattern as first-impression.
-    const source = new EventSource(api.tourStreamUrl(tourId), { withCredentials: true });
-    const applyNamedEvent = (name: string, raw: string) => {
-      receivedEvent = true;
-      try {
-        // The SSE frame carries the event type in its `event:` line, not in the
-        // JSON body (e.g. {"v":1,"order":0,"title":"…"}), but applyTourEvent
-        // discriminates on `event.event` — so inject the event name here.
-        const parsed = JSON.parse(raw) as Record<string, unknown>;
-        const tourEvent = { ...parsed, event: name } as unknown as TourEvent;
-        setStore((current) => applyTourEvent(current, tourEvent, repoId));
-      } catch {
-        // Ignore malformed frames; the stall timer surfaces a total failure.
-      }
-    };
-    for (const name of ["section_start", "token", "claim", "diagram", "section_end"]) {
-      source.addEventListener(name, (event) => {
-        applyNamedEvent(name, (event as MessageEvent<string>).data);
-      });
-    }
-    source.addEventListener("done", (event) => {
-      applyNamedEvent("done", (event as MessageEvent<string>).data);
-      source.close();
-    });
-    source.addEventListener("error", () => {
-      // A normal close after "done" is already handled; only surface real failures.
-      if (!receivedEvent) {
-        setTourStreamFailed(true);
-        setErrorMessage("Unable to stream the tour.");
-      }
-      source.close();
-    });
-
-    setTourStreamFailed(false);
-    return () => {
-      window.clearTimeout(stallTimer);
-      source.close();
-    };
-  }, [repoId, stage, tourId, pollTick]);
+  }, [repoError, repoId, repoReady, pollTick]);
 
   useEffect(() => {
     const chunkId = store.viewer.chunkId;
@@ -486,7 +385,9 @@ export default function RepoPilotApp() {
       })
       .catch((error: unknown) => {
         if (active) {
-          setErrorMessage(error instanceof Error ? error.message : "Could not open this source reference.");
+          setErrorMessage(
+            error instanceof Error ? error.message : "Could not open this source reference.",
+          );
         }
       })
       .finally(() => {
@@ -497,18 +398,39 @@ export default function RepoPilotApp() {
     };
   }, [store.viewer.chunkId, store.viewer.content]);
 
+  // Structure free-text personas server-side once the user stops typing. A
+  // failure is not fatal: `profile` already falls back to raw text.
+  const structureCustomPersona = async () => {
+    const text = customText.trim();
+    if (!isCustom || text.length < 8) return;
+    setDraftingIntent(true);
+    try {
+      setCustomProfile(await api.draftIntent(text));
+    } catch {
+      setCustomProfile(fallbackCustomProfile(text));
+    } finally {
+      setDraftingIntent(false);
+    }
+  };
+
   const submitRepo = async (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     if (!validPublicGithubUrl(repoUrl)) {
-      setErrorMessage("Enter a public GitHub repository URL in the form https://github.com/owner/repository.");
+      setErrorMessage(
+        "Enter a public GitHub repository URL in the form https://github.com/owner/repository.",
+      );
+      return;
+    }
+    if (!profile) {
+      setErrorMessage("Choose a persona, or describe your own, before analyzing.");
       return;
     }
     setBusy(true);
     setErrorMessage(null);
     setRepoId(undefined);
-    setTourId(undefined);
-    setStore(initialTourStoreState);
+    setStore(initialSessionState);
     try {
+      if (isCustom) await structureCustomPersona();
       const created = await api.createRepo(repoUrl.trim());
       setUsage(await api.getAccountUsage());
       setRepoId(created.repo_id);
@@ -518,37 +440,18 @@ export default function RepoPilotApp() {
           progress: created.status === "ready" ? 100 : 5,
         }),
       );
+      window.history.replaceState(
+        null,
+        "",
+        `/?repo=${encodeURIComponent(created.repo_id)}&persona=${personaId}`,
+      );
     } catch (error) {
       if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
         setProviderDialogOpen(true);
       }
-      setErrorMessage(error instanceof Error ? error.message : "Unable to reach the RepoPilot API.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const startTour = async () => {
-    if (!repoId || !repoReady) return;
-    setBusy(true);
-    setErrorMessage(null);
-    try {
-      const created = await api.createTour(repoId, profile);
-      setStore(initialTourStoreState);
-      setTourId(created.tour_id);
-      setStage("tour");
-      // Update the URL WITHOUT a router navigation: router.push triggers an RSC
-      // soft-navigation that remounts this client tree and tears down the tour
-      // EventSource mid-stream. history.replaceState keeps the component (and the
-      // open stream) alive while still making the tour deep-linkable.
-      window.history.replaceState(
-        null,
-        "",
-        `/?tour=${created.tour_id}&repo=${encodeURIComponent(repoId)}`,
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unable to reach the RepoPilot API.",
       );
-    } catch (error) {
-      setStage("capture");
-      setErrorMessage(error instanceof Error ? error.message : "Unable to start the tour.");
     } finally {
       setBusy(false);
     }
@@ -556,21 +459,22 @@ export default function RepoPilotApp() {
 
   const askAnything = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!tourId || !repoId || !askPrompt.trim() || asking) return;
+    if (!repoId || !askPrompt.trim() || asking) return;
     setAsking(true);
     setErrorMessage(null);
     try {
-      const prompt = askPrompt.trim();
-      const answer = await api.askTour(tourId, prompt);
+      const question = askPrompt.trim();
+      const answer = await api.askRepo(repoId, question, profile);
       setUsage(await api.getAccountUsage());
-      const claims: ClaimEvent[] = answer.claims.map((claim) => ({
-        ...claim,
-        event: "claim",
-        v: 1,
-      }));
-      setStore((current) => appendAnswerAsSection(current, prompt, answer.answer, claims, repoId));
-      const first = answer.claims[0];
-      if (first) setStore((current) => selectClaim(current, first.id));
+      setStore((current) =>
+        appendExchange(current, {
+          question,
+          answer: answer.answer,
+          claims: answer.claims,
+          personaLabel: personaLabel(profile),
+          repoId,
+        }),
+      );
       setAskPrompt("");
     } catch (error) {
       if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
@@ -615,6 +519,73 @@ export default function RepoPilotApp() {
     }
   };
 
+  const personaPicker = (
+    <div className="persona-picker">
+      <div className="persona-grid" role="group" aria-label="Answer persona">
+        {PERSONAS.map((persona) => {
+          const active = personaId === persona.id;
+          return (
+            <button
+              key={persona.id}
+              type="button"
+              className="persona-option"
+              data-active={active}
+              aria-pressed={active}
+              onClick={() => setPersonaId(persona.id)}
+            >
+              <span className="option-check" aria-hidden="true">
+                {active ? <CheckCircle size={19} weight="fill" /> : null}
+              </span>
+              <span>
+                <strong>{persona.label}</strong>
+                <small>{persona.blurb}</small>
+              </span>
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          className="persona-option"
+          data-active={isCustom}
+          aria-pressed={isCustom}
+          onClick={() => setPersonaId(CUSTOM_PERSONA_ID)}
+        >
+          <span className="option-check" aria-hidden="true">
+            {isCustom ? <CheckCircle size={19} weight="fill" /> : null}
+          </span>
+          <span>
+            <strong>Something else</strong>
+            <small>Describe who you are and what you need.</small>
+          </span>
+        </button>
+      </div>
+
+      {isCustom ? (
+        <div className="feature-field">
+          <label htmlFor="persona-custom">Who are you, and what do you want from this repo?</label>
+          <input
+            id="persona-custom"
+            className="text-input"
+            value={customText}
+            onChange={(event) => {
+              setCustomText(event.target.value);
+              setCustomProfile(null);
+            }}
+            onBlur={() => void structureCustomPersona()}
+            placeholder="I'm writing a migration guide and need the breaking changes"
+          />
+          <p className="field-help">
+            {draftingIntent
+              ? "Reading your description…"
+              : customProfile
+                ? `Lens: ${personaLabel(customProfile)}`
+                : "Answers will be shaped around this description."}
+          </p>
+        </div>
+      ) : null}
+    </div>
+  );
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -624,8 +595,16 @@ export default function RepoPilotApp() {
           </span>
           <span>RepoPilot</span>
         </a>
-        <button className="usage-control" type="button" onClick={() => setProviderDialogOpen(true)}>
-          <LockKey size={17} weight={usage?.provider_connected ? "fill" : "regular"} aria-hidden="true" />
+        <button
+          className="usage-control"
+          type="button"
+          onClick={() => setProviderDialogOpen(true)}
+        >
+          <LockKey
+            size={17}
+            weight={usage?.provider_connected ? "fill" : "regular"}
+            aria-hidden="true"
+          />
           <span>
             {usage?.provider_connected
               ? "Your provider is connected"
@@ -634,23 +613,25 @@ export default function RepoPilotApp() {
         </button>
       </header>
 
-      {stage === "capture" ? (
+      {!inWorkspace ? (
         <div className="onboarding-layout">
           <section className="onboarding-intro" aria-labelledby="onboarding-title">
             <div>
               <p className="section-kicker">Repository onboarding</p>
-              <h1 id="onboarding-title">Understand the code before you change it.</h1>
+              <h1 id="onboarding-title">Ask a codebase anything, as anyone.</h1>
               <p className="intro-copy">
-                Build a guided code-reading path grounded in the repository&apos;s actual files and symbols.
+                Paste a repository, pick the lens you are reading through, and ask. The same
+                verified facts get prioritized differently for a contributor, a competitor, or a
+                security reviewer.
               </p>
             </div>
 
             <div className="product-principles" aria-label="How RepoPilot works">
               <div className="principle-row">
-                <MagnifyingGlass size={21} aria-hidden="true" />
+                <UserFocus size={21} aria-hidden="true" />
                 <div>
-                  <strong>Repository-specific retrieval</strong>
-                  <span>Answers stay scoped to the indexed snapshot.</span>
+                  <strong>Answers shaped by your purpose</strong>
+                  <span>Your persona decides which findings lead.</span>
                 </div>
               </div>
               <div className="principle-row">
@@ -661,35 +642,35 @@ export default function RepoPilotApp() {
                 </div>
               </div>
               <div className="principle-row">
-                <FileCode size={21} aria-hidden="true" />
+                <MagnifyingGlass size={21} aria-hidden="true" />
                 <div>
-                  <strong>Synchronized code reading</strong>
-                  <span>Select a claim to inspect the supporting code immediately.</span>
+                  <strong>Repository-specific retrieval</strong>
+                  <span>Answers stay scoped to the indexed snapshot.</span>
                 </div>
               </div>
             </div>
 
             <p className="scope-note">
-              Supports Python, TypeScript, JavaScript, Java, Go, Rust, C-family languages, Ruby, PHP,
-              Swift, Scala, Vue, Svelte, Kotlin, and shell repositories.
+              Supports Python, TypeScript, JavaScript, Java, Go, Rust, C-family languages, Ruby,
+              PHP, Swift, Scala, Vue, Svelte, Kotlin, and shell repositories.
             </p>
           </section>
 
-          <section className="setup-panel" aria-label="Configure repository tour">
-            <div className="setup-heading">
-              <div>
-                <span className="step-label">Repository</span>
-                <h2>Choose a codebase</h2>
-              </div>
-              {repoId ? (
-                <span className={`repo-status repo-status-${store.repoStatus?.status ?? "queued"}`}>
-                  {repoReady ? <CheckCircle size={16} weight="fill" /> : <ClockCountdown size={16} />}
-                  {statusLabel(store.repoStatus?.status)}
-                </span>
-              ) : null}
-            </div>
-
+          <section className="setup-panel" aria-label="Configure repository session">
             <form className="repo-form" onSubmit={submitRepo} noValidate>
+              <div className="setup-heading">
+                <div>
+                  <span className="step-label">Repository</span>
+                  <h2>Choose a codebase</h2>
+                </div>
+                {repoId ? (
+                  <span className={`repo-status repo-status-${store.repoStatus?.status ?? "queued"}`}>
+                    {repoReady ? <CheckCircle size={16} weight="fill" /> : <ClockCountdown size={16} />}
+                    {statusLabel(store.repoStatus?.status)}
+                  </span>
+                ) : null}
+              </div>
+
               <label htmlFor="repo-url">Public GitHub URL</label>
               <div className="repo-input-row">
                 <span className="input-icon" aria-hidden="true">
@@ -705,141 +686,73 @@ export default function RepoPilotApp() {
                   placeholder="https://github.com/owner/repository"
                   aria-describedby="repo-help"
                 />
-                <button className="button button-primary repo-submit" type="submit" disabled={busy}>
-                  {busy ? "Starting" : "Analyze"}
-                  {!busy ? <ArrowRight size={17} weight="bold" aria-hidden="true" /> : null}
-                </button>
               </div>
               <p id="repo-help" className="field-help">
-                RepoPilot indexes the current default branch. Private repositories are not supported.
+                RepoPilot indexes the current default branch. Private repositories are not
+                supported.
               </p>
-            </form>
 
-            {repoId ? (
-              <div className="index-status" aria-live="polite">
-                <div className="index-status-header">
-                  <div>
-                    <strong>{repoDisplayName}</strong>
-                    <span>{statusLabel(store.repoStatus?.status)}</span>
+              <div className="setup-divider" />
+
+              <div className="setup-heading goal-heading">
+                <div>
+                  <span className="step-label">Lens</span>
+                  <h2>Who is asking?</h2>
+                </div>
+              </div>
+
+              {personaPicker}
+
+              {errorMessage ? (
+                <div className="inline-alert" role="alert">
+                  <WarningCircle size={19} weight="fill" aria-hidden="true" />
+                  <span>{errorMessage}</span>
+                </div>
+              ) : null}
+
+              {repoId ? (
+                <div className="index-status" aria-live="polite">
+                  <div className="index-status-header">
+                    <div>
+                      <strong>{repoDisplayName}</strong>
+                      <span>{statusLabel(store.repoStatus?.status)}</span>
+                    </div>
+                    <span className="progress-value">{progress}%</span>
                   </div>
-                  <span className="progress-value">{progress}%</span>
-                </div>
-                <div
-                  className="progress-track"
-                  role="progressbar"
-                  aria-label="Repository indexing progress"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={progress}
-                >
-                  <span className="progress-fill" style={{ width: `${progress}%` }} />
-                </div>
-                <p>
-                  {store.firstImpression ||
-                    (repoReady
-                      ? "The repository snapshot is ready. Choose your goal to begin."
-                      : "Cloning files, creating chunks, and building the repository graph.")}
-                </p>
-              </div>
-            ) : null}
-
-            <div className="setup-divider" />
-
-            <div className="setup-heading goal-heading">
-              <div>
-                <span className="step-label">Goal</span>
-                <h2>What do you need?</h2>
-              </div>
-            </div>
-
-            <div className="mode-switch" role="group" aria-label="Tour goal">
-              <button
-                type="button"
-                className="mode-button"
-                data-active={mode === "learn"}
-                aria-pressed={mode === "learn"}
-                onClick={() => setMode("learn")}
-              >
-                <BookOpenText size={18} aria-hidden="true" />
-                Learn the codebase
-              </button>
-              <button
-                type="button"
-                className="mode-button"
-                data-active={mode === "contribute"}
-                aria-pressed={mode === "contribute"}
-                onClick={() => setMode("contribute")}
-              >
-                <Wrench size={18} aria-hidden="true" />
-                Plan a contribution
-              </button>
-            </div>
-
-            <div className="goal-options">
-              {(mode === "learn" ? learnChoices : contributeChoices).map((choice) => {
-                const active =
-                  mode === "learn"
-                    ? learnChoice === choice.value
-                    : contributeChoice === choice.value;
-                return (
-                  <button
-                    key={choice.value}
-                    type="button"
-                    className="goal-option"
-                    data-active={active}
-                    aria-pressed={active}
-                    onClick={() => {
-                      if (mode === "learn") setLearnChoice(choice.value as LearnChoice);
-                      else setContributeChoice(choice.value as ContributeChoice);
-                    }}
+                  <div
+                    className="progress-track"
+                    role="progressbar"
+                    aria-label="Repository indexing progress"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress}
                   >
-                    <span className="option-check" aria-hidden="true">
-                      {active ? <CheckCircle size={19} weight="fill" /> : null}
-                    </span>
-                    <span>
-                      <strong>{choice.label}</strong>
-                      <small>{choice.description}</small>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                    <span className="progress-fill" style={{ width: `${progress}%` }} />
+                  </div>
+                  <p>
+                    {store.firstImpression ||
+                      "Cloning files, creating chunks, and building the repository graph."}
+                  </p>
+                </div>
+              ) : null}
 
-            {mode === "learn" && learnChoice === "specific feature" ? (
-              <div className="feature-field">
-                <label htmlFor="feature-focus">Feature or workflow</label>
-                <input
-                  id="feature-focus"
-                  className="text-input"
-                  value={featureText}
-                  onChange={(event) => setFeatureText(event.target.value)}
-                  placeholder="Authentication, routing, CLI, configuration"
-                />
+              <div className="setup-footer">
+                <div className="intent-summary">
+                  <span>Answering as</span>
+                  <strong>{personaLabel(profile)}</strong>
+                </div>
+                <button
+                  className="button button-primary start-button"
+                  type="submit"
+                  disabled={busy || Boolean(repoId && !repoError)}
+                >
+                  {busy ? "Analyzing" : repoId && !repoError ? "Indexing" : "Analyze and ask"}
+                  {!busy && !repoId ? (
+                    <ArrowRight size={17} weight="bold" aria-hidden="true" />
+                  ) : null}
+                </button>
               </div>
-            ) : null}
-
-            {errorMessage ? (
-              <div className="inline-alert" role="alert">
-                <WarningCircle size={19} weight="fill" aria-hidden="true" />
-                <span>{errorMessage}</span>
-              </div>
-            ) : null}
-
-            <div className="setup-footer">
-              <div className="intent-summary">
-                <span>Tour focus</span>
-                <strong>{profile.raw_text}</strong>
-              </div>
-              <button
-                className="button button-primary start-button"
-                type="button"
-                onClick={startTour}
-                disabled={!repoReady || busy}
-              >
-                {busy && repoReady ? "Building tour" : repoReady ? "Open guided tour" : "Waiting for snapshot"}
-                {repoReady && !busy ? <ArrowRight size={17} weight="bold" aria-hidden="true" /> : null}
-              </button>
-            </div>
+            </form>
           </section>
         </div>
       ) : (
@@ -849,14 +762,18 @@ export default function RepoPilotApp() {
               <button
                 className="icon-button"
                 type="button"
-                onClick={() => setStage("capture")}
+                onClick={() => {
+                  setRepoId(undefined);
+                  setStore(initialSessionState);
+                  window.history.replaceState(null, "", "/");
+                }}
                 aria-label="Back to repository setup"
               >
                 <ArrowLeft size={19} />
               </button>
               <div>
                 <span>{repoDisplayName}</span>
-                <h1>Guided repository tour</h1>
+                <h1>Ask this repository</h1>
               </div>
             </div>
             <div className="workspace-meta">
@@ -864,7 +781,6 @@ export default function RepoPilotApp() {
                 <CheckCircle size={16} weight="fill" aria-hidden="true" />
                 Snapshot ready
               </span>
-              <span className="focus-summary">{profile.raw_text}</span>
             </div>
           </header>
 
@@ -876,87 +792,54 @@ export default function RepoPilotApp() {
           ) : null}
 
           <div className="workspace-grid">
-            <aside className="tour-navigation" aria-label="Tour sections">
+            <aside className="tour-navigation" aria-label="Session lens">
               <div className="navigation-heading">
-                <ListBullets size={18} aria-hidden="true" />
-                <span>Tour contents</span>
+                <UserFocus size={18} aria-hidden="true" />
+                <span>Answering as</span>
               </div>
-              <nav>
-                {store.sections.length > 0 ? (
-                  store.sections.map((section) => (
-                    <a key={section.order} href={`#section-${section.order}`}>
-                      <span>{section.title}</span>
-                      {section.done ? (
-                        <CheckCircle size={16} weight="fill" aria-label="Complete" />
-                      ) : (
-                        <CaretRight size={15} aria-hidden="true" />
-                      )}
-                    </a>
-                  ))
-                ) : (
-                  <div className="navigation-empty">Preparing the first section.</div>
-                )}
-              </nav>
+              {/* The lens is switchable mid-session: ask the same question
+                  again as someone else and compare the two answers. */}
+              {personaPicker}
               <div className="navigation-focus">
-                <span>Focus keywords</span>
+                <span>Priorities</span>
                 <div className="keyword-list">
-                  {(profile.focus_keywords ?? []).map((keyword) => (
+                  {(profile?.focus_keywords ?? []).map((keyword) => (
                     <span key={keyword}>{keyword}</span>
                   ))}
                 </div>
               </div>
             </aside>
 
-            <section className="tour-content" aria-label="Guided tour" aria-live="polite">
-              {store.sections.length === 0 && tourStreamFailed ? (
-                <div className="tour-error" role="alert">
-                  <p>{errorMessage ?? "The guided tour could not be loaded."}</p>
-                  <button
-                    className="button button-secondary"
-                    type="button"
-                    onClick={() => {
-                      setErrorMessage(null);
-                      setTourStreamFailed(false);
-                      forcePoll();
-                    }}
-                  >
-                    Retry tour
-                  </button>
-                </div>
-              ) : store.sections.length === 0 ? (
-                <div className="tour-loading" aria-label="Building guided tour">
-                  <div className="skeleton skeleton-heading" />
-                  <div className="skeleton skeleton-copy" />
-                  <div className="skeleton skeleton-copy skeleton-copy-short" />
-                  <div className="skeleton skeleton-claim" />
+            <section className="tour-content" aria-label="Answers" aria-live="polite">
+              {store.firstImpression ? (
+                <p className="first-impression">{store.firstImpression}</p>
+              ) : null}
+
+              {store.exchanges.length === 0 ? (
+                <div className="answers-empty">
+                  <MagnifyingGlass size={26} aria-hidden="true" />
+                  <strong>Ask your first question</strong>
+                  <span>
+                    Answers are drawn from the indexed snapshot and prioritized for the lens you
+                    picked.
+                  </span>
                 </div>
               ) : (
-                store.sections.map((section) => (
-                  <article className="tour-section" id={`section-${section.order}`} key={section.order}>
+                store.exchanges.map((exchange) => (
+                  <article className="tour-section" id={`answer-${exchange.id}`} key={exchange.id}>
                     <div className="tour-section-heading">
-                      <h2>{section.title}</h2>
-                      {section.done ? (
-                        <span className="section-complete">
-                          <CheckCircle size={16} weight="fill" aria-hidden="true" />
-                          Complete
-                        </span>
-                      ) : (
-                        <span className="section-streaming">Writing section</span>
-                      )}
+                      <h2>{exchange.question}</h2>
+                      <span className="section-complete">
+                        <UserFocus size={15} aria-hidden="true" />
+                        {exchange.personaLabel}
+                      </span>
                     </div>
-                    <p className="section-body">{section.body || "Generating a repository-grounded explanation."}</p>
+                    <p className="section-body">{exchange.answer}</p>
 
-                    {section.mermaid ? (
-                      <div className="diagram-source">
-                        <span>Architecture diagram source</span>
-                        <pre>{section.mermaid}</pre>
-                      </div>
-                    ) : null}
-
-                    {section.claimIds.length > 0 ? (
-                      <div className="claim-group" aria-label={`Sources for ${section.title}`}>
+                    {exchange.claimIds.length > 0 ? (
+                      <div className="claim-group" aria-label={`Sources for ${exchange.question}`}>
                         <div className="claim-group-label">Verified sources</div>
-                        {section.claimIds.map((claimId) => {
+                        {exchange.claimIds.map((claimId) => {
                           const claim = store.claimsById[claimId];
                           const flagged = claim.status === "flagged" || claim.status === "rejected";
                           const unverified = claim.status === "unverified";
@@ -980,7 +863,8 @@ export default function RepoPilotApp() {
                               <span className="claim-content">
                                 <strong>{claim.text}</strong>
                                 <span className="claim-reference">
-                                  {claim.refs[0].file_path}:{claim.refs[0].start_line}-{claim.refs[0].end_line}
+                                  {claim.refs[0].file_path}:{claim.refs[0].start_line}-
+                                  {claim.refs[0].end_line}
                                 </span>
                                 {claim.verifier_note ? <small>{claim.verifier_note}</small> : null}
                               </span>
@@ -1024,7 +908,10 @@ export default function RepoPilotApp() {
                     {asking ? "Asking" : "Ask"}
                   </button>
                 </div>
-                <p>Answers use only the indexed snapshot and include source references.</p>
+                <p>
+                  Answers use only the indexed snapshot, include source references, and are
+                  prioritized for {personaLabel(profile)}.
+                </p>
               </form>
             </section>
 
@@ -1056,7 +943,10 @@ export default function RepoPilotApp() {
                 ) : viewerLines.length > 0 ? (
                   <pre>
                     {viewerLines.map((line, index) => (
-                      <span className={line.active ? "code-line code-line-active" : "code-line"} key={`${line.number}-${index}`}>
+                      <span
+                        className={line.active ? "code-line code-line-active" : "code-line"}
+                        key={`${line.number}-${index}`}
+                      >
                         <span className="line-number">{line.number}</span>
                         <span className="line-content">{line.content || " "}</span>
                       </span>

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from repopilot_agents.state import IntentProfile, OutputShape
 from repopilot_agents.types import ChunkContent
 
 _DATA_NOT_INSTRUCTIONS = (
@@ -91,6 +92,54 @@ ANSWER_SYSTEM = (
     + _DATA_NOT_INSTRUCTIONS
 )
 
+# Output-shape hints. Deliberately about *ordering and packaging* only — none
+# of them can license a claim the chunks don't support.
+_SHAPE_DIRECTIVE: dict[OutputShape, str] = {
+    "narrative": "Order the claims so they read as a short explanation, cause before effect.",
+    "ranked_list": "Order the claims most-consequential first for this reader.",
+    "dossier": "Lead with the claims that establish scope and ownership, then details.",
+    "comparison_table": "Group claims so that comparable facts sit on adjacent lines.",
+    "unspecified": "",
+}
+
+
+def reader_context(profile: IntentProfile | None) -> str:
+    """Render the persona block appended to ``ANSWER_SYSTEM``.
+
+    The profile tilts *which* supported facts get surfaced first and how they
+    are worded. It never relaxes rules 1–4: an open-source contributor and a
+    competitor asking the same question get the same underlying claims, in a
+    different order, with different emphasis. Returns "" for no profile so the
+    prompt is byte-identical to the pre-persona one.
+    """
+    if profile is None:
+        return ""
+    lines = [f"  goal:       {profile.raw_text.strip()}"]
+    if profile.audience_framing:
+        lines.append(f"  reader:     {profile.audience_framing.strip()}")
+    if profile.focus_keywords:
+        lines.append(f"  priorities: {', '.join(profile.focus_keywords)}")
+    if profile.success_criterion:
+        lines.append(f"  success:    {profile.success_criterion.strip()}")
+    shape = _SHAPE_DIRECTIVE.get(profile.output_shape_preference, "")
+    if shape:
+        lines.append(f"  ordering:   {shape}")
+    return (
+        "\n\nREADER CONTEXT — this shapes emphasis, ordering, and wording ONLY.\n"
+        + "\n".join(lines)
+        + "\nWhen several supported claims compete for space, prefer the ones this reader "
+        "can act on. Rules 1-4 above still bind absolutely: never add, soften, or "
+        "strengthen a claim to suit this reader, and never drop a citation. If the "
+        "chunks hold nothing relevant to this reader's priorities, answer the question "
+        "plainly rather than manufacturing relevance."
+    )
+
+
+def answer_system(profile: IntentProfile | None = None) -> str:
+    """``ANSWER_SYSTEM`` with the reader context appended, if any."""
+    return ANSWER_SYSTEM + reader_context(profile)
+
+
 COMPRESS_SYSTEM = (
     "You see one repository source chunk and a user question. Return ONLY JSON with "
     'this schema: {"keep":[[start_line,end_line], ...]}. Select the smallest '
@@ -140,7 +189,9 @@ __all__ = [
     "QUERY_SPEC_SYSTEM",
     "SUFFICIENCY_SYSTEM",
     "_render_numbered_chunk",
+    "answer_system",
     "answer_user_prompt",
     "query_spec_user_prompt",
+    "reader_context",
     "sufficiency_user_prompt",
 ]

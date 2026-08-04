@@ -15,16 +15,16 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from repopilot_agents.state import IntentProfile
 from repopilot_api.access import AccountUsage, AllowanceExceededError
 from repopilot_api.models import (
     AccountUsageResponse,
-    AskTourRequest,
+    AskRequest,
     BaseTourEvent,
     ChunkPayload,
     CreateRepoRequest,
     CreateRepoResponse,
-    CreateTourRequest,
-    CreateTourResponse,
+    IntentDraftRequest,
     ProviderCredentialsRequest,
     QAAnswerResponse,
     RepoStatusResponse,
@@ -219,67 +219,29 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
         )
 
-    @app.post("/tours", response_model=CreateTourResponse, status_code=201)
-    async def create_tour(
-        request: CreateTourRequest,
+    @app.post("/intent", response_model=IntentProfile)
+    async def draft_intent(
+        request: IntentDraftRequest,
         session_id: str = Depends(resolve_session),
-    ) -> CreateTourResponse:
-        await get_services().access.status(session_id)
-        try:
-            record = await get_services().tours.create(
-                request.repo_id,
-                request.intent_profile,
-                session_id=session_id,
-            )
-        except RepoNotReadyError as exc:
-            raise HTTPException(
-                status_code=409,
-                detail={
-                    "code": "REPO_NOT_READY",
-                    "message": "repo must finish indexing before a tour can be created",
-                    "repo_id": exc.repo_id,
-                    "status": exc.status,
-                },
-            ) from exc
-        except KeyError as exc:
-            raise HTTPException(status_code=404, detail="repo not found") from exc
-        await get_services().access.bind_tour(session_id, record.tour_id)
-        return CreateTourResponse(
-            tour_id=record.tour_id,
-            stream_url=f"/tours/{record.tour_id}/stream",
-        )
+    ) -> IntentProfile:
+        """Turn a free-text persona description into a structured profile.
 
-    @app.get("/tours/{tour_id}/stream")
-    async def stream_tour(
-        tour_id: str,
-        session_id: str = Depends(resolve_session),
-    ) -> StreamingResponse:
-        if not await get_services().access.can_access_tour(session_id, tour_id):
-            raise HTTPException(status_code=404, detail="tour not found")
+        Not metered: this is one small call that makes the *next* question
+        better, and charging for it would push users toward the presets for
+        the wrong reason. Falls back to a raw_text-only profile internally,
+        so it never fails the caller.
+        """
+        provider = await get_services().access.provider_for(session_id)
+        return await get_services().qa.draft_intent(request.raw_text, provider=provider)
 
-        async def event_source() -> AsyncIterator[BaseTourEvent]:
-            try:
-                async for event in get_services().tours.stream(tour_id):
-                    yield event
-            except KeyError as exc:
-                raise HTTPException(status_code=404, detail="tour not found") from exc
-
-        return StreamingResponse(
-            with_heartbeats(event_source()),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
-        )
-
-    @app.post("/tours/{tour_id}/ask", response_model=QAAnswerResponse)
-    async def ask_tour(
-        tour_id: str,
-        request: AskTourRequest,
+    @app.post("/repos/{repo_id:path}/ask", response_model=QAAnswerResponse)
+    async def ask_repo(
+        repo_id: str,
+        request: AskRequest,
         session_id: str = Depends(resolve_session),
     ) -> QAAnswerResponse:
-        if not await get_services().access.can_access_tour(session_id, tour_id):
-            raise HTTPException(status_code=404, detail="tour not found")
         try:
-            reservation = await get_services().access.reserve_question(session_id, tour_id)
+            reservation = await get_services().access.reserve_question(session_id, repo_id)
         except AllowanceExceededError as exc:
             raise allowance_error(exc) from exc
         provider = (
@@ -288,17 +250,29 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             else None
         )
         try:
-            answer = await get_services().tours.ask(
-                tour_id,
+            answer = await get_services().qa.ask(
+                repo_id,
                 request.question,
+                intent_profile=request.intent_profile,
                 provider=provider,
             )
+        except RepoNotReadyError as exc:
+            await get_services().access.release(reservation)
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "code": "REPO_NOT_READY",
+                    "message": "repo must finish indexing before it can answer questions",
+                    "repo_id": exc.repo_id,
+                    "status": exc.status,
+                },
+            ) from exc
         except KeyError as exc:
             await get_services().access.release(reservation)
-            raise HTTPException(status_code=404, detail="tour not found") from exc
+            raise HTTPException(status_code=404, detail="repo not found") from exc
         except Exception as exc:
             await get_services().access.release(reservation)
-            log.exception("tour.ask_failed", tour_id=tour_id)
+            log.exception("repo.ask_failed", repo_id=repo_id)
             raise HTTPException(
                 status_code=503,
                 detail={

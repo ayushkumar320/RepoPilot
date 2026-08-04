@@ -1,4 +1,11 @@
-"""Phase 4 API contracts and SSE event models."""
+"""API contracts and SSE event models.
+
+The tour entity is gone: a repository plus an ``IntentProfile`` (the reader's
+persona) is everything a question needs, and the persona travels with each
+``/repos/{repo_id}/ask`` call rather than being frozen into a server-side
+record. What remains here is the repo lifecycle, the ask contract, and the
+first-impression stream.
+"""
 
 from __future__ import annotations
 
@@ -31,18 +38,22 @@ class RepoStatusResponse(BaseModel):
     commits_behind_estimate: int | None = Field(default=None, ge=0)
 
 
-class CreateTourRequest(BaseModel):
-    repo_id: str = Field(min_length=1)
-    intent_profile: IntentProfile
+class AskRequest(BaseModel):
+    """A question plus the persona it should be answered for.
 
+    ``intent_profile`` is optional so the endpoint still works for a caller
+    that has no persona (scripts, evals); omitting it yields the neutral,
+    pre-persona answer prompt.
+    """
 
-class CreateTourResponse(BaseModel):
-    tour_id: str = Field(min_length=1)
-    stream_url: str = Field(min_length=1)
-
-
-class AskTourRequest(BaseModel):
     question: str = Field(min_length=1)
+    intent_profile: IntentProfile | None = None
+
+
+class IntentDraftRequest(BaseModel):
+    """Free-text persona description to be structured by the intent profiler."""
+
+    raw_text: str = Field(min_length=1, max_length=1000)
 
 
 class ProviderCredentialsRequest(BaseModel):
@@ -59,7 +70,7 @@ class AccountUsageResponse(BaseModel):
     credential_storage: Literal["session_only"] = "session_only"
 
 
-class TourClaimPayload(BaseModel):
+class ClaimPayload(BaseModel):
     id: str = Field(min_length=1)
     text: str = Field(min_length=1)
     refs: list[CodeRef] = Field(min_length=1)
@@ -70,7 +81,7 @@ class TourClaimPayload(BaseModel):
 
 class QAAnswerResponse(BaseModel):
     answer: str = Field(min_length=1)
-    claims: list[TourClaimPayload] = Field(default_factory=list)
+    claims: list[ClaimPayload] = Field(default_factory=list)
     retrieval_path: list[str] = Field(default_factory=list)
 
 
@@ -85,37 +96,6 @@ class ChunkPayload(BaseModel):
 class BaseTourEvent(BaseModel):
     v: Literal[1] = 1
     event: str
-
-
-class TourSectionStartEvent(BaseTourEvent):
-    event: Literal["section_start"] = "section_start"
-    order: int = Field(ge=0)
-    title: str = Field(min_length=1)
-
-
-class TourTokenEvent(BaseTourEvent):
-    event: Literal["token"] = "token"
-    text: str
-
-
-class TourClaimEvent(BaseTourEvent):
-    event: Literal["claim"] = "claim"
-    id: str = Field(min_length=1)
-    text: str = Field(min_length=1)
-    refs: list[CodeRef] = Field(min_length=1)
-    status: ClaimStatus
-    verifier_note: str | None = None
-    retrieval_path: list[str] = Field(default_factory=list)
-
-
-class TourDiagramEvent(BaseTourEvent):
-    event: Literal["diagram"] = "diagram"
-    mermaid: str = Field(min_length=1)
-
-
-class TourSectionEndEvent(BaseTourEvent):
-    event: Literal["section_end"] = "section_end"
-    order: int = Field(ge=0)
 
 
 class TourFirstImpressionEvent(BaseTourEvent):
@@ -134,14 +114,7 @@ class TourErrorEvent(BaseTourEvent):
 
 
 TourEventType = Annotated[
-    TourSectionStartEvent
-    | TourTokenEvent
-    | TourClaimEvent
-    | TourDiagramEvent
-    | TourSectionEndEvent
-    | TourFirstImpressionEvent
-    | TourDoneEvent
-    | TourErrorEvent,
+    TourFirstImpressionEvent | TourDoneEvent | TourErrorEvent,
     Field(discriminator="event"),
 ]
 
@@ -171,27 +144,21 @@ def event_payload(event: BaseTourEvent) -> dict[str, Any]:
 
 __all__ = [
     "AccountUsageResponse",
-    "AskTourRequest",
+    "AskRequest",
     "BaseTourEvent",
     "ChunkPayload",
+    "ClaimPayload",
     "CreateRepoRequest",
     "CreateRepoResponse",
-    "CreateTourRequest",
-    "CreateTourResponse",
+    "IntentDraftRequest",
     "ProviderCredentialsRequest",
     "QAAnswerResponse",
     "RepoStatus",
     "RepoStatusResponse",
-    "TourClaimEvent",
-    "TourClaimPayload",
-    "TourDiagramEvent",
     "TourDoneEvent",
     "TourErrorEvent",
     "TourEvent",
     "TourEventType",
     "TourFirstImpressionEvent",
-    "TourSectionEndEvent",
-    "TourSectionStartEvent",
-    "TourTokenEvent",
     "event_payload",
 ]

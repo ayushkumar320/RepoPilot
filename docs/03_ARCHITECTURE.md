@@ -541,7 +541,7 @@ The Intent Profiler can be wrong. The chip strip is the first line of defense �
 
 Implementation:
 - UI tracks `intent_iterations` in Zustand; the free-text fallback shows on the 3rd attempt.
-- The free-text path posts `{repo_id, raw_text}` (no parsed profile) to `POST /tours`.
+- The free-text path posts `{raw_text}` to `POST /intent`, which returns a best-effort `IntentProfile`; on any failure it returns one with only `raw_text` populated. The web app sends that profile with each `POST /repos/{repo_id}/ask`.
 - The backend Profiler is skipped; the Planner receives an `IntentProfile` with only `raw_text` populated and `modality_weights={}`. The planner's fallthrough rule activates the inclusive default.
 
 Phase 3 test: `test_intent_fallback_after_two_iterations_uses_inclusive_default`.
@@ -607,6 +607,25 @@ The architecture's distinguishing properties are only differentiating if the use
 | **Considered-and-rejected trail (Lane A)** | "We looked at #234 but ranked it lower because it touches a hub of fan-in 47." Top-3 rejected items shown below the top-N accepted. | The triage is graph-backed, not label-driven. Lane A is doing real work, not parroting `good first issue`. |
 
 These surfaces are required deliverables in Phase 4 (verified badge, retrieval path, intent chip) and Phase 5 (considered-and-rejected trail). Without them, the architectural moat does not reach the user.
+
+---
+
+## Persona-shaped Q&A (the shipped product path)
+
+The product surface is deliberately smaller than the agent topology above. There is **no tour entity**: the user pastes a repo URL, picks a persona, and asks. The persona is an `IntentProfile` that travels with every `POST /repos/{repo_id}/ask` call rather than being frozen into a server-side record at "create tour" time — so switching lens mid-session costs nothing and needs no migration.
+
+Where the persona is allowed to act:
+
+| Stage | Persona's influence |
+|---|---|
+| Retrieval (hybrid search, rerank, traversal) | **None.** Identical pools regardless of persona. |
+| Answer prompt | **Emphasis and ordering only**, via the `READER CONTEXT` block appended by `qa.prompts.answer_system`. `output_shape_preference` selects one ordering directive. |
+| Citation requirement | **None.** Every claim still carries a `[N]` citation; the persona block explicitly restates that rules 1–4 bind absolutely. |
+| Verifier | **None.** Claims are checked against source, not against the reader's interests. |
+
+The invariant this buys: an open-source contributor and a competitive analyst asking the same question receive **the same verified facts, ranked and worded differently**. A persona can never license a claim the chunks do not support, and `intent_profile=None` reproduces the pre-persona prompt byte-for-byte.
+
+Presets live in [`apps/web/src/lib/personas.ts`](../apps/web/src/lib/personas.ts) as data. Free-text personas go through `POST /intent` → `intent.profiler.profile_intent`, which never raises: on any failure it degrades to an `IntentProfile` carrying only `raw_text`.
 
 ---
 

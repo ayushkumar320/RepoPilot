@@ -28,12 +28,19 @@ export interface CodeRef {
   symbol?: string | null;
 }
 
+export type OutputShape =
+  | "narrative"
+  | "ranked_list"
+  | "dossier"
+  | "comparison_table"
+  | "unspecified";
+
 export interface IntentProfile {
   raw_text: string;
   modality_weights?: Partial<Record<"understand" | "change" | "evaluate" | "locate" | "compare", number>>;
   focus_keywords?: string[];
   audience_framing?: string | null;
-  output_shape_preference?: "narrative" | "ranked_list" | "dossier" | "comparison_table" | "unspecified";
+  output_shape_preference?: OutputShape;
   success_criterion?: string | null;
 }
 
@@ -51,12 +58,7 @@ export interface RepoStatusResponse {
   commits_behind_estimate?: number | null;
 }
 
-export interface CreateTourResponse {
-  tour_id: string;
-  stream_url: string;
-}
-
-export interface TourClaimPayload {
+export interface ClaimPayload {
   id: string;
   text: string;
   refs: CodeRef[];
@@ -67,7 +69,7 @@ export interface TourClaimPayload {
 
 export interface QAAnswerResponse {
   answer: string;
-  claims: TourClaimPayload[];
+  claims: ClaimPayload[];
   retrieval_path: string[];
 }
 
@@ -77,36 +79,6 @@ export interface ChunkPayload {
   ref: CodeRef;
   content: string;
   summary?: string | null;
-}
-
-export interface SectionStartEvent {
-  event: "section_start";
-  v: 1;
-  order: number;
-  title: string;
-}
-
-export interface TokenEvent {
-  event: "token";
-  v: 1;
-  text: string;
-}
-
-export interface ClaimEvent extends TourClaimPayload {
-  event: "claim";
-  v: 1;
-}
-
-export interface DiagramEvent {
-  event: "diagram";
-  v: 1;
-  mermaid: string;
-}
-
-export interface SectionEndEvent {
-  event: "section_end";
-  v: 1;
-  order: number;
 }
 
 export interface FirstImpressionEvent {
@@ -127,15 +99,7 @@ export interface ErrorEvent {
   message: string;
 }
 
-export type TourEvent =
-  | SectionStartEvent
-  | TokenEvent
-  | ClaimEvent
-  | DiagramEvent
-  | SectionEndEvent
-  | FirstImpressionEvent
-  | DoneEvent
-  | ErrorEvent;
+export type RepoEvent = FirstImpressionEvent | DoneEvent | ErrorEvent;
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
@@ -143,8 +107,8 @@ const API_BASE =
 const RETRYABLE_STATUS = new Set([500, 502, 503, 504]);
 
 // Only idempotent requests may be auto-retried: reads (GET) and repo submission
-// (POST /repos is idempotent on repo_url). We must NOT retry POST /tours or
-// /ask — those create tours or consume the free-question quota.
+// (POST /repos is idempotent on repo_url). We must NOT retry an /ask — it
+// consumes the free-question quota.
 function isIdempotent(path: string, init?: RequestInit): boolean {
   const method = (init?.method ?? "GET").toUpperCase();
   return method === "GET" || path === "/repos";
@@ -221,16 +185,22 @@ export const api = {
   getRepoStatus(repoId: string): Promise<RepoStatusResponse> {
     return http(`/repos/${repoId}/status`);
   },
-  createTour(repoId: string, intentProfile: IntentProfile): Promise<CreateTourResponse> {
-    return http("/tours", {
+  // The persona travels with every question rather than being pinned to a
+  // server-side record, so switching lenses mid-conversation costs nothing.
+  askRepo(
+    repoId: string,
+    question: string,
+    intentProfile: IntentProfile | null,
+  ): Promise<QAAnswerResponse> {
+    return http(`/repos/${repoId}/ask`, {
       method: "POST",
-      body: JSON.stringify({ repo_id: repoId, intent_profile: intentProfile }),
+      body: JSON.stringify({ question, intent_profile: intentProfile }),
     });
   },
-  askTour(tourId: string, question: string): Promise<QAAnswerResponse> {
-    return http(`/tours/${tourId}/ask`, {
+  draftIntent(rawText: string): Promise<IntentProfile> {
+    return http("/intent", {
       method: "POST",
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ raw_text: rawText }),
     });
   },
   getChunk(chunkId: string): Promise<ChunkPayload> {
@@ -238,8 +208,5 @@ export const api = {
   },
   firstImpressionUrl(repoId: string): string {
     return `${API_BASE}/repos/${repoId}/first-impression`;
-  },
-  tourStreamUrl(tourId: string): string {
-    return `${API_BASE}/tours/${tourId}/stream`;
   },
 };

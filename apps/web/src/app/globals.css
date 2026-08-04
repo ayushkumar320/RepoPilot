@@ -400,7 +400,7 @@ a {
 }
 
 .button:active:not(:disabled),
-.goal-option:active,
+.persona-option:active,
 .mode-button:active,
 .claim-row:active,
 .icon-button:active {
@@ -517,19 +517,19 @@ a {
   box-shadow: var(--shadow-sm);
 }
 
-.goal-options {
+.persona-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 14px;
 }
 
-.goal-options .goal-option:last-child:nth-child(odd) {
+.persona-grid .persona-option:last-child:nth-child(odd) {
   grid-column: 1 / -1;
   min-height: 82px;
 }
 
-.goal-option {
+.persona-option {
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr);
   gap: 10px;
@@ -544,12 +544,12 @@ a {
   transition: border-color 140ms ease, background 140ms ease, transform 100ms ease;
 }
 
-.goal-option:hover {
+.persona-option:hover {
   border-color: var(--border-strong);
   background: var(--surface-subtle);
 }
 
-.goal-option[data-active="true"] {
+.persona-option[data-active="true"] {
   border-color: var(--accent-border);
   background: var(--accent-soft);
 }
@@ -566,22 +566,22 @@ a {
   background: var(--surface);
 }
 
-.goal-option[data-active="true"] .option-check {
+.persona-option[data-active="true"] .option-check {
   border-color: transparent;
   background: transparent;
 }
 
-.goal-option > span:last-child {
+.persona-option > span:last-child {
   display: grid;
   gap: 5px;
 }
 
-.goal-option strong {
+.persona-option strong {
   font-size: 0.82rem;
   font-weight: 620;
 }
 
-.goal-option small {
+.persona-option small {
   color: var(--text-secondary);
   font-size: 0.73rem;
   line-height: 1.45;
@@ -1527,7 +1527,7 @@ input:focus-visible {
   }
 
   .mode-switch,
-  .goal-options {
+  .persona-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1620,4 +1620,66 @@ input:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* ── Persona picker ─────────────────────────────────────────────────────── */
+
+.persona-picker {
+  display: grid;
+  gap: 4px;
+}
+
+/* In the sidebar the picker is a compact single column: it stays reachable
+   for mid-session lens switching without competing with the answers. */
+.tour-navigation .persona-grid {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tour-navigation .persona-option {
+  min-height: 0;
+  padding: 10px 12px;
+}
+
+.tour-navigation .persona-option small {
+  display: none;
+}
+
+.tour-navigation .feature-field {
+  margin-top: 10px;
+}
+
+.first-impression {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--surface-subtle);
+}
+
+.answers-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-control);
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+.answers-empty strong {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.answers-empty span {
+  max-width: 42ch;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.55;
 }

@@ -38,8 +38,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_agents.qa.compress import compress_chunks
 from repopilot_agents.qa.prompts import (
-    ANSWER_SYSTEM,
     SUFFICIENCY_SYSTEM,
+    answer_system,
     answer_user_prompt,
     sufficiency_user_prompt,
 )
@@ -48,6 +48,7 @@ from repopilot_agents.qa.types import SufficiencyVerdict
 from repopilot_agents.qa.union import reciprocal_rank_fusion
 from repopilot_agents.rerank.pipeline import DEFAULT_MAX_POOL as RERANK_MAX_POOL
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
+from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_traverse import graph_traverse
 from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.read_chunks import read_chunks
@@ -152,6 +153,7 @@ async def answer_question(
     use_rerank: bool = True,
     use_compress: bool = True,
     retry_429_attempts: int | None = None,
+    intent_profile: IntentProfile | None = None,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -173,6 +175,12 @@ async def answer_question(
     ``use_rerank`` (Phase 4) cross-encoder-reranks + MMR-diversifies the top
     of the pool before the prompt slice. Requires ``recall_k`` (needs a pool
     to reorder); disabled automatically on the pre-Phase-1 baseline arm.
+
+    ``intent_profile`` carries the reader's persona (who they are, what they
+    are optimizing for). It tilts the answer's emphasis and ordering only —
+    retrieval, citation, and verification are identical with or without it, so
+    two personas asking the same question get the same facts, prioritized
+    differently. ``None`` reproduces the pre-persona prompt byte-for-byte.
 
     ``use_compress`` (Phase 5) narrows the answerer's view of each chunk to
     load-bearing lines only. ``ChunkContent.content`` remains full text so the
@@ -274,6 +282,7 @@ async def answer_question(
             question,
             ctx.chunks,
             retry_429_attempts=retry_429_attempts,
+            intent_profile=intent_profile,
         )
 
     if _is_not_found(answer_text):
@@ -510,12 +519,13 @@ async def _generate_answer(
     chunks: list[ChunkContent],
     *,
     retry_429_attempts: int | None,
+    intent_profile: IntentProfile | None = None,
 ) -> str:
     user_prompt = answer_user_prompt(question, chunks)
     response = await provider.generate(
         ModelId.QA_PRIMARY,
         [
-            Message("system", ANSWER_SYSTEM),
+            Message("system", answer_system(intent_profile)),
             Message("user", user_prompt),
         ],
         temperature=0.0,

@@ -7,43 +7,35 @@ import base64
 import binascii
 import json
 import re
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from typing import Protocol
 from urllib.parse import quote, unquote
 from uuid import uuid4
 
 from arq.connections import ArqRedis, RedisSettings, create_pool
 from arq.jobs import Job
-from sqlalchemy import func, insert, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from repopilot_agents.intent.profiler import profile_intent
 from repopilot_agents.qa import QAResult, answer_question
-from repopilot_agents.state import Claim as StateClaim
 from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
-from repopilot_agents.types import CodeRef, GraphQueryResult
+from repopilot_agents.types import CodeRef
 from repopilot_agents.verifier.grounding import Claim as QAClaim
 from repopilot_api.access import AccessService, InMemoryAccessService, ProductAccessService
 from repopilot_api.models import (
     BaseTourEvent,
     ChunkPayload,
+    ClaimPayload,
     QAAnswerResponse,
     RepoStatus,
-    TourClaimEvent,
-    TourClaimPayload,
-    TourDiagramEvent,
     TourDoneEvent,
-    TourErrorEvent,
     TourEventType,
     TourFirstImpressionEvent,
-    TourSectionEndEvent,
-    TourSectionStartEvent,
-    TourTokenEvent,
 )
-from repopilot_api.product_db import product_tours
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
@@ -81,29 +73,6 @@ class RepoRecord:
     first_impression: str | None = None
 
 
-@dataclass(slots=True)
-class TourRecord:
-    tour_id: str
-    repo_id: str
-    created_at: datetime
-    intent_profile: IntentProfile
-    snapshot_repo_id: str
-
-
-@dataclass(slots=True)
-class TourSectionData:
-    title: str
-    summary: str
-    claims: list[SectionClaimData]
-    diagram: str | None = None
-
-
-@dataclass(slots=True)
-class SectionClaimData:
-    claim: StateClaim
-    retrieval_path: list[str]
-
-
 class RepoService(Protocol):
     async def enqueue(
         self, repo_url: str, *, provider: LLMProvider | None = None
@@ -114,18 +83,19 @@ class RepoService(Protocol):
     def first_impression_stream(self, repo_id: str) -> AsyncIterator[BaseTourEvent]: ...
 
 
-class TourService(Protocol):
-    async def create(
-        self, repo_id: str, intent_profile: IntentProfile, *, session_id: str | None = None
-    ) -> TourRecord: ...
-
-    async def get(self, tour_id: str) -> TourRecord: ...
-
-    def stream(self, tour_id: str) -> AsyncIterator[BaseTourEvent]: ...
-
+class QAService(Protocol):
     async def ask(
-        self, tour_id: str, question: str, *, provider: LLMProvider | None = None
+        self,
+        repo_id: str,
+        question: str,
+        *,
+        intent_profile: IntentProfile | None = None,
+        provider: LLMProvider | None = None,
     ) -> QAAnswerResponse: ...
+
+    async def draft_intent(
+        self, raw_text: str, *, provider: LLMProvider | None = None
+    ) -> IntentProfile: ...
 
 
 class ChunkService(Protocol):
@@ -133,18 +103,18 @@ class ChunkService(Protocol):
 
 
 class RepoNotReadyError(Exception):
-    """Raised when a tour is requested before a repo has an indexed snapshot."""
+    """Raised when a question is asked before a repo has an indexed snapshot."""
 
     def __init__(self, repo_id: str, status: RepoStatus) -> None:
         self.repo_id = repo_id
         self.status = status
-        super().__init__(f"repo {repo_id!r} is not ready for tours; status={status!r}")
+        super().__init__(f"repo {repo_id!r} is not ready for questions; status={status!r}")
 
 
 @dataclass(slots=True)
 class AppServices:
     repos: RepoService
-    tours: TourService
+    qa: QAService
     chunks: ChunkService
     access: AccessService = field(default_factory=InMemoryAccessService)
 
@@ -438,182 +408,38 @@ class LiveRepoService:
 
 
 @dataclass(slots=True)
-class LiveTourService:
+class LiveQAService:
+    """Answers questions against an indexed repo snapshot, tilted by persona.
+
+    Stateless by design. The old ``LiveTourService`` had to persist a tour row
+    to remember the user's intent between "create" and "ask"; now the persona
+    rides along with every question, so there is nothing to store and nothing
+    to expire.
+    """
+
     runtime: Runtime
     repos: LiveRepoService
-    records: dict[str, TourRecord] = field(default_factory=dict)
 
-    async def create(
-        self, repo_id: str, intent_profile: IntentProfile, *, session_id: str | None = None
-    ) -> TourRecord:
+    async def _snapshot_repo_id(self, repo_id: str) -> str:
         repo = await self.repos.get(repo_id)
-        snapshot_repo_id = repo.indexed_repo_id
-        if snapshot_repo_id is None:
+        if repo.indexed_repo_id is None:
             raise RepoNotReadyError(repo_id, repo.status)
-        record = TourRecord(
-            tour_id=f"tour-{uuid4().hex[:8]}",
-            repo_id=repo_id,
-            created_at=datetime.now(tz=UTC),
-            intent_profile=intent_profile,
-            snapshot_repo_id=snapshot_repo_id,
-        )
-        self.records[record.tour_id] = record
-        if session_id is not None:
-            engine = make_engine(self.runtime.settings)
-            try:
-                async with engine.begin() as conn:
-                    await conn.execute(
-                        insert(product_tours).values(
-                            tour_id=record.tour_id,
-                            session_id=session_id,
-                            repo_id=record.repo_id,
-                            snapshot_repo_id=record.snapshot_repo_id,
-                            intent_profile=record.intent_profile.model_dump(mode="json"),
-                            created_at=record.created_at,
-                        )
-                    )
-            finally:
-                await engine.dispose()
-        return record
+        return repo.indexed_repo_id
 
-    async def get(self, tour_id: str) -> TourRecord:
-        record = self.records.get(tour_id)
-        if record is not None:
-            return record
-        engine = make_engine(self.runtime.settings)
-        try:
-            async with engine.connect() as conn:
-                row = (
-                    await conn.execute(
-                        select(
-                            product_tours.c.tour_id,
-                            product_tours.c.repo_id,
-                            product_tours.c.created_at,
-                            product_tours.c.intent_profile,
-                            product_tours.c.snapshot_repo_id,
-                        ).where(product_tours.c.tour_id == tour_id)
-                    )
-                ).first()
-        finally:
-            await engine.dispose()
-        if row is None:
-            raise KeyError(tour_id)
-        record = TourRecord(
-            tour_id=str(row[0]),
-            repo_id=str(row[1]),
-            created_at=row[2],
-            intent_profile=IntentProfile.model_validate(row[3]),
-            snapshot_repo_id=str(row[4]),
-        )
-        self.records[tour_id] = record
-        return record
-
-    async def _build_sections(self, record: TourRecord) -> list[TourSectionData]:
-        engine = make_engine(self.runtime.settings)
-        try:
-            snapshot = await load_snapshot(engine, record.snapshot_repo_id)
-            # Fetch wider candidate pools so the intent's focus keywords have
-            # something to rank. Hubs stay on pure fan-in (a structural fact);
-            # the "start here" and "reading path" sections are intent-tilted.
-            keywords = record.intent_profile.focus_keywords
-            hubs = await graph_query("hubs", engine=engine, repo_id=snapshot.repo_id, top_n=4)
-            entry_points = await graph_query(
-                "entry_points", engine=engine, repo_id=snapshot.repo_id, top_n=12
-            )
-            layers = await graph_query("layers", engine=engine, repo_id=snapshot.repo_id, top_n=12)
-
-            # Rank a wider set (6) but cap claims at 3: build_claims_for_symbols
-            # drops symbols with no backing chunk, so over-fetching keeps the
-            # section full even when the top-ranked symbols don't resolve.
-            entry_claims = (
-                await build_claims_for_symbols(
-                    engine,
-                    snapshot.repo_id,
-                    [item.symbol for item in _rank_symbols_by_focus(entry_points, keywords, 12)],
-                    note="Identified from graph entry points.",
-                    path=["graph_query:entry_points", "focus_rank", "chunks:symbol_lookup"],
-                )
-            )[:3]
-            hub_claims = await build_claims_for_symbols(
-                engine,
-                snapshot.repo_id,
-                [item.symbol for item in hubs[:3]],
-                note="Identified from graph hubs.",
-                path=["graph_query:hubs", "chunks:symbol_lookup"],
-            )
-            layer_claims = (
-                await build_claims_for_symbols(
-                    engine,
-                    snapshot.repo_id,
-                    [item.symbol for item in _rank_symbols_by_focus(layers, keywords, 12)],
-                    note="Representative symbols from structural layers.",
-                    path=["graph_query:layers", "focus_rank", "chunks:symbol_lookup"],
-                )
-            )[:3]
-        finally:
-            await engine.dispose()
-
-        focus = ", ".join(record.intent_profile.focus_keywords) or "system shape"
-        return [
-            TourSectionData(
-                title="Where To Start",
-                summary=(
-                    f"For your goal around {focus}, the clearest entry points are the outward-facing "
-                    "functions that begin real work in the indexed graph."
-                ),
-                claims=entry_claims,
-            ),
-            TourSectionData(
-                title="Structural Hubs",
-                summary=(
-                    "These symbols attract the highest fan-in, so they’re the places where reading effort "
-                    "compounds fastest."
-                ),
-                claims=hub_claims,
-                diagram=build_mermaid(hubs[:3]),
-            ),
-            TourSectionData(
-                title="Reading Path",
-                summary=(
-                    "This final section gives you a concrete traversal path through representative symbols "
-                    "so the code viewer can stay synchronized with the tour."
-                ),
-                claims=layer_claims,
-            ),
-        ]
-
-    async def _stream_impl(self, tour_id: str) -> AsyncIterator[TourEventType]:
-        record = await self.get(tour_id)
-        try:
-            sections = await self._build_sections(record)
-        except Exception as exc:
-            yield TourErrorEvent(code="TOUR_BUILD_FAILED", message=str(exc))
-            return
-        for order, section in enumerate(sections):
-            yield TourSectionStartEvent(order=order, title=section.title)
-            for sentence in split_sentences(section.summary):
-                yield TourTokenEvent(text=sentence + " ")
-            for idx, claim in enumerate(section.claims):
-                yield TourClaimEvent(
-                    id=f"{tour_id}-section-{order}-claim-{idx}",
-                    text=claim.claim.text,
-                    refs=claim.claim.refs,
-                    status=claim.claim.status,
-                    verifier_note=claim.claim.verifier_note,
-                    retrieval_path=claim.retrieval_path,
-                )
-            if section.diagram is not None:
-                yield TourDiagramEvent(mermaid=section.diagram)
-            yield TourSectionEndEvent(order=order)
-        yield TourDoneEvent()
-
-    def stream(self, tour_id: str) -> AsyncIterator[TourEventType]:
-        return self._stream_impl(tour_id)
+    async def draft_intent(
+        self, raw_text: str, *, provider: LLMProvider | None = None
+    ) -> IntentProfile:
+        return await profile_intent(raw_text, provider=provider or self.runtime.provider)
 
     async def ask(
-        self, tour_id: str, question: str, *, provider: LLMProvider | None = None
+        self,
+        repo_id: str,
+        question: str,
+        *,
+        intent_profile: IntentProfile | None = None,
+        provider: LLMProvider | None = None,
     ) -> QAAnswerResponse:
-        record = await self.get(tour_id)
+        snapshot_repo_id = await self._snapshot_repo_id(repo_id)
         engine = make_engine(self.runtime.settings)
         try:
             try:
@@ -621,24 +447,26 @@ class LiveTourService:
                     question,
                     engine=engine,
                     provider=provider or self.runtime.provider,
-                    repo_id=record.snapshot_repo_id,
+                    repo_id=snapshot_repo_id,
                     use_compress=self.runtime.settings.qa_compress_enabled,
                     retry_429_attempts=self.runtime.settings.qa_llm_max_429_retries,
+                    intent_profile=intent_profile,
                 )
             except Exception as exc:
                 result = await answer_deterministically(
                     engine=engine,
-                    snapshot_repo_id=record.snapshot_repo_id,
+                    snapshot_repo_id=snapshot_repo_id,
                     question=question,
                     fallback_reason=str(exc),
                 )
         finally:
             await engine.dispose()
+        answer_id = uuid4().hex[:8]
         return QAAnswerResponse(
             answer=result.answer,
             claims=[
-                TourClaimPayload(
-                    id=f"{tour_id}-qa-{index}",
+                ClaimPayload(
+                    id=f"qa-{answer_id}-{index}",
                     text=claim.text,
                     refs=claim.refs,
                     status=claim.status,
@@ -692,9 +520,9 @@ async def create_live_services() -> AppServices:
         settings=runtime.settings,
     )
     repos = LiveRepoService(runtime=runtime)
-    tours = LiveTourService(runtime=runtime, repos=repos)
+    qa = LiveQAService(runtime=runtime, repos=repos)
     chunks = LiveChunkService(runtime=runtime, repos=repos)
-    return AppServices(repos=repos, tours=tours, chunks=chunks, access=access)
+    return AppServices(repos=repos, qa=qa, chunks=chunks, access=access)
 
 
 async def close_live_services(services: AppServices) -> None:
@@ -711,149 +539,6 @@ async def close_live_services(services: AppServices) -> None:
             await repo_service.redis.aclose()
         await shutdown_runtime(repo_service.runtime)
     await services.access.aclose()
-
-
-async def load_snapshot(engine: AsyncEngine, snapshot_repo_id: str) -> RepoSnapshot:
-    async with engine.connect() as conn:
-        row = (
-            await conn.execute(
-                select(repos_table.c.id, repos_table.c.url, repos_table.c.head_sha).where(
-                    repos_table.c.id == snapshot_repo_id
-                )
-            )
-        ).first()
-    if row is None:
-        raise KeyError(snapshot_repo_id)
-    return RepoSnapshot(repo_id=str(row[0]), repo_url=str(row[1]), head_sha=str(row[2]))
-
-
-async def build_claims_for_symbols(
-    engine: AsyncEngine,
-    snapshot_repo_id: str,
-    symbols: list[str],
-    *,
-    note: str,
-    path: list[str],
-) -> list[SectionClaimData]:
-    refs = await resolve_symbol_refs(engine, snapshot_repo_id, symbols)
-    chunks = await read_chunks(refs, engine=engine, repo_id=snapshot_repo_id)
-    by_symbol = {chunk.ref.symbol or chunk.ref.file_path: chunk for chunk in chunks}
-    claims: list[SectionClaimData] = []
-    for symbol in symbols:
-        chunk = by_symbol.get(symbol)
-        if chunk is None:
-            continue
-        first_line = chunk.content.strip().splitlines()[0] if chunk.content.strip() else symbol
-        claim = StateClaim(
-            text=(
-                f"`{symbol}` is worth reading early because it anchors a real code path in "
-                f"`{chunk.ref.file_path}` and begins with `{first_line[:72]}`."
-            ),
-            refs=[chunk.ref],
-            status="verified",
-            verifier_note=note,
-        )
-        claims.append(SectionClaimData(claim=claim, retrieval_path=path))
-    return claims
-
-
-async def resolve_symbol_refs(
-    engine: AsyncEngine, snapshot_repo_id: str, symbols: list[str]
-) -> list[CodeRef]:
-    if not symbols:
-        return []
-    async with engine.connect() as conn:
-        rows = (
-            await conn.execute(
-                select(
-                    chunks_table.c.file_path,
-                    chunks_table.c.start_line,
-                    chunks_table.c.end_line,
-                    chunks_table.c.symbol,
-                )
-                .where(
-                    chunks_table.c.repo_id == snapshot_repo_id,
-                    chunks_table.c.symbol.in_(symbols),
-                )
-                .order_by(chunks_table.c.file_path, chunks_table.c.start_line)
-            )
-        ).all()
-    by_symbol: dict[str, CodeRef] = {}
-    for file_path, start_line, end_line, symbol in rows:
-        key = str(symbol)
-        by_symbol.setdefault(
-            key,
-            CodeRef(
-                file_path=str(file_path),
-                start_line=int(start_line),
-                end_line=int(end_line),
-                symbol=key,
-            ),
-        )
-    return [by_symbol[symbol] for symbol in symbols if symbol in by_symbol]
-
-
-def _focus_score(symbol: str, keywords: Sequence[str]) -> int:
-    """How strongly a symbol matches the user's focus keywords.
-
-    The leaf name (e.g. ``connect``) is weighted above the dotted path so a
-    test module named ``test_databases`` doesn't score as "database"-relevant.
-    A 6-char token stem lets "connection" match ``connect``, "pooling" match
-    ``pool``, etc., without a full stemmer.
-    """
-    leaf = symbol.rsplit(".", 1)[-1].lower()
-    haystack = symbol.lower()
-    is_test = "test" in haystack
-    score = 0
-    for keyword in keywords:
-        for token in re.findall(r"[a-z0-9]{4,}", keyword.lower()):
-            stem = token[:6]
-            if stem in leaf:
-                score += 2  # strong: the symbol's own name matches
-            elif stem in haystack and not is_test:
-                score += 1  # weak: only the module/path matches (never test modules)
-    return score
-
-
-def _rank_symbols_by_focus(
-    items: Sequence[GraphQueryResult], keywords: Sequence[str], limit: int
-) -> list[GraphQueryResult]:
-    """Bias graph candidates toward the user's intent: focus-matching symbols
-    lead, with the graph's own ordering as the tiebreaker. When keywords are
-    given, prefer non-test symbols (a "how does X work" intent almost never
-    wants test fixtures) as long as enough non-test candidates exist. No-op
-    when no keywords are given.
-    """
-    if not keywords:
-        return list(items[:limit])
-    # Sort by: focus score (desc), then non-test before test, then graph order.
-    # Soft down-ranking (not exclusion) keeps sections populated even when the
-    # only chunk-backed candidates happen to live in tests.
-    ranked = sorted(
-        enumerate(items),
-        key=lambda pair: (
-            -_focus_score(pair[1].symbol, keywords),
-            "test" in pair[1].symbol.lower(),
-            pair[0],
-        ),
-    )
-    return [item for _, item in ranked[:limit]]
-
-
-def build_mermaid(hubs: Sequence[object]) -> str:
-    lines = ["graph TD"]
-    for index, hub in enumerate(hubs):
-        name = getattr(hub, "symbol", f"hub{index}")
-        node = name.rsplit(".", 1)[-1]
-        lines.append(f'  H{index}["{node}"]')
-        if index > 0:
-            lines.append(f"  H0 --> H{index}")
-    return "\n".join(lines)
-
-
-def split_sentences(text: str) -> list[str]:
-    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", text) if part.strip()]
-    return sentences or [text]
 
 
 def encode_chunk_id(repo_id: str, ref: CodeRef) -> str:
@@ -962,12 +647,11 @@ __all__ = [
     "AppServices",
     "ChunkService",
     "LiveChunkService",
+    "LiveQAService",
     "LiveRepoService",
-    "LiveTourService",
+    "QAService",
     "RepoRecord",
     "RepoService",
-    "TourRecord",
-    "TourService",
     "build_runtime",
     "close_live_services",
     "create_live_services",

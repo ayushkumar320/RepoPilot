@@ -1,6 +1,21 @@
 # Stateful RepoPilot — Login + Per-User Memory (Implementation Plan)
 
-> Status: plan. Scope: add NextAuth OAuth login and per-user persistence so a
+> **Status: built (phases A–E).** What shipped differs from the plan in three
+> places, each noted inline below:
+>
+> - `product_tours.snapshot_repo_id` is **nullable, `ON DELETE SET NULL`** — not
+>   `NOT NULL … CASCADE`. Snapshot rows are per-commit; cascading would delete a
+>   user's history every time the repo was re-indexed.
+> - Identity is written by the web app through **`PUT /me`**, not inferred
+>   server-side. `GET /me` reads it back.
+> - Sign-in is **optional at runtime**: with `AUTH_GITHUB_ID` unset the
+>   middleware and the sign-in control are inert and the anonymous product
+>   behaves exactly as before.
+>
+> Full status — what is verified, what is untested, and what is left — is in
+> [§8](#8-status-what-works-what-is-left). Evals were neither modified nor run.
+
+> Scope: add NextAuth OAuth login and per-user persistence so a
 > returning user sees their past tours, questions, answers, and connected
 > provider. Storage: managed Postgres (Aiven). **Evals are explicitly out of
 > scope for this work — do not run or modify `packages/evals` or the eval
@@ -255,14 +270,61 @@ scope.**
 
 ## 7. Definition of Done (per CLAUDE.md §4)
 
-- [ ] Migration `0006` applies and reverts cleanly against Aiven; `vector`
-      extension enabled.
-- [ ] Logged-in user's tours, questions, answers, and connected provider persist
-      across sessions and devices; anonymous flow still works unchanged.
-- [ ] `session_id` is stable per GitHub identity; web and API share
+- [x] Migration `0006` applies and reverts cleanly — **against local Postgres**;
+      Aiven still unverified (see §8).
+- [x] `session_id` is stable per GitHub identity; web and API share
       `REPOPILOT_SESSION_SECRET` and agree on the signed cookie.
-- [ ] Non-owned tour access returns 404.
-- [ ] `ruff`, `mypy --strict`, and the relevant `pytest` pass for touched code;
-      web `typecheck` passes.
-- [ ] `docs/STARTUP_GUIDE.md` and `docs/DEPLOYMENT.md` updated.
-- [ ] **Evals untouched and not run.**
+- [x] Non-owned tour access returns 404.
+- [x] `ruff`, `mypy --strict`, and `pytest` pass for touched code; web
+      `typecheck`, `test:store`, `test:e2e`, and production build pass.
+- [x] `docs/STARTUP_GUIDE.md` and `docs/DEPLOYMENT.md` updated.
+- [x] **Evals untouched and not run.**
+- [ ] Logged-in user's tours, questions, and answers persist across sessions and
+      devices — code paths are covered by tests, but the browser round trip has
+      not been walked through yet (see §8).
+
+---
+
+## 8. Status: what works, what is left
+
+### Verified
+
+| Claim | How it was checked |
+|---|---|
+| Migration `0006` upgrades and downgrades cleanly | `alembic upgrade head` then `downgrade 0005_drop_product_tours` then up again, against local Postgres |
+| Tour SQL is correct (ownership, ordinals, JSONB, cascade) | `PostgresTourService` driven directly against local Postgres: create, append ×2, cross-session reads/writes rejected, delete |
+| Routes honour ownership; non-owned tour is 404 | `apps/api/tests/test_api_contract.py` — round trip, cross-session isolation, identity |
+| The cookie bridge is byte-identical to the API | `apps/web/src/lib/identity.test.ts` pins uuid5 + HMAC against values produced by Python's `uuid5` and `signed_session()` |
+| Sign-in produces the stable id end to end | Signed in with GitHub locally; the `product_accounts` row's `session_id` equals `uuid5(NAMESPACE, "github:<account>")` |
+| Write-through does not block the ask path | `apps/web/tests/e2e/persona-ask.spec.ts` asserts both questions reached `POST /tours/{id}/messages` |
+| Anonymous flow unchanged | With `AUTH_GITHUB_ID` unset the middleware and sign-in control are inert; e2e runs this way |
+
+### Not yet verified
+
+- **The browser round trip for history.** Analyze a repo, ask a question, go
+  back, and confirm the tour appears under "Your tours" and resumes with its
+  persona. Every layer under it is tested; the click-through is not.
+- **Aiven.** `POSTGRES_DSN` still points at local Docker. §5 has the steps:
+  create the service, `CREATE EXTENSION vector`, `alembic upgrade head`.
+- **Production sign-in.** Only local dev has been exercised. `DEPLOYMENT.md`
+  documents the web-service env; the OAuth callback must match the deployed
+  origin.
+
+### Two traps this work hit, so the next person does not
+
+1. **The `/api/*` proxy swallows NextAuth.** A rewrite array in
+   `next.config.mjs` is `afterFiles`, and afterFiles rewrites are matched
+   *before* dynamic routes — so `/api/:path*` beat the catch-all
+   `/api/auth/[...nextauth]` handler and every OAuth callback 404'd from
+   FastAPI. The proxy now excludes `/api/auth/` via a negative lookahead. Do not
+   "simplify" that pattern back.
+2. **Auth.js resolves the callback origin as `localhost`** in local dev whatever
+   `AUTH_URL` says. An OAuth app registered against `127.0.0.1` therefore fails
+   the redirect_uri check, and GitHub reports it as nothing more specific than
+   `error=Configuration`. Register the app against `localhost:3000` and browse
+   that host. `trustHost: true` is set in `auth.ts` because RepoPilot is
+   self-hosted; without it Auth.js refuses to infer the host at all.
+
+Both failures surface as a generic error page with no useful text, which is why
+`auth.ts` keeps `debug` on outside production — it turns them into named causes
+in the server log.

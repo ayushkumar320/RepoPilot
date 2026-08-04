@@ -627,6 +627,23 @@ The invariant this buys: an open-source contributor and a competitive analyst as
 
 Presets live in [`apps/web/src/lib/personas.ts`](../apps/web/src/lib/personas.ts) as data. Free-text personas go through `POST /intent` → `intent.profiler.profile_intent`, which never raises: on any failure it degrades to an `IntentProfile` carrying only `raw_text`.
 
+### Saved tours (history, not a control-flow entity)
+
+`product_tours` is back — as a **record of what was asked**, not as the old create-then-start state machine. It changes nothing about how a question is answered: the persona still travels with every `/ask`, and a tour row is written after the fact.
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /tours` | Start a history entry (`repo_id` + `IntentProfile`). |
+| `GET /tours` | The caller's tours, newest first. |
+| `GET /tours/{tour_id}` | Tour plus ordered messages, for resume. |
+| `POST /tours/{tour_id}/messages` | Append one answered question. |
+| `DELETE /tours/{tour_id}` | Owner-only hard delete (messages cascade). |
+| `GET` / `PUT /me` | Read / record the identity behind this session. |
+
+Ownership is the entire authorization story: every query filters on the `session_id` resolved from the signed cookie, and a tour you do not own returns **404, never 403** — a 403 would confirm the id exists. Writes are best-effort from the UI: if `POST /tours` or a message append fails, the session continues unsaved rather than failing the ask.
+
+Sign-in ([`apps/web/src/auth.ts`](../apps/web/src/auth.ts), GitHub + JWT, no database adapter) adds no new auth channel to the API. It makes the *existing* `session_id` stable — `uuidv5(NAMESPACE, "github:" + providerAccountId)` — and writes it into the same HMAC-signed `repopilot_session` cookie the API already verifies ([`apps/web/src/middleware.ts`](../apps/web/src/middleware.ts)). Web and API must share `REPOPILOT_SESSION_SECRET`; a mismatch degrades silently to anonymous sessions, which is why [`identity.test.ts`](../apps/web/src/lib/identity.test.ts) pins both the uuid5 and HMAC outputs against the Python originals.
+
 ---
 
 ## How the intent profile flows through the system

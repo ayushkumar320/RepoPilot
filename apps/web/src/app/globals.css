@@ -1683,3 +1683,69 @@ input:focus-visible {
   font-size: 0.8rem;
   line-height: 1.55;
 }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-name {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.tour-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 24px;
+}
+
+.tour-history ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tour-history li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tour-history li > button:first-child {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tour-history li > button:first-child:hover {
+  border-color: var(--text-tertiary);
+}
+
+.tour-history strong {
+  font-size: 0.85rem;
+}
+
+.tour-history small {
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+}

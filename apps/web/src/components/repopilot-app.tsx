@@ -14,6 +14,8 @@ import {
   MagnifyingGlass,
   PaperPlaneTilt,
   ShieldCheck,
+  SignOut,
+  Trash,
   UserFocus,
   WarningCircle,
   X,
@@ -28,6 +30,7 @@ import {
   type IntentProfile,
   type RepoEvent,
   type RepoStatus,
+  type TourSummary,
 } from "@/lib/api/generated";
 import {
   CUSTOM_PERSONA_ID,
@@ -39,6 +42,7 @@ import {
   appendExchange,
   applyFirstImpression,
   applyRepoStatus,
+  hydrateFromTour,
   hydrateViewer,
   initialSessionState,
   personaLabel,
@@ -285,7 +289,26 @@ function ProviderDialog({
   );
 }
 
-export default function RepoPilotApp() {
+export interface Viewer {
+  providerAccountId: string;
+  name: string | null;
+  email: string | null;
+  image: string | null;
+}
+
+export interface RepoPilotAppProps {
+  authEnabled?: boolean;
+  signInAction?: () => Promise<void>;
+  signOutAction?: () => Promise<void>;
+  viewer?: Viewer | null;
+}
+
+export default function RepoPilotApp({
+  authEnabled = false,
+  signInAction,
+  signOutAction,
+  viewer = null,
+}: RepoPilotAppProps = {}) {
   const [repoUrl, setRepoUrl] = useState("https://github.com/pallets/flask");
   const [repoId, setRepoId] = useState<string>();
   const [personaId, setPersonaId] = useState<string>(PERSONAS[0].id);
@@ -302,6 +325,8 @@ export default function RepoPilotApp() {
   const [providerSaving, setProviderSaving] = useState(false);
   const [providerError, setProviderError] = useState<string | null>(null);
   const [store, setStore] = useState<SessionState>(initialSessionState);
+  const [tours, setTours] = useState<TourSummary[]>([]);
+  const [tourId, setTourId] = useState<string>();
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
 
   const isCustom = personaId === CUSTOM_PERSONA_ID;
@@ -329,6 +354,31 @@ export default function RepoPilotApp() {
         setErrorMessage("Could not load the free usage allowance.");
       });
   }, []);
+
+  // Label the session with who owns it, then load their history. Anonymous
+  // visitors skip the label but still get their own (cookie-scoped) tours.
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      if (viewer) {
+        await api
+          .saveIdentity({
+            provider: "github",
+            provider_account_id: viewer.providerAccountId,
+            display_name: viewer.name,
+            email: viewer.email,
+            avatar_url: viewer.image,
+          })
+          .catch(() => undefined);
+      }
+      const listed = await api.listTours().catch(() => [] as TourSummary[]);
+      if (active) setTours(listed);
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [viewer]);
 
   // Deep link: ?repo=<id>&persona=<id> reopens a repo with the same lens.
   useEffect(() => {
@@ -428,12 +478,22 @@ export default function RepoPilotApp() {
     setBusy(true);
     setErrorMessage(null);
     setRepoId(undefined);
+    setTourId(undefined);
     setStore(initialSessionState);
     try {
       if (isCustom) await structureCustomPersona();
       const created = await api.createRepo(repoUrl.trim());
       setUsage(await api.getAccountUsage());
       setRepoId(created.repo_id);
+      // History is a convenience, not part of the analyze path: if the tour
+      // cannot be recorded the session still works, just unsaved.
+      void api
+        .createTour(created.repo_id, profile, repositoryName(repoUrl))
+        .then(async ({ tour_id }) => {
+          setTourId(tour_id);
+          setTours(await api.listTours());
+        })
+        .catch(() => undefined);
       setStore((current) =>
         applyRepoStatus(current, {
           status: created.status,
@@ -476,6 +536,16 @@ export default function RepoPilotApp() {
         }),
       );
       setAskPrompt("");
+      if (tourId) {
+        void api
+          .appendTourMessage(tourId, {
+            question,
+            answer: answer.answer,
+            claims: answer.claims,
+            persona_label: personaLabel(profile),
+          })
+          .catch(() => undefined);
+      }
     } catch (error) {
       if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
         setProviderDialogOpen(true);
@@ -483,6 +553,42 @@ export default function RepoPilotApp() {
       setErrorMessage(error instanceof Error ? error.message : "Unable to query this snapshot.");
     } finally {
       setAsking(false);
+    }
+  };
+
+  const resumeTour = async (id: string) => {
+    setErrorMessage(null);
+    try {
+      const tour = await api.getTour(id);
+      const preset = tour.intent_profile
+        ? PERSONAS.find((persona) => persona.profile.raw_text === tour.intent_profile?.raw_text)
+        : undefined;
+      if (preset) {
+        setPersonaId(preset.id);
+        setCustomProfile(null);
+        setCustomText("");
+      } else if (tour.intent_profile) {
+        setPersonaId(CUSTOM_PERSONA_ID);
+        setCustomProfile(tour.intent_profile);
+        setCustomText(tour.intent_profile.raw_text);
+      }
+      setTourId(tour.tour_id);
+      setRepoId(tour.repo_id);
+      setRepoUrl(`https://github.com/${decodeURIComponent(tour.repo_id)}`);
+      setStore(hydrateFromTour(tour));
+      window.history.replaceState(null, "", `/?repo=${encodeURIComponent(tour.repo_id)}`);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not reopen this tour.");
+    }
+  };
+
+  const removeTour = async (id: string) => {
+    try {
+      await api.deleteTour(id);
+      setTours((current) => current.filter((tour) => tour.tour_id !== id));
+      if (tourId === id) setTourId(undefined);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not delete this tour.");
     }
   };
 
@@ -595,22 +701,42 @@ export default function RepoPilotApp() {
           </span>
           <span>RepoPilot</span>
         </a>
-        <button
-          className="usage-control"
-          type="button"
-          onClick={() => setProviderDialogOpen(true)}
-        >
-          <LockKey
-            size={17}
-            weight={usage?.provider_connected ? "fill" : "regular"}
-            aria-hidden="true"
-          />
-          <span>
-            {usage?.provider_connected
-              ? "Your provider is connected"
-              : `${usage?.free_questions_remaining ?? 5} free questions`}
-          </span>
-        </button>
+        <div className="header-controls">
+          <button
+            className="usage-control"
+            type="button"
+            onClick={() => setProviderDialogOpen(true)}
+          >
+            <LockKey
+              size={17}
+              weight={usage?.provider_connected ? "fill" : "regular"}
+              aria-hidden="true"
+            />
+            <span>
+              {usage?.provider_connected
+                ? "Your provider is connected"
+                : `${usage?.free_questions_remaining ?? 5} free questions`}
+            </span>
+          </button>
+          {authEnabled ? (
+            viewer ? (
+              <form action={signOutAction} className="account-control">
+                <span className="account-name">{viewer.name ?? "Signed in"}</span>
+                <button className="usage-control" type="submit">
+                  <SignOut size={17} aria-hidden="true" />
+                  <span>Sign out</span>
+                </button>
+              </form>
+            ) : (
+              <form action={signInAction}>
+                <button className="usage-control" type="submit">
+                  <GithubLogo size={17} aria-hidden="true" />
+                  <span>Sign in with GitHub</span>
+                </button>
+              </form>
+            )
+          ) : null}
+        </div>
       </header>
 
       {!inWorkspace ? (
@@ -649,6 +775,33 @@ export default function RepoPilotApp() {
                 </div>
               </div>
             </div>
+
+            {tours.length > 0 ? (
+              <div className="tour-history" aria-label="Your tours">
+                <span className="section-kicker">Your tours</span>
+                <ul>
+                  {tours.map((tour) => (
+                    <li key={tour.tour_id}>
+                      <button type="button" onClick={() => void resumeTour(tour.tour_id)}>
+                        <strong>{tour.title || decodeURIComponent(tour.repo_id)}</strong>
+                        <small>
+                          {tour.message_count} question{tour.message_count === 1 ? "" : "s"} ·{" "}
+                          {new Date(tour.updated_at).toLocaleDateString()}
+                        </small>
+                      </button>
+                      <button
+                        className="icon-button"
+                        type="button"
+                        onClick={() => void removeTour(tour.tour_id)}
+                        aria-label={`Delete tour for ${decodeURIComponent(tour.repo_id)}`}
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             <p className="scope-note">
               Supports Python, TypeScript, JavaScript, Java, Go, Rust, C-family languages, Ruby,
@@ -764,8 +917,10 @@ export default function RepoPilotApp() {
                 type="button"
                 onClick={() => {
                   setRepoId(undefined);
+                  setTourId(undefined);
                   setStore(initialSessionState);
                   window.history.replaceState(null, "", "/");
+                  void api.listTours().then(setTours).catch(() => undefined);
                 }}
                 aria-label="Back to repository setup"
               >

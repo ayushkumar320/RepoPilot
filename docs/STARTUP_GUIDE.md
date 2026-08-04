@@ -85,6 +85,39 @@ REDIS_URL=redis://localhost:6379/0
 REPOPILOT_WEB_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
 ```
 
+### Optional: GitHub sign-in and saved tours
+
+Sign-in is off unless you configure it, and the app works fully without it —
+anonymous sessions keep their own tours via the same cookie. Turning it on
+makes a reader's history follow their GitHub account across devices.
+
+Next.js reads its own environment, so these go in `apps/web/.env.local` (not
+the root `.env`):
+
+```bash
+AUTH_SECRET=<openssl rand -hex 32>
+AUTH_GITHUB_ID=<oauth app client id>
+AUTH_GITHUB_SECRET=<oauth app client secret>
+NEXTAUTH_URL=http://localhost:3000
+AUTH_URL=http://localhost:3000
+AUTH_TRUST_HOST=true
+# Must be byte-identical to REPOPILOT_SESSION_SECRET in the root .env.
+REPOPILOT_SESSION_SECRET=repopilot-development-session-secret
+```
+
+Create the OAuth app at <https://github.com/settings/developers> with callback
+URL `http://localhost:3000/api/auth/callback/github`.
+
+Use `localhost`, not `127.0.0.1`. Auth.js derives the callback origin as
+`localhost` in local dev whatever `AUTH_URL` says, so an OAuth app registered
+against `127.0.0.1` fails the redirect_uri check — GitHub reports that back as
+nothing more specific than `error=Configuration`.
+
+`REPOPILOT_SESSION_SECRET` is the whole handshake: the web app signs the
+stable session id with it and the API verifies that signature. If the two
+values differ, sign-in appears to work but the API silently treats every
+request as a fresh anonymous session and no history is found.
+
 ## 3. Start Local Services
 
 ```bash

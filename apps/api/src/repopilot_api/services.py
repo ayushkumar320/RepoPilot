@@ -36,6 +36,7 @@ from repopilot_api.models import (
     TourEventType,
     TourFirstImpressionEvent,
 )
+from repopilot_api.tours import InMemoryTourService, PostgresTourService, TourService
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
@@ -117,6 +118,7 @@ class AppServices:
     qa: QAService
     chunks: ChunkService
     access: AccessService = field(default_factory=InMemoryAccessService)
+    tours: TourService = field(default_factory=InMemoryTourService)
 
 
 @dataclass(slots=True)
@@ -515,14 +517,14 @@ class LiveChunkService:
 
 async def create_live_services() -> AppServices:
     runtime = await build_runtime()
-    access = ProductAccessService(
-        engine=make_engine(runtime.settings),
-        settings=runtime.settings,
-    )
+    # One product engine shared by access and tours; `access.aclose()` disposes it.
+    product_engine = make_engine(runtime.settings)
+    access = ProductAccessService(engine=product_engine, settings=runtime.settings)
+    tours = PostgresTourService(engine=product_engine)
     repos = LiveRepoService(runtime=runtime)
     qa = LiveQAService(runtime=runtime, repos=repos)
     chunks = LiveChunkService(runtime=runtime, repos=repos)
-    return AppServices(repos=repos, qa=qa, chunks=chunks, access=access)
+    return AppServices(repos=repos, qa=qa, chunks=chunks, access=access, tours=tours)
 
 
 async def close_live_services(services: AppServices) -> None:

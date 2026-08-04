@@ -19,15 +19,25 @@ from repopilot_agents.state import IntentProfile
 from repopilot_api.access import AccountUsage, AllowanceExceededError
 from repopilot_api.models import (
     AccountUsageResponse,
+    AppendTourMessageRequest,
+    AppendTourMessageResponse,
     AskRequest,
     BaseTourEvent,
     ChunkPayload,
+    ClaimPayload,
     CreateRepoRequest,
     CreateRepoResponse,
+    CreateTourRequest,
+    CreateTourResponse,
+    IdentityRequest,
+    IdentityResponse,
     IntentDraftRequest,
     ProviderCredentialsRequest,
     QAAnswerResponse,
     RepoStatusResponse,
+    TourDetailResponse,
+    TourMessagePayload,
+    TourSummaryResponse,
 )
 from repopilot_api.services import (
     AppServices,
@@ -37,6 +47,7 @@ from repopilot_api.services import (
     repo_slug,
 )
 from repopilot_api.sse import with_heartbeats
+from repopilot_api.tours import Identity
 from repopilot_core.logging import configure_logging
 from repopilot_core.settings import get_settings
 
@@ -285,6 +296,152 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             ) from exc
         await get_services().access.complete(reservation)
         return answer
+
+    @app.get("/me", response_model=IdentityResponse)
+    async def read_identity(session_id: str = Depends(resolve_session)) -> IdentityResponse:
+        identity = await get_services().tours.identity(session_id)
+        return IdentityResponse(
+            session_id=identity.session_id,
+            authenticated=identity.provider is not None,
+            provider=identity.provider,
+            provider_account_id=identity.provider_account_id,
+            display_name=identity.display_name,
+            email=identity.email,
+            avatar_url=identity.avatar_url,
+        )
+
+    @app.put("/me", response_model=IdentityResponse)
+    async def write_identity(
+        request: IdentityRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> IdentityResponse:
+        """Record who this session belongs to after the web app signs them in.
+
+        The claim is only as trustworthy as the signed cookie that carries it,
+        which is exactly the trust level the rest of the product already runs
+        on: the cookie *is* the identity, and this just labels it for display.
+        """
+        identity = await get_services().tours.set_identity(
+            session_id,
+            Identity(
+                session_id=session_id,
+                provider=request.provider,
+                provider_account_id=request.provider_account_id,
+                display_name=request.display_name,
+                email=request.email,
+                avatar_url=request.avatar_url,
+            ),
+        )
+        return IdentityResponse(
+            session_id=identity.session_id,
+            authenticated=True,
+            provider=identity.provider,
+            provider_account_id=identity.provider_account_id,
+            display_name=identity.display_name,
+            email=identity.email,
+            avatar_url=identity.avatar_url,
+        )
+
+    @app.post("/tours", response_model=CreateTourResponse, status_code=201)
+    async def create_tour(
+        request: CreateTourRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> CreateTourResponse:
+        snapshot_repo_id: str | None = None
+        try:
+            snapshot_repo_id = (await get_services().repos.get(request.repo_id)).indexed_repo_id
+        except KeyError:
+            # A tour may be started before indexing finishes; the snapshot id is
+            # a convenience, not the identity of the tour.
+            snapshot_repo_id = None
+        tour_id = await get_services().tours.create_tour(
+            session_id,
+            repo_id=request.repo_id,
+            snapshot_repo_id=snapshot_repo_id,
+            intent_profile=(
+                None if request.intent_profile is None else request.intent_profile.model_dump()
+            ),
+            title=request.title,
+        )
+        return CreateTourResponse(tour_id=tour_id)
+
+    @app.get("/tours", response_model=list[TourSummaryResponse])
+    async def list_tours(
+        session_id: str = Depends(resolve_session),
+    ) -> list[TourSummaryResponse]:
+        return [
+            TourSummaryResponse(
+                tour_id=tour.tour_id,
+                repo_id=tour.repo_id,
+                title=tour.title,
+                created_at=tour.created_at,
+                updated_at=tour.updated_at,
+                message_count=tour.message_count,
+            )
+            for tour in await get_services().tours.list_tours(session_id)
+        ]
+
+    @app.get("/tours/{tour_id}", response_model=TourDetailResponse)
+    async def get_tour(
+        tour_id: str,
+        session_id: str = Depends(resolve_session),
+    ) -> TourDetailResponse:
+        tour = await get_services().tours.get_tour(session_id, tour_id)
+        if tour is None:
+            raise HTTPException(status_code=404, detail="tour not found")
+        return TourDetailResponse(
+            tour_id=tour.tour_id,
+            repo_id=tour.repo_id,
+            snapshot_repo_id=tour.snapshot_repo_id,
+            title=tour.title,
+            intent_profile=(
+                IntentProfile.model_validate(tour.intent_profile) if tour.intent_profile else None
+            ),
+            created_at=tour.created_at,
+            updated_at=tour.updated_at,
+            message_count=len(tour.messages),
+            messages=[
+                TourMessagePayload(
+                    ordinal=message.ordinal,
+                    question=message.question,
+                    answer=message.answer,
+                    claims=[ClaimPayload.model_validate(claim) for claim in message.claims],
+                    persona_label=message.persona_label,
+                )
+                for message in tour.messages
+            ],
+        )
+
+    @app.post(
+        "/tours/{tour_id}/messages",
+        response_model=AppendTourMessageResponse,
+        status_code=201,
+    )
+    async def append_tour_message(
+        tour_id: str,
+        request: AppendTourMessageRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> AppendTourMessageResponse:
+        ordinal = await get_services().tours.append_message(
+            session_id,
+            tour_id,
+            question=request.question,
+            answer=request.answer,
+            claims=[claim.model_dump() for claim in request.claims],
+            persona_label=request.persona_label,
+        )
+        if ordinal is None:
+            raise HTTPException(status_code=404, detail="tour not found")
+        return AppendTourMessageResponse(ordinal=ordinal)
+
+    @app.delete("/tours/{tour_id}", status_code=204)
+    async def delete_tour(
+        tour_id: str,
+        session_id: str = Depends(resolve_session),
+    ) -> Response:
+        if not await get_services().tours.delete_tour(session_id, tour_id):
+            raise HTTPException(status_code=404, detail="tour not found")
+        return Response(status_code=204)
 
     @app.get("/chunks/{chunk_id:path}", response_model=ChunkPayload)
     async def get_chunk(chunk_id: str) -> ChunkPayload:

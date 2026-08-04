@@ -201,15 +201,95 @@ async def test_get_repo_status_returns_expected_shape(api_client: AsyncClient) -
 
 
 @pytest.mark.asyncio
-async def test_no_tour_endpoints_remain(api_client: AsyncClient) -> None:
-    """The create-then-start flow is gone; nothing should answer on /tours."""
-    create = await api_client.post("/tours", json={"repo_id": "repo-123"})
+async def test_old_tour_flow_endpoints_remain_gone(api_client: AsyncClient) -> None:
+    """/tours is history now: the create-then-stream-then-ask flow stays dead."""
     stream = await api_client.get("/tours/tour-123/stream")
     ask = await api_client.post("/tours/tour-123/ask", json={"question": "hi"})
 
-    assert create.status_code == 404
     assert stream.status_code == 404
     assert ask.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_tour_round_trips_questions_and_answers(api_client: AsyncClient) -> None:
+    created = await api_client.post(
+        "/tours",
+        json={"repo_id": "repo-123", "intent_profile": CONTRIBUTOR_PROFILE, "title": "flask"},
+    )
+    assert created.status_code == 201
+    tour_id = created.json()["tour_id"]
+
+    appended = await api_client.post(
+        f"/tours/{tour_id}/messages",
+        json={
+            "question": "Where do requests enter?",
+            "answer": "Through `Flask.wsgi_app`.",
+            "claims": [],
+            "persona_label": "a first-time outside contributor",
+        },
+    )
+    assert appended.status_code == 201
+    assert appended.json() == {"ordinal": 0}
+
+    listed = await api_client.get("/tours")
+    assert listed.status_code == 200
+    assert [(tour["tour_id"], tour["message_count"]) for tour in listed.json()] == [(tour_id, 1)]
+
+    detail = await api_client.get(f"/tours/{tour_id}")
+    assert detail.status_code == 200
+    payload = detail.json()
+    assert payload["repo_id"] == "repo-123"
+    assert payload["snapshot_repo_id"] == "repo-123@abc"
+    assert payload["intent_profile"]["audience_framing"] == "a first-time outside contributor"
+    assert [message["question"] for message in payload["messages"]] == ["Where do requests enter?"]
+
+    deleted = await api_client.delete(f"/tours/{tour_id}")
+    assert deleted.status_code == 204
+    assert (await api_client.get(f"/tours/{tour_id}")).status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_tour_of_another_session_is_not_found(app_services: AppServices) -> None:
+    """A tour you do not own must read as absent — 404, never 403."""
+    app = create_app(services=app_services)
+    transport = ASGITransport(app=app)
+    async with (
+        AsyncClient(transport=transport, base_url="http://testserver") as owner,
+        AsyncClient(transport=transport, base_url="http://testserver") as stranger,
+    ):
+        tour_id = (await owner.post("/tours", json={"repo_id": "repo-123"})).json()["tour_id"]
+
+        assert (await stranger.get(f"/tours/{tour_id}")).status_code == 404
+        assert (await stranger.delete(f"/tours/{tour_id}")).status_code == 404
+        assert (
+            await stranger.post(
+                f"/tours/{tour_id}/messages",
+                json={"question": "q", "answer": "a", "persona_label": "p"},
+            )
+        ).status_code == 404
+        assert (await stranger.get("/tours")).json() == []
+        assert (await owner.get(f"/tours/{tour_id}")).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_me_reports_anonymous_until_identity_is_written(api_client: AsyncClient) -> None:
+    anonymous = await api_client.get("/me")
+    assert anonymous.status_code == 200
+    assert anonymous.json()["authenticated"] is False
+
+    written = await api_client.put(
+        "/me",
+        json={
+            "provider": "github",
+            "provider_account_id": "4242",
+            "display_name": "Ada",
+            "avatar_url": "https://avatars.githubusercontent.com/u/4242",
+        },
+    )
+    assert written.status_code == 200
+    assert written.json()["display_name"] == "Ada"
+
+    assert (await api_client.get("/me")).json() == written.json()
 
 
 @pytest.mark.asyncio

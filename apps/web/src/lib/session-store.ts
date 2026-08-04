@@ -5,6 +5,7 @@ import type {
   FirstImpressionEvent,
   IntentProfile,
   RepoStatusResponse,
+  TourMessage,
 } from "./api/generated.ts";
 
 export interface StoredClaim extends ClaimPayload {
@@ -100,6 +101,24 @@ export function appendExchange(
   // lands on evidence rather than on whatever they last clicked.
   const firstClaimId = claimIds[0];
   return firstClaimId ? selectClaim(next, firstClaimId) : next;
+}
+
+/** Replay a persisted tour's exchanges into a fresh session state. */
+export function hydrateFromTour(
+  tour: { repo_id: string; messages: TourMessage[] },
+  firstImpression = "",
+): SessionState {
+  return tour.messages.reduce<SessionState>(
+    (state, message) =>
+      appendExchange(state, {
+        question: message.question,
+        answer: message.answer,
+        claims: message.claims,
+        personaLabel: message.persona_label,
+        repoId: tour.repo_id,
+      }),
+    { ...initialSessionState, firstImpression },
+  );
 }
 
 export function selectClaim(state: SessionState, claimId: string): SessionState {

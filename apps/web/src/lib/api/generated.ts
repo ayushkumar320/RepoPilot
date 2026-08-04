@@ -101,6 +101,39 @@ export interface ErrorEvent {
 
 export type RepoEvent = FirstImpressionEvent | DoneEvent | ErrorEvent;
 
+export interface Identity {
+  session_id: string;
+  authenticated: boolean;
+  provider?: string | null;
+  provider_account_id?: string | null;
+  display_name?: string | null;
+  email?: string | null;
+  avatar_url?: string | null;
+}
+
+export interface TourSummary {
+  tour_id: string;
+  repo_id: string;
+  title?: string | null;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+}
+
+export interface TourMessage {
+  ordinal: number;
+  question: string;
+  answer: string;
+  claims: ClaimPayload[];
+  persona_label: string;
+}
+
+export interface TourDetail extends TourSummary {
+  snapshot_repo_id?: string | null;
+  intent_profile?: IntentProfile | null;
+  messages: TourMessage[];
+}
+
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
 
@@ -157,6 +190,7 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new ApiError(message, response.status, code);
   }
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 
@@ -205,6 +239,55 @@ export const api = {
   },
   getChunk(chunkId: string): Promise<ChunkPayload> {
     return http(`/chunks/${encodeURIComponent(chunkId)}`);
+  },
+  getIdentity(): Promise<Identity> {
+    return http("/me");
+  },
+  saveIdentity(identity: {
+    provider: string;
+    provider_account_id: string;
+    display_name?: string | null;
+    email?: string | null;
+    avatar_url?: string | null;
+  }): Promise<Identity> {
+    return http("/me", { method: "PUT", body: JSON.stringify(identity) });
+  },
+  createTour(
+    repoId: string,
+    intentProfile: IntentProfile | null,
+    title?: string,
+  ): Promise<{ tour_id: string }> {
+    return http("/tours", {
+      method: "POST",
+      body: JSON.stringify({
+        repo_id: repoId,
+        intent_profile: intentProfile,
+        title: title ?? null,
+      }),
+    });
+  },
+  listTours(): Promise<TourSummary[]> {
+    return http("/tours");
+  },
+  getTour(tourId: string): Promise<TourDetail> {
+    return http(`/tours/${encodeURIComponent(tourId)}`);
+  },
+  appendTourMessage(
+    tourId: string,
+    message: {
+      question: string;
+      answer: string;
+      claims: ClaimPayload[];
+      persona_label: string;
+    },
+  ): Promise<{ ordinal: number }> {
+    return http(`/tours/${encodeURIComponent(tourId)}/messages`, {
+      method: "POST",
+      body: JSON.stringify(message),
+    });
+  },
+  deleteTour(tourId: string): Promise<void> {
+    return http(`/tours/${encodeURIComponent(tourId)}`, { method: "DELETE" });
   },
   firstImpressionUrl(repoId: string): string {
     return `${API_BASE}/repos/${repoId}/first-impression`;

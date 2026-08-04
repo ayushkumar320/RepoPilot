@@ -90,6 +90,11 @@ async def bench_repo(
         llm_policy_kwargs["use_query_understanding"] = True
     else:
         llm_policy_kwargs["use_query_understanding"] = False
+    # Phase 5's arm asks for compression, but ``Settings.compress_enabled`` is
+    # off by default since 2026-08-04 (measured +5.6% vs the -40% gate), so
+    # this is a no-op unless that flag is flipped back on. Kept as the arm's
+    # honest definition rather than deleted: a phase-5 re-run must opt in
+    # deliberately instead of silently measuring an uncompressed pipeline.
     if phase >= 5:
         llm_policy_kwargs["use_compress"] = True
     else:

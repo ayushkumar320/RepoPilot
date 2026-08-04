@@ -16,6 +16,7 @@ from repopilot_agents.qa import graph as qa_graph
 from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, answer_question
 from repopilot_agents.qa.query_spec import fallback_query_spec
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef, Path
+from repopilot_core.settings import get_settings
 
 
 def _ref(symbol: str, line: int = 1) -> CodeRef:
@@ -263,6 +264,42 @@ async def test_empty_graph_expansion_stops_without_repeating(
 
 
 @pytest.mark.asyncio
+@pytest.mark.asyncio
+async def test_compression_is_off_by_default_even_when_requested(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """P2: ``use_compress=True`` alone must not compress while the flag is off.
+
+    Phase 5 measured +5.6% token reduction against a -40% gate, so the default
+    is off and ``compress_enabled`` is the single authority. A caller asking
+    for compression gets none, and the retrieval path says so by omission.
+    """
+    called = False
+
+    async def fake_compress_chunks(question: str, chunks: Any, **kw: Any) -> list[ChunkContent]:
+        nonlocal called
+        called = True
+        return list(chunks)
+
+    monkeypatch.setattr(qa_graph, "compress_chunks", fake_compress_chunks)
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one.",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        use_compress=True,
+    )
+    assert not called, "compression ran despite compress_enabled being off"
+    assert not any(step.startswith("compress:") for step in result.retrieval_path)
+
+
+@pytest.mark.asyncio
 async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_compress_chunks(question: str, chunks: Any, **kw: Any) -> list[ChunkContent]:
         return [
@@ -273,6 +310,15 @@ async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.Mon
         ]
 
     monkeypatch.setattr(qa_graph, "compress_chunks", fake_compress_chunks)
+    # ``compress_enabled`` defaults to off (Phase 5 measured +5.6% against a
+    # -40% gate), so this test states the flag it exercises instead of
+    # inheriting it -- otherwise flipping the default silently guts the test.
+    base = get_settings()
+    monkeypatch.setattr(
+        qa_graph,
+        "get_settings",
+        lambda: base.model_copy(update={"compress_enabled": True}),
+    )
     provider = _ScriptedProvider(
         [
             '{"decision":"sufficient","reason":"enough","next_symbol":""}',

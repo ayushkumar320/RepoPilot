@@ -114,7 +114,14 @@ class Settings(BaseSettings):
     rerank_lambda: float = 0.9
 
     # ── Context compression (RAG Phase 5) ───────────────────────────────────
-    compress_enabled: bool = True
+    # Off by default. Measured on fastapi 2026-08-04: +5.6% input-token
+    # reduction against Phase 5's -40% gate, at multiple seconds per question.
+    # The failure is not the documented 413 (zero payload errors observed) --
+    # the model simply returns no usable keep-ranges for most chunks, so
+    # ``compress_chunk`` hands back the original untouched. Code and the
+    # ``use_compress`` kwarg are retained so this can be re-measured after
+    # prompt or chunk-splitting work; flip this to re-enable.
+    compress_enabled: bool = False
     compress_min_chunk_lines: int = 15
 
     # ── Query understanding (RAG Phase 2) ───────────────────────────────────
@@ -123,8 +130,9 @@ class Settings(BaseSettings):
 
     # ── Interactive Q&A ─────────────────────────────────────────────────────
     # UI asks should fail over quickly instead of spending a click-and-wait path
-    # on the long retry budget used by indexing/evals. Compression is still
-    # available to offline callers via ``answer_question(..., use_compress=True)``.
+    # on the long retry budget used by indexing/evals. Compression is gated by
+    # ``compress_enabled`` above (now off), so this flag is belt-and-braces:
+    # ``use_compress=True`` alone no longer enables compression for any caller.
     qa_llm_max_429_retries: int = 2
     qa_compress_enabled: bool = False
 

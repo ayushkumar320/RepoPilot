@@ -27,8 +27,10 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from collections.abc import Sequence
-from dataclasses import dataclass
+import time
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
+from dataclasses import dataclass, field
 
 import structlog
 from pydantic import BaseModel, Field
@@ -88,6 +90,25 @@ class QAResult(BaseModel):
     hops: int = 0
     retrieval_path: list[str] = Field(default_factory=list)
     answer_input_tokens: int = 0
+    # Wall-clock ms per pipeline stage (see STAGES). Loop stages accumulate
+    # across hops. The latency eval aggregates these into per-stage p50/p95;
+    # without them a p95 regression tells you only *that* the budget slipped,
+    # never *which* stage ate it.
+    stage_timings_ms: dict[str, float] = Field(default_factory=dict)
+
+
+# Stage keys recorded in ``QAResult.stage_timings_ms``. Ordered as the
+# pipeline runs them so reports read top-to-bottom.
+STAGES = (
+    "retrieval",
+    "rerank",
+    "read_chunks",
+    "compress",
+    "sufficiency",
+    "expand",
+    "answer",
+    "verify",
+)
 
 
 @dataclass(slots=True)
@@ -95,6 +116,22 @@ class _Context:
     seen_refs: set[tuple[str, int, int]]
     chunks: list[ChunkContent]
     retrieval_path: list[str]
+    stage_ms: dict[str, float] = field(default_factory=dict)
+
+
+@contextmanager
+def _timed(ctx: _Context, stage: str) -> Iterator[None]:
+    """Accumulate wall-clock ms for ``stage`` onto ``ctx``.
+
+    Accumulates rather than overwrites: ``sufficiency`` and ``expand`` run
+    once per hop, and the interesting number is their total contribution.
+    """
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        elapsed = (time.perf_counter() - start) * 1000
+        ctx.stage_ms[stage] = ctx.stage_ms.get(stage, 0.0) + elapsed
 
 
 _JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
@@ -144,91 +181,100 @@ async def answer_question(
     settings = get_settings()
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
 
-    hits = await _initial_retrieval(
-        question,
-        engine=engine,
-        provider=provider,
-        repo_id=repo_id,
-        k=k,
-        recall_k=recall_k,
-        exclude_path_prefixes=exclude_path_prefixes,
-        use_hybrid=use_hybrid,
-        use_query_understanding=(
-            settings.query_understanding_enabled
-            if use_query_understanding is None
-            else use_query_understanding
-        ),
-        max_rewrites=settings.query_understanding_max_rewrites,
-        retrieval_path=ctx.retrieval_path,
-    )
+    with _timed(ctx, "retrieval"):
+        hits = await _initial_retrieval(
+            question,
+            engine=engine,
+            provider=provider,
+            repo_id=repo_id,
+            k=k,
+            recall_k=recall_k,
+            exclude_path_prefixes=exclude_path_prefixes,
+            use_hybrid=use_hybrid,
+            use_query_understanding=(
+                settings.query_understanding_enabled
+                if use_query_understanding is None
+                else use_query_understanding
+            ),
+            max_rewrites=settings.query_understanding_max_rewrites,
+            retrieval_path=ctx.retrieval_path,
+        )
 
     if use_rerank and recall_k is not None and len(hits) > k:
         # Phase 4: fetch the top of the pool, cross-encoder rerank + MMR
         # diversify, and let the reranked order decide the prompt slice.
-        pool_hits = hits[:RERANK_MAX_POOL]
-        pool_chunks = await read_chunks([h.ref for h in pool_hits], engine=engine, repo_id=repo_id)
-        if len(pool_chunks) == len(pool_hits):
-            ranked = rerank_and_diversify(question, pool_hits, pool_chunks, k=k)
-            ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
-            initial_chunks = [content for _, content in ranked]
-        else:
-            # read_chunks dropped refs (stale index?) — fall back untranked.
-            initial_chunks = pool_chunks[:k]
+        with _timed(ctx, "rerank"):
+            pool_hits = hits[:RERANK_MAX_POOL]
+            pool_chunks = await read_chunks(
+                [h.ref for h in pool_hits], engine=engine, repo_id=repo_id
+            )
+            if len(pool_chunks) == len(pool_hits):
+                ranked = rerank_and_diversify(question, pool_hits, pool_chunks, k=k)
+                ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
+                initial_chunks = [content for _, content in ranked]
+            else:
+                # read_chunks dropped refs (stale index?) — fall back untranked.
+                initial_chunks = pool_chunks[:k]
     else:
-        initial_chunks = await read_chunks(
-            [h.ref for h in hits[:k]], engine=engine, repo_id=repo_id
-        )
+        with _timed(ctx, "read_chunks"):
+            initial_chunks = await read_chunks(
+                [h.ref for h in hits[:k]], engine=engine, repo_id=repo_id
+            )
     if use_compress and settings.compress_enabled and initial_chunks:
-        initial_chunks = await compress_chunks(
-            question,
-            initial_chunks,
-            provider=provider,
-            min_lines=settings.compress_min_chunk_lines,
-            retry_429_attempts=retry_429_attempts,
-        )
+        with _timed(ctx, "compress"):
+            initial_chunks = await compress_chunks(
+                question,
+                initial_chunks,
+                provider=provider,
+                min_lines=settings.compress_min_chunk_lines,
+                retry_429_attempts=retry_429_attempts,
+            )
         ctx.retrieval_path.append(f"compress:k={len(initial_chunks)}")
     _extend_context(ctx, initial_chunks)
 
     # Outer loop: sufficiency judge → optional traverse expansion.
     hops = 0
     while hops < max_hops:
-        verdict = await _judge_sufficiency(
+        with _timed(ctx, "sufficiency"):
+            verdict = await _judge_sufficiency(
+                provider,
+                question,
+                ctx.chunks,
+                retry_429_attempts=retry_429_attempts,
+            )
+        if verdict.decision == "sufficient" or verdict.next_symbol is None:
+            break
+
+        with _timed(ctx, "expand"):
+            ctx.retrieval_path.append(f"graph_traverse:{verdict.next_symbol}")
+            paths = await graph_traverse(
+                verdict.next_symbol,
+                engine=engine,
+                repo_id=repo_id,
+                edge_types=("calls", "imports", "inherits"),
+                max_depth=2,
+            )
+            if not paths:
+                ctx.retrieval_path.append("graph_traverse:empty")
+                break
+            new_refs: list[CodeRef] = []
+            for path in paths:
+                for ref in path.steps:
+                    key = (ref.file_path, ref.start_line, ref.end_line)
+                    if key not in ctx.seen_refs and ref.file_path != "<unresolved>":
+                        new_refs.append(ref)
+            new_chunks = await read_chunks(new_refs, engine=engine, repo_id=repo_id)
+            _extend_context(ctx, new_chunks)
+        hops += 1
+
+    answer_prompt_tokens = _estimate_tokens(answer_user_prompt(question, ctx.chunks))
+    with _timed(ctx, "answer"):
+        answer_text = await _generate_answer(
             provider,
             question,
             ctx.chunks,
             retry_429_attempts=retry_429_attempts,
         )
-        if verdict.decision == "sufficient" or verdict.next_symbol is None:
-            break
-
-        ctx.retrieval_path.append(f"graph_traverse:{verdict.next_symbol}")
-        paths = await graph_traverse(
-            verdict.next_symbol,
-            engine=engine,
-            repo_id=repo_id,
-            edge_types=("calls", "imports", "inherits"),
-            max_depth=2,
-        )
-        if not paths:
-            ctx.retrieval_path.append("graph_traverse:empty")
-            break
-        new_refs: list[CodeRef] = []
-        for path in paths:
-            for ref in path.steps:
-                key = (ref.file_path, ref.start_line, ref.end_line)
-                if key not in ctx.seen_refs and ref.file_path != "<unresolved>":
-                    new_refs.append(ref)
-        new_chunks = await read_chunks(new_refs, engine=engine, repo_id=repo_id)
-        _extend_context(ctx, new_chunks)
-        hops += 1
-
-    answer_prompt_tokens = _estimate_tokens(answer_user_prompt(question, ctx.chunks))
-    answer_text = await _generate_answer(
-        provider,
-        question,
-        ctx.chunks,
-        retry_429_attempts=retry_429_attempts,
-    )
 
     if _is_not_found(answer_text):
         return QAResult(
@@ -239,6 +285,7 @@ async def answer_question(
             hops=hops,
             retrieval_path=ctx.retrieval_path,
             answer_input_tokens=answer_prompt_tokens,
+            stage_timings_ms=ctx.stage_ms,
         )
 
     claims = _parse_claims(answer_text, ctx.chunks)
@@ -251,18 +298,20 @@ async def answer_question(
             hops=hops,
             retrieval_path=ctx.retrieval_path,
             answer_input_tokens=answer_prompt_tokens,
+            stage_timings_ms=ctx.stage_ms,
         )
 
     # Uncited claims were already marked "unverified" in _parse_claims and
     # skip the verifier entirely — there's no chunk to check them against.
     to_verify = [c for c in claims if c.verifier_note != UNCITED_CLAIM_REASON]
-    verify_results = await verify_claims(
-        to_verify,
-        provider=provider,
-        engine=engine,
-        repo_id=repo_id,
-        retry_429_attempts=retry_429_attempts,
-    )
+    with _timed(ctx, "verify"):
+        verify_results = await verify_claims(
+            to_verify,
+            provider=provider,
+            engine=engine,
+            repo_id=repo_id,
+            retry_429_attempts=retry_429_attempts,
+        )
     objections = [r.objection for r in verify_results if r.objection is not None]
 
     # Flag the rejected ones (still shipped, but visually marked). A claim whose
@@ -288,6 +337,7 @@ async def answer_question(
         hops=hops,
         retrieval_path=ctx.retrieval_path,
         answer_input_tokens=answer_prompt_tokens,
+        stage_timings_ms=ctx.stage_ms,
     )
 
 

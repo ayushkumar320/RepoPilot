@@ -214,6 +214,24 @@ def aggregate(phase: int) -> tuple[Path, Path]:
 LATENCY_P95_BUDGET = 1.5
 
 
+def top_stage_regressions(
+    repo_delta: dict[str, dict[str, float]], limit: int = 3
+) -> list[tuple[str, float]]:
+    """Stages whose p95 grew most, worst first — the latency culprits.
+
+    Returns ``[]`` when the artifacts predate stage instrumentation or no
+    stage actually regressed, so callers can stay silent rather than
+    reporting a misleading "no cause found".
+    """
+    grown: list[tuple[str, float]] = []
+    for stage in qa_graph.STAGES:
+        d = repo_delta.get(f"stage_{stage}_p95_ms")
+        if d and d["delta"] > 0:
+            grown.append((stage, d["delta"]))
+    grown.sort(key=lambda pair: pair[1], reverse=True)
+    return grown[:limit]
+
+
 def write_delta(phase: int, after: dict[str, object]) -> None:
     """Compare ``_after`` to ``_before`` per repo; fail on guardrail breaches.
 
@@ -238,6 +256,11 @@ def write_delta(phase: int, after: dict[str, object]) -> None:
         "input_tokens_per_question",
         "latency_p95_ms",
         "index_time_seconds",
+        # Per-stage p95s so a latency breach can name the stage that caused
+        # it instead of leaving the next reader to guess (as the Phase 6
+        # regression did). Absent from pre-instrumentation artifacts, which
+        # the isinstance check below skips harmlessly.
+        *(f"stage_{stage}_p95_ms" for stage in qa_graph.STAGES),
     )
     delta: dict[str, dict[str, dict[str, float]]] = {}
     breaches: list[str] = []
@@ -256,10 +279,16 @@ def write_delta(phase: int, after: dict[str, object]) -> None:
         delta[repo] = repo_delta
         lat = repo_delta.get("latency_p95_ms")
         if lat and lat["before"] > 0 and lat["after"] > lat["before"] * LATENCY_P95_BUDGET:
-            breaches.append(
+            msg = (
                 f"{repo}: latency_p95_ms {lat['before']:.0f} → {lat['after']:.0f} "
                 f"(> {LATENCY_P95_BUDGET}× budget)"
             )
+            culprits = top_stage_regressions(repo_delta)
+            if culprits:
+                msg += " — worst stages: " + ", ".join(
+                    f"{stage} {d:+.0f}ms" for stage, d in culprits
+                )
+            breaches.append(msg)
 
     delta_path = out_dir / "delta.json"
     delta_path.write_text(json.dumps(delta, indent=2) + "\n", encoding="utf-8")

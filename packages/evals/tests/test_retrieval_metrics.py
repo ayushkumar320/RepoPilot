@@ -5,7 +5,8 @@ from __future__ import annotations
 import pytest
 
 from repopilot_agents.types import ChunkHit, CodeRef
-from repopilot_evals.runners.latency import percentile
+from repopilot_evals.bench import top_stage_regressions
+from repopilot_evals.runners.latency import LatencyEvalMetrics, percentile
 from repopilot_evals.runners.retrieval import (
     mrr,
     ndcg_at_k,
@@ -112,3 +113,75 @@ class TestPercentile:
 
     def test_empty(self) -> None:
         assert percentile([], 95) == 0.0
+
+
+class TestStageAttribution:
+    """Per-stage latency breakdown — the point of P1 instrumentation."""
+
+    def _metrics(self) -> LatencyEvalMetrics:
+        # Two questions: one verifier-dominated, one answer-dominated.
+        return LatencyEvalMetrics(
+            total=2,
+            timings_ms=[1000.0, 2000.0],
+            stage_timings_ms=[
+                {"retrieval": 100.0, "answer": 300.0, "verify": 600.0},
+                {"retrieval": 200.0, "answer": 1400.0, "verify": 400.0},
+            ],
+        )
+
+    def test_stage_percentiles(self) -> None:
+        m = self._metrics()
+        assert m.stage_p95_ms("verify") == pytest.approx(600.0)
+        assert m.stage_p95_ms("answer") == pytest.approx(1400.0)
+
+    def test_absent_stage_counts_as_zero(self) -> None:
+        """A stage the pipeline skipped (no rerank, no hops) is not an error."""
+        m = self._metrics()
+        assert m.stage_p95_ms("rerank") == 0.0
+        assert m.stage_mean_share("rerank") == 0.0
+
+    def test_mean_share_is_per_question_not_ratio_of_sums(self) -> None:
+        # verify: 600/1000 = 0.6 and 400/2000 = 0.2 -> mean 0.4.
+        # A ratio-of-sums would give 1000/3000 = 0.33 and let the slow
+        # question dominate, which is exactly what we don't want.
+        m = self._metrics()
+        assert m.stage_mean_share("verify") == pytest.approx(0.4)
+
+    def test_unaccounted_time_is_surfaced(self) -> None:
+        m = self._metrics()
+        d = m.as_dict()
+        # 1000-1000=0 and 2000-2000=0 -> fully accounted.
+        assert d["stage_unaccounted_p95_ms"] == pytest.approx(0.0)
+        assert d["stage_verify_p95_ms"] == pytest.approx(600.0)
+
+    def test_as_dict_omits_stage_keys_when_uninstrumented(self) -> None:
+        """Old artifacts with no stage data still serialize cleanly."""
+        m = LatencyEvalMetrics(total=1, timings_ms=[500.0])
+        d = m.as_dict()
+        assert d == {"total": 1, "latency_p50_ms": 500.0, "latency_p95_ms": 500.0}
+
+
+class TestTopStageRegressions:
+    """A latency breach must name the stage that caused it."""
+
+    def test_names_worst_stages_in_order(self) -> None:
+        # Shaped like the real Phase 5 → 6 fastapi regression (2149 → 12065).
+        repo_delta = {
+            "latency_p95_ms": {"before": 2149.0, "after": 12065.0, "delta": 9916.0},
+            "stage_retrieval_p95_ms": {"before": 300.0, "after": 400.0, "delta": 100.0},
+            "stage_answer_p95_ms": {"before": 800.0, "after": 3000.0, "delta": 2200.0},
+            "stage_verify_p95_ms": {"before": 900.0, "after": 8000.0, "delta": 7100.0},
+            "stage_compress_p95_ms": {"before": 149.0, "after": 100.0, "delta": -49.0},
+        }
+        top = top_stage_regressions(repo_delta)
+        assert [stage for stage, _ in top] == ["verify", "answer", "retrieval"]
+        assert top[0] == ("verify", 7100.0)
+
+    def test_improved_stages_are_not_reported_as_culprits(self) -> None:
+        repo_delta = {"stage_compress_p95_ms": {"before": 500.0, "after": 100.0, "delta": -400.0}}
+        assert top_stage_regressions(repo_delta) == []
+
+    def test_pre_instrumentation_artifacts_report_nothing(self) -> None:
+        """Old _before.json has no stage keys — stay silent, don't invent a cause."""
+        repo_delta = {"latency_p95_ms": {"before": 1000.0, "after": 5000.0, "delta": 4000.0}}
+        assert top_stage_regressions(repo_delta) == []

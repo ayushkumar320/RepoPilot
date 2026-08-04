@@ -168,6 +168,52 @@ async def test_uncited_claim_is_unverified_and_skips_verifier() -> None:
 
 
 @pytest.mark.asyncio
+async def test_stage_timings_are_recorded() -> None:
+    """P1 instrumentation: every stage the run touched reports wall-clock."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    timings = result.stage_timings_ms
+    # Stages this path must have run.
+    for stage in ("retrieval", "sufficiency", "answer", "verify"):
+        assert stage in timings, f"{stage} not timed"
+        assert timings[stage] >= 0.0
+    # Stages it never reached stay absent rather than reporting a bogus 0.
+    assert "expand" not in timings
+    assert set(timings) <= set(qa_graph.STAGES)
+
+
+@pytest.mark.asyncio
+async def test_stage_timings_accumulate_across_hops() -> None:
+    """sufficiency/expand run once per hop; their timings must sum, not overwrite."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"insufficient","reason":"more","next_symbol":"alpha"}',
+            '{"decision":"insufficient","reason":"more","next_symbol":"beta"}',
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert result.hops == 2
+    assert "expand" in result.stage_timings_ms
+
+
+@pytest.mark.asyncio
 async def test_hop_budget_enforced_at_three() -> None:
     insufficient = '{"decision":"insufficient","reason":"more needed","next_symbol":"alpha"}'
     provider = _ScriptedProvider(

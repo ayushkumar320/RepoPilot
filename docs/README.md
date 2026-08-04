@@ -2,7 +2,7 @@
 
 The product slice (clone → index → retrieve → answer → verify) ships on `main`. Start with [`STARTUP_GUIDE.md`](STARTUP_GUIDE.md) when you want to run the project locally.
 
-> Prefer the [Graphify knowledge graph](../graphify-out/) over reading raw — `graphify query "<question>"`. Project rules live in [`../CLAUDE.md`](../CLAUDE.md); this is the human-readable map.
+> Project rules live in [`../CLAUDE.md`](../CLAUDE.md); this is the human-readable map.
 
 ## The one-paragraph story
 

@@ -34,13 +34,12 @@ For real tours, put at least one LLM provider key in `.env` before using the app
 - npm
 - Docker Desktop or Docker Engine
 - Git
-- Optional: `graphify` for repo-knowledge graph updates
 
 ## Commands You Actually Use
 
 | Command | What it does |
 |---|---|
-| `make setup` | Installs Python workspace deps, the pre-commit git hook, and frontend npm deps. |
+| `make setup` | Installs Python workspace deps and frontend npm deps. |
 | `make services` | Starts Postgres/Redis and runs DB migrations. |
 | `make backend` | Runs only the FastAPI backend. |
 | `make frontend` | Runs only the Next.js frontend. |
@@ -187,15 +186,6 @@ Browser and Lighthouse checks need the web app running:
 cd apps/web
 npm run test:e2e
 npm run test:lighthouse
-```
-
-## 8. Graph Maintenance
-
-After major code, architecture, or multi-file documentation changes, update the committed Graphify graph:
-
-```bash
-graphify update .
-git add graphify-out/graph.json graphify-out/manifest.json
 ```
 
 The CI retrieval gate requires a fresh `evals/results/rag_phaseN/_after.json` whenever a pull request touches retrieval paths.

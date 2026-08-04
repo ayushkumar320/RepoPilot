@@ -133,12 +133,7 @@ flowchart LR
 
 ### Graph Connections That Matter
 
-RepoPilot has two important graph layers:
-
-1. The **code graph** built from the target repository.
-2. The **Graphify knowledge graph** built over this RepoPilot repo itself.
-
-The target-repo code graph powers product behavior:
+The **code graph** built from the target repository powers product behavior:
 
 ```mermaid
 flowchart TB
@@ -192,20 +187,6 @@ flowchart LR
     issues --> agents
 ```
 
-The Graphify repo graph is for contributors and AI agents working on RepoPilot:
-
-```bash
-graphify query "how does the verifier connect to Q&A?"
-graphify explain "Capability Planner"
-graphify path "IntentProfile" "Opportunity Ranker"
-```
-
-Graphify artifacts live in [graphify-out/](graphify-out/). After major code or architecture changes, run:
-
-```bash
-graphify update .
-```
-
 ## Repository Structure
 
 ```text
@@ -221,7 +202,6 @@ graphify update .
 ├── infra/
 │   └── postgres/             # pgvector init SQL
 ├── docs/                     # startup guide, architecture, and historical product rationale
-├── graphify-out/             # committed knowledge graph over this repo
 ├── docker-compose.yml        # Postgres + pgvector, Redis
 ├── Makefile                  # common dev/test commands
 └── pyproject.toml            # uv workspace + Python quality config
@@ -284,13 +264,6 @@ make test             # fast pytest lane
 make ci               # lint + typecheck + coverage
 make test-slow        # integration/slow tests, needs services and provider keys
 make docker-down      # stop and remove local service volumes
-```
-
-When changing architecture or adding modules, refresh the committed Graphify graph:
-
-```bash
-graphify update .
-git add graphify-out/graph.json graphify-out/manifest.json
 ```
 
 ## Design Principles

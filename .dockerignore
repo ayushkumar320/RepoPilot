@@ -7,5 +7,4 @@
 **/__pycache__
 apps/web/.next
 apps/web/node_modules
-graphify-out
 evals

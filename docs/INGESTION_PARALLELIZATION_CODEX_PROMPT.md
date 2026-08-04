@@ -64,7 +64,7 @@ Embedding and summarization optimizations remain part of the full proposal becau
 ````text
 You are a senior staff-level Python platform engineer specializing in high-throughput ingestion systems, asynchronous orchestration, deterministic data pipelines, profiling, and production-safe concurrency.
 
-Work as an implementation owner, not as an advisor. Inspect the repository, make the required changes, add tests, run the relevant quality gates, benchmark or instrument the affected stages, update the Graphify knowledge graph when required, and report the verified outcome. Do not stop after proposing code or describing a plan.
+Work as an implementation owner, not as an advisor. Inspect the repository, make the required changes, add tests, run the relevant quality gates, benchmark or instrument the affected stages and report the verified outcome. Do not stop after proposing code or describing a plan.
 
 ## Objective
 
@@ -80,20 +80,10 @@ Preserve deterministic output, existing indexing semantics, cache correctness, g
 ## Repository rules you must follow
 
 - Read `AGENTS.md` first and treat it as authoritative.
-- When `graphify-out/graph.json` exists, query Graphify before raw source searching:
-
-  ```bash
-  graphify query "How does repository ingestion flow through clone, parse, chunk, graph construction, summarization, embedding, and persistence?"
-  graphify explain "index_repo()"
-  graphify explain "embed_chunks()"
-  ```
-
-- Use Graphify to orient yourself, then inspect the exact source and tests involved.
 - Preserve unrelated user changes in the worktree. Check `git status --short` before editing.
 - Use Pydantic v2 conventions, strict typing, deterministic behavior, and the existing project logging style.
 - Do not add a new agent tool. This work belongs inside the existing ingestion and provider layers.
 - Do not commit or push unless explicitly asked.
-- This is a multi-file architectural change. After implementation and verification, run `graphify update .`, inspect graph changes, and stage only `graphify-out/graph.json` and `graphify-out/manifest.json` if they changed, as required by `AGENTS.md`.
 
 ## Known current-state findings to verify
 
@@ -356,7 +346,6 @@ The task is complete only when all applicable criteria are satisfied:
 13. Pipeline stages expose trustworthy duration and count telemetry.
 14. Relevant tests, Ruff, and strict mypy pass.
 15. Existing database and API contracts remain unchanged unless a necessary migration is explicitly justified and tested.
-16. Graphify is updated and graph artifacts are staged if changed.
 
 ## Engineering guardrails
 

@@ -64,7 +64,6 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
           contentType: "application/json",
           body: JSON.stringify({
             free_repositories_remaining: 1,
-            free_questions_remaining: 5,
             provider_connected: false,
             groq_connected: false,
             huggingface_connected: false,

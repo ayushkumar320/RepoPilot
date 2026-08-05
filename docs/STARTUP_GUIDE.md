@@ -85,17 +85,22 @@ REDIS_URL=redis://localhost:6379/0
 REPOPILOT_WEB_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
 ```
 
-### Optional: GitHub sign-in and saved tours
+### Optional: Google/GitHub sign-in and saved tours
 
 Sign-in is off unless you configure it, and the app works fully without it —
-anonymous sessions keep their own tours via the same cookie. Turning it on
-makes a reader's history follow their GitHub account across devices.
+anonymous sessions keep their own tours via the same cookie. Configure either
+provider and the app becomes **gated**: the landing page is a sign-in screen,
+and the repository and lens steps come after signing in. A reader's history
+then follows their account across devices.
 
 Next.js reads its own environment, so these go in `apps/web/.env.local` (not
 the root `.env`):
 
 ```bash
 AUTH_SECRET=<openssl rand -hex 32>
+# Set either provider, or both. Each is wired only when its id is present.
+AUTH_GOOGLE_ID=<oauth client id>
+AUTH_GOOGLE_SECRET=<oauth client secret>
 AUTH_GITHUB_ID=<oauth app client id>
 AUTH_GITHUB_SECRET=<oauth app client secret>
 NEXTAUTH_URL=http://localhost:3000
@@ -105,13 +110,16 @@ AUTH_TRUST_HOST=true
 REPOPILOT_SESSION_SECRET=repopilot-development-session-secret
 ```
 
-Create the OAuth app at <https://github.com/settings/developers> with callback
-URL `http://localhost:3000/api/auth/callback/github`.
+Create the Google OAuth client at
+<https://console.cloud.google.com/apis/credentials> with redirect URI
+`http://localhost:3000/api/auth/callback/google`, and the GitHub OAuth app at
+<https://github.com/settings/developers> with callback URL
+`http://localhost:3000/api/auth/callback/github`.
 
 Use `localhost`, not `127.0.0.1`. Auth.js derives the callback origin as
 `localhost` in local dev whatever `AUTH_URL` says, so an OAuth app registered
-against `127.0.0.1` fails the redirect_uri check — GitHub reports that back as
-nothing more specific than `error=Configuration`.
+against `127.0.0.1` fails the redirect_uri check — the provider reports that
+back as nothing more specific than `error=Configuration`.
 
 `REPOPILOT_SESSION_SECRET` is the whole handshake: the web app signs the
 stable session id with it and the API verifies that signature. If the two

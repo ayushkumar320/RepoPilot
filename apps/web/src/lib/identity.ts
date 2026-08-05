@@ -3,7 +3,7 @@
  *
  * The API already trusts one thing: `repopilot_session`, an HMAC-signed
  * `session_id`. Logging a user in therefore means minting a *stable*
- * `session_id` for their GitHub account and signing it with the same secret,
+ * `session_id` for their OAuth account and signing it with the same secret,
  * so every existing per-session feature becomes per-user with no API change.
  *
  * Web Crypto only — this runs in Next's edge middleware, where `node:crypto`
@@ -31,10 +31,14 @@ function uuidBytes(uuid: string): Uint8Array {
 /**
  * RFC 4122 v5 (SHA-1, name-based) UUID — the same value Python's
  * `uuid.uuid5(NAMESPACE, name)` produces, so ids stay comparable across the
- * stack. Deterministic: same GitHub account, same session id, every device.
+ * stack. Deterministic: same account, same session id, every device. The
+ * provider is part of the name so two providers cannot collide on one id.
  */
-export async function stableSessionId(providerAccountId: string): Promise<string> {
-  const name = new TextEncoder().encode(`github:${providerAccountId}`);
+export async function stableSessionId(
+  providerAccountId: string,
+  provider = "github",
+): Promise<string> {
+  const name = new TextEncoder().encode(`${provider}:${providerAccountId}`);
   const input = new Uint8Array(16 + name.length);
   input.set(uuidBytes(NAMESPACE), 0);
   input.set(name, 16);

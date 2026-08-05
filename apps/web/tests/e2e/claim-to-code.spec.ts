@@ -41,7 +41,6 @@ test.beforeEach(async ({ page }) => {
         return json(
           JSON.stringify({
             free_repositories_remaining: 1,
-            free_questions_remaining: 5,
             provider_connected: false,
             groq_connected: false,
             huggingface_connected: false,

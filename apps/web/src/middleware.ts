@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "@/auth";
+import { auth, authEnabled } from "@/auth";
 import {
   SESSION_COOKIE,
   sessionCookieSecure,
@@ -41,12 +41,12 @@ const bridge = auth(async (request) => {
 });
 
 /**
- * With no GitHub OAuth app configured there is nothing to bridge, and calling
- * into NextAuth without AUTH_SECRET would fail every request — so a stock
- * local checkout skips the wrapper entirely.
+ * With no OAuth app configured there is nothing to bridge, and calling into
+ * NextAuth without AUTH_SECRET would fail every request — so a stock local
+ * checkout skips the wrapper entirely.
  */
 const middleware: typeof bridge = (...args) => {
-  if (!process.env.AUTH_GITHUB_ID) return NextResponse.next();
+  if (!authEnabled) return NextResponse.next();
   return bridge(...args);
 };
 

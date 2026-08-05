@@ -64,7 +64,6 @@ class ProviderCredentialsRequest(BaseModel):
 
 class AccountUsageResponse(BaseModel):
     free_repositories_remaining: int = Field(ge=0)
-    free_questions_remaining: int = Field(ge=0)
     provider_connected: bool
     groq_connected: bool
     huggingface_connected: bool

@@ -306,6 +306,7 @@ function ProviderDialog({
 }
 
 export interface Viewer {
+  provider: string;
   providerAccountId: string;
   name: string | null;
   email: string | null;
@@ -313,15 +314,11 @@ export interface Viewer {
 }
 
 export interface RepoPilotAppProps {
-  authEnabled?: boolean;
-  signInAction?: () => Promise<void>;
   signOutAction?: () => Promise<void>;
   viewer?: Viewer | null;
 }
 
 export default function RepoPilotApp({
-  authEnabled = false,
-  signInAction,
   signOutAction,
   viewer = null,
 }: RepoPilotAppProps = {}) {
@@ -367,7 +364,7 @@ export default function RepoPilotApp({
       .getAccountUsage()
       .then(setUsage)
       .catch(() => {
-        setErrorMessage("Could not load the free usage allowance.");
+        setErrorMessage("Could not load your account usage.");
       });
   }, []);
 
@@ -379,7 +376,7 @@ export default function RepoPilotApp({
       if (viewer) {
         await api
           .saveIdentity({
-            provider: "github",
+            provider: viewer.provider,
             provider_account_id: viewer.providerAccountId,
             display_name: viewer.name,
             email: viewer.email,
@@ -734,28 +731,17 @@ export default function RepoPilotApp({
               aria-hidden="true"
             />
             <span>
-              {usage?.provider_connected
-                ? "Your provider is connected"
-                : `${usage?.free_questions_remaining ?? 5} free questions`}
+              {usage?.provider_connected ? "Your provider is connected" : "Connect your provider"}
             </span>
           </button>
-          {authEnabled ? (
-            viewer ? (
-              <form action={signOutAction} className="account-control">
-                <span className="account-name">{viewer.name ?? "Signed in"}</span>
-                <button className="usage-control" type="submit">
-                  <SignOut size={17} aria-hidden="true" />
-                  <span>Sign out</span>
-                </button>
-              </form>
-            ) : (
-              <form action={signInAction}>
-                <button className="usage-control" type="submit">
-                  <GithubLogo size={17} aria-hidden="true" />
-                  <span>Sign in with GitHub</span>
-                </button>
-              </form>
-            )
+          {viewer ? (
+            <form action={signOutAction} className="account-control">
+              <span className="account-name">{viewer.name ?? "Signed in"}</span>
+              <button className="usage-control" type="submit">
+                <SignOut size={17} aria-hidden="true" />
+                <span>Sign out</span>
+              </button>
+            </form>
           ) : null}
         </div>
       </header>
@@ -1061,9 +1047,7 @@ export default function RepoPilotApp({
                   <label htmlFor="ask-repository">Ask this repository</label>
                   <button type="button" onClick={() => setProviderDialogOpen(true)}>
                     <LockKey size={15} aria-hidden="true" />
-                    {usage?.provider_connected
-                      ? "Using your provider"
-                      : `${usage?.free_questions_remaining ?? 5} free remaining`}
+                    {usage?.provider_connected ? "Using your provider" : "Using the shared key"}
                   </button>
                 </div>
                 <div className="ask-row">

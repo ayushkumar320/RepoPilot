@@ -20,7 +20,7 @@ import {
   WarningCircle,
   X,
 } from "@phosphor-icons/react";
-import { type FormEvent, useEffect, useMemo, useReducer, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import {
   ApiError,
@@ -139,6 +139,7 @@ function ProviderDialog({
   const [huggingfaceKey, setHuggingfaceKey] = useState("");
   const [showGroq, setShowGroq] = useState(false);
   const [showHuggingface, setShowHuggingface] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -149,16 +150,31 @@ function ProviderDialog({
     }
   }, [open]);
 
-  if (!open) return null;
+  // showModal() is what buys the focus trap, the Escape key, the inert
+  // background and the top layer — none of which are worth hand-rolling.
+  useEffect(() => {
+    const node = dialogRef.current;
+    if (!node) return;
+    if (open && !node.open) node.showModal();
+    if (!open && node.open) node.close();
+  }, [open]);
 
   return (
-    <div className="dialog-backdrop" role="presentation">
-      <section
-        className="provider-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="provider-dialog-title"
-      >
+    <dialog
+      className="provider-dialog"
+      ref={dialogRef}
+      aria-labelledby="provider-dialog-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        // A click that lands on the dialog element itself is a backdrop click:
+        // the content sits in a child that stops it getting this far.
+        if (event.target === dialogRef.current) onClose();
+      }}
+    >
+      <div className="provider-dialog-content">
         <div className="dialog-heading">
           <div className="dialog-icon" aria-hidden="true">
             <LockKey size={21} weight="fill" />
@@ -284,8 +300,8 @@ function ProviderDialog({
             </div>
           </form>
         )}
-      </section>
-    </div>
+      </div>
+    </dialog>
   );
 }
 
@@ -560,6 +576,10 @@ export default function RepoPilotApp({
     setErrorMessage(null);
     try {
       const tour = await api.getTour(id);
+      // Fetch the snapshot status up front: the workspace only opens once the
+      // repo reads as ready, and without this the resumed tour flashes the
+      // onboarding screen ("Not started") until the 1.5s status poll lands.
+      const status = await api.getRepoStatus(tour.repo_id).catch(() => undefined);
       const preset = tour.intent_profile
         ? PERSONAS.find((persona) => persona.profile.raw_text === tour.intent_profile?.raw_text)
         : undefined;
@@ -575,7 +595,8 @@ export default function RepoPilotApp({
       setTourId(tour.tour_id);
       setRepoId(tour.repo_id);
       setRepoUrl(`https://github.com/${decodeURIComponent(tour.repo_id)}`);
-      setStore(hydrateFromTour(tour));
+      const restored = hydrateFromTour(tour);
+      setStore(status ? applyRepoStatus(restored, status) : restored);
       window.history.replaceState(null, "", `/?repo=${encodeURIComponent(tour.repo_id)}`);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Could not reopen this tour.");

@@ -279,9 +279,8 @@ scope.**
       `typecheck`, `test:store`, `test:e2e`, and production build pass.
 - [x] `docs/STARTUP_GUIDE.md` and `docs/DEPLOYMENT.md` updated.
 - [x] **Evals untouched and not run.**
-- [ ] Logged-in user's tours, questions, and answers persist across sessions and
-      devices — code paths are covered by tests, but the browser round trip has
-      not been walked through yet (see §8).
+- [x] Tours, questions, and answers persist and resume — walked through in a
+      browser (see §8).
 
 ---
 
@@ -298,12 +297,15 @@ scope.**
 | Sign-in produces the stable id end to end | Signed in with GitHub locally; the `product_accounts` row's `session_id` equals `uuid5(NAMESPACE, "github:<account>")` |
 | Write-through does not block the ask path | `apps/web/tests/e2e/persona-ask.spec.ts` asserts both questions reached `POST /tours/{id}/messages` |
 | Anonymous flow unchanged | With `AUTH_GITHUB_ID` unset the middleware and sign-in control are inert; e2e runs this way |
+| History round trip in a browser | Anonymous session: submitted flask, asked a question, went back, resumed. Tour row, message at ordinal 0, "Your tours" entry, and full restore of answer + 8 claims + persona |
+| Tours are scoped per session in the UI, not just in SQL | Two concurrent sessions (one signed in, one anonymous) each saw only their own tour in "Your tours" |
+
+Worth knowing: **history works for anonymous visitors too** — tours are scoped
+to the session cookie, and signing in only makes that cookie's id stable across
+browsers and devices. The round trip above was walked entirely signed-out.
 
 ### Not yet verified
 
-- **The browser round trip for history.** Analyze a repo, ask a question, go
-  back, and confirm the tour appears under "Your tours" and resumes with its
-  persona. Every layer under it is tested; the click-through is not.
 - **Aiven.** `POSTGRES_DSN` still points at local Docker. §5 has the steps:
   create the service, `CREATE EXTENSION vector`, `alembic upgrade head`.
 - **Production sign-in.** Only local dev has been exercised. `DEPLOYMENT.md`

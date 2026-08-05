@@ -11,6 +11,9 @@
   --border-strong: #c8ced6;
   --accent: #0f766e;
   --accent-hover: #0b625c;
+  /* Text that sits ON the accent. Dark mode lightens the accent, so the
+     foreground has to flip with it or the primary button drops to 2.3:1. */
+  --on-accent: #f8fffe;
   --accent-soft: #e7f5f2;
   --accent-border: #9ed8d1;
   --warning: #a14f16;
@@ -26,6 +29,47 @@
   --shadow-lg: 0 24px 60px rgba(31, 42, 55, 0.1);
   --radius-panel: 14px;
   --radius-control: 8px;
+  /* Press feedback is instant going down and eases coming back up: the finger
+     leads, the release follows. One duration for both reads as lag on press. */
+  --press-in: 60ms;
+  --press-out: 220ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* The mirror of --ease-out, for the return leg of a reversible transition:
+     a surface leaves by accelerating away, the inverse of how it arrived. */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --exit-duration: 220ms;
+
+  /* Spring motion, expressed in Apple's damping/response terms and sampled
+     into a linear() ramp. Nothing here is gesture-driven, so we need the
+     spring's shape, not its interruptibility — which is exactly what CSS can
+     do on its own. The durations ARE the springs' settle times; changing one
+     without the other breaks the curve. Older engines fall back to the
+     cubic-bezier below. */
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-duration: 580ms;
+  --spring-bounce: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-bounce-duration: 540ms;
+}
+
+/* damping 1.0 / response 0.4 — settles flat, no overshoot.
+   damping 0.8 / response 0.4 — overshoots 1.5%, for surfaces that arrive. */
+@supports (animation-timing-function: linear(0, 1)) {
+  :root {
+    --spring: linear(
+      0, 0.0192, 0.0669, 0.1318, 0.2055, 0.2825, 0.3588, 0.4319, 0.5003, 0.5632, 0.6202,
+      0.6712, 0.7166, 0.7565, 0.7915, 0.822, 0.8484, 0.8712, 0.8908, 0.9076, 0.9219, 0.9341,
+      0.9445, 0.9534, 0.9608, 0.9671, 0.9725, 0.977, 0.9807, 0.9839, 0.9866, 0.9888, 0.9907,
+      0.9922, 0.9935, 0.9946, 0.9955, 0.9963, 0.9969, 0.9974, 0.9979, 0.9982, 0.9985, 0.9988,
+      0.999
+    );
+    --spring-bounce: linear(
+      0, 0.0168, 0.0604, 0.1224, 0.196, 0.2756, 0.3572, 0.4377, 0.5147, 0.5867, 0.6528,
+      0.7125, 0.7654, 0.8118, 0.8519, 0.886, 0.9148, 0.9386, 0.958, 0.9737, 0.986, 0.9955,
+      1.0026, 1.0078, 1.0113, 1.0135, 1.0147, 1.0152, 1.015, 1.0144, 1.0135, 1.0124, 1.0112,
+      1.0099, 1.0087, 1.0075, 1.0064, 1.0054, 1.0045, 1.0037, 1.003, 1.0023, 1.0018, 1.0014,
+      1.001
+    );
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,6 +85,7 @@
     --border-strong: #3a4552;
     --accent: #49b9ad;
     --accent-hover: #63c8bd;
+    --on-accent: #06231f;
     --accent-soft: #173b39;
     --accent-border: #2b6c67;
     --warning: #f0a15f;
@@ -73,6 +118,7 @@ body {
   background: var(--canvas);
   color: var(--text);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -114,9 +160,25 @@ a {
   justify-content: space-between;
   min-height: 64px;
   padding: 0 max(24px, calc((100vw - 1440px) / 2));
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--canvas) 92%, transparent);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--canvas) 82%, transparent);
+  backdrop-filter: blur(18px) saturate(180%);
+}
+
+/* Scroll edge, not a hard divider: content dissolves under the material
+   instead of being cut by a 1px line. */
+.app-header::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 12px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--canvas) 82%, transparent),
+    transparent
+  );
+  pointer-events: none;
 }
 
 .product-brand,
@@ -376,12 +438,11 @@ a {
   font-weight: 620;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 140ms ease, border-color 140ms ease, transform 100ms ease;
 }
 
 .button-primary {
   background: var(--accent);
-  color: #f8fffe;
+  color: var(--on-accent);
 }
 
 .button-primary:hover:not(:disabled) {
@@ -399,12 +460,30 @@ a {
   background: var(--surface-subtle);
 }
 
+/* Every pressable surface shares one press language. Transform-only so the
+   press stays on the compositor. */
+.button,
+.persona-option,
+.mode-button,
+.claim-row,
+.icon-button,
+.usage-control,
+.tour-history li > button:first-child {
+  transition-property: background, border-color, color, box-shadow, transform;
+  transition-duration: 140ms, 140ms, 140ms, 140ms, var(--press-out);
+  transition-timing-function: ease, ease, ease, ease, var(--ease-out);
+}
+
 .button:active:not(:disabled),
 .persona-option:active,
 .mode-button:active,
 .claim-row:active,
-.icon-button:active {
-  transform: translateY(1px);
+.icon-button:active:not(:disabled),
+.usage-control:active,
+.tour-history li > button:first-child:active {
+  transform: scale(0.97);
+  /* Down is near-instant; only the release gets eased. */
+  transition-duration: 140ms, 140ms, 140ms, 140ms, var(--press-in);
 }
 
 .button:disabled,
@@ -469,7 +548,10 @@ a {
   height: 100%;
   border-radius: inherit;
   background: var(--accent);
-  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Deliberately NOT a spring. Progress re-targets from server events, and an
+     overshooting spring would run the bar past the new value and back — which
+     reads as progress being lost. Monotone ease-out only. */
+  transition: width 420ms var(--ease-out);
 }
 
 .index-status p {
@@ -541,7 +623,6 @@ a {
   color: var(--text);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 140ms ease, background 140ms ease, transform 100ms ease;
 }
 
 .persona-option:hover {
@@ -1047,26 +1128,143 @@ a {
   border-color: var(--border-strong);
 }
 
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: color-mix(in srgb, var(--code) 62%, transparent);
-  backdrop-filter: blur(6px);
-}
-
 .provider-dialog {
   width: min(560px, 100%);
+  max-width: calc(100vw - 48px);
   max-height: calc(100dvh - 48px);
-  overflow: auto;
-  padding: 26px;
+  /* The dialog box is the click target for backdrop dismissal, so it keeps
+     its own padding rather than sitting inside a wrapper. */
+  padding: 0;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--surface-raised);
+  color: var(--text);
   box-shadow: var(--shadow-lg);
+  overflow: auto;
+
+  /* Enter and exit run the same path, so this is a transition rather than a
+     pair of keyframes. `allow-discrete` is what keeps the element in the top
+     layer while it animates away — without it `close()` would yank it out on
+     the same frame and the dialog would arrive like a surface but vanish like
+     a bug. Split across two declarations so that an engine which cannot parse
+     the discrete half still gets the opacity and transform half.
+
+     This block is the LEAVING state, so it carries the exit curve: quick and
+     accelerating, the mirror of the arrival. */
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    transform var(--exit-duration) var(--ease-in);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    transform var(--exit-duration) var(--ease-in),
+    display var(--exit-duration) allow-discrete,
+    overlay var(--exit-duration) allow-discrete;
+}
+
+/* The arriving state, so it carries the arrival curve: a sheet landing, with
+   the slight overshoot that implies weight. */
+.provider-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--spring-bounce-duration) var(--spring-bounce),
+    transform var(--spring-bounce-duration) var(--spring-bounce);
+  transition:
+    opacity var(--spring-bounce-duration) var(--spring-bounce),
+    transform var(--spring-bounce-duration) var(--spring-bounce),
+    display var(--spring-bounce-duration) allow-discrete,
+    overlay var(--spring-bounce-duration) allow-discrete;
+}
+
+/* Where the transition starts from on the very first frame it is shown. */
+@starting-style {
+  .provider-dialog[open] {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.provider-dialog-content {
+  padding: 26px;
+}
+
+/* The scrim and its blur move together so the surface reads as glass forming
+   and un-forming, not a flat panel fading. */
+.provider-dialog::backdrop {
+  background: color-mix(in srgb, #05080c 62%, transparent);
+  opacity: 0;
+  backdrop-filter: blur(0);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    backdrop-filter var(--exit-duration) var(--ease-in);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    backdrop-filter var(--exit-duration) var(--ease-in),
+    display var(--exit-duration) allow-discrete,
+    overlay var(--exit-duration) allow-discrete;
+}
+
+.provider-dialog[open]::backdrop {
+  opacity: 1;
+  backdrop-filter: blur(6px);
+  transition:
+    opacity 260ms var(--ease-out),
+    backdrop-filter 260ms var(--ease-out);
+  transition:
+    opacity 260ms var(--ease-out),
+    backdrop-filter 260ms var(--ease-out),
+    display 260ms allow-discrete,
+    overlay 260ms allow-discrete;
+}
+
+@starting-style {
+  .provider-dialog[open]::backdrop {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+}
+
+/* ── Arrival motion ─────────────────────────────────────────────────────────
+   Everything that appears mid-session rather than on first paint. Content
+   that gets appended rises from below, matching where it came from; content
+   that replaces something in place just settles. */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
+/* A new answer is appended to the bottom of the thread, so it comes up from
+   the bottom. */
+.tour-section {
+  animation: rise-in var(--spring-duration) var(--spring) both;
+}
+
+/* Indexing status and errors appear in place inside a panel that is already
+   on screen — no travel, just arrival. */
+.index-status,
+.inline-alert,
+.first-impression {
+  animation: settle-in var(--spring-duration) var(--spring) both;
+}
+
+/* The whole view changes here. A big surface sliding is vestibular noise, so
+   this one crossfades and does not move — opacity only, deliberately no
+   transform, which would otherwise linger as a containing block for anything
+   positioned inside. */
+.workspace {
+  animation: fade-in 320ms var(--ease-out) both;
 }
 
 .dialog-heading {
@@ -1468,9 +1666,20 @@ input:focus-visible {
     padding: 0 16px;
   }
 
+  /* Collapsing these to icons must not take the label away from screen
+     readers — `display: none` would leave the buttons with no accessible
+     name at all. Hide them visually and keep them in the tree. */
   .header-context span,
   .usage-control span {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .usage-control {
@@ -1581,13 +1790,14 @@ input:focus-visible {
     padding: 14px;
   }
 
-  .dialog-backdrop {
-    align-items: end;
-    padding: 12px;
+  /* Sits at the bottom on small screens, within thumb reach. */
+  .provider-dialog {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    margin-block: auto 12px;
   }
 
-  .provider-dialog {
-    max-height: calc(100dvh - 24px);
+  .provider-dialog-content {
     padding: 20px;
   }
 
@@ -1607,6 +1817,8 @@ input:focus-visible {
   }
 }
 
+/* Reduced motion means a gentler equivalent, not silence. Movement goes away;
+   opacity and colour changes stay, because they carry meaning. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1616,9 +1828,101 @@ input:focus-visible {
   *::before,
   *::after {
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-property: opacity, background, border-color, color, box-shadow !important;
+    transition-duration: 140ms !important;
+  }
+
+  /* Drop the press scale, but keep the colour shift so the press still lands.
+     Only the pressable set — a blanket transform reset would break layout
+     transforms like the centred input icon. */
+  .button:active:not(:disabled),
+  .persona-option:active,
+  .mode-button:active,
+  .claim-row:active,
+  .icon-button:active:not(:disabled),
+  .usage-control:active,
+  .tour-history li > button:first-child:active {
+    transform: none;
+  }
+
+  /* Every arrival becomes a plain crossfade — the information still announces
+     itself, nothing travels. Kept as an explicit list so a new animation has
+     to opt in here rather than silently shipping motion. */
+  .tour-section,
+  .index-status,
+  .inline-alert,
+  .first-impression,
+  .workspace {
+    animation: fade-in 160ms ease both;
+  }
+
+  /* The dialog crossfades instead of scaling, but it still has to hold the
+     top layer for the length of that fade — the blanket transition-property
+     rule above would otherwise drop `display` and snap it away mid-fade. */
+  .provider-dialog,
+  .provider-dialog[open],
+  .provider-dialog::backdrop,
+  .provider-dialog[open]::backdrop {
+    transform: none !important;
+    backdrop-filter: none !important;
+    transition-property: opacity, display, overlay !important;
+    transition-duration: 160ms !important;
+    transition-behavior: allow-discrete !important;
+  }
+
+  /* A looping shimmer has no gentler equivalent — it is pure motion. The
+     placeholder still reads as a placeholder without it. */
+  .skeleton {
+    animation: none;
+    background: var(--surface-subtle);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Frost over glass: raise the surface, drop the blur. */
+@media (prefers-reduced-transparency: reduce) {
+  .app-header {
+    background: var(--canvas);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: none;
+  }
+
+  .app-header::after {
+    display: none;
+  }
+
+  .provider-dialog::backdrop {
+    background: color-mix(in srgb, #05080c 88%, transparent);
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-secondary: var(--text);
+    --border: var(--border-strong);
+  }
+
+  .app-header {
+    background: var(--canvas);
+    border-bottom: 1px solid var(--border-strong);
+    backdrop-filter: none;
+  }
+
+  .app-header::after {
+    display: none;
+  }
+
+  .text-input:focus,
+  .button:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
   }
 }
 

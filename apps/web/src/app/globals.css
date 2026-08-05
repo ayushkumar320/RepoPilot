@@ -25,6 +25,8 @@
   --code-text: #d8e0e8;
   --code-muted: #74808c;
   --code-highlight: rgba(45, 212, 191, 0.13);
+  /* The tint the claimed range lands on before settling to its resting one. */
+  --code-highlight-strong: rgba(45, 212, 191, 0.34);
   --shadow-sm: 0 1px 2px rgba(20, 31, 43, 0.05);
   --shadow-lg: 0 24px 60px rgba(31, 42, 55, 0.1);
   --radius-panel: 14px;
@@ -97,6 +99,7 @@
     --code-text: #dce3ea;
     --code-muted: #697583;
     --code-highlight: rgba(73, 185, 173, 0.15);
+    --code-highlight-strong: rgba(73, 185, 173, 0.36);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22);
     --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.28);
   }
@@ -1531,8 +1534,30 @@ a {
   min-height: 20px;
 }
 
+/* Clicking a claim changes a panel on the other side of the screen, which is
+   easy to miss. The claimed range is the reason the panel changed, so it
+   arrives on a stronger tint and settles to its resting one — the answer
+   announces itself instead of being already there when you look over.
+   Paint-only: no transform, because .code-frame scrolls and would clip it. */
+@keyframes claimed-range-land {
+  from {
+    background: var(--code-highlight-strong);
+  }
+}
+
 .code-line-active {
   background: var(--code-highlight);
+  animation: claimed-range-land var(--spring-duration) var(--spring) both;
+}
+
+@keyframes code-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+.code-frame pre {
+  animation: code-arrive 320ms var(--ease-out) both;
 }
 
 .line-number {
@@ -1853,8 +1878,15 @@ input:focus-visible {
   .index-status,
   .inline-alert,
   .first-impression,
+  .code-frame pre,
   .workspace {
     animation: fade-in 160ms ease both;
+  }
+
+  /* The claimed range keeps its resting highlight, it just stops arriving on
+     a brighter one — a colour pulse is motion for the same reason a slide is. */
+  .code-line-active {
+    animation: none;
   }
 
   /* The dialog crossfades instead of scaling, but it still has to hold the

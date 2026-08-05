@@ -2,7 +2,6 @@ export type RepoStatus = "queued" | "indexing" | "ready" | "error" | "stale";
 
 export interface AccountUsage {
   free_repositories_remaining: number;
-  free_questions_remaining: number;
   provider_connected: boolean;
   groq_connected: boolean;
   huggingface_connected: boolean;
@@ -141,7 +140,7 @@ const RETRYABLE_STATUS = new Set([500, 502, 503, 504]);
 
 // Only idempotent requests may be auto-retried: reads (GET) and repo submission
 // (POST /repos is idempotent on repo_url). We must NOT retry an /ask — it
-// consumes the free-question quota.
+// bills a provider call and appends to the transcript.
 function isIdempotent(path: string, init?: RequestInit): boolean {
   const method = (init?.method ?? "GET").toUpperCase();
   return method === "GET" || path === "/repos";

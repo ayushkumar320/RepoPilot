@@ -8,9 +8,13 @@
 >   user's history every time the repo was re-indexed.
 > - Identity is written by the web app through **`PUT /me`**, not inferred
 >   server-side. `GET /me` reads it back.
-> - Sign-in is **optional at runtime**: with `AUTH_GITHUB_ID` unset the
->   middleware and the sign-in control are inert and the anonymous product
->   behaves exactly as before.
+> - Sign-in is **optional at runtime**: with no provider id set (`AUTH_GOOGLE_ID`,
+>   `AUTH_GITHUB_ID`) the middleware and the sign-in control are inert and the
+>   anonymous product behaves exactly as before.
+> - **Superseded (Google gate):** with any provider configured, sign-in is now a
+>   *gate* rather than a header control — the landing page is a sign-in screen and
+>   the repository/lens steps come after it. Google was added alongside GitHub, so
+>   the `session_id` name is `"<provider>:<providerAccountId>"`.
 >
 > Full status — what is verified, what is untested, and what is left — is in
 > [§8](#8-status-what-works-what-is-left). Evals were neither modified nor run.
@@ -58,10 +62,10 @@ Everything below is the minimum to do those three things.
 | Decision | Choice | Why / what we skip |
 |---|---|---|
 | Auth library | **NextAuth / Auth.js v5** on the Next 15 app router | Native to the existing web app; no new backend. |
-| OAuth provider | **GitHub** (single provider) | The product's input *is* a GitHub URL; the user already has a GitHub account. Skip Google/email — add later if asked. |
+| OAuth provider | **Google + GitHub** (GitHub only, originally) | The product's input *is* a GitHub URL, but Google is the sign-up most users already have. Each provider is wired only when its client id is set. |
 | Session strategy | **JWT** (no NextAuth DB adapter) | We do not need NextAuth's own user/account tables. Skip the adapter and its 4 tables entirely. Identity lives in the JWT; our own `product_accounts` row is the user record. |
 | Web ↔ API trust | **Reuse the existing signed `repopilot_session` cookie** | The API already verifies this cookie. Web sets it after login with a user-derived `session_id`. No new token format, no JWKS, no bearer plumbing. |
-| `session_id` for a user | `uuidv5(NAMESPACE, "github:" + providerAccountId)` | Deterministic and stable across logins/devices. Anonymous users keep their random UUID — fully backward compatible. |
+| `session_id` for a user | `uuidv5(NAMESPACE, provider + ":" + providerAccountId)` | Deterministic and stable across logins/devices. Anonymous users keep their random UUID — fully backward compatible. |
 | Tour storage | **Postgres**, reintroduce `product_tours` + add `product_tour_messages` | We already dropped/re-add a known schema. |
 | Aiven | Set `POSTGRES_DSN` to the Aiven connection string | No code change; `make_engine` already rewrites the DSN scheme. |
 | Migrations | **Alembic** (existing setup in `packages/ingestion`) | Reuse migration `0006`. |

@@ -15,7 +15,6 @@ test.beforeEach(async ({ page }) => {
           contentType: "application/json",
           body: JSON.stringify({
             free_repositories_remaining: 1,
-            free_questions_remaining: 5,
             provider_connected: false,
             groq_connected: false,
             huggingface_connected: false,
@@ -32,7 +31,7 @@ test.beforeEach(async ({ page }) => {
 const dialog = "dialog.provider-dialog";
 
 test("opens modally and traps focus inside", async ({ page }) => {
-  await page.getByRole("button", { name: /free questions/i }).click();
+  await page.getByRole("button", { name: /connect your provider/i }).click();
 
   await expect(page.locator(dialog)).toBeVisible();
   // showModal() (not show()) is what makes the rest of the page inert.
@@ -73,7 +72,7 @@ test("it animates in rather than appearing fully formed", async ({ page }) => {
 });
 
 test("Escape closes it", async ({ page }) => {
-  await page.getByRole("button", { name: /free questions/i }).click();
+  await page.getByRole("button", { name: /connect your provider/i }).click();
   await expect(page.locator(dialog)).toBeVisible();
 
   await page.keyboard.press("Escape");
@@ -82,7 +81,7 @@ test("Escape closes it", async ({ page }) => {
 });
 
 test("it animates out instead of vanishing on close", async ({ page }) => {
-  await page.getByRole("button", { name: /free questions/i }).click();
+  await page.getByRole("button", { name: /connect your provider/i }).click();
   await expect(page.locator(dialog)).toBeVisible();
   // Let the entrance finish so we are only measuring the exit.
   await page.waitForTimeout(700);
@@ -127,7 +126,7 @@ function assertExit(exit: unknown): void {
 }
 
 test("clicking the backdrop closes it, clicking the panel does not", async ({ page }) => {
-  await page.getByRole("button", { name: /free questions/i }).click();
+  await page.getByRole("button", { name: /connect your provider/i }).click();
   await expect(page.locator(dialog)).toBeVisible();
 
   // A click on the panel must not bubble into a dismissal.

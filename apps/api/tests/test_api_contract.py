@@ -384,13 +384,12 @@ async def test_first_impression_endpoint_emits_sse_events(api_client: AsyncClien
 
 
 @pytest.mark.asyncio
-async def test_account_starts_with_one_repo_and_five_questions(api_client: AsyncClient) -> None:
+async def test_account_starts_with_one_free_repo(api_client: AsyncClient) -> None:
     response = await api_client.get("/account/usage")
 
     assert response.status_code == 200
     assert response.json() == {
         "free_repositories_remaining": 1,
-        "free_questions_remaining": 5,
         "provider_connected": False,
         "groq_connected": False,
         "huggingface_connected": False,
@@ -399,31 +398,17 @@ async def test_account_starts_with_one_repo_and_five_questions(api_client: Async
 
 
 @pytest.mark.asyncio
-async def test_sixth_question_requires_user_provider(api_client: AsyncClient) -> None:
-    for index in range(5):
+async def test_questions_are_unmetered(api_client: AsyncClient) -> None:
+    for index in range(6):
         response = await api_client.post(
             "/repos/repo-123/ask",
             json={"question": f"Question {index}?"},
         )
         assert response.status_code == 200
 
-    response = await api_client.post(
-        "/repos/repo-123/ask",
-        json={"question": "Question six?"},
-    )
-
-    assert response.status_code == 402
-    assert response.json()["detail"]["code"] == "PROVIDER_KEY_REQUIRED"
-
 
 @pytest.mark.asyncio
-async def test_connected_provider_continues_after_free_questions(api_client: AsyncClient) -> None:
-    for index in range(5):
-        await api_client.post(
-            "/repos/repo-123/ask",
-            json={"question": f"Question {index}?"},
-        )
-
+async def test_connected_provider_serves_questions(api_client: AsyncClient) -> None:
     connected = await api_client.post(
         "/account/provider",
         json={

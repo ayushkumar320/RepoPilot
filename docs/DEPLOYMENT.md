@@ -29,13 +29,15 @@ NEXT_PUBLIC_API_BASE_URL=/api
 
 `REPOPILOT_SESSION_SECRET` must be stable across API deployments. Changing it signs every browser out. User provider keys are deliberately session-only and users must reconnect them after an API restart.
 
-### Optional: GitHub sign-in (web service)
+### Sign-in (web service)
 
 Set these on the **web** service only, alongside the same
 `REPOPILOT_SESSION_SECRET` the API uses:
 
 ```bash
 AUTH_SECRET=<openssl-rand-hex-32>
+AUTH_GOOGLE_ID=<oauth client id>
+AUTH_GOOGLE_SECRET=<oauth client secret>
 AUTH_GITHUB_ID=<oauth app client id>
 AUTH_GITHUB_SECRET=<oauth app client secret>
 NEXTAUTH_URL=https://your-domain.example
@@ -43,14 +45,18 @@ REPOPILOT_SESSION_SECRET=<same value as the API>
 REPOPILOT_SESSION_COOKIE_SECURE=true
 ```
 
-OAuth callback URL: `https://your-domain.example/api/auth/callback/github`.
+OAuth callback URLs: `https://your-domain.example/api/auth/callback/google`
+and `.../callback/github`. Configure whichever providers you set ids for —
+each one is wired only when its id is present.
 
-The web app signs a stable, GitHub-derived session id with
+The web app signs a stable, account-derived session id with
 `REPOPILOT_SESSION_SECRET` and writes it to the same `repopilot_session`
 cookie the API already verifies — there is no second token format and no
 bearer plumbing. The two values must match byte for byte; a mismatch degrades
-silently to anonymous sessions rather than erroring. Leaving `AUTH_GITHUB_ID`
-unset disables sign-in and the product behaves exactly as it did before.
+silently to anonymous sessions rather than erroring. With **both** provider
+ids unset there is no gate and the product runs anonymously, exactly as
+before; with either set, the landing page is a sign-in screen and the
+repository step comes after sign-in.
 
 ### Managed Postgres (Aiven)
 
@@ -71,6 +77,6 @@ Any Postgres with `pgvector` works. For Aiven:
 4. Deploy the API and worker.
 5. Verify `GET /health`, Postgres connectivity, and Redis connectivity.
 6. Deploy the web image with `API_PROXY_TARGET` pointing at the API.
-7. Smoke test one repository, five free questions, the key gate, and SSE streaming.
+7. Smoke test sign-in, one repository, a few questions, the key gate, and SSE streaming.
 
 Do not expose the API and web on unrelated sites while using cookie sessions. Prefer `app.example.com` and `api.example.com`, or proxy `/api` through the Next.js service as configured here.

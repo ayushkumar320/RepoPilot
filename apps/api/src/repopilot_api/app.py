@@ -117,7 +117,6 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
     def usage_response(usage: AccountUsage) -> AccountUsageResponse:
         return AccountUsageResponse(
             free_repositories_remaining=usage.free_repositories_remaining,
-            free_questions_remaining=usage.free_questions_remaining,
             provider_connected=usage.provider_connected,
             groq_connected=usage.groq_connected,
             huggingface_connected=usage.huggingface_connected,
@@ -131,8 +130,6 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
                 "action": exc.action,
                 "message": (
                     "Your free repository is used. Connect your Groq key to analyze another."
-                    if exc.action == "repository"
-                    else "Your five free questions are used. Connect your Groq key to continue."
                 ),
             },
         )
@@ -251,10 +248,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         request: AskRequest,
         session_id: str = Depends(resolve_session),
     ) -> QAAnswerResponse:
-        try:
-            reservation = await get_services().access.reserve_question(session_id, repo_id)
-        except AllowanceExceededError as exc:
-            raise allowance_error(exc) from exc
+        reservation = await get_services().access.reserve_question(session_id, repo_id)
         provider = (
             await get_services().access.provider_for(session_id)
             if reservation.source == "user"

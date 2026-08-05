@@ -21,7 +21,7 @@ CredentialSource = Literal["platform", "user"]
 class AllowanceExceededError(RuntimeError):
     """Raised when a session has no free allowance and no user provider key."""
 
-    def __init__(self, action: Literal["repository", "question"]) -> None:
+    def __init__(self, action: Literal["repository"]) -> None:
         self.action = action
         super().__init__(f"{action} allowance exhausted")
 
@@ -29,7 +29,6 @@ class AllowanceExceededError(RuntimeError):
 @dataclass(frozen=True, slots=True)
 class AccountUsage:
     free_repositories_remaining: int
-    free_questions_remaining: int
     provider_connected: bool
     groq_connected: bool
     huggingface_connected: bool
@@ -96,20 +95,9 @@ class ProductAccessService:
                     usage_events.c.status.in_(["reserved", "completed"]),
                 )
             )
-            question_count = await conn.scalar(
-                select(func.count())
-                .select_from(usage_events)
-                .where(
-                    usage_events.c.session_id == session_id,
-                    usage_events.c.action == "question",
-                    usage_events.c.credential_source == "platform",
-                    usage_events.c.status.in_(["reserved", "completed"]),
-                )
-            )
         groq, huggingface = self.connected.get(session_id, (False, False))
         return AccountUsage(
             free_repositories_remaining=max(0, 1 - int(repo_count or 0)),
-            free_questions_remaining=max(0, 5 - int(question_count or 0)),
             provider_connected=groq,
             groq_connected=groq,
             huggingface_connected=huggingface,
@@ -185,7 +173,7 @@ class ProductAccessService:
         *,
         action: Literal["repository", "question"],
         resource_id: str,
-        free_limit: int,
+        free_limit: int | None,
     ) -> UsageReservation:
         await self._ensure_account(session_id)
         source: CredentialSource = "user" if session_id in self.providers else "platform"
@@ -206,7 +194,7 @@ class ProductAccessService:
             )
             if existing is not None and action == "repository":
                 return UsageReservation(id=str(existing), source=source)
-            if source == "platform":
+            if source == "platform" and free_limit is not None:
                 used = await conn.scalar(
                     select(func.count())
                     .select_from(usage_events)
@@ -218,10 +206,7 @@ class ProductAccessService:
                     )
                 )
                 if int(used or 0) >= free_limit:
-                    public_action: Literal["repository", "question"] = (
-                        "repository" if action == "repository" else "question"
-                    )
-                    raise AllowanceExceededError(public_action)
+                    raise AllowanceExceededError("repository")
             await conn.execute(
                 insert(usage_events).values(
                     id=reservation_id,
@@ -240,7 +225,10 @@ class ProductAccessService:
         )
 
     async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation:
-        return await self._reserve(session_id, action="question", resource_id=repo_id, free_limit=5)
+        # Questions are unmetered; the row is still written for usage history.
+        return await self._reserve(
+            session_id, action="question", resource_id=repo_id, free_limit=None
+        )
 
     async def complete(self, reservation: UsageReservation) -> None:
         async with self.engine.begin() as conn:
@@ -283,7 +271,6 @@ class InMemoryAccessService:
             free_repositories_remaining=max(
                 0, 1 - len(self.repository_events.get(session_id, set()))
             ),
-            free_questions_remaining=max(0, 5 - self.question_counts.get(session_id, 0)),
             provider_connected=groq,
             groq_connected=groq,
             huggingface_connected=self.connected_sessions.get(session_id, False),
@@ -315,10 +302,7 @@ class InMemoryAccessService:
     async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation:
         if session_id in self.connected_sessions:
             return UsageReservation(str(uuid4()), "user")
-        used = self.question_counts.get(session_id, 0)
-        if used >= 5:
-            raise AllowanceExceededError("question")
-        self.question_counts[session_id] = used + 1
+        self.question_counts[session_id] = self.question_counts.get(session_id, 0) + 1
         return UsageReservation(str(uuid4()), "platform")
 
     async def complete(self, reservation: UsageReservation) -> None:

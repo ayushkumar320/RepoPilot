@@ -34,6 +34,10 @@
   --press-in: 60ms;
   --press-out: 220ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* The mirror of --ease-out, for the return leg of a reversible transition:
+     a surface leaves by accelerating away, the inverse of how it arrived. */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --exit-duration: 220ms;
 
   /* Spring motion, expressed in Apple's damping/response terms and sampled
      into a linear() ramp. Nothing here is gesture-driven, so we need the
@@ -1137,34 +1141,88 @@ a {
   color: var(--text);
   box-shadow: var(--shadow-lg);
   overflow: auto;
-  /* A sheet arriving gets the bounce: it reads as a surface landing rather
-     than a box being drawn. */
-  animation: dialog-materialize var(--spring-bounce-duration) var(--spring-bounce) both;
+
+  /* Enter and exit run the same path, so this is a transition rather than a
+     pair of keyframes. `allow-discrete` is what keeps the element in the top
+     layer while it animates away — without it `close()` would yank it out on
+     the same frame and the dialog would arrive like a surface but vanish like
+     a bug. Split across two declarations so that an engine which cannot parse
+     the discrete half still gets the opacity and transform half.
+
+     This block is the LEAVING state, so it carries the exit curve: quick and
+     accelerating, the mirror of the arrival. */
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    transform var(--exit-duration) var(--ease-in);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    transform var(--exit-duration) var(--ease-in),
+    display var(--exit-duration) allow-discrete,
+    overlay var(--exit-duration) allow-discrete;
+}
+
+/* The arriving state, so it carries the arrival curve: a sheet landing, with
+   the slight overshoot that implies weight. */
+.provider-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--spring-bounce-duration) var(--spring-bounce),
+    transform var(--spring-bounce-duration) var(--spring-bounce);
+  transition:
+    opacity var(--spring-bounce-duration) var(--spring-bounce),
+    transform var(--spring-bounce-duration) var(--spring-bounce),
+    display var(--spring-bounce-duration) allow-discrete,
+    overlay var(--spring-bounce-duration) allow-discrete;
+}
+
+/* Where the transition starts from on the very first frame it is shown. */
+@starting-style {
+  .provider-dialog[open] {
+    opacity: 0;
+    transform: scale(0.94);
+  }
 }
 
 .provider-dialog-content {
   padding: 26px;
 }
 
+/* The scrim and its blur move together so the surface reads as glass forming
+   and un-forming, not a flat panel fading. */
 .provider-dialog::backdrop {
   background: color-mix(in srgb, #05080c 62%, transparent);
-  backdrop-filter: blur(6px);
-  animation: backdrop-materialize 260ms var(--ease-out) both;
+  opacity: 0;
+  backdrop-filter: blur(0);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    backdrop-filter var(--exit-duration) var(--ease-in);
+  transition:
+    opacity var(--exit-duration) var(--ease-in),
+    backdrop-filter var(--exit-duration) var(--ease-in),
+    display var(--exit-duration) allow-discrete,
+    overlay var(--exit-duration) allow-discrete;
 }
 
-/* The scrim and its blur arrive together so the surface reads as glass
-   forming, not a flat panel fading in. */
-@keyframes backdrop-materialize {
-  from {
+.provider-dialog[open]::backdrop {
+  opacity: 1;
+  backdrop-filter: blur(6px);
+  transition:
+    opacity 260ms var(--ease-out),
+    backdrop-filter 260ms var(--ease-out);
+  transition:
+    opacity 260ms var(--ease-out),
+    backdrop-filter 260ms var(--ease-out),
+    display 260ms allow-discrete,
+    overlay 260ms allow-discrete;
+}
+
+@starting-style {
+  .provider-dialog[open]::backdrop {
     opacity: 0;
     backdrop-filter: blur(0);
-  }
-}
-
-@keyframes dialog-materialize {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
   }
 }
 
@@ -1791,14 +1849,26 @@ input:focus-visible {
   /* Every arrival becomes a plain crossfade — the information still announces
      itself, nothing travels. Kept as an explicit list so a new animation has
      to opt in here rather than silently shipping motion. */
-  .provider-dialog,
-  .provider-dialog::backdrop,
   .tour-section,
   .index-status,
   .inline-alert,
   .first-impression,
   .workspace {
     animation: fade-in 160ms ease both;
+  }
+
+  /* The dialog crossfades instead of scaling, but it still has to hold the
+     top layer for the length of that fade — the blanket transition-property
+     rule above would otherwise drop `display` and snap it away mid-fade. */
+  .provider-dialog,
+  .provider-dialog[open],
+  .provider-dialog::backdrop,
+  .provider-dialog[open]::backdrop {
+    transform: none !important;
+    backdrop-filter: none !important;
+    transition-property: opacity, display, overlay !important;
+    transition-duration: 160ms !important;
+    transition-behavior: allow-discrete !important;
   }
 
   /* A looping shimmer has no gentler equivalent — it is pure motion. The

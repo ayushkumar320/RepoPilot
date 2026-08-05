@@ -45,6 +45,33 @@ test("opens modally and traps focus inside", async ({ page }) => {
   expect(focusInsideDialog).toBe(true);
 });
 
+test("it animates in rather than appearing fully formed", async ({ page }) => {
+  // @starting-style is what gives a dialog an entrance at all — without it
+  // showModal() paints the final state on the first frame.
+  const entrance = await page.evaluate(() => {
+    const node = document.querySelector<HTMLDialogElement>("dialog.provider-dialog");
+    if (!node) return { error: "no dialog" };
+    (document.querySelector(".usage-control") as HTMLButtonElement).click();
+    return new Promise((resolve) => {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          resolve({
+            transitioning: node
+              .getAnimations()
+              .map((a) => (a as CSSTransition).transitionProperty ?? "")
+              .filter(Boolean),
+          }),
+        ),
+      );
+    });
+  });
+
+  const result = entrance as Record<string, unknown>;
+  expect(result.error, "dialog was not found").toBeUndefined();
+  expect(result.transitioning, "dialog appeared with no entrance transition").toContain("opacity");
+  expect(result.transitioning, "dialog did not scale in").toContain("transform");
+});
+
 test("Escape closes it", async ({ page }) => {
   await page.getByRole("button", { name: /free questions/i }).click();
   await expect(page.locator(dialog)).toBeVisible();
@@ -53,6 +80,51 @@ test("Escape closes it", async ({ page }) => {
 
   await expect(page.locator(dialog)).toBeHidden();
 });
+
+test("it animates out instead of vanishing on close", async ({ page }) => {
+  await page.getByRole("button", { name: /free questions/i }).click();
+  await expect(page.locator(dialog)).toBeVisible();
+  // Let the entrance finish so we are only measuring the exit.
+  await page.waitForTimeout(700);
+
+  const exit = await page.evaluate(() => {
+    const node = document.querySelector<HTMLDialogElement>("dialog.provider-dialog");
+    if (!node) return { error: "no dialog" };
+    (document.querySelector(".dialog-actions button") as HTMLButtonElement).click();
+    // Sampled on the frame after the close: the element must still be laid
+    // out and still hold the top layer while its transition plays.
+    return new Promise((resolve) => {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          const style = getComputedStyle(node);
+          resolve({
+            stillRendered: style.display !== "none",
+            stillInTopLayer: style.overlay !== "none",
+            // Which properties are mid-transition. Asserting on the running
+            // set rather than a sampled opacity value keeps this independent
+            // of how far the transition happens to have advanced.
+            transitioning: node
+              .getAnimations()
+              .map((a) => (a as CSSTransition).transitionProperty ?? "")
+              .filter(Boolean),
+          });
+        }),
+      );
+    });
+  });
+
+  assertExit(exit);
+  // And it does eventually leave.
+  await expect(page.locator(dialog)).toBeHidden();
+});
+
+function assertExit(exit: unknown): void {
+  const result = exit as Record<string, unknown>;
+  expect(result.error, "dialog was not found").toBeUndefined();
+  expect(result.stillRendered, "dialog was removed from layout on the same frame").toBe(true);
+  expect(result.stillInTopLayer, "dialog dropped out of the top layer mid-exit").toBe(true);
+  expect(result.transitioning, "nothing was transitioning on the way out").toContain("opacity");
+}
 
 test("clicking the backdrop closes it, clicking the panel does not", async ({ page }) => {
   await page.getByRole("button", { name: /free questions/i }).click();

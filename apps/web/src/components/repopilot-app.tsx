@@ -20,7 +20,7 @@ import {
   WarningCircle,
   X,
 } from "@phosphor-icons/react";
-import { type FormEvent, useEffect, useMemo, useReducer, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import {
   ApiError,
@@ -139,6 +139,7 @@ function ProviderDialog({
   const [huggingfaceKey, setHuggingfaceKey] = useState("");
   const [showGroq, setShowGroq] = useState(false);
   const [showHuggingface, setShowHuggingface] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -149,16 +150,31 @@ function ProviderDialog({
     }
   }, [open]);
 
-  if (!open) return null;
+  // showModal() is what buys the focus trap, the Escape key, the inert
+  // background and the top layer — none of which are worth hand-rolling.
+  useEffect(() => {
+    const node = dialogRef.current;
+    if (!node) return;
+    if (open && !node.open) node.showModal();
+    if (!open && node.open) node.close();
+  }, [open]);
 
   return (
-    <div className="dialog-backdrop" role="presentation">
-      <section
-        className="provider-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="provider-dialog-title"
-      >
+    <dialog
+      className="provider-dialog"
+      ref={dialogRef}
+      aria-labelledby="provider-dialog-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        // A click that lands on the dialog element itself is a backdrop click:
+        // the content sits in a child that stops it getting this far.
+        if (event.target === dialogRef.current) onClose();
+      }}
+    >
+      <div className="provider-dialog-content">
         <div className="dialog-heading">
           <div className="dialog-icon" aria-hidden="true">
             <LockKey size={21} weight="fill" />
@@ -284,8 +300,8 @@ function ProviderDialog({
             </div>
           </form>
         )}
-      </section>
-    </div>
+      </div>
+    </dialog>
   );
 }
 

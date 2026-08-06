@@ -11,6 +11,8 @@ dependencies = [
     "starlette<0.42",
     "uvicorn[standard]>=0.30",
     "httpx>=0.27",
+    # Fernet, for the BYOK provider keys held at rest in product_credentials.
+    "cryptography>=43,<46",
     "arq>=0.26,<0.27",
     "structlog>=24.4,<25",
 ]

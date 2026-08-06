@@ -1,5 +1,4 @@
 import type {
-  ChunkPayload,
   ClaimPayload,
   CodeRef,
   FirstImpressionEvent,
@@ -22,22 +21,12 @@ export interface Exchange {
   personaLabel: string;
 }
 
-export interface ViewerState {
-  chunkId?: string;
-  filePath?: string;
-  startLine?: number;
-  endLine?: number;
-  content?: string;
-  summary?: string | null;
-}
-
 export interface SessionState {
   repoStatus?: RepoStatusResponse;
   firstImpression: string;
   exchanges: Exchange[];
   claimsById: Record<string, StoredClaim>;
   selectedClaimId?: string;
-  viewer: ViewerState;
   error?: string;
 }
 
@@ -45,7 +34,6 @@ export const initialSessionState: SessionState = {
   firstImpression: "",
   exchanges: [],
   claimsById: {},
-  viewer: {},
 };
 
 export function encodeChunkId(repoId: string, ref: CodeRef): string {
@@ -97,8 +85,8 @@ export function appendExchange(
     error: undefined,
   };
 
-  // Jump the code viewer to the newest answer's first source, so the reader
-  // lands on evidence rather than on whatever they last clicked.
+  // Focus the newest answer's first source, so the reader lands on evidence
+  // rather than on whatever they last clicked.
   const firstClaimId = claimIds[0];
   return firstClaimId ? selectClaim(next, firstClaimId) : next;
 }
@@ -122,37 +110,10 @@ export function hydrateFromTour(
 }
 
 export function selectClaim(state: SessionState, claimId: string): SessionState {
-  const claim = state.claimsById[claimId];
-  if (!claim) {
+  if (!state.claimsById[claimId]) {
     return state;
   }
-  const ref = claim.refs[0];
-  return {
-    ...state,
-    selectedClaimId: claimId,
-    viewer: {
-      chunkId: claim.chunkId,
-      filePath: ref.file_path,
-      startLine: ref.start_line,
-      endLine: ref.end_line,
-      content: undefined,
-      summary: undefined,
-    },
-  };
-}
-
-export function hydrateViewer(state: SessionState, chunk: ChunkPayload): SessionState {
-  return {
-    ...state,
-    viewer: {
-      chunkId: chunk.chunk_id,
-      filePath: chunk.ref.file_path,
-      startLine: chunk.ref.start_line,
-      endLine: chunk.ref.end_line,
-      content: chunk.content,
-      summary: chunk.summary,
-    },
-  };
+  return { ...state, selectedClaimId: claimId };
 }
 
 export function applyFirstImpression(

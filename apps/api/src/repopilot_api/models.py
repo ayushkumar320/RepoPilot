@@ -67,7 +67,7 @@ class AccountUsageResponse(BaseModel):
     provider_connected: bool
     groq_connected: bool
     huggingface_connected: bool
-    credential_storage: Literal["session_only"] = "session_only"
+    credential_storage: Literal["account_bound"] = "account_bound"
 
 
 class ClaimPayload(BaseModel):

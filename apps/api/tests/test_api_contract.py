@@ -393,7 +393,7 @@ async def test_account_starts_with_one_free_repo(api_client: AsyncClient) -> Non
         "provider_connected": False,
         "groq_connected": False,
         "huggingface_connected": False,
-        "credential_storage": "session_only",
+        "credential_storage": "account_bound",
     }
 
 

@@ -222,7 +222,13 @@ async def answer_question(
                 [h.ref for h in pool_hits], engine=engine, repo_id=repo_id
             )
             if len(pool_chunks) == len(pool_hits):
-                ranked = rerank_and_diversify(
+                # to_thread, not a direct call: the cross-encoder is sync CPU
+                # work and its first invocation downloads the ONNX model. On
+                # the event loop that stalls every other request on the worker
+                # until it finishes, which the web proxy sees as a socket hang
+                # up (ECONNRESET).
+                ranked = await asyncio.to_thread(
+                    rerank_and_diversify,
                     question,
                     pool_hits,
                     pool_chunks,

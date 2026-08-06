@@ -67,7 +67,7 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
             provider_connected: false,
             groq_connected: false,
             huggingface_connected: false,
-            credential_storage: "session_only",
+            credential_storage: "account_bound",
           }),
         });
       }

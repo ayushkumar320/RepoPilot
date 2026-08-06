@@ -43,29 +43,11 @@ import {
   applyFirstImpression,
   applyRepoStatus,
   hydrateFromTour,
-  hydrateViewer,
   initialSessionState,
   personaLabel,
   selectClaim,
   type SessionState,
 } from "@/lib/session-store";
-
-interface ViewerLine {
-  active: boolean;
-  content: string;
-  number: number;
-}
-
-function splitLines(content: string, startLine: number, endLine: number): ViewerLine[] {
-  return content.split("\n").map((line, index) => {
-    const number = index + startLine;
-    return {
-      active: number >= startLine && number <= endLine,
-      content: line,
-      number,
-    };
-  });
-}
 
 function claimBadgeClass(status: ClaimStatus): string {
   if (status === "flagged" || status === "rejected") {
@@ -184,8 +166,8 @@ function ProviderDialog({
               {usage?.provider_connected ? "Provider connected" : "Continue with your Groq limit"}
             </h2>
             <p>
-              Keys go directly to the API and remain only in this server session. They are never
-              stored in the browser or database.
+              Keys go directly to the API and stay with your account, encrypted at rest, so they
+              survive signing out. They are never stored in the browser. Disconnect deletes them.
             </p>
           </div>
           <button
@@ -331,7 +313,6 @@ export default function RepoPilotApp({
   const [askPrompt, setAskPrompt] = useState("");
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(false);
-  const [viewerLoading, setViewerLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [usage, setUsage] = useState<AccountUsage | null>(null);
   const [providerDialogOpen, setProviderDialogOpen] = useState(false);
@@ -435,31 +416,6 @@ export default function RepoPilotApp({
     }, 1500);
     return () => window.clearTimeout(timeout);
   }, [repoError, repoId, repoReady, pollTick]);
-
-  useEffect(() => {
-    const chunkId = store.viewer.chunkId;
-    if (!chunkId || store.viewer.content) return;
-    let active = true;
-    setViewerLoading(true);
-    void api
-      .getChunk(chunkId)
-      .then((chunk) => {
-        if (active) setStore((current) => hydrateViewer(current, chunk));
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          setErrorMessage(
-            error instanceof Error ? error.message : "Could not open this source reference.",
-          );
-        }
-      })
-      .finally(() => {
-        if (active) setViewerLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [store.viewer.chunkId, store.viewer.content]);
 
   // Structure free-text personas server-side once the user stops typing. A
   // failure is not fatal: `profile` already falls back to raw text.
@@ -609,11 +565,6 @@ export default function RepoPilotApp({
       setErrorMessage(error instanceof Error ? error.message : "Could not delete this tour.");
     }
   };
-
-  const viewerLines = useMemo(() => {
-    if (!store.viewer.content || !store.viewer.startLine || !store.viewer.endLine) return [];
-    return splitLines(store.viewer.content, store.viewer.startLine, store.viewer.endLine);
-  }, [store.viewer.content, store.viewer.endLine, store.viewer.startLine]);
 
   const connectProvider = async (groqKey: string, huggingfaceKey: string) => {
     setProviderSaving(true);
@@ -977,6 +928,38 @@ export default function RepoPilotApp({
                 <p className="first-impression">{store.firstImpression}</p>
               ) : null}
 
+              <form className="ask-panel" onSubmit={askAnything}>
+                <div className="ask-heading">
+                  <label htmlFor="ask-repository">Ask this repository</label>
+                  <button type="button" onClick={() => setProviderDialogOpen(true)}>
+                    <LockKey size={15} aria-hidden="true" />
+                    {usage?.provider_connected ? "Using your provider" : "Using the shared key"}
+                  </button>
+                </div>
+                <div className="ask-row">
+                  <input
+                    id="ask-repository"
+                    className="text-input ask-input"
+                    value={askPrompt}
+                    onChange={(event) => setAskPrompt(event.target.value)}
+                    placeholder="What is the tech stack?"
+                    disabled={asking}
+                  />
+                  <button
+                    className="button button-primary ask-button"
+                    type="submit"
+                    disabled={!askPrompt.trim() || asking}
+                  >
+                    <PaperPlaneTilt size={18} weight="fill" aria-hidden="true" />
+                    {asking ? "Asking" : "Ask"}
+                  </button>
+                </div>
+                <p>
+                  Answers use only the indexed snapshot, include source references, and are
+                  prioritized for {personaLabel(profile)}.
+                </p>
+              </form>
+
               {store.exchanges.length === 0 ? (
                 <div className="answers-empty">
                   <MagnifyingGlass size={26} aria-hidden="true" />
@@ -987,7 +970,7 @@ export default function RepoPilotApp({
                   </span>
                 </div>
               ) : (
-                store.exchanges.map((exchange) => (
+                [...store.exchanges].reverse().map((exchange) => (
                   <article className="tour-section" id={`answer-${exchange.id}`} key={exchange.id}>
                     <div className="tour-section-heading">
                       <h2>{exchange.question}</h2>
@@ -1042,85 +1025,8 @@ export default function RepoPilotApp({
                 ))
               )}
 
-              <form className="ask-panel" onSubmit={askAnything}>
-                <div className="ask-heading">
-                  <label htmlFor="ask-repository">Ask this repository</label>
-                  <button type="button" onClick={() => setProviderDialogOpen(true)}>
-                    <LockKey size={15} aria-hidden="true" />
-                    {usage?.provider_connected ? "Using your provider" : "Using the shared key"}
-                  </button>
-                </div>
-                <div className="ask-row">
-                  <input
-                    id="ask-repository"
-                    className="text-input ask-input"
-                    value={askPrompt}
-                    onChange={(event) => setAskPrompt(event.target.value)}
-                    placeholder="What is the tech stack?"
-                    disabled={asking}
-                  />
-                  <button
-                    className="button button-primary ask-button"
-                    type="submit"
-                    disabled={!askPrompt.trim() || asking}
-                  >
-                    <PaperPlaneTilt size={18} weight="fill" aria-hidden="true" />
-                    {asking ? "Asking" : "Ask"}
-                  </button>
-                </div>
-                <p>
-                  Answers use only the indexed snapshot, include source references, and are
-                  prioritized for {personaLabel(profile)}.
-                </p>
-              </form>
             </section>
 
-            <aside className="code-inspector" aria-label="Synchronized Code Viewer">
-              <div className="code-inspector-header">
-                <div className="file-heading">
-                  <FileCode size={19} aria-hidden="true" />
-                  <div>
-                    <span>Synchronized Code Viewer</span>
-                    <strong>{store.viewer.filePath ?? "Select a verified source"}</strong>
-                  </div>
-                </div>
-                {store.viewer.startLine ? (
-                  <span className="line-range">
-                    L{store.viewer.startLine}-L{store.viewer.endLine}
-                  </span>
-                ) : null}
-              </div>
-
-              {store.viewer.summary ? <p className="code-summary">{store.viewer.summary}</p> : null}
-
-              <div className="code-frame" data-empty={viewerLines.length === 0}>
-                {viewerLoading ? (
-                  <div className="code-loading">
-                    <div className="skeleton skeleton-code" />
-                    <div className="skeleton skeleton-code skeleton-code-short" />
-                    <div className="skeleton skeleton-code" />
-                  </div>
-                ) : viewerLines.length > 0 ? (
-                  <pre>
-                    {viewerLines.map((line, index) => (
-                      <span
-                        className={line.active ? "code-line code-line-active" : "code-line"}
-                        key={`${line.number}-${index}`}
-                      >
-                        <span className="line-number">{line.number}</span>
-                        <span className="line-content">{line.content || " "}</span>
-                      </span>
-                    ))}
-                  </pre>
-                ) : (
-                  <div className="code-empty">
-                    <FileCode size={28} aria-hidden="true" />
-                    <strong>No source selected</strong>
-                    <span>Choose a verified claim to inspect its supporting code.</span>
-                  </div>
-                )}
-              </div>
-            </aside>
           </div>
         </div>
       )}

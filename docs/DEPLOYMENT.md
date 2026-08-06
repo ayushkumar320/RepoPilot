@@ -11,7 +11,7 @@ RepoPilot deploys as a web service, an API service, a background worker, Postgre
 | Worker | `Dockerfile.api` with repository root as build context | `arq repopilot_api.jobs.index_repo.WorkerSettings` |
 | Migration job | `Dockerfile.api` | `cd packages/ingestion && alembic upgrade head` |
 
-In production, platform-key indexing runs on the ARQ worker. BYOK indexing stays inside the API process because raw user keys are session-only and must never be copied into Redis. Keep one API replica while BYOK indexing is active; moving those jobs across replicas requires an encrypted credential-reference service.
+In production, platform-key indexing runs on the ARQ worker. BYOK indexing stays inside the API process because raw user keys are held in process memory and must never be copied into Redis. Keep one API replica while BYOK indexing is active; moving those jobs across replicas requires an encrypted credential-reference service.
 
 ## Required production environment
 
@@ -27,7 +27,7 @@ API_PROXY_TARGET=https://api.your-domain.example
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
 
-`REPOPILOT_SESSION_SECRET` must be stable across API deployments. Changing it signs every browser out. User provider keys are deliberately session-only and users must reconnect them after an API restart.
+`REPOPILOT_SESSION_SECRET` must be stable across API deployments. Changing it signs every browser out. It also keys the Fernet cipher for stored provider keys (`product_credentials`): rotating it invalidates every saved key, and users must reconnect them.
 
 ### Sign-in (web service)
 

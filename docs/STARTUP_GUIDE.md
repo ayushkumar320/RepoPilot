@@ -229,7 +229,7 @@ npm run test:e2e
 npm run test:lighthouse
 ```
 
-The CI retrieval gate requires a fresh `evals/results/rag_phaseN/_after.json` whenever a pull request touches retrieval paths.
+The CI retrieval gate requires a fresh `evals/results/rag_phaseN/_after.json` whenever a pull request touches retrieval paths. Two exemptions: a pull request whose only retrieval-path change is a migration, and one labelled `retrieval-eval-exempt` — for edits on those paths that cannot move ranking (concurrency, warmup, logging, annotations). Use the label deliberately; anything that touches what is retrieved or how it is ordered needs the bench run.
 
 ## Troubleshooting
 

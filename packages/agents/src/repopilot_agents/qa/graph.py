@@ -558,7 +558,16 @@ async def _generate_answer(
 
 
 def _is_not_found(answer: str) -> bool:
-    norm = answer.strip().lower()
+    """True only when the whole answer IS the not-found sentinel.
+
+    A detailed answer is allowed to say "I couldn't find a test for this" in
+    one of its lines; substring-matching the whole body threw away the other
+    twelve grounded claims with it. Only a short, sentinel-shaped reply counts.
+    """
+    lines = [line for line in answer.strip().splitlines() if line.strip()]
+    if len(lines) != 1:
+        return False
+    norm = lines[0].strip().lower()
     return "couldn't find" in norm or "could not find" in norm or "not in the repo" in norm
 
 
@@ -571,6 +580,11 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     out: list[Claim] = []
     pool = list(chunks)
     for line in answer.splitlines():
+        raw = line.strip()
+        # '## Section' lines organize the answer; they assert nothing, so they
+        # are not claims and must never reach the verifier.
+        if raw.startswith("#"):
+            continue
         text = line.strip(" -•").strip()
         if not text:
             continue

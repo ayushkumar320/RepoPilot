@@ -626,12 +626,31 @@ async def answer_deterministically(
                 f"and is summarized as {summary or 'an implementation chunk worth reading directly'}."
             ),
             refs=[ref],
-            status="verified",
+            # Not "verified": nothing checked this claim against the code. It
+            # is a keyword hit, and labelling it verified would be the exact
+            # fluent-over-truthful failure the verifier exists to prevent.
+            status="unverified",
             verifier_note="Matched by deterministic text overlap against the indexed snapshot.",
         )
         for _, ref, summary, _ in top
     ]
-    answer = "Start with " + ", ".join(f"`{claim.refs[0].symbol}`" for claim in claims) + "."
+    answer = "\n".join(
+        [
+            "## Keyword match only",
+            "The language model could not answer this question, so these are the "
+            "closest matches by keyword overlap in the indexed snapshot — not a "
+            "verified explanation.",
+            "",
+            "## Where to look next",
+            *[
+                f"Read `{ref.symbol}` in `{ref.file_path}`:{ref.start_line}-{ref.end_line}"
+                + (f" — {summary}" if summary else ".")
+                for _, ref, summary, _ in top
+            ],
+            "",
+            "Ask again naming a concrete symbol or file for a fuller answer.",
+        ]
+    )
     retrieval_path = ["deterministic_text_overlap"]
     if fallback_reason:
         retrieval_path.insert(0, f"rag_fallback:{fallback_reason[:160]}")

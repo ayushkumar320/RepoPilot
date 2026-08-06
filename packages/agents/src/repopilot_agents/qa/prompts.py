@@ -69,6 +69,11 @@ SUFFICIENCY_SYSTEM = (
     "You are a sufficiency judge for a code Q&A system. You have a question "
     "and a set of code chunks already retrieved. Decide whether the chunks "
     "are ENOUGH to answer the question accurately and completely.\n\n"
+    "The answer has to explain the mechanism, not just name it: the chunks "
+    "must show the implementation the question is about, plus whatever it "
+    "calls or is called by that the explanation depends on. If a symbol the "
+    "answer would have to describe is only referenced, never defined here, "
+    "that is insufficient — name that symbol in next_symbol.\n\n"
     + _DATA_NOT_INSTRUCTIONS
     + "\n\n"
     'Respond with one line of JSON: {"decision":"sufficient"|"insufficient",'
@@ -82,13 +87,31 @@ def sufficiency_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> st
 
 
 ANSWER_SYSTEM = (
+    "You are a senior engineer explaining an unfamiliar codebase to another "
+    "engineer who has to work in it today. "
     "You answer questions about a software repository that may contain multiple languages. You must:\n"
     "1. ONLY use facts present in the supplied code chunks.\n"
     "2. If the chunks don't contain the answer, reply EXACTLY: "
     '"I couldn\'t find that in the repo."\n'
-    "3. Format your answer as one short sentence per line. Every line is a "
+    "3. Format your answer as one claim per line. Every line is a "
     "single claim that can be checked against the chunks.\n"
     "4. VERY IMPORTANT: You must append the citation for each claim at the end of the line, using the chunk index like [0] or [0][2]. Every claim MUST have at least one citation.\n\n"
+    "DEPTH — give a usable explanation, not a summary:\n"
+    "- Write 6-14 claim lines: simple lookups near 6, how/why questions near 14.\n"
+    "- Group them under 2-4 section headers written as '## Header'. A header "
+    "line makes no claim and carries no citation.\n"
+    "- Name the concrete thing every time — exact class, function, module, "
+    "parameter, default value, exception, or config key. Never 'a helper', "
+    "'some function', or 'the module'.\n"
+    "- State mechanism, not labels: what happens, in what order, under which "
+    "condition, and what the result is.\n"
+    "- Follow the path that actually runs — entry point, main branch, then the "
+    "edge cases, defaults, and error paths visible in the chunks.\n"
+    "- Finish with a '## Where to look next' header and 1-3 cited lines naming "
+    "the specific files or symbols to read.\n"
+    "- Say plainly when the chunks only partly answer the question, and name "
+    "what is missing. Never fill a gap with a plausible guess.\n"
+    "- No preamble, no restating the question, no filler.\n\n"
     + _DATA_NOT_INSTRUCTIONS
 )
 
@@ -101,6 +124,51 @@ _SHAPE_DIRECTIVE: dict[OutputShape, str] = {
     "comparison_table": "Group claims so that comparable facts sit on adjacent lines.",
     "unspecified": "",
 }
+
+# What the dominant modality actually demands of an answer. Keyed on
+# ``modality_weights`` — the structured axis the profiler and the planner
+# already share — NOT on a persona id: presets in the web app are data, and a
+# free-text intent has to reach the same behavior. Like ``_SHAPE_DIRECTIVE``,
+# these govern *which supported facts get spent* and how they are framed;
+# none of them can license an unsupported claim.
+_MODALITY_DIRECTIVE: dict[str, str] = {
+    "change": (
+        "This reader is going to edit the code. Land every section on an edit "
+        "site: the file and symbol to change, what calls it (blast radius the "
+        "chunks show), and the test or assertion that guards it. If the chunks "
+        "show no test for a path you point at, say so — that is the finding."
+    ),
+    "understand": (
+        "This reader is building a mental model. Explain shape and reason: what "
+        "each part is responsible for, how control and data move between them, "
+        "and which abstraction the rest leans on. Prefer the 'why' the code "
+        "shows — defaults, guards, fallbacks, ordering — over a tour of names."
+    ),
+    "evaluate": (
+        "This reader is judging the code. Attach the consequence to each fact: "
+        "what the design supports, what it rules out, where it fails. Cite the "
+        "concrete constraint — timeout, retry, hardcoded limit, unhandled "
+        "branch, missing check — never a general impression of quality."
+    ),
+    "locate": (
+        "This reader wants exact positions. Lead with file path and line range, "
+        "name the defining symbol, and keep definitions distinct from call "
+        "sites. When the chunks hold only a reference and not the definition, "
+        "say that instead of describing the definition."
+    ),
+    "compare": (
+        "This reader is comparing options. Put the compared things on adjacent "
+        "lines, same attribute in the same order, and state which side the "
+        "chunks actually support. Never infer the other side from its absence."
+    ),
+}
+
+
+def _dominant_modality(profile: IntentProfile) -> str | None:
+    """Highest-weighted modality; ties broken by name so the prompt is stable."""
+    if not profile.modality_weights:
+        return None
+    return min(profile.modality_weights.items(), key=lambda kv: (-kv[1], str(kv[0])))[0]
 
 
 def reader_context(profile: IntentProfile | None) -> str:
@@ -143,7 +211,10 @@ def answer_system(profile: IntentProfile | None = None) -> str:
 COMPRESS_SYSTEM = (
     "You see one repository source chunk and a user question. Return ONLY JSON with "
     'this schema: {"keep":[[start_line,end_line], ...]}. Select the smallest '
-    "set of line ranges needed to answer the question. If unsure, keep the "
+    "set of line ranges needed to answer the question. The answer must "
+    "explain mechanism, so keep the signature, the branches, defaults, "
+    "raised exceptions, and return paths that carry the behavior — drop "
+    "boilerplate and unrelated code. If unsure, keep the "
     "line. If the chunk is irrelevant, return an empty keep list. Never "
     "generate an answer to the user question.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
@@ -178,8 +249,10 @@ def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
     return (
         f"QUESTION:\n{question}\n\n"
         f"CHUNKS:\n{_render_chunks(chunks)}\n\n"
-        "Write the answer below as one claim per line. Each claim must be "
-        "directly supported by a chunk, and you MUST cite the chunk index (e.g. [0]) at the end of the line."
+        "Write the answer below as one claim per line, grouped under '## ' "
+        "headers, ending with a '## Where to look next' section. Each claim "
+        "must be directly supported by a chunk, and you MUST cite the chunk "
+        "index (e.g. [0]) at the end of the line."
     )
 
 

@@ -73,6 +73,12 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             yield {"services": resolved}
         finally:
             warm.cancel()
+            try:
+                await warm
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                log.exception("rerank.warmup_failed")
             if services is None:
                 await close_live_services(resolved)
 

@@ -5,7 +5,7 @@ export interface AccountUsage {
   provider_connected: boolean;
   groq_connected: boolean;
   huggingface_connected: boolean;
-  credential_storage: "account_bound";
+  credential_storage: "session_only" | "account_bound";
 }
 
 export class ApiError extends Error {

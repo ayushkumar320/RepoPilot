@@ -9,14 +9,12 @@ under-count.
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from math import log2
 from typing import Literal
 
 from repopilot_agents.qa.query_spec import QuerySpec, build_query_spec
-from repopilot_agents.qa.union import reciprocal_rank_fusion
 from repopilot_agents.tools.bm25_search import bm25_search
 from repopilot_agents.tools.hybrid_search import hybrid_search
 from repopilot_agents.tools.vector_search import vector_search
@@ -247,39 +245,24 @@ async def _retrieve_for_eval(
         )
 
     spec = await build_query_spec(question, provider=provider)  # type: ignore[arg-type]
-    queries = spec.retrieval_queries(max_rewrites=query_max_rewrites)
-    path_prefix = _single_path_prefix(spec)
-    if len(queries) == 1:
-        return await _retrieve_one(
-            queries[0],
-            engine=engine,
-            provider=provider,
-            repo_id=repo_id,
-            k=k,
-            pool=pool,
-            recall_k=recall_k,
-            exclude_path_prefixes=exclude_path_prefixes,
-            search_mode=search_mode,
-            path_prefix=path_prefix,
-        )
-    lanes = await asyncio.gather(
-        *(
-            _retrieve_one(
-                query,
-                engine=engine,
-                provider=provider,
-                repo_id=repo_id,
-                k=k,
-                pool=pool,
-                recall_k=recall_k,
-                exclude_path_prefixes=exclude_path_prefixes,
-                search_mode=search_mode,
-                path_prefix=path_prefix,
-            )
-            for query in queries
-        )
+    # Mirrors ``qa.graph._initial_retrieval``: the dense lane sees the raw
+    # question, the spec's identifiers go to the sparse lane and the path
+    # filter. The paraphrase fan-out this used to do is gone from both — it is
+    # what cost Phase 2 its recall, and an eval that still measured it would be
+    # measuring a path production no longer takes.
+    return await _retrieve_one(
+        spec.raw_text,
+        engine=engine,
+        provider=provider,
+        repo_id=repo_id,
+        k=k,
+        pool=pool,
+        recall_k=recall_k,
+        exclude_path_prefixes=exclude_path_prefixes,
+        search_mode=search_mode,
+        path_prefix=_single_path_prefix(spec),
+        sparse_query=spec.lexical_query(),
     )
-    return reciprocal_rank_fusion(lanes, weights=_query_lane_weights(len(lanes)))[:pool]
 
 
 async def _retrieve_one(
@@ -294,10 +277,11 @@ async def _retrieve_one(
     exclude_path_prefixes: Sequence[str],
     search_mode: SearchMode,
     path_prefix: str | None,
+    sparse_query: str | None = None,
 ) -> list[ChunkHit]:
     if search_mode == "sparse":
         return await bm25_search(
-            query,
+            sparse_query or query,
             engine=engine,  # type: ignore[arg-type]
             repo_id=repo_id,
             k=pool,
@@ -313,6 +297,7 @@ async def _retrieve_one(
             recall_k=pool,
             path_prefix=path_prefix,
             exclude_path_prefixes=exclude_path_prefixes,
+            sparse_query=sparse_query,
         )
     return await vector_search(
         query,

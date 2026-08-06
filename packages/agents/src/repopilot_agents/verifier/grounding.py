@@ -201,8 +201,17 @@ async def verify_claim(
     engine: AsyncEngine,
     repo_id: str,
     retry_429_attempts: int | None = None,
+    fallback_refs: Sequence[CodeRef] = (),
 ) -> _VerifyResult:
-    """Verify one claim. Updates ``claim.status`` and ``claim.verifier_note`` in place."""
+    """Verify one claim. Updates ``claim.status`` and ``claim.verifier_note`` in place.
+
+    ``fallback_refs`` are the other chunks the answerer had in front of it. A
+    claim rejected against its own citation gets one recheck against that wider
+    set, because the commonest rejection is not an ungrounded claim — it is a
+    true claim citing the wrong ``[N]``. Verifying against what the answerer
+    actually saw is the correct question; verifying against one mistyped index
+    is what produced the all-or-nothing grounding scores.
+    """
     chunks = await read_chunks(claim.refs, engine=engine, repo_id=repo_id)
 
     if not chunks:
@@ -266,12 +275,94 @@ async def verify_claim(
         parsed = VerifierVerdict(decision="rejected", reason="verifier_parse_error")
 
     _CACHE.put(key, parsed)
+
+    if parsed.decision == "rejected" and fallback_refs:
+        widened = await _recheck_against_answer_context(
+            claim,
+            cited=chunks,
+            fallback_refs=fallback_refs,
+            provider=provider,
+            engine=engine,
+            repo_id=repo_id,
+            retry_429_attempts=retry_429_attempts,
+        )
+        if widened is not None:
+            parsed = widened
+
     _apply(claim, parsed)
     return _VerifyResult(
         claim=claim,
         verdict=parsed,
         objection=_objection_if_rejected(claim, parsed),
     )
+
+
+# How many of the answerer's other chunks a recheck may add. The prompt slice
+# is k=8, but hop expansion can push the context well past that, and a verifier
+# prompt carrying forty chunks stops being a grounding check.
+_RECHECK_MAX_EXTRA_CHUNKS = 8
+
+
+async def _recheck_against_answer_context(
+    claim: Claim,
+    *,
+    cited: Sequence[ChunkContent],
+    fallback_refs: Sequence[CodeRef],
+    provider: LLMProvider,
+    engine: AsyncEngine,
+    repo_id: str,
+    retry_429_attempts: int | None,
+) -> VerifierVerdict | None:
+    """Re-verify a rejected claim against the answerer's wider context.
+
+    Returns the new verdict only when it flips to ``supported`` — a second
+    rejection changes nothing, and keeping the original verdict keeps its
+    reason, which is the one the reader sees.
+    """
+    seen = {(c.ref.file_path, c.ref.start_line, c.ref.end_line) for c in cited}
+    extra: list[CodeRef] = []
+    for ref in fallback_refs:
+        key = (ref.file_path, ref.start_line, ref.end_line)
+        if key in seen:
+            continue
+        seen.add(key)
+        extra.append(ref)
+        if len(extra) >= _RECHECK_MAX_EXTRA_CHUNKS:
+            break
+    if not extra:
+        return None
+
+    extra_chunks = await read_chunks(extra, engine=engine, repo_id=repo_id)
+    if not extra_chunks:
+        return None
+    widened = [*cited, *extra_chunks]
+
+    cache_key = _CACHE.key(claim.text, widened)
+    cached = _CACHE.get(cache_key)
+    if cached is not None:
+        return cached if cached.decision == "supported" else None
+
+    try:
+        response = await provider.generate(
+            ModelId.VERIFIER,
+            [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, widened))],
+            temperature=0.0,
+            max_tokens=1024,
+            retry_429_attempts=retry_429_attempts,
+        )
+    except ProviderError:
+        # The first verdict stands; a transient outage on the recheck must not
+        # upgrade a rejected claim.
+        return None
+
+    parsed = _parse_verdict(response.text)
+    if parsed is None:
+        return None
+    _CACHE.put(cache_key, parsed)
+    if parsed.decision != "supported":
+        return None
+    log.info("verifier.recheck_supported", claim=claim.text[:80], extra_chunks=len(extra_chunks))
+    return VerifierVerdict(decision="supported", reason="verified against answer context")
 
 
 async def verify_claims(
@@ -282,6 +373,7 @@ async def verify_claims(
     repo_id: str,
     max_concurrency: int | None = None,
     retry_429_attempts: int | None = None,
+    fallback_refs: Sequence[CodeRef] = (),
 ) -> list[_VerifyResult]:
     """Verify N claims concurrently, bounded to avoid 429 stampedes (M1).
 
@@ -307,6 +399,7 @@ async def verify_claims(
                 engine=engine,
                 repo_id=repo_id,
                 retry_429_attempts=retry_429_attempts,
+                fallback_refs=fallback_refs,
             )
             for c in claims
         ]
@@ -321,6 +414,7 @@ async def verify_claims(
                     engine=engine,
                     repo_id=repo_id,
                     retry_429_attempts=retry_429_attempts,
+                    fallback_refs=fallback_refs,
                 )
 
         coros = [_bounded(c) for c in claims]

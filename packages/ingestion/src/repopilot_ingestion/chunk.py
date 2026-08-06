@@ -23,6 +23,14 @@ from repopilot_ingestion.parse import ParsedFile, ParsedSymbol
 
 ChunkKind = Literal["module", "function", "class", "method"]
 
+# Longest function/method body kept as a single chunk. Past this, one symbol
+# fills the whole k=8 prompt slice on its own and crowds out the context that
+# would explain it — and the retriever can only offer the reader all 400 lines
+# or none. Parts keep the symbol of their parent, so the graph and BM25 still
+# find the function by name; ``graph_traverse`` resolves the symbol to its
+# opening part.
+MAX_CHUNK_LINES = 150
+
 
 @dataclass(frozen=True, slots=True)
 class Chunk:
@@ -103,34 +111,76 @@ def chunk_file(parsed: ParsedFile, *, rel_path: str | Path | None = None) -> lis
                 )
             )
         elif sym.kind in {"function", "method"}:
-            content = _slice_lines(lines, sym.start_line, sym.end_line)
-            out.append(
-                Chunk(
-                    file_path=file_path,
-                    symbol=sym.qualified_name,
-                    kind=sym.kind,
-                    start_line=sym.start_line,
-                    end_line=sym.end_line,
-                    content=content,
-                    enriched_text=_build_enriched_text(
+            for start, end in _split_span(lines, sym.start_line, sym.end_line):
+                content = _slice_lines(lines, start, end)
+                out.append(
+                    Chunk(
+                        file_path=file_path,
                         symbol=sym.qualified_name,
                         kind=sym.kind,
+                        start_line=start,
+                        end_line=end,
+                        content=content,
+                        enriched_text=_build_enriched_text(
+                            symbol=sym.qualified_name,
+                            kind=sym.kind,
+                            signature=sym.signature,
+                            decorators=sym.decorators,
+                            docstring_tokens=sym.docstring_tokens,
+                            neighbor_symbols=(),
+                            body=content,
+                        ),
                         signature=sym.signature,
                         decorators=sym.decorators,
                         docstring_tokens=sym.docstring_tokens,
-                        neighbor_symbols=(),
-                        body=content,
-                    ),
-                    signature=sym.signature,
-                    decorators=sym.decorators,
-                    docstring_tokens=sym.docstring_tokens,
+                    )
                 )
-            )
 
     return out
 
 
 # ── internals ───────────────────────────────────────────────────────────────
+
+
+def _split_span(lines: list[str], start: int, end: int) -> list[tuple[int, int]]:
+    """Cut ``[start, end]`` into spans of at most ``MAX_CHUNK_LINES`` lines.
+
+    Returns ``[(start, end)]`` unchanged for anything that already fits, which
+    is the overwhelming majority of symbols. Longer bodies are cut at the blank
+    line nearest each target boundary so a split lands between statements
+    rather than inside one.
+
+    ponytail: blank-line boundaries, not AST statement boundaries. A blank line
+    inside a triple-quoted string or a bracketed continuation would split
+    mid-statement; both are rare inside an oversized function, and the cost is
+    one ugly chunk, not a wrong line range. Walk ``ast`` statement offsets here
+    if a real case shows up.
+    """
+    total = end - start + 1
+    if total <= MAX_CHUNK_LINES:
+        return [(start, end)]
+
+    spans: list[tuple[int, int]] = []
+    cursor = start
+    while end - cursor + 1 > MAX_CHUNK_LINES:
+        target = cursor + MAX_CHUNK_LINES - 1
+        boundary = _nearest_blank_line(lines, cursor, target)
+        spans.append((cursor, boundary))
+        cursor = boundary + 1
+    spans.append((cursor, end))
+    return spans
+
+
+def _nearest_blank_line(lines: list[str], lower: int, target: int) -> int:
+    """Last blank line at or before ``target``, else ``target`` itself.
+
+    Never returns below ``lower`` — a span must contain at least one line or
+    the loop above would not terminate.
+    """
+    for candidate in range(target, lower, -1):
+        if not lines[candidate - 1].strip():
+            return candidate
+    return target
 
 
 def _slice_lines(lines: list[str], start: int, end: int) -> str:

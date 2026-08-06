@@ -95,17 +95,25 @@ async def _resolve_refs(
             chunks_table.c.repo_id == repo_id,
             or_(*[chunks_table.c.symbol == s for s in sym_list]),
         )
+        # A long function is stored as several chunks under one symbol (see
+        # ``chunk.MAX_CHUNK_LINES``). Order so the first row is its opening
+        # part, and let ``setdefault`` below keep that one — otherwise the
+        # symbol resolves to whichever part the planner happened to return.
+        .order_by(chunks_table.c.file_path, chunks_table.c.start_line)
     )
     async with engine.connect() as conn:
         rows = (await conn.execute(query)).all()
 
     out: dict[str, CodeRef] = {}
     for symbol, file_path, start_line, end_line in rows:
-        out[symbol] = CodeRef(
-            file_path=file_path,
-            start_line=int(start_line),
-            end_line=int(end_line),
-            symbol=symbol,
+        out.setdefault(
+            symbol,
+            CodeRef(
+                file_path=file_path,
+                start_line=int(start_line),
+                end_line=int(end_line),
+                symbol=symbol,
+            ),
         )
     return out
 

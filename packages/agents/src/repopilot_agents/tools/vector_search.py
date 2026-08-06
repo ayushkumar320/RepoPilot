@@ -29,7 +29,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_agents.types import ChunkHit, CodeRef
-from repopilot_core.llm.provider import LLMProvider
+from repopilot_core.llm.provider import EMBED_QUERY_PREFIX, LLMProvider
 
 log = structlog.get_logger(__name__)
 
@@ -109,7 +109,7 @@ async def vector_search(
     if limit <= 0:
         return []
 
-    embedding = await provider.embed(query)
+    embedding = await provider.embed(EMBED_QUERY_PREFIX + query)
     literal = "[" + ",".join(repr(float(x)) for x in embedding.vector) + "]"
 
     # Filter and materialize the target corpus before cosine ranking. A global

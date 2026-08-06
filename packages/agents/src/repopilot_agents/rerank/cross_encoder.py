@@ -53,6 +53,15 @@ class CrossEncoderReranker:
             self._encoder = TextCrossEncoder(self.model_name)
         return self._encoder
 
+    def warm(self) -> None:
+        """Load the ONNX model now (downloads ~91 MB on a cold cache).
+
+        Blocking and slow on first run — call it off the event loop (API
+        startup does, via ``asyncio.to_thread``) so the first user question
+        doesn't pay the download while the request socket waits.
+        """
+        self._ensure_loaded()
+
     def _key(self, query: str, text: str) -> str:
         return hashlib.sha256(f"{self.model_name}\x00{query}\x00{text}".encode()).hexdigest()
 

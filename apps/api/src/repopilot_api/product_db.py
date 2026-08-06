@@ -92,9 +92,24 @@ product_tour_messages = Table(
     UniqueConstraint("tour_id", "ordinal", name="uq_tour_message_ordinal"),
 )
 
+product_credentials = Table(
+    "product_credentials",
+    metadata,
+    # Keyed by the *account*, not the session: a reader who signs out and back
+    # in gets a new session id, and their provider key has to follow them.
+    Column("provider", Text, primary_key=True),
+    Column("provider_account_id", Text, primary_key=True),
+    # Fernet ciphertext, never the raw key.
+    Column("groq_api_key", Text, nullable=False),
+    Column("huggingface_api_key", Text, nullable=True),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+    Column("updated_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
+)
+
 __all__ = [
     "metadata",
     "product_accounts",
+    "product_credentials",
     "product_tour_messages",
     "product_tours",
     "usage_events",

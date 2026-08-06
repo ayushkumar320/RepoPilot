@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
             provider_connected: false,
             groq_connected: false,
             huggingface_connected: false,
-            credential_storage: "session_only",
+            credential_storage: "account_bound",
           }),
         });
       }

@@ -1,21 +1,35 @@
-"""Anonymous product sessions, free allowances, and session-only BYOK providers."""
+"""Anonymous product sessions, free allowances, and account-bound BYOK providers."""
 
 from __future__ import annotations
 
+import base64
+import hashlib
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
 from uuid import uuid4
 
 import httpx
-from sqlalchemy import func, select, update
+from cryptography.fernet import Fernet, InvalidToken
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from repopilot_api.product_db import product_accounts, usage_events
+from repopilot_api.product_db import product_accounts, product_credentials, usage_events
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings
 
 CredentialSource = Literal["platform", "user"]
+
+
+def credential_cipher(session_secret: str) -> Fernet:
+    """Fernet keyed off the session secret, so BYOK keys are encrypted at rest.
+
+    Derived rather than configured separately: production already refuses to
+    boot on the default session secret, so there is exactly one secret to
+    manage. Rotating it invalidates stored keys — readers reconnect.
+    """
+    digest = hashlib.sha256(f"{session_secret}\x00repopilot-credentials".encode()).digest()
+    return Fernet(base64.urlsafe_b64encode(digest))
 
 
 class AllowanceExceededError(RuntimeError):
@@ -64,12 +78,94 @@ class AccessService(Protocol):
 
 @dataclass(slots=True)
 class ProductAccessService:
-    """Postgres-backed allowances with credentials retained only in process memory."""
+    """Postgres-backed allowances; BYOK keys are bound to the signed-in account.
+
+    Anonymous sessions keep their key in process memory only — there is no
+    account to bind it to. Once a reader signs in, the key is stored encrypted
+    against their identity, so signing out or restarting the API doesn't lose
+    it: the next session for that account rehydrates from Postgres.
+    """
 
     engine: AsyncEngine
     settings: Settings
     providers: dict[str, LLMProvider] = field(default_factory=dict)
     connected: dict[str, tuple[bool, bool]] = field(default_factory=dict)
+    _cipher: Fernet | None = None
+
+    @property
+    def cipher(self) -> Fernet:
+        if self._cipher is None:
+            self._cipher = credential_cipher(self.settings.repopilot_session_secret)
+        return self._cipher
+
+    async def _account_key(self, session_id: str) -> tuple[str, str] | None:
+        """The (provider, account id) this session is signed in as, if any."""
+        async with self.engine.connect() as conn:
+            row = (
+                await conn.execute(
+                    select(
+                        product_accounts.c.provider,
+                        product_accounts.c.provider_account_id,
+                    ).where(product_accounts.c.session_id == session_id)
+                )
+            ).first()
+        if row is None or row.provider is None or row.provider_account_id is None:
+            return None
+        return str(row.provider), str(row.provider_account_id)
+
+    async def _stored_keys(self, session_id: str) -> tuple[str, str | None] | None:
+        """Decrypted (groq, hugging face) keys saved for this session's account."""
+        account = await self._account_key(session_id)
+        if account is None:
+            return None
+        async with self.engine.connect() as conn:
+            row = (
+                await conn.execute(
+                    select(
+                        product_credentials.c.groq_api_key,
+                        product_credentials.c.huggingface_api_key,
+                    ).where(
+                        product_credentials.c.provider == account[0],
+                        product_credentials.c.provider_account_id == account[1],
+                    )
+                )
+            ).first()
+        if row is None:
+            return None
+        try:
+            groq = self.cipher.decrypt(str(row.groq_api_key).encode()).decode()
+            stored_hf = row.huggingface_api_key
+            hf = self.cipher.decrypt(str(stored_hf).encode()).decode() if stored_hf else None
+        except InvalidToken:
+            # Session secret rotated out from under the stored ciphertext.
+            # Treat as not connected; the reader reconnects their key.
+            return None
+        return groq, hf
+
+    def _build_provider(self, groq: str, huggingface: str | None) -> LLMProvider:
+        user_settings = self.settings.model_copy(
+            update={
+                "groq_api_key": groq,
+                "cerebras_api_key": None,
+                "huggingface_api_key": huggingface,
+                "llm_hf_chat_fallback": huggingface is not None,
+            }
+        )
+        return LLMProvider.build(settings=user_settings)
+
+    async def _resolve_provider(self, session_id: str) -> LLMProvider | None:
+        """This session's BYOK provider, rehydrating from the account if needed."""
+        existing = self.providers.get(session_id)
+        if existing is not None:
+            return existing
+        stored = await self._stored_keys(session_id)
+        if stored is None:
+            return None
+        groq, huggingface = stored
+        provider = self._build_provider(groq, huggingface)
+        self.providers[session_id] = provider
+        self.connected[session_id] = (True, huggingface is not None)
+        return provider
 
     async def _ensure_account(self, session_id: str) -> None:
         async with self.engine.begin() as conn:
@@ -95,6 +191,9 @@ class ProductAccessService:
                     usage_events.c.status.in_(["reserved", "completed"]),
                 )
             )
+        # Resolve first: a fresh session for a signed-in reader has nothing in
+        # memory yet, and must still report their saved key as connected.
+        await self._resolve_provider(session_id)
         groq, huggingface = self.connected.get(session_id, (False, False))
         return AccountUsage(
             free_repositories_remaining=max(0, 1 - int(repo_count or 0)),
@@ -129,16 +228,31 @@ class ProductAccessService:
         previous = self.providers.pop(session_id, None)
         if previous is not None:
             await previous.aclose()
-        user_settings = self.settings.model_copy(
-            update={
-                "groq_api_key": clean_groq,
-                "cerebras_api_key": None,
-                "huggingface_api_key": clean_hf,
-                "llm_hf_chat_fallback": clean_hf is not None,
-            }
-        )
-        self.providers[session_id] = LLMProvider.build(settings=user_settings)
+        self.providers[session_id] = self._build_provider(clean_groq, clean_hf)
         self.connected[session_id] = (True, clean_hf is not None)
+
+        # Signed in? Keep the key with the account so a sign-out doesn't drop
+        # it. Anonymous sessions have nothing durable to attach it to.
+        account = await self._account_key(session_id)
+        if account is not None:
+            values = {
+                "groq_api_key": self.cipher.encrypt(clean_groq.encode()).decode(),
+                "huggingface_api_key": (
+                    self.cipher.encrypt(clean_hf.encode()).decode() if clean_hf else None
+                ),
+            }
+            async with self.engine.begin() as conn:
+                await conn.execute(
+                    insert(product_credentials)
+                    .values(provider=account[0], provider_account_id=account[1], **values)
+                    .on_conflict_do_update(
+                        index_elements=[
+                            product_credentials.c.provider,
+                            product_credentials.c.provider_account_id,
+                        ],
+                        set_={**values, "updated_at": func.now()},
+                    )
+                )
         return await self.status(session_id)
 
     async def _validate_provider_key(self, *, provider: str, base_url: str, api_key: str) -> None:
@@ -162,10 +276,21 @@ class ProductAccessService:
         self.connected.pop(session_id, None)
         if provider is not None:
             await provider.aclose()
+        # Disconnect means disconnect: drop the stored copy too, or the next
+        # sign-in would hand the key straight back.
+        account = await self._account_key(session_id)
+        if account is not None:
+            async with self.engine.begin() as conn:
+                await conn.execute(
+                    delete(product_credentials).where(
+                        product_credentials.c.provider == account[0],
+                        product_credentials.c.provider_account_id == account[1],
+                    )
+                )
         return await self.status(session_id)
 
     async def provider_for(self, session_id: str) -> LLMProvider | None:
-        return self.providers.get(session_id)
+        return await self._resolve_provider(session_id)
 
     async def _reserve(
         self,
@@ -176,7 +301,8 @@ class ProductAccessService:
         free_limit: int | None,
     ) -> UsageReservation:
         await self._ensure_account(session_id)
-        source: CredentialSource = "user" if session_id in self.providers else "platform"
+        byok = await self._resolve_provider(session_id)
+        source: CredentialSource = "user" if byok is not None else "platform"
         reservation_id = str(uuid4())
         async with self.engine.begin() as conn:
             await conn.execute(

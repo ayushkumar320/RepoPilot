@@ -62,9 +62,22 @@ jobs:
             exit 0
           fi
 
+          # Escape hatch for changes on these paths that provably cannot move
+          # ranking -- concurrency (moving a sync call to a thread), warmup,
+          # logging, type annotations. A bench run there only reproves the
+          # status quo. It is a label rather than a commit-message token on
+          # purpose: labelling is a deliberate act by someone with write
+          # access, is visible on the PR, and shows up in its timeline.
+          if printf '%s\n' '${{ toJSON(github.event.pull_request.labels.*.name) }}' | grep -q '"retrieval-eval-exempt"'; then
+            echo "PR is labelled retrieval-eval-exempt; skipping the artifact requirement for:"
+            printf '%s\n' "$non_migration_changed"
+            exit 0
+          fi
+
           echo "::error title=Missing RAG eval artifact::Retrieval-path changes must include evals/results/rag_phaseN/_after.json from a fresh bench run."
           echo "Changed retrieval files (migration-only changes are exempt):"
           printf '%s\n' "$non_migration_changed"
+          echo "If the change cannot affect ranking, label the PR retrieval-eval-exempt."
           exit 1
 
   build:

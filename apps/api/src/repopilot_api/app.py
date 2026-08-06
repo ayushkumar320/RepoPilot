@@ -15,6 +15,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from repopilot_agents.rerank.cross_encoder import shared_reranker
 from repopilot_agents.state import IntentProfile
 from repopilot_api.access import AccountUsage, AllowanceExceededError
 from repopilot_api.models import (
@@ -62,9 +63,22 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
     async def lifespan(_: FastAPI) -> AsyncIterator[dict[str, AppServices]]:
         resolved = services or await create_live_services()
         app.state.services = resolved
+        # Pull the cross-encoder into memory in the background so the first
+        # question doesn't wait on a ~91 MB cold download mid-request.
+        warm = asyncio.create_task(
+            asyncio.to_thread(shared_reranker(settings.rerank_model).warm),
+            name="rerank-warmup",
+        )
         try:
             yield {"services": resolved}
         finally:
+            warm.cancel()
+            try:
+                await warm
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                log.exception("rerank.warmup_failed")
             if services is None:
                 await close_live_services(resolved)
 

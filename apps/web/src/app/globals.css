@@ -190,7 +190,6 @@ a {
 .workspace-meta,
 .workspace-title,
 .navigation-heading,
-.file-heading,
 .section-complete,
 .claim-reference,
 .mode-button,
@@ -778,8 +777,7 @@ a {
   gap: 2px;
 }
 
-.workspace-title span,
-.file-heading span {
+.workspace-title span {
   color: var(--text-tertiary);
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.69rem;
@@ -830,22 +828,20 @@ a {
 
 .workspace-grid {
   display: grid;
-  grid-template-columns: minmax(170px, 0.48fr) minmax(440px, 1.22fr) minmax(400px, 1fr);
+  grid-template-columns: minmax(170px, 0.42fr) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
 
 .tour-navigation,
-.tour-content,
-.code-inspector {
+.tour-content {
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
-.tour-navigation,
-.code-inspector {
+.tour-navigation {
   position: sticky;
   top: 88px;
 }
@@ -1481,166 +1477,6 @@ a {
   }
 }
 
-.code-inspector {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.code-inspector-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.file-heading {
-  min-width: 0;
-  gap: 10px;
-  color: var(--text-tertiary);
-}
-
-.file-heading > div {
-  display: grid;
-  min-width: 0;
-  gap: 3px;
-}
-
-.file-heading strong {
-  overflow: hidden;
-  max-width: 32ch;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.74rem;
-  font-weight: 540;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.line-range {
-  flex: 0 0 auto;
-  padding: 4px 7px;
-  border-radius: 5px;
-  color: var(--text-secondary);
-  background: var(--surface-subtle);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.62rem;
-}
-
-.code-summary {
-  margin: 0;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-size: 0.72rem;
-  line-height: 1.5;
-}
-
-.code-frame {
-  min-height: 420px;
-  max-height: calc(100dvh - 210px);
-  overflow: auto;
-  background: var(--code);
-  color: var(--code-text);
-}
-
-.code-frame pre {
-  min-width: max-content;
-  margin: 0;
-  padding: 14px 0 20px;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.72rem;
-  line-height: 1.65;
-  tab-size: 2;
-}
-
-.code-line {
-  display: grid;
-  grid-template-columns: 52px minmax(max-content, 1fr);
-  min-height: 20px;
-}
-
-/* Clicking a claim changes a panel on the other side of the screen, which is
-   easy to miss. The claimed range is the reason the panel changed, so it
-   arrives on a stronger tint and settles to its resting one — the answer
-   announces itself instead of being already there when you look over.
-   Paint-only: no transform, because .code-frame scrolls and would clip it. */
-@keyframes claimed-range-land {
-  from {
-    background: var(--code-highlight-strong);
-  }
-}
-
-.code-line-active {
-  background: var(--code-highlight);
-  animation: claimed-range-land var(--spring-duration) var(--spring) both;
-}
-
-@keyframes code-arrive {
-  from {
-    opacity: 0;
-  }
-}
-
-.code-frame pre {
-  animation: code-arrive 320ms var(--ease-out) both;
-}
-
-.line-number {
-  padding-right: 14px;
-  color: var(--code-muted);
-  text-align: right;
-  user-select: none;
-}
-
-.line-content {
-  padding-right: 20px;
-  white-space: pre;
-}
-
-.code-empty {
-  display: flex;
-  min-height: 420px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  color: var(--code-muted);
-  text-align: center;
-}
-
-.code-empty strong {
-  margin-top: 12px;
-  color: var(--code-text);
-  font-size: 0.78rem;
-}
-
-.code-empty span {
-  max-width: 30ch;
-  margin-top: 6px;
-  font-size: 0.69rem;
-  line-height: 1.5;
-}
-
-.code-loading {
-  padding: 22px;
-}
-
-.skeleton-code {
-  width: 92%;
-  height: 9px;
-  background: linear-gradient(90deg, #1b2630 25%, #2a3946 50%, #1b2630 75%);
-  background-size: 200% 100%;
-}
-
-.skeleton-code + .skeleton-code {
-  margin-top: 12px;
-}
-
-.skeleton-code-short {
-  width: 68%;
-}
-
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
@@ -1652,10 +1488,6 @@ input:focus-visible {
   .onboarding-layout {
     grid-template-columns: minmax(280px, 0.62fr) minmax(560px, 1.38fr);
     gap: 48px;
-  }
-
-  .workspace-grid {
-    grid-template-columns: minmax(430px, 1.12fr) minmax(390px, 0.88fr);
   }
 
   .tour-navigation {
@@ -1698,16 +1530,6 @@ input:focus-visible {
 
   .workspace-grid {
     grid-template-columns: 1fr;
-  }
-
-  .code-inspector {
-    position: static;
-  }
-
-  .code-frame,
-  .code-empty {
-    min-height: 360px;
-    max-height: 560px;
   }
 }
 
@@ -1837,10 +1659,6 @@ input:focus-visible {
     justify-self: start;
   }
 
-  .code-inspector-header {
-    padding: 14px;
-  }
-
   /* Sits at the bottom on small screens, within thumb reach. */
   .provider-dialog {
     max-width: calc(100vw - 24px);
@@ -1904,15 +1722,8 @@ input:focus-visible {
   .index-status,
   .inline-alert,
   .first-impression,
-  .code-frame pre,
   .workspace {
     animation: fade-in 160ms ease both;
-  }
-
-  /* The claimed range keeps its resting highlight, it just stops arriving on
-     a brighter one — a colour pulse is motion for the same reason a slide is. */
-  .code-line-active {
-    animation: none;
   }
 
   /* The dialog crossfades instead of scaling, but it still has to hold the

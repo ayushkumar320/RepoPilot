@@ -7,7 +7,6 @@ import {
   applyRepoStatus,
   encodeChunkId,
   hydrateFromTour,
-  hydrateViewer,
   initialSessionState,
   personaLabel,
   selectClaim,
@@ -58,9 +57,8 @@ test("appendExchange focuses the newest answer's first source", () => {
     personaLabel: "a learner",
     repoId: REPO_ID,
   });
-  // The viewer follows the latest evidence, not the first thing ever selected.
+  // Selection follows the latest evidence, not the first thing ever selected.
   assert.equal(state.selectedClaimId, "c2");
-  assert.equal(state.viewer.startLine, 90);
 });
 
 test("exchanges accumulate so two personas can be compared side by side", () => {
@@ -99,7 +97,7 @@ test("appendExchange skips claims with no refs rather than throwing", () => {
   assert.equal(state.selectedClaimId, undefined);
 });
 
-test("selectClaim moves the viewer and clears stale content", () => {
+test("selectClaim moves the selection to the clicked claim", () => {
   let state = appendExchange(initialSessionState, {
     question: "q",
     answer: "a",
@@ -107,19 +105,10 @@ test("selectClaim moves the viewer and clears stale content", () => {
     personaLabel: "anyone",
     repoId: REPO_ID,
   });
-  state = hydrateViewer(state, {
-    chunk_id: state.claimsById.c1.chunkId,
-    repo_id: REPO_ID,
-    ref: state.claimsById.c1.refs[0],
-    content: "class Flask:",
-    summary: null,
-  });
-  assert.equal(state.viewer.content, "class Flask:");
+  assert.equal(state.selectedClaimId, "c1");
 
   state = selectClaim(state, "c2");
   assert.equal(state.selectedClaimId, "c2");
-  assert.equal(state.viewer.startLine, 40);
-  assert.equal(state.viewer.content, undefined);
 });
 
 test("selectClaim on an unknown id is a no-op", () => {

@@ -39,7 +39,7 @@ _SYSTEM_PROMPT = (
     "the user's stated goal.\n\n"
     'Walk the path in order: "finding" says what the chain does end to end, '
     'naming each hop\'s symbol. "because" points at the specific hop that '
-    'explains it — where the branch, the retry, the transform, or the I/O '
+    "explains it — where the branch, the retry, the transform, or the I/O "
     'sits. "so_what" says where this reader would join the path to make their '
     "change, and what breaks downstream if they get it wrong. Full sentences.\n\n"
     "Output STRICT JSON: a single JSON array. Each entry has exactly "

@@ -73,9 +73,7 @@ SUFFICIENCY_SYSTEM = (
     "must show the implementation the question is about, plus whatever it "
     "calls or is called by that the explanation depends on. If a symbol the "
     "answer would have to describe is only referenced, never defined here, "
-    "that is insufficient — name that symbol in next_symbol.\n\n"
-    + _DATA_NOT_INSTRUCTIONS
-    + "\n\n"
+    "that is insufficient — name that symbol in next_symbol.\n\n" + _DATA_NOT_INSTRUCTIONS + "\n\n"
     'Respond with one line of JSON: {"decision":"sufficient"|"insufficient",'
     '"reason":"<one short sentence>","next_symbol":"<dotted symbol to walk '
     'next if insufficient, else empty>"}.'
@@ -111,8 +109,7 @@ ANSWER_SYSTEM = (
     "the specific files or symbols to read.\n"
     "- Say plainly when the chunks only partly answer the question, and name "
     "what is missing. Never fill a gap with a plausible guess.\n"
-    "- No preamble, no restating the question, no filler.\n\n"
-    + _DATA_NOT_INSTRUCTIONS
+    "- No preamble, no restating the question, no filler.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
 
 # Output-shape hints. Deliberately about *ordering and packaging* only — none

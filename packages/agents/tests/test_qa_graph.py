@@ -175,8 +175,7 @@ async def test_section_headers_are_not_claims() -> None:
     provider = _ScriptedProvider(
         [
             '{"decision":"sufficient","reason":"enough","next_symbol":""}',
-            "## How it works\nalpha returns one. [0]\n## Where to look next\n"
-            "Read beta next. [1]",
+            "## How it works\nalpha returns one. [0]\n## Where to look next\nRead beta next. [1]",
         ]
     )
     result = await answer_question(
@@ -191,8 +190,11 @@ async def test_section_headers_are_not_claims() -> None:
 
 @pytest.mark.asyncio
 async def test_detailed_answer_mentioning_missing_evidence_is_kept() -> None:
-    """"I couldn't find a test for it" inside a long answer must not nuke the
-    whole answer down to the not-found sentinel."""
+    """A long answer that says it couldn't find one thing is still an answer.
+
+    Saying "I couldn't find a test for it" on one line must not collapse the
+    whole reply down to the not-found sentinel.
+    """
     provider = _ScriptedProvider(
         [
             '{"decision":"sufficient","reason":"enough","next_symbol":""}',

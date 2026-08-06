@@ -45,7 +45,6 @@ from repopilot_agents.qa.prompts import (
 )
 from repopilot_agents.qa.query_spec import QuerySpec, build_query_spec, fallback_query_spec
 from repopilot_agents.qa.types import SufficiencyVerdict
-from repopilot_agents.qa.union import reciprocal_rank_fusion
 from repopilot_agents.rerank.pipeline import rerank_and_diversify
 from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_traverse import graph_traverse
@@ -166,10 +165,11 @@ async def answer_question(
     falls back to pure dense, so the pre-Phase-1 baseline arm stays dense-only.
     Set ``use_hybrid=False`` for the Phase 1/2 dense-only ``_before`` arm.
 
-    ``use_query_understanding`` (Phase 2) asks a cheap model for retrieval
-    rewrites and path hints, fans retrieval out over the rewrites, then fuses
-    the pools with RRF. ``None`` follows settings; explicit ``True``/``False``
-    lets evals A/B the path. Parse/provider failures fall back to raw.
+    ``use_query_understanding`` (Phase 2) asks a cheap model for the
+    identifiers and paths a question implies. Those go to the sparse lane and
+    the path filter; the dense lane always sees the raw question. ``None``
+    follows settings; explicit ``True``/``False`` lets evals A/B the path.
+    Parse/provider failures fall back to regex-extracted hints.
 
     ``use_rerank`` (Phase 4) cross-encoder-reranks + MMR-diversifies the top
     of the pool before the prompt slice. Requires ``recall_k`` (needs a pool
@@ -203,7 +203,6 @@ async def answer_question(
                 if use_query_understanding is None
                 else use_query_understanding
             ),
-            max_rewrites=settings.query_understanding_max_rewrites,
             retrieval_path=ctx.retrieval_path,
         )
 
@@ -338,6 +337,10 @@ async def answer_question(
             engine=engine,
             repo_id=repo_id,
             retry_429_attempts=retry_429_attempts,
+            # Every chunk the answerer saw. A claim rejected against its own
+            # citation gets one recheck against these — a mistyped [N] is the
+            # commonest cause of a rejection, not an ungrounded claim.
+            fallback_refs=[chunk.ref for chunk in ctx.chunks],
         )
     objections = [r.objection for r in verify_results if r.objection is not None]
 
@@ -396,7 +399,6 @@ async def _initial_retrieval(
     exclude_path_prefixes: Sequence[str],
     use_hybrid: bool,
     use_query_understanding: bool,
-    max_rewrites: int,
     retrieval_path: list[str],
 ) -> list[ChunkHit]:
     pool = recall_k if recall_k is not None else k
@@ -405,45 +407,33 @@ async def _initial_retrieval(
     else:
         spec = fallback_query_spec(question)
 
-    queries = spec.retrieval_queries(max_rewrites=max_rewrites if use_query_understanding else 0)
     path_prefix = _single_path_prefix(spec)
+    # The dense lane always sees the raw question. Phase 2 fanned retrieval out
+    # over paraphrases and fused the pools, which cost recall (httpx
+    # `0.949 -> 0.817`): a weak paraphrase pool drags a good dense ranking
+    # around. The spec's useful output — the identifiers and paths it found —
+    # goes to the sparse lane and the path filter instead, where it can only
+    # add matches.
+    sparse_query = spec.lexical_query()
 
-    if len(queries) == 1:
-        hits = await _retrieve_one(
-            queries[0],
-            engine=engine,
-            provider=provider,
-            repo_id=repo_id,
-            k=k,
-            recall_k=recall_k,
-            exclude_path_prefixes=exclude_path_prefixes,
-            use_hybrid=use_hybrid,
-            path_prefix=path_prefix,
-        )
-    else:
-        pools = await asyncio.gather(
-            *(
-                _retrieve_one(
-                    query,
-                    engine=engine,
-                    provider=provider,
-                    repo_id=repo_id,
-                    k=k,
-                    recall_k=recall_k,
-                    exclude_path_prefixes=exclude_path_prefixes,
-                    use_hybrid=use_hybrid,
-                    path_prefix=path_prefix,
-                )
-                for query in queries
-            )
-        )
-        hits = reciprocal_rank_fusion(pools, weights=_query_lane_weights(len(pools)))[:pool]
+    hits = await _retrieve_one(
+        spec.raw_text,
+        engine=engine,
+        provider=provider,
+        repo_id=repo_id,
+        k=k,
+        recall_k=recall_k,
+        exclude_path_prefixes=exclude_path_prefixes,
+        use_hybrid=use_hybrid,
+        path_prefix=path_prefix,
+        sparse_query=sparse_query,
+    )
 
     mode = "hybrid_search" if use_hybrid and recall_k is not None else "vector_search"
     if use_query_understanding:
         retrieval_path.append(
             "query_spec:"
-            f"queries={len(queries)}:paths={len(spec.extracted_paths)}:"
+            f"symbols={len(spec.extracted_symbols)}:paths={len(spec.extracted_paths)}:"
             f"intent={spec.intent_class}:multi_hop={spec.needs_multi_hop}"
         )
     retrieval_path.append(f"{mode}:recall_k={pool}:k={k}:hits={len(hits)}")
@@ -461,6 +451,7 @@ async def _retrieve_one(
     exclude_path_prefixes: Sequence[str],
     use_hybrid: bool,
     path_prefix: str | None,
+    sparse_query: str | None = None,
 ) -> list[ChunkHit]:
     if use_hybrid and recall_k is not None:
         return await hybrid_search(
@@ -471,6 +462,7 @@ async def _retrieve_one(
             recall_k=recall_k,
             path_prefix=path_prefix,
             exclude_path_prefixes=exclude_path_prefixes,
+            sparse_query=sparse_query,
         )
     return await vector_search(
         query,
@@ -558,7 +550,16 @@ async def _generate_answer(
 
 
 def _is_not_found(answer: str) -> bool:
-    norm = answer.strip().lower()
+    """True only when the whole answer IS the not-found sentinel.
+
+    A detailed answer is allowed to say "I couldn't find a test for this" in
+    one of its lines; substring-matching the whole body threw away the other
+    twelve grounded claims with it. Only a short, sentinel-shaped reply counts.
+    """
+    lines = [line for line in answer.strip().splitlines() if line.strip()]
+    if len(lines) != 1:
+        return False
+    norm = lines[0].strip().lower()
     return "couldn't find" in norm or "could not find" in norm or "not in the repo" in norm
 
 
@@ -571,6 +572,11 @@ def _parse_claims(answer: str, chunks: list[ChunkContent]) -> list[Claim]:
     out: list[Claim] = []
     pool = list(chunks)
     for line in answer.splitlines():
+        raw = line.strip()
+        # '## Section' lines organize the answer; they assert nothing, so they
+        # are not claims and must never reach the verifier.
+        if raw.startswith("#"):
+            continue
         text = line.strip(" -•").strip()
         if not text:
             continue

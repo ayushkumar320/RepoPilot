@@ -97,7 +97,10 @@ _TSQUERY = "replace(plainto_tsquery('simple', :q)::text, '&', '|')::tsquery"
 # ts_rank_cd weight array is {D, C, B, A}. The symbol is indexed in band A
 # (migration 0002), so weighting A=1.0 and body D=0.1 makes a chunk whose
 # *symbol* matches the query dominate one that only mentions the term in its
-# body — the IDF substitute for rare-symbol retrieval.
+# body — the IDF substitute for rare-symbol retrieval. Band B (migration 0009)
+# holds the symbol split on case and ``._`` boundaries, so prose ("transport
+# handle request") reaches ``HTTPTransport.handle_request``; at 0.4 it ranks
+# below an exact symbol hit and above a body mention.
 _RANK_WEIGHTS = "'{0.1, 0.2, 0.4, 1.0}'"
 
 

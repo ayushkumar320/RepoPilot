@@ -5,10 +5,14 @@ from pathlib import Path
 import pytest
 
 from repopilot_core.llm.models import ModelId, ProviderName
-from repopilot_core.llm.provider import EmbeddingResponse, ProviderError
+from repopilot_core.llm.provider import (
+    EMBED_DOCUMENT_PREFIX,
+    EmbeddingResponse,
+    ProviderError,
+)
 from repopilot_core.settings import Settings
 from repopilot_ingestion.chunk import chunk_file, enrich_chunks_with_neighbors
-from repopilot_ingestion.embed import embed_chunks
+from repopilot_ingestion.embed import embed_chunks, embedding_text
 from repopilot_ingestion.parse import parse_file
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_module.py"
@@ -107,7 +111,12 @@ async def test_embed_chunks_uses_raw_content_by_default(tmp_path: Path) -> None:
         ),
     )
 
-    assert provider.texts == [login.content]
+    sent = provider.texts[0]
+    assert sent.startswith(EMBED_DOCUMENT_PREFIX)
+    assert "# file: sample_module.py" in sent
+    assert "# symbol: sample.login" in sent
+    assert sent.endswith(login.content)
+    assert login.enriched_text not in sent
     assert provider.batch_sizes == [8]
 
 
@@ -129,12 +138,12 @@ async def test_embed_chunks_can_opt_into_enriched_text(tmp_path: Path) -> None:
         ),
     )
 
-    assert provider.texts == [login.enriched_text]
+    assert provider.texts[0].endswith(login.enriched_text or "")
     assert provider.texts[0] != login.content
 
 
 @pytest.mark.asyncio
-async def test_embed_batch_failure_isolates_only_bad_chunk(tmp_path: Path) -> None:
+async def test_embed_batch_failure_skips_only_the_bad_chunk(tmp_path: Path) -> None:
     parsed = parse_file(FIXTURE, module="sample")
     chunks = chunk_file(parsed, rel_path=FIXTURE.name)[:3]
 
@@ -147,7 +156,7 @@ async def test_embed_batch_failure_isolates_only_bad_chunk(tmp_path: Path) -> No
         ) -> list[EmbeddingResponse]:
             self.texts.extend(texts)
             self.batch_sizes.append(batch_size)
-            if chunks[1].content in texts:
+            if embedding_text(chunks[1], settings=settings) in texts:
                 raise ProviderError("bad chunk")
             return [
                 EmbeddingResponse(
@@ -159,18 +168,21 @@ async def test_embed_batch_failure_isolates_only_bad_chunk(tmp_path: Path) -> No
                 for _ in texts
             ]
 
+    settings = Settings(
+        repopilot_env="test",
+        llm_cache_path=tmp_path / "llm.sqlite",
+        ingestion_embed_batch_size=16,
+    )
     provider = SelectiveProvider()
     embedded = await embed_chunks(
         chunks,
         provider=provider,  # type: ignore[arg-type]
-        settings=Settings(
-            repopilot_env="test",
-            llm_cache_path=tmp_path / "llm.sqlite",
-            ingestion_embed_batch_size=16,
-        ),
+        settings=settings,
     )
 
-    assert len(embedded) == len(chunks)
-    assert embedded[0].vector == [0.25] * 768
-    assert embedded[1].vector != [0.25] * 768
-    assert embedded[2].vector == [0.25] * 768
+    # The rejected chunk is dropped, never given a fabricated vector: a
+    # hash-derived vector would place it at a meaningless point in the corpus
+    # while still counting as indexed.
+    assert len(embedded) == len(chunks) - 1
+    assert [e.chunk.symbol for e in embedded] == [chunks[0].symbol, chunks[2].symbol]
+    assert all(e.vector == [0.25] * 768 for e in embedded)

@@ -41,10 +41,16 @@ _DEFAULT_TOP_ENTRY_POINTS = 6
 _SYSTEM_PROMPT = (
     "You are the Cartographer. Given the USER GOAL, the PLAN TILT, and "
     "a STRUCTURAL FACT BUNDLE (hubs + entry points + per-hub metrics) "
-    "drawn from the deterministic call graph, emit 2–5 Insight objects. "
+    "drawn from the deterministic call graph, emit 4–6 Insight objects. "
     "Every Insight MUST translate raw numbers into a goal-anchored "
     "consequence: never repeat a fan-in or a count without saying what "
     "it MEANS for the user's stated goal.\n\n"
+    '"finding" names the exact symbol and what role it plays. "because" '
+    "cites the structural evidence (fan-in, fan-out, cyclomatic, entry-point "
+    'status) that makes the finding true. "so_what" states the concrete '
+    "consequence for this reader — what gets easier, riskier, or slower — and "
+    "names the next thing to open or check. Full sentences, no fragments, no "
+    "restating the same hub twice.\n\n"
     "Output STRICT JSON: a single JSON array. Each entry has exactly "
     'these keys: "finding", "because", "so_what", "goal_link", "refs". '
     '"refs" is an array of symbol strings drawn from the fact bundle '
@@ -154,7 +160,7 @@ async def run_cartographer(
             Message("user", f"{anchor}\n\n{bundle}"),
         ],
         temperature=0.2,
-        max_tokens=900,
+        max_tokens=1500,
     )
 
     insights: list[Insight] = []

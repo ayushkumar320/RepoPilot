@@ -34,9 +34,14 @@ _DEFAULT_PATHS_PER_TARGET = 3
 _SYSTEM_PROMPT = (
     "You are the Flow Tracer. Given the USER GOAL, the PLAN TILT, and a "
     "TRACED PATHS bundle (each path is an ordered chain of symbols from "
-    "the deterministic call graph), emit 1–3 Insight objects per traced "
+    "the deterministic call graph), emit 2–3 Insight objects per traced "
     "path. Every Insight MUST tie the structural shape of the path to "
     "the user's stated goal.\n\n"
+    'Walk the path in order: "finding" says what the chain does end to end, '
+    'naming each hop\'s symbol. "because" points at the specific hop that '
+    'explains it — where the branch, the retry, the transform, or the I/O '
+    'sits. "so_what" says where this reader would join the path to make their '
+    "change, and what breaks downstream if they get it wrong. Full sentences.\n\n"
     "Output STRICT JSON: a single JSON array. Each entry has exactly "
     'these keys: "finding", "because", "so_what", "goal_link", "refs". '
     '"refs" is an array of symbol strings drawn from the bundle. No other '
@@ -121,7 +126,7 @@ async def run_flow_tracer(
             Message("user", f"{anchor}\n\n{bundle_text}"),
         ],
         temperature=0.2,
-        max_tokens=800,
+        max_tokens=1400,
     )
 
     insights: list[Insight] = []

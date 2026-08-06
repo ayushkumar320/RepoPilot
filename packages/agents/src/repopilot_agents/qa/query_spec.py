@@ -56,6 +56,21 @@ class QuerySpec(BaseModel):
             out.append(cleaned)
         return out
 
+    def lexical_query(self) -> str:
+        """The question plus any identifiers named in it, for the sparse lane.
+
+        This is the non-destructive half of query understanding. Fanning
+        retrieval out over paraphrases and fusing the pools cost recall
+        (Phase 2: httpx `0.949 -> 0.817`) because a weak paraphrase pool drags
+        a good dense ranking around. Appending extracted symbols to the BM25
+        query only *adds* lexemes to a lane that scores by term density — it
+        cannot reorder the dense lane, and it costs nothing when the list is
+        empty. Works with or without the LLM: ``fallback_query_spec`` extracts
+        backticked and dotted identifiers by regex.
+        """
+        extra = [s for s in self.extracted_symbols if s.lower() not in self.raw_text.lower()]
+        return " ".join([self.raw_text, *extra]) if extra else self.raw_text
+
     def retrieval_queries(self, *, max_rewrites: int = 3) -> list[str]:
         """Return raw question + deduped rewrites, capped for latency."""
         queries: list[str] = []

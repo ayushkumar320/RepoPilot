@@ -1,4 +1,4 @@
-"""Fast-lane tests for Phase 2 multi-query retrieval fan-out."""
+"""Fast-lane tests for how the query spec reaches retrieval."""
 
 from __future__ import annotations
 
@@ -20,24 +20,29 @@ def _hit(symbol: str, distance: float) -> ChunkHit:
 
 
 @pytest.mark.asyncio
-async def test_initial_retrieval_fuses_rewrite_lanes(monkeypatch: pytest.MonkeyPatch) -> None:
-    seen_queries: list[str] = []
+async def test_query_spec_feeds_the_sparse_lane_not_a_dense_fan_out(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The dense lane sees the raw question and nothing else.
+
+    Fanning dense retrieval out over paraphrases and fusing the pools is what
+    cost Phase 2 its recall (httpx 0.949 -> 0.817). The spec's identifiers are
+    still used — appended to the BM25 query, where they can only add matches.
+    """
+    seen: list[dict[str, Any]] = []
 
     async def fake_build_query_spec(question: str, **kw: Any) -> QuerySpec:
         return QuerySpec(
             raw_text=question,
             rewrites=["lexical redirect method", "location header flow"],
+            extracted_symbols=["Client.send", "max_redirects"],
             intent_class="procedural",
             needs_multi_hop=True,
         )
 
     async def fake_hybrid_search(query: str, **kw: Any) -> list[ChunkHit]:
-        seen_queries.append(query)
-        if query == "How are redirects handled?":
-            return [_hit("alpha", 0.1), _hit("shared", 0.2)]
-        if query == "lexical redirect method":
-            return [_hit("shared", 0.05), _hit("beta", 0.2)]
-        return [_hit("gamma", 0.1)]
+        seen.append({"query": query, "sparse_query": kw.get("sparse_query")})
+        return [_hit("alpha", 0.1)]
 
     monkeypatch.setattr(qa_graph, "build_query_spec", fake_build_query_spec)
     monkeypatch.setattr(qa_graph, "hybrid_search", fake_hybrid_search)
@@ -53,18 +58,14 @@ async def test_initial_retrieval_fuses_rewrite_lanes(monkeypatch: pytest.MonkeyP
         exclude_path_prefixes=(),
         use_hybrid=True,
         use_query_understanding=True,
-        max_rewrites=3,
         retrieval_path=path,
     )
 
-    assert seen_queries == [
-        "How are redirects handled?",
-        "lexical redirect method",
-        "location header flow",
-    ]
-    assert {hit.ref.symbol for hit in hits} == {"alpha", "shared", "beta", "gamma"}
-    assert hits[0].ref.symbol == "shared"
-    assert path[0].startswith("query_spec:queries=3")
+    assert len(seen) == 1, "one retrieval, no paraphrase fan-out"
+    assert seen[0]["query"] == "How are redirects handled?"
+    assert seen[0]["sparse_query"] == "How are redirects handled? Client.send max_redirects"
+    assert [hit.ref.symbol for hit in hits] == ["alpha"]
+    assert path[0].startswith("query_spec:symbols=2")
 
 
 @pytest.mark.asyncio
@@ -97,7 +98,6 @@ async def test_initial_retrieval_applies_single_extracted_path(
         exclude_path_prefixes=(),
         use_hybrid=False,
         use_query_understanding=True,
-        max_rewrites=3,
         retrieval_path=[],
     )
 

@@ -169,6 +169,48 @@ async def test_uncited_claim_is_unverified_and_skips_verifier() -> None:
 
 
 @pytest.mark.asyncio
+async def test_section_headers_are_not_claims() -> None:
+    """The structured answer format uses '## ' headers. They assert nothing,
+    so they must never become claims or reach the verifier."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "## How it works\nalpha returns one. [0]\n## Where to look next\n"
+            "Read beta next. [1]",
+        ]
+    )
+    result = await answer_question(
+        "How does alpha work?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert [c.text for c in result.claims] == ["alpha returns one.", "Read beta next."]
+    assert "## How it works" in result.answer
+
+
+@pytest.mark.asyncio
+async def test_detailed_answer_mentioning_missing_evidence_is_kept() -> None:
+    """"I couldn't find a test for it" inside a long answer must not nuke the
+    whole answer down to the not-found sentinel."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]\n"
+            "I couldn't find a test covering the error path in these chunks. [1]",
+        ]
+    )
+    result = await answer_question(
+        "How does alpha work?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert result.answer != NOT_FOUND_SENTINEL
+    assert len(result.claims) == 2
+
+
+@pytest.mark.asyncio
 async def test_stage_timings_are_recorded() -> None:
     """P1 instrumentation: every stage the run touched reports wall-clock."""
     provider = _ScriptedProvider(

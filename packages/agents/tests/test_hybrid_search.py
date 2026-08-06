@@ -141,3 +141,23 @@ async def test_empty_filtered_lanes_retry_without_exclusions(
         ("dense", ()),
         ("sparse", ()),
     ]
+
+
+def test_lane_weights_route_identifier_queries_to_the_sparse_lane() -> None:
+    """A query naming a symbol is answered by BM25 by construction; a prose
+    question has no lexical anchor and dense must lead."""
+    from repopilot_agents.tools.hybrid_search import (
+        DENSE_WEIGHT,
+        IDENTIFIER_SPARSE_WEIGHT,
+        lane_weights,
+    )
+
+    for lexical in ("HTTPTransport", "what does handle_request do", "httpx.Client send"):
+        dense, sparse = lane_weights(lexical)
+        assert sparse == IDENTIFIER_SPARSE_WEIGHT
+        assert sparse > dense, lexical
+
+    for prose in ("how does the transport handle a request", "explain the retry logic"):
+        dense, sparse = lane_weights(prose)
+        assert dense == DENSE_WEIGHT
+        assert dense > sparse, prose

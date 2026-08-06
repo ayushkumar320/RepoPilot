@@ -74,6 +74,45 @@ Phase 2 deferred entry state: implementation exists, eval artifacts exist, runti
 
 Phase 6 deferred entry state: enrichment fields are implemented and the dense regression fix keeps dense embeddings on raw `content` by default. Latest measured artifact: `evals/results/rag_phase6/_after.json` reports no recall@10 lift, httpx NDCG@5 regression of `-0.018`, flask grounding regression of `-0.10`, and large latency regressions.
 
+## Phase 8 — accuracy pass (landed in code, **NOT MEASURED**)
+
+Committed 2026-08-06. Every item below is a code change with unit tests and no
+eval artifact: Docker was unavailable in the session that wrote them, so no
+Postgres, no re-index, and no A/B. **Treat the numbers in this report as the
+last measured state until `_after.json` exists for these.** Ordered by expected
+effect on the numbers.
+
+| # | Change | Where | Needs |
+|---|---|---|---|
+| 1 | nomic `search_document:`/`search_query:` prefixes. The model is asymmetric and was being run bare on both sides. | `llm/provider.py`, `ingestion/embed.py`, `tools/vector_search.py` | **Full re-index** |
+| 2 | A claim rejected against its own `[N]` is rechecked once against the rest of the answer's chunks. Targets the documented all-or-nothing attribution weakness (`claim_grounding_rate` 0.94/0.88/0.95 vs `grounding_accuracy` 0.81/0.55/0.80). | `verifier/grounding.py`, `qa/graph.py` | — |
+| 3 | Datasets still 16/20/6 rows. **Not done — see below.** | — | — |
+| 4 | `content_tsv` gains a band-B split form of the symbol, so prose reaches `HTTPTransport.handle_request`. | migration `0009` | `alembic upgrade` (table rewrite, no re-embed) |
+| 5 | Query-adaptive lane weights: identifier-shaped query routes to the sparse lane, prose keeps dense at 3:1. | `tools/hybrid_search.py` | — |
+| 6 | Query understanding no longer fans dense retrieval over paraphrases (the Phase 2 recall regression); its identifiers feed the BM25 query and the path filter instead. Applies with the flag off too, via the regex fallback spec. | `qa/graph.py`, `qa/query_spec.py`, eval runner | — |
+| 7 | Embedding input carries a two-line `# file:`/`# symbol:` locator; functions over `MAX_CHUNK_LINES = 150` split into contiguous parts under one symbol. | `ingestion/embed.py`, `ingestion/chunk.py`, `tools/graph_traverse.py` | **Full re-index** |
+| 8 | Embedding failure no longer stores a hash-derived vector; the chunk is skipped and the gap is logged. `repos.index_version` (migration `0008`) invalidates snapshots built by an older recipe. | `ingestion/embed.py`, `ingestion/persist.py`, migration `0008` | `alembic upgrade` |
+
+Not done: **item 3, the datasets.** fastapi carries 3 answerable questions, so
+every fastapi figure in this report is 2.5 questions and cannot support a
+decision. Gold labels have to be authored against an indexed corpus — inventing
+them would corrupt the one instrument that says whether any of the above
+worked. Do this first; the rest is unmeasurable until it lands.
+
+Also unchanged by design: `vector_search` still wraps its scan in `MATERIALIZED`
+and gets exact kNN, leaving the `ivfflat` index unused. Correct for accuracy,
+won't scale. Dropping the materialization is a recall regression by
+construction — measure it, and set `ivfflat.probes` if you do.
+
+Validation order once Postgres is up:
+
+```bash
+docker compose up -d db && make db-migrate && make test-eval-sampled
+```
+
+Expect item 1 and item 7 to move every number: both change what is embedded, so
+the corpus must be rebuilt before the comparison means anything.
+
 ## Permanent Regression Gate
 
 `.github/workflows/ci.yml` now contains `retrieval-eval-artifact-gate`. On pull requests, it diffs against the PR base SHA and fails when files under `packages/agents/src/repopilot_agents/{tools,qa,rerank}/` or `packages/ingestion/` changed without a matching `evals/results/rag_phaseN/_after.json` artifact.

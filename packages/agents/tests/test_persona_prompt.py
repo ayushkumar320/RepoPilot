@@ -87,7 +87,37 @@ def test_sparse_profile_renders_without_empty_lines() -> None:
         assert absent not in rendered
 
 
+def test_dominant_modality_selects_exactly_one_directive() -> None:
+    editor = reader_context(
+        CONTRIBUTOR.model_copy(update={"modality_weights": {"change": 1.0, "understand": 0.6}})
+    )
+    judge = reader_context(
+        CONTRIBUTOR.model_copy(update={"modality_weights": {"evaluate": 1.0, "change": 0.4}})
+    )
+
+    assert "going to edit the code" in editor
+    assert "judging the code" not in editor
+    assert "judging the code" in judge
+    assert "going to edit the code" not in judge
+
+
+def test_modality_ties_break_deterministically() -> None:
+    tied = CONTRIBUTOR.model_copy(update={"modality_weights": {"locate": 1.0, "change": 1.0}})
+
+    assert reader_context(tied) == reader_context(tied)
+    assert "going to edit the code" in reader_context(tied)  # "change" < "locate"
+
+
+def test_profile_without_modality_weights_gets_no_directive() -> None:
+    rendered = reader_context(IntentProfile(raw_text="just tell me how it works"))
+
+    for directive in ("going to edit the code", "judging the code", "exact positions"):
+        assert directive not in rendered
+
+
 def test_persona_block_stays_within_the_prompt_budget() -> None:
-    # ~4 chars/token; the node budget is 2000 input tokens and the chunks need
-    # nearly all of it, so the persona block must stay marginal.
-    assert len(reader_context(CONTRIBUTOR)) // 4 < 200
+    # ~4 chars/token. The persona block is the product bet, so it buys real
+    # room: the profile fields, one modality directive, and the priority /
+    # success rules. It still has to stay a minority of the 2000-token node
+    # budget — the chunks are what the answer is made of.
+    assert len(reader_context(CONTRIBUTOR)) // 4 < 350

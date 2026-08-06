@@ -972,6 +972,37 @@ a {
   white-space: pre-wrap;
 }
 
+.answer-body {
+  white-space: normal;
+}
+
+.answer-heading {
+  margin: 18px 0 6px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.answer-heading:first-child {
+  margin-top: 0;
+}
+
+.answer-line {
+  margin: 0 0 6px;
+}
+
+.answer-citation {
+  margin-left: 2px;
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--surface-2, rgba(127, 127, 127, 0.14));
+  color: var(--text-tertiary);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .diagram-source {
   margin-top: 20px;
   overflow: hidden;

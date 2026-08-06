@@ -4,7 +4,7 @@ RepoPilot is a purpose-driven codebase onboarding tool for public software repos
 
 The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
-> Current status: the project is ready for local beta/demo use. Start with the [local startup guide](docs/STARTUP_GUIDE.md).
+> Current status: launch-ready. Run it locally with the [startup guide](docs/STARTUP_GUIDE.md); deploy it with the [deployment guide](docs/DEPLOYMENT.md).
 
 ## What It Does
 
@@ -18,9 +18,10 @@ RepoPilot turns a repository into a purpose-aware map:
 - Embeds chunks into pgvector for semantic retrieval.
 - Captures the user's free-text intent and converts it into an `IntentProfile`.
 - Plans which agent capabilities should run using deterministic planner rules.
-- Answers questions through the reader's persona, so a contributor and a competitor get the same verified facts ranked differently.
-- Verifies factual claims against retrieved source before showing them.
-- Streams results through a FastAPI SSE API into a Next.js synchronized code viewer.
+- Shapes each answer around the reader's persona: the persona decides what the answer must *do* (narrative, ranked list, dossier, comparison table), not just how it is worded.
+- Verifies factual claims against retrieved source before showing them, and labels anything unsupported instead of dropping it.
+- Signs the reader in, keeps their tours, and lets them bring their own model provider key.
+- Streams progress through a FastAPI SSE API into a Next.js tour UI.
 
 RepoPilot is not a general chatbot over code. The LLM never invents the call graph; deterministic parsing and graph tools provide the facts, and generation is wrapped by a verifier.
 
@@ -30,9 +31,10 @@ RepoPilot is not a general chatbot over code. The LLM never invents the call gra
 |---|---|
 | Foundation | Monorepo, settings, LLM provider, lint/type/test tooling, Docker services |
 | Ingestion | Clone → parse → chunk → graph → embed → persist |
-| Q&A spine | Hybrid vector + graph retrieval with verifier loop |
+| Q&A spine | Hybrid vector + graph retrieval, persona-shaped answers, verifier loop |
 | Orchestration | Intent profiler, deterministic capability planner, LangGraph state graph |
-| Experience | FastAPI + Next.js product slice, SSE streams, code viewer scaffolding |
+| Experience | FastAPI + Next.js product slice, SSE streams, claim-level verification badges |
+| Accounts | Sign-in gate (Google/GitHub), stable session identity, saved tours, BYOK provider keys |
 | Contribute mode | Lane A/B/C cores, ranker, and eval registration scaffold |
 | Ship hardening | RAG ship report and retrieval eval artifact gate in CI |
 
@@ -42,9 +44,9 @@ The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md).
 
 ```mermaid
 flowchart TB
-    user["User<br/>repo URL + free-text intent"]
-    web["Next.js Web App<br/>intent capture + tour UI + code viewer"]
-    api["FastAPI API<br/>repos, ask, chunks, SSE"]
+    user["User<br/>sign-in + repo URL + free-text intent"]
+    web["Next.js Web App<br/>auth gate + intent capture + tour UI"]
+    api["FastAPI API<br/>repos, ask, tours, account, SSE"]
     worker["Indexing / Runtime Services"]
     db[("Postgres + pgvector<br/>repos, chunks, embeddings, graph adjacency")]
     redis[("Redis<br/>background job coordination")]
@@ -80,6 +82,8 @@ sequenceDiagram
     participant G as LangGraph Agents
     participant V as Verifier
 
+    U->>W: Sign in (Google/GitHub)
+    W->>A: PUT /me — bind session to account
     U->>W: Paste GitHub URL
     W->>A: POST /repos
     A->>I: enqueue indexing
@@ -93,7 +97,8 @@ sequenceDiagram
     V-->>G: verified or flagged claims
     G-->>A: answer and verified claims
     A-->>W: JSON answer + claim refs
-    W-->>U: Tour + synchronized exact-line code viewer
+    W->>A: POST /tours/{tour_id}/messages — persist the turn
+    W-->>U: Persona-shaped answer with per-claim `file:line` refs
 ```
 
 ## Agent Graph
@@ -219,12 +224,15 @@ flowchart LR
 | `packages/agents/src/repopilot_agents/tools/` | Deterministic tool layer |
 | `packages/agents/src/repopilot_agents/verifier/` | Grounding and actionability checks |
 | `packages/agents/src/repopilot_agents/contribute/` | Contribute-mode Lane A/B/C and ranker scaffolding |
+| `packages/agents/src/repopilot_agents/qa/prompts.py` | Persona-driven answer prompts and output shapes |
 | `apps/api/src/repopilot_api/app.py` | FastAPI routes and SSE endpoints |
+| `apps/api/src/repopilot_api/access.py` | Sessions, free allowance, encrypted BYOK provider keys |
+| `apps/web/src/app/api/auth/[...nextauth]/route.ts` | Google/GitHub sign-in |
 | `apps/web/src/components/repopilot-app.tsx` | Main web experience |
 
 ## API Surface
 
-The API exposes:
+Every request carries a signed session cookie; account, tour, and usage routes are scoped to it.
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -234,7 +242,13 @@ The API exposes:
 | `GET` | `/repos/{repo_id}/first-impression` | SSE first-impression stream |
 | `POST` | `/intent` | Structure a free-text persona into an `IntentProfile` |
 | `POST` | `/repos/{repo_id}/ask` | Ask a grounded question through a persona |
-| `GET` | `/chunks/{chunk_id}` | Fetch exact source for the code viewer |
+| `GET` `PUT` | `/me` | Read or bind the signed-in identity for this session |
+| `GET` | `/account/usage` | Free repository allowance and connected providers |
+| `POST` | `/account/provider` | Connect a bring-your-own provider key (encrypted at rest) |
+| `POST` `GET` | `/tours` | Create a saved tour / list this account's tours |
+| `GET` `DELETE` | `/tours/{tour_id}` | Load or delete a saved tour with its messages |
+| `POST` | `/tours/{tour_id}/messages` | Append a question/answer turn to a tour |
+| `GET` | `/chunks/{chunk_id}` | Fetch exact source for a claim's `file:line` span |
 
 In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.
 
@@ -250,6 +264,8 @@ make dev
 ```
 
 Open `http://127.0.0.1:3000`. `make dev` runs the backend at `http://127.0.0.1:8000` and the frontend at `http://127.0.0.1:3000`.
+
+Sign-in is optional locally. Leave `AUTH_GOOGLE_ID` and `AUTH_GITHUB_ID` empty in `.env` and the app runs anonymously; set either one (plus `AUTH_SECRET`) and the app is gated behind sign-in, with tours following the account across devices. Callback URL: `<web-origin>/api/auth/callback/{google,github}`.
 
 ## Development Workflow
 
@@ -272,7 +288,7 @@ RepoPilot follows a few hard rules:
 
 - **Truthful over fluent:** claims need `CodeRef` source spans.
 - **No stat dumps:** metrics become actionable `Insight` objects with consequences.
-- **Intent first:** every downstream capability reads the user's stated purpose.
+- **Intent first:** every downstream capability reads the user's stated purpose, and the persona decides what the answer must do — not only its tone.
 - **Deterministic facts, LLM narration:** parsing, graph construction, retrieval, and metrics are tool-driven.
 - **Verifier wrapped:** unsupported claims are flagged, not silently shipped.
 - **No fixed purpose enum:** there is no `learn/contribute/audit` branch; planner rules read continuous intent weights and raw-text signals.
@@ -295,6 +311,8 @@ RepoPilot follows a few hard rules:
 - Query Understanding, Ingestion Enrichment, and Context Compression are implemented/evaluated but switched off because their gates missed.
 - Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
 - Docker Compose is for local data services; the app dev flow runs API/web directly.
+- Identity is only as strong as the signed session cookie: the web app asserts who signed in, and the API trusts that cookie.
+- The synchronized side-by-side code panel was removed; claims still carry exact `file:line` spans, and `/chunks/{chunk_id}` still serves the source.
 
 ## License
 

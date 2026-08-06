@@ -33,9 +33,14 @@ log = structlog.get_logger(__name__)
 _SYSTEM_PROMPT = (
     "You are the Teacher. Given the USER GOAL, the PLAN TILT, and a "
     "SOURCE BUNDLE of grounded Insights produced by upstream capabilities, "
-    "weave them into 2–4 short tour sections. Each section must be "
-    "goal-anchored, narratable in 2–4 sentences, and end in motion "
-    "(what the reader does next).\n\n"
+    "weave them into 3–5 tour sections that a new engineer can act on.\n\n"
+    "Each section: a title that states a takeaway (not a topic label), then "
+    "3–6 claims. Each claim is one complete sentence naming the concrete "
+    "symbol, file, or mechanism it is about — never 'a helper' or 'the "
+    "module'. Order claims so the section reads as an explanation: what the "
+    "code does, why it is shaped that way, what it costs the reader. Every "
+    "section is goal-anchored and its last claim ends in motion — the "
+    "specific next thing the reader opens, runs, or checks.\n\n"
     "Output STRICT JSON: a single array. Each entry is a SECTION object "
     'with exactly these keys: "title" (string), "order" (integer, 0-based), '
     '"claims" (array). Each claim has exactly "text" (string) and "refs" '
@@ -142,7 +147,7 @@ async def run_teacher(
             Message("user", f"{anchor}\n\n{bundle}"),
         ],
         temperature=0.3,
-        max_tokens=1200,
+        max_tokens=2400,
     )
 
     sections: list[TourSection] = []

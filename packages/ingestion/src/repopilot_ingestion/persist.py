@@ -20,6 +20,7 @@ from sqlalchemy import delete, func, insert, select, text
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 from repopilot_core.settings import Settings
+from repopilot_ingestion.db import INDEX_RECIPE_VERSION
 from repopilot_ingestion.db import (
     chunk_embeddings as embeddings_table,
 )
@@ -36,6 +37,15 @@ from repopilot_ingestion.embed import EmbeddedChunk
 from repopilot_ingestion.summary import SummarisedChunk
 
 log = structlog.get_logger(__name__)
+
+
+# A snapshot counts as indexed once this fraction of its chunks carry an
+# embedding. Not 1.0: the embedder can reject an individual chunk, and since
+# ``embed_chunks`` no longer fabricates a vector for it, an exact-equality gate
+# would mark the snapshot incomplete and re-index the whole repo on every
+# visit, forever. Below the floor the index is genuinely broken and a rebuild
+# is the right answer.
+EMBEDDING_COVERAGE_FLOOR = 0.99
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,16 +73,28 @@ def make_engine(settings: Settings) -> AsyncEngine:
 
 
 async def repo_already_indexed(engine: AsyncEngine, *, repo_url: str, head_sha: str) -> bool:
-    """Return whether the snapshot has chunks and one embedding per chunk."""
+    """Return whether the snapshot has chunks and one embedding per chunk.
+
+    A snapshot built by an older recipe (``index_version`` below
+    ``INDEX_RECIPE_VERSION``) does not count: its vectors answer to different
+    rules than the query path now uses.
+    """
     async with engine.connect() as conn:
         row = await conn.execute(
             select(repos_table.c.id)
             .join(chunks_table, chunks_table.c.repo_id == repos_table.c.id)
             .outerjoin(embeddings_table, embeddings_table.c.chunk_id == chunks_table.c.id)
-            .where(repos_table.c.url == repo_url, repos_table.c.head_sha == head_sha)
+            .where(
+                repos_table.c.url == repo_url,
+                repos_table.c.head_sha == head_sha,
+                repos_table.c.index_version >= INDEX_RECIPE_VERSION,
+            )
             .group_by(repos_table.c.id)
             .having(func.count(chunks_table.c.id) > 0)
-            .having(func.count(embeddings_table.c.chunk_id) == func.count(chunks_table.c.id))
+            .having(
+                func.count(embeddings_table.c.chunk_id)
+                >= EMBEDDING_COVERAGE_FLOOR * func.count(chunks_table.c.id)
+            )
         )
         return row.first() is not None
 
@@ -84,10 +106,16 @@ async def known_head_sha(engine: AsyncEngine, *, repo_url: str) -> str | None:
             select(repos_table.c.head_sha)
             .join(chunks_table, chunks_table.c.repo_id == repos_table.c.id)
             .outerjoin(embeddings_table, embeddings_table.c.chunk_id == chunks_table.c.id)
-            .where(repos_table.c.url == repo_url)
+            .where(
+                repos_table.c.url == repo_url,
+                repos_table.c.index_version >= INDEX_RECIPE_VERSION,
+            )
             .group_by(repos_table.c.id, repos_table.c.head_sha, repos_table.c.indexed_at)
             .having(func.count(chunks_table.c.id) > 0)
-            .having(func.count(embeddings_table.c.chunk_id) == func.count(chunks_table.c.id))
+            .having(
+                func.count(embeddings_table.c.chunk_id)
+                >= EMBEDDING_COVERAGE_FLOOR * func.count(chunks_table.c.id)
+            )
             .order_by(repos_table.c.indexed_at.desc())
             .limit(1)
         )
@@ -101,7 +129,12 @@ async def delete_incomplete_index(
     repo_url: str,
     head_sha: str,
 ) -> None:
-    """Delete a same-SHA snapshot only when it is empty or missing embeddings."""
+    """Delete a same-SHA snapshot that is empty, missing embeddings, or stale.
+
+    "Stale" means built by an older recipe. Such a row is complete, so the
+    emptiness checks below leave it alone — and then ``persist_index`` hits
+    ``uq_repos_url_sha`` trying to write the rebuild. It has to go here.
+    """
     chunk_exists = (
         select(chunks_table.c.id).where(chunks_table.c.repo_id == repos_table.c.id).exists()
     )
@@ -119,7 +152,9 @@ async def delete_incomplete_index(
             delete(repos_table).where(
                 repos_table.c.url == repo_url,
                 repos_table.c.head_sha == head_sha,
-                (~chunk_exists) | missing_embedding_exists,
+                (~chunk_exists)
+                | missing_embedding_exists
+                | (repos_table.c.index_version < INDEX_RECIPE_VERSION),
             )
         )
     if result.rowcount:
@@ -162,6 +197,7 @@ async def persist_index(
                 url=repo_url,
                 head_sha=head_sha,
                 status="indexed",
+                index_version=INDEX_RECIPE_VERSION,
                 loc_total=loc_total,
                 file_count=len({s.chunk.file_path for s in summarised_list}),
             )

@@ -32,6 +32,17 @@ from sqlalchemy.types import UserDefinedType
 
 EMBEDDING_DIM: int = 768
 
+# Version of the *recipe* that produced an index: chunk shape, embedding text,
+# and embedding prefixes. ``repos`` is keyed on (url, head_sha), so without
+# this a recipe change leaves every existing snapshot in place and silently
+# mismatched — documents embedded under the old rules, queries issued under the
+# new ones. Bump this whenever chunking or embedding input changes; snapshots
+# at an older version stop counting as indexed and are rebuilt on next visit.
+#
+#   1 — nomic ``search_document:``/``search_query:`` prefixes; method chunks
+#       carry their file + owning-class header; oversized symbols are split.
+INDEX_RECIPE_VERSION: int = 1
+
 
 class Vector(UserDefinedType[list[float]]):
     """Minimal pgvector type so alembic can emit `vector(N)` without importing
@@ -68,6 +79,7 @@ repos = Table(
     ),
     Column("loc_total", Integer, nullable=False, server_default="0"),
     Column("file_count", Integer, nullable=False, server_default="0"),
+    Column("index_version", Integer, nullable=False, server_default="0"),
     UniqueConstraint("url", "head_sha", name="uq_repos_url_sha"),
 )
 

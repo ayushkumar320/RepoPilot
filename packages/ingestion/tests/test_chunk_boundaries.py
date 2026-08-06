@@ -93,3 +93,25 @@ def test_top_level_functions_are_chunked(symbol: str) -> None:
     chunks = chunk_file(parsed, rel_path=FIXTURE.name)
     syms = {c.symbol for c in chunks if c.kind == "function"}
     assert symbol in syms
+
+
+def test_oversized_function_is_split_into_contiguous_parts() -> None:
+    """A long body becomes several chunks that keep the symbol and tile the
+    original line range exactly — no gaps, no overlap, none over the cap."""
+    from repopilot_ingestion.chunk import MAX_CHUNK_LINES, _split_span
+
+    lines = ["    pass\n"] * 400
+    for i in range(120, 400, 70):
+        lines[i] = "\n"
+
+    spans = _split_span(lines, 1, 400)
+
+    assert len(spans) > 1
+    assert spans[0][0] == 1
+    assert spans[-1][1] == 400
+    assert all(end - start + 1 <= MAX_CHUNK_LINES for start, end in spans)
+    assert all(spans[i + 1][0] == spans[i][1] + 1 for i in range(len(spans) - 1))
+    # A body that fits is never touched.
+    assert _split_span(lines, 1, MAX_CHUNK_LINES) == [(1, MAX_CHUNK_LINES)]
+    # No blank line anywhere still terminates, at the hard cap.
+    assert _split_span(["x\n"] * 400, 1, 400) == [(1, 150), (151, 300), (301, 400)]

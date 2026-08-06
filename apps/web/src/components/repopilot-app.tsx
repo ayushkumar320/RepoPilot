@@ -295,6 +295,42 @@ export interface Viewer {
   image: string | null;
 }
 
+/** Render the answer body: "## " lines become headings, "[3]" citation
+ *  markers become superscripts, everything else is a paragraph. The claim
+ *  list below the answer carries the actual source links. */
+function AnswerBody({ text }: { text: string }) {
+  const lines = text.split("\n").filter((line) => line.trim().length > 0);
+  return (
+    <div className="section-body answer-body">
+      {lines.map((line, index) => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("#")) {
+          return (
+            <h3 className="answer-heading" key={index}>
+              {trimmed.replace(/^#+\s*/, "")}
+            </h3>
+          );
+        }
+        const body = trimmed.replace(/^[-•*]\s*/, "");
+        const parts = body.split(/(\[\d+\])/g).filter(Boolean);
+        return (
+          <p className="answer-line" key={index}>
+            {parts.map((part, partIndex) =>
+              /^\[\d+\]$/.test(part) ? (
+                <sup className="answer-citation" key={partIndex}>
+                  {part.slice(1, -1)}
+                </sup>
+              ) : (
+                <span key={partIndex}>{part}</span>
+              ),
+            )}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export interface RepoPilotAppProps {
   signOutAction?: () => Promise<void>;
   viewer?: Viewer | null;
@@ -979,7 +1015,7 @@ export default function RepoPilotApp({
                         {exchange.personaLabel}
                       </span>
                     </div>
-                    <p className="section-body">{exchange.answer}</p>
+                    <AnswerBody text={exchange.answer} />
 
                     {exchange.claimIds.length > 0 ? (
                       <div className="claim-group" aria-label={`Sources for ${exchange.question}`}>

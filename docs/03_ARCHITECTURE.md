@@ -619,11 +619,13 @@ Where the persona is allowed to act:
 | Stage | Persona's influence |
 |---|---|
 | Retrieval (hybrid search, rerank, traversal) | **None.** Identical pools regardless of persona. |
-| Answer prompt | **Emphasis and ordering only**, via the `READER CONTEXT` block appended by `qa.prompts.answer_system`. `output_shape_preference` selects one ordering directive. |
+| Answer prompt | **Emphasis, ordering, and framing only**, via the `READER CONTEXT` block appended by `qa.prompts.answer_system`. `output_shape_preference` selects one ordering directive; the dominant key of `modality_weights` selects exactly one `_MODALITY_DIRECTIVE` (change / understand / evaluate / locate / compare) saying what the answer must do for this reader; `focus_keywords` and `success_criterion` each add one rule. Keyed on the profile's structured fields, never on a persona id — free-text intents reach the same behavior through the profiler. |
 | Citation requirement | **None.** Every claim still carries a `[N]` citation; the persona block explicitly restates that rules 1–4 bind absolutely. |
 | Verifier | **None.** Claims are checked against source, not against the reader's interests. |
 
 The invariant this buys: an open-source contributor and a competitive analyst asking the same question receive **the same verified facts, ranked and worded differently**. A persona can never license a claim the chunks do not support, and `intent_profile=None` reproduces the pre-persona prompt byte-for-byte.
+
+**Answer shape.** `ANSWER_SYSTEM` asks for 6–14 claim lines grouped under `## ` headers, closing with `## Where to look next`. One claim per line stays the machine-readable contract — each line is what the verifier checks and what the UI links to a file range. Header lines assert nothing, so `qa.graph._parse_claims` skips them and they never reach the verifier. `_is_not_found` matches only a single-line sentinel reply, so a detailed answer may say "I couldn't find a test for this" in one line without the whole answer collapsing to the sentinel.
 
 Presets live in [`apps/web/src/lib/personas.ts`](../apps/web/src/lib/personas.ts) as data. Free-text personas go through `POST /intent` → `intent.profiler.profile_intent`, which never raises: on any failure it degrades to an `IntentProfile` carrying only `raw_text`.
 

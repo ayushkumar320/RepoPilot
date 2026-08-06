@@ -105,6 +105,17 @@ class LLMResponse:
         return self.prompt_tokens + self.completion_tokens
 
 
+# nomic-embed-text-v1.5 is trained with task prefixes and is asymmetric: the
+# corpus side must be embedded as ``search_document:`` and the query side as
+# ``search_query:``. Embedding both sides bare — which this codebase did until
+# 2026-08-06 — puts every comparison in a regime the model was not trained for.
+# Applied at the two call sites (ingestion ``embed_chunks``, retrieval
+# ``vector_search``) rather than inside the provider, so the embedding cache
+# keys the prefixed text and the two roles can never collide.
+EMBED_DOCUMENT_PREFIX = "search_document: "
+EMBED_QUERY_PREFIX = "search_query: "
+
+
 @dataclass(slots=True)
 class EmbeddingResponse:
     """Provider-agnostic embedding shape."""

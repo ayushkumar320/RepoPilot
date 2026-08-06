@@ -116,6 +116,7 @@ async def test_embed_chunks_uses_raw_content_by_default(tmp_path: Path) -> None:
     assert "# file: sample_module.py" in sent
     assert "# symbol: sample.login" in sent
     assert sent.endswith(login.content)
+    assert login.enriched_text is not None
     assert login.enriched_text not in sent
     assert provider.batch_sizes == [8]
 

@@ -192,14 +192,35 @@ def reader_context(profile: IntentProfile | None) -> str:
     shape = _SHAPE_DIRECTIVE.get(profile.output_shape_preference, "")
     if shape:
         lines.append(f"  ordering:   {shape}")
-    return (
-        "\n\nREADER CONTEXT — this shapes emphasis, ordering, and wording ONLY.\n"
-        + "\n".join(lines)
-        + "\nWhen several supported claims compete for space, prefer the ones this reader "
+
+    tail: list[str] = []
+    modality = _dominant_modality(profile)
+    directive = _MODALITY_DIRECTIVE.get(str(modality), "") if modality else ""
+    if directive:
+        tail.append(directive)
+    if profile.focus_keywords:
+        tail.append(
+            "When a chunk touches one of the priorities above, surface that fact even "
+            "if the question did not name it — and when a priority is simply absent "
+            "from the retrieved code, say so rather than passing over it in silence."
+        )
+    if profile.success_criterion:
+        tail.append(
+            "The last section must leave this reader at the success criterion above, "
+            "or name exactly what is still missing to get there."
+        )
+    tail.append(
+        "When several supported claims compete for space, prefer the ones this reader "
         "can act on. Rules 1-4 above still bind absolutely: never add, soften, or "
         "strengthen a claim to suit this reader, and never drop a citation. If the "
         "chunks hold nothing relevant to this reader's priorities, answer the question "
         "plainly rather than manufacturing relevance."
+    )
+    return (
+        "\n\nREADER CONTEXT — this shapes emphasis, ordering, and wording ONLY.\n"
+        + "\n".join(lines)
+        + "\n"
+        + "\n".join(tail)
     )
 
 

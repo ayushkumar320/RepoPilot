@@ -17,6 +17,7 @@ from dataclasses import dataclass
 
 import structlog
 from sqlalchemy import delete, func, insert, select, text
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 from repopilot_core.settings import Settings
@@ -129,11 +130,18 @@ async def delete_incomplete_index(
     repo_url: str,
     head_sha: str,
 ) -> None:
-    """Delete a same-SHA snapshot that is empty, missing embeddings, or stale.
+    """Clear the chunks of a same-SHA snapshot that is empty, broken, or stale.
 
     "Stale" means built by an older recipe. Such a row is complete, so the
-    emptiness checks below leave it alone — and then ``persist_index`` hits
-    ``uq_repos_url_sha`` trying to write the rebuild. It has to go here.
+    emptiness checks below leave it alone — it still has to be cleared, or the
+    rebuild would stack new chunks on top of the old ones.
+
+    This deletes the snapshot's **chunks**, never its ``repos`` row. Dropping
+    the row used to be the simple way to make space for ``persist_index``'s
+    plain INSERT, but ``product_tours.snapshot_repo_id`` references ``repos``
+    ``ON DELETE SET NULL``: every re-index silently unpinned every saved tour
+    pointing at that snapshot, even though the row came straight back with the
+    same id. ``persist_index`` now upserts, so the row can simply stay put.
     """
     chunk_exists = (
         select(chunks_table.c.id).where(chunks_table.c.repo_id == repos_table.c.id).exists()
@@ -147,22 +155,23 @@ async def delete_incomplete_index(
         )
         .exists()
     )
+    rebuildable = select(repos_table.c.id).where(
+        repos_table.c.url == repo_url,
+        repos_table.c.head_sha == head_sha,
+        (~chunk_exists)
+        | missing_embedding_exists
+        | (repos_table.c.index_version < INDEX_RECIPE_VERSION),
+    )
     async with engine.begin() as conn:
         result = await conn.execute(
-            delete(repos_table).where(
-                repos_table.c.url == repo_url,
-                repos_table.c.head_sha == head_sha,
-                (~chunk_exists)
-                | missing_embedding_exists
-                | (repos_table.c.index_version < INDEX_RECIPE_VERSION),
-            )
+            delete(chunks_table).where(chunks_table.c.repo_id.in_(rebuildable))
         )
     if result.rowcount:
         log.warning(
-            "persist.incomplete_snapshot_deleted",
+            "persist.incomplete_snapshot_cleared",
             repo_url=repo_url,
             head_sha=head_sha,
-            rows=result.rowcount,
+            chunks=result.rowcount,
         )
 
 
@@ -191,15 +200,32 @@ async def persist_index(
     SessionMaker = async_sessionmaker(engine, expire_on_commit=False)
 
     async with SessionMaker.begin() as session:
+        file_count = len({s.chunk.file_path for s in summarised_list})
+        # Upsert rather than insert. A re-index of the same snapshot must not
+        # delete and recreate this row: product_tours.snapshot_repo_id points
+        # at it ON DELETE SET NULL, so recreating it under the same id still
+        # unpins every saved tour that referenced it.
+        repo_upsert = pg_insert(repos_table).values(
+            id=repo_id,
+            url=repo_url,
+            head_sha=head_sha,
+            status="indexed",
+            index_version=INDEX_RECIPE_VERSION,
+            loc_total=loc_total,
+            file_count=file_count,
+        )
         await session.execute(
-            insert(repos_table).values(
-                id=repo_id,
-                url=repo_url,
-                head_sha=head_sha,
-                status="indexed",
-                index_version=INDEX_RECIPE_VERSION,
-                loc_total=loc_total,
-                file_count=len({s.chunk.file_path for s in summarised_list}),
+            repo_upsert.on_conflict_do_update(
+                index_elements=[repos_table.c.id],
+                set_={
+                    "url": repo_url,
+                    "head_sha": head_sha,
+                    "status": "indexed",
+                    "index_version": INDEX_RECIPE_VERSION,
+                    "loc_total": loc_total,
+                    "file_count": file_count,
+                    "indexed_at": func.now(),
+                },
             )
         )
 
@@ -259,12 +285,24 @@ async def persist_index(
                     )
 
         node_count = len(adjacency)
+        adjacency_json = json.loads(json.dumps(adjacency))
+        # Upsert for the same reason the repos row does: this row used to be
+        # swept away by the cascade when the repos row was deleted, and now the
+        # repos row survives a rebuild.
+        graph_upsert = pg_insert(graph_table).values(
+            repo_id=repo_id,
+            adjacency=adjacency_json,
+            node_count=node_count,
+            edge_count=edge_count,
+        )
         await session.execute(
-            insert(graph_table).values(
-                repo_id=repo_id,
-                adjacency=json.loads(json.dumps(adjacency)),
-                node_count=node_count,
-                edge_count=edge_count,
+            graph_upsert.on_conflict_do_update(
+                index_elements=[graph_table.c.repo_id],
+                set_={
+                    "adjacency": adjacency_json,
+                    "node_count": node_count,
+                    "edge_count": edge_count,
+                },
             )
         )
 

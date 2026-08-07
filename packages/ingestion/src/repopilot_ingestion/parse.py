@@ -76,11 +76,14 @@ class ParsedFile:
 
 def parse_file(path: Path, *, module: str = "") -> ParsedFile:
     source = path.read_text(encoding="utf-8", errors="replace")
-    tree = _get_parser().parse(source.encode("utf-8"))
+    # The parsed buffer is what tree-sitter's byte offsets index, so the
+    # internals slice these bytes rather than the decoded ``str``.
+    source_bytes = source.encode("utf-8")
+    tree = _get_parser().parse(source_bytes)
     root = tree.root_node
 
-    imports = tuple(_extract_imports(root, source))
-    symbols = tuple(_extract_symbols(root, source, parent_qual=module))
+    imports = tuple(_extract_imports(root, source_bytes))
+    symbols = tuple(_extract_symbols(root, source_bytes, parent_qual=module))
 
     return ParsedFile(
         path=path,
@@ -104,8 +107,14 @@ def _get_parser() -> Parser:
 # ── internals ───────────────────────────────────────────────────────────────
 
 
-def _text(node: Node, source: str) -> str:
-    return source[node.start_byte : node.end_byte]
+def _text(node: Node, source: bytes) -> str:
+    """Slice the source by tree-sitter's byte offsets, then decode.
+
+    ``source`` is bytes on purpose: ``start_byte``/``end_byte`` index the UTF-8
+    buffer tree-sitter parsed, so slicing a ``str`` with them silently shifts
+    every span after the file's first non-ASCII character.
+    """
+    return source[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
 
 
 def _line_span(node: Node) -> tuple[int, int]:
@@ -113,7 +122,7 @@ def _line_span(node: Node) -> tuple[int, int]:
     return node.start_point[0] + 1, node.end_point[0] + 1
 
 
-def _extract_imports(root: Node, source: str) -> list[ImportEdge]:
+def _extract_imports(root: Node, source: bytes) -> list[ImportEdge]:
     out: list[ImportEdge] = []
     for child in root.children:
         if child.type == "import_statement":
@@ -127,7 +136,7 @@ def _extract_imports(root: Node, source: str) -> list[ImportEdge]:
     return out
 
 
-def _walk_dotted_aliases(node: Node, source: str) -> list[tuple[str, str | None]]:
+def _walk_dotted_aliases(node: Node, source: bytes) -> list[tuple[str, str | None]]:
     """Yield ``(dotted_module, alias_or_None)`` pairs from an ``import`` node."""
     out: list[tuple[str, str | None]] = []
     for child in node.children:
@@ -141,14 +150,19 @@ def _walk_dotted_aliases(node: Node, source: str) -> list[tuple[str, str | None]
     return out
 
 
-def _parse_from_import(node: Node, source: str) -> list[ImportEdge]:
+def _parse_from_import(node: Node, source: bytes) -> list[ImportEdge]:
     module_node = node.child_by_field_name("module_name")
     module = _text(module_node, source) if module_node is not None else ""
 
     names: list[str] = []
     aliases: dict[str, str] = {}
+    # Compare by ``id``, not by ``is``: py-tree-sitter builds a fresh Node
+    # wrapper per access, so ``child is not module_node`` never excludes the
+    # module and duplicated it into ``names`` (``from pathlib import Path``
+    # yielded ``("pathlib", "Path")``).
+    module_id = module_node.id if module_node is not None else None
     for child in node.children:
-        if child.type == "dotted_name" and child is not module_node:
+        if child.type == "dotted_name" and child.id != module_id:
             names.append(_text(child, source))
         elif child.type == "aliased_import":
             inner = child.child_by_field_name("name")
@@ -165,7 +179,7 @@ def _parse_from_import(node: Node, source: str) -> list[ImportEdge]:
     return [ImportEdge(module=module, names=tuple(names), aliases=aliases)]
 
 
-def _extract_symbols(node: Node, source: str, *, parent_qual: str) -> list[ParsedSymbol]:
+def _extract_symbols(node: Node, source: bytes, *, parent_qual: str) -> list[ParsedSymbol]:
     out: list[ParsedSymbol] = []
     for child in _iter_block_children(node):
         stripped = _strip_decorator(child)
@@ -275,7 +289,7 @@ def _strip_decorator(node: Node) -> Node | None:
     return None
 
 
-def _decorators(node: Node, source: str) -> list[str]:
+def _decorators(node: Node, source: bytes) -> list[str]:
     if node.type != "decorated_definition":
         return []
     return [
@@ -285,15 +299,16 @@ def _decorators(node: Node, source: str) -> list[str]:
     ]
 
 
-def _signature(node: Node, source: str) -> str:
+def _signature(node: Node, source: bytes) -> str:
     """Return the def/class header without decorators or body text."""
     body = node.child_by_field_name("body")
     if body is None:
         return _text(node, source).splitlines()[0].strip()
-    return source[node.start_byte : body.start_byte].rstrip().removesuffix(":").rstrip() + ":"
+    header = source[node.start_byte : body.start_byte].decode("utf-8", errors="replace")
+    return header.rstrip().removesuffix(":").rstrip() + ":"
 
 
-def _first_docstring(node: Node, source: str) -> str | None:
+def _first_docstring(node: Node, source: bytes) -> str | None:
     body = node.child_by_field_name("body")
     if body is None:
         return None
@@ -328,7 +343,7 @@ def _docstring_tokens(docstring: str | None, *, limit: int = 12) -> tuple[str, .
     return tuple(out)
 
 
-def _class_base_names(node: Node, source: str) -> list[str]:
+def _class_base_names(node: Node, source: bytes) -> list[str]:
     superclasses = node.child_by_field_name("superclasses")
     if superclasses is None:
         return []
@@ -339,7 +354,7 @@ def _class_base_names(node: Node, source: str) -> list[str]:
     return out
 
 
-def _class_method_names(node: Node, source: str) -> list[str]:
+def _class_method_names(node: Node, source: bytes) -> list[str]:
     body = node.child_by_field_name("body")
     if body is None:
         return []

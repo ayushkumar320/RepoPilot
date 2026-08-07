@@ -41,7 +41,11 @@ EMBEDDING_DIM: int = 768
 #
 #   1 — nomic ``search_document:``/``search_query:`` prefixes; method chunks
 #       carry their file + owning-class header; oversized symbols are split.
-INDEX_RECIPE_VERSION: int = 1
+#   2 — parser slices spans by tree-sitter's byte offsets instead of indexing
+#       the decoded str with them. Every symbol after a file's first non-ASCII
+#       character was previously truncated or shifted, so ``chunks.symbol`` —
+#       the join key from a graph node to its file:line — is different at rest.
+INDEX_RECIPE_VERSION: int = 2
 
 
 class Vector(UserDefinedType[list[float]]):

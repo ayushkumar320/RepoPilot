@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "name": "repopilot-feed-promo",
+  "workflow": "general-video",
+  "approved_at": "2026-08-06T18:17:05.627Z",
+  "source_project": "repopilot-showcase",
+  "destination": "x-feed",
+  "aspect": "1920x1080",
+  "language": "en",
+  "voice": "0c2151d538844c70a8b096de533f2828"
+}

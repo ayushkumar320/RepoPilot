@@ -1,0 +1,40 @@
+# What is versioned here is the composition and the reasoning behind it — the
+# scene HTML, the plan layer (BRIEF / STORYBOARD / SCRIPT / frame), and the
+# project config. Those are ~1 MB of text and are the actual work.
+#
+# Everything below is output or fetched media: ~75 MB that git would carry
+# forever. Each entry says how to get it back, because "regenerable" is only
+# true if someone knows the command.
+
+# Rendered MP4s. Six of them, one per iteration; only the last was final.
+# Restore: npm run render  (~90s for the 60s cut)
+renders/
+
+# Verification screenshots taken during the build.
+# Restore: npx hyperframes snapshot --at <seconds>
+snapshots/
+
+# Framework caches and generated diagnostics.
+.hyperframes/
+.thumbnails/
+.waveform-cache/
+node_modules/
+
+# Music bed. track.mp3 was retrieved from the HeyGen catalog; bed60.mp3 and
+# track-ducked.mp3 are derived from it by the ffmpeg steps recorded in
+# frame.md. Not deterministically reproducible — the catalog may rank a
+# different track for the same query — so treat the query in BRIEF.md as the
+# record, and keep a copy elsewhere if this exact bed matters.
+assets/bgm/
+
+# Narration. Regenerate from SCRIPT.md with the voice id recorded in BRIEF.md:
+#   node <media-use>/audio/scripts/heygen-tts.mjs "<line>" -o assets/vo/line-N.wav \
+#     --voice 0c2151d538844c70a8b096de533f2828
+# Costs HeyGen allowance, so it is output rather than source.
+assets/vo/
+
+# Six cues copied from the bundled media-use SFX library. Excluded on
+# licensing grounds as much as size: they are third-party audio and their
+# CREDITS.md was not copied across with them.
+# Restore: cp <media-use>/audio/assets/sfx/{riser,impact-bass-1,impact-bass-2,typing,click-soft,ping}.mp3 assets/sfx/
+assets/sfx/

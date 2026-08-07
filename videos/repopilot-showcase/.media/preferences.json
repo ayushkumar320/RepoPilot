@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "preferences": {
+    "destination": {
+      "value": "x-feed",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.822Z"
+    },
+    "aspect": {
+      "value": "1920x1080",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.847Z"
+    },
+    "language": {
+      "value": "en",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.869Z"
+    },
+    "flow": {
+      "value": "companion",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.891Z"
+    },
+    "storyboard": {
+      "value": "yes",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.912Z"
+    },
+    "voice": {
+      "value": "0c2151d538844c70a8b096de533f2828",
+      "confirmed_in": [
+        "repopilot-showcase"
+      ],
+      "updated_at": "2026-08-06T17:51:42.934Z"
+    }
+  },
+  "sightings": {}
+}

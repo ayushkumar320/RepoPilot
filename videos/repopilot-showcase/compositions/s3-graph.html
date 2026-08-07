@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          font-family: "JetBrains Mono", monospace;
+        }
+        .fill {
+          position: absolute;
+          inset: 0;
+          background: #0d1117;
+        }
+        /* Background light: one soft neutral source lifting the frame off flat black.
+           Deliberately NOT accent-tinted — accent means "verified source" and stays
+           rationed. Static, so it costs nothing in determinism. */
+        .glow {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            82% 64% at 50% 36%,
+            rgba(150, 168, 194, 0.1) 0%,
+            rgba(150, 168, 194, 0.035) 46%,
+            rgba(150, 168, 194, 0) 74%
+          );
+        }
+        .stage {
+          position: absolute;
+          left: 480px;
+          top: 200px;
+          width: 960px;
+          height: 560px;
+        }
+        .edges {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 960px;
+          height: 560px;
+          overflow: visible;
+        }
+        .edge {
+          stroke: #3a4552;
+          stroke-width: 2;
+          fill: none;
+        }
+        .node {
+          position: absolute;
+          display: block;
+          width: 18px;
+          height: 18px;
+          margin-left: -9px;
+          margin-top: -9px;
+          border-radius: 50%;
+          background: #697583;
+          border: 2px solid #2b3440;
+        }
+        .node-hub {
+          width: 26px;
+          height: 26px;
+          margin-left: -13px;
+          margin-top: -13px;
+          background: #aab3bd;
+        }
+        /* Centred by box maths, not by a CSS transform — GSAP owns transform here. */
+        .node-label {
+          position: absolute;
+          display: block;
+          width: 340px;
+          margin-left: -170px;
+          text-align: center;
+          font-size: 28px;
+          line-height: 1;
+          color: #aab3bd;
+          white-space: nowrap;
+        }
+        .chips {
+          position: absolute;
+          left: 120px;
+          top: 120px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: flex-start;
+        }
+        .chip {
+          display: block;
+          padding: 14px 26px;
+          border-radius: 999px;
+          background: #151b23;
+          border: 1px solid #2b3440;
+          color: #aab3bd;
+          font-size: 32px;
+          line-height: 1.1;
+        }
+        .toolstrip {
+          position: absolute;
+          left: 0;
+          bottom: 84px;
+          width: 1920px;
+          display: flex;
+          justify-content: center;
+          gap: 22px;
+          align-items: baseline;
+        }
+        .tool {
+          display: block;
+          font-size: 30px;
+          line-height: 1.2;
+          color: #dce3ea;
+        }
+        .tool-dot {
+          display: block;
+          font-size: 30px;
+          line-height: 1.2;
+          color: #697583;
+        }
+        .headline {
+          position: absolute;
+          left: 120px;
+          top: 636px;
+          width: 1500px;
+        }
+        .hl {
+          display: block;
+          font-family: "Archivo Black", sans-serif;
+          font-weight: 400;
+          font-size: 96px;
+          line-height: 1.04;
+          letter-spacing: -0.03em;
+          color: #edf1f5;
+        }
+        .sub {
+          display: block;
+          margin-top: 26px;
+          font-size: 54px;
+          line-height: 1.2;
+          color: #aab3bd;
+        }
+      </style>
+
+      <div data-hf-id="hf-2rks" id="root" data-composition-id="s3-graph" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-4qej" class="fill"></div>
+        <div data-hf-id="hf-2s7n" class="glow"></div>
+
+        <div data-hf-id="hf-nz6b" id="s3-stage" class="stage">
+          <svg data-hf-id="hf-et33" id="s3-edges" class="edges" viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg" />
+        </div>
+
+        <div data-hf-id="hf-pwof" id="s3-chips" class="chips">
+          <span data-hf-id="hf-tiex" class="chip">tree-sitter AST</span>
+          <span data-hf-id="hf-jmmt" class="chip">NetworkX</span>
+          <span data-hf-id="hf-ir7x" class="chip">pgvector</span>
+        </div>
+
+        <div data-hf-id="hf-o6jq" id="s3-tools" class="toolstrip">
+          <span data-hf-id="hf-5bcq" class="tool">read_chunks</span><span data-hf-id="hf-481m" class="tool-dot">·</span>
+          <span data-hf-id="hf-tks9" class="tool">vector_search</span><span data-hf-id="hf-ceou" class="tool-dot">·</span>
+          <span data-hf-id="hf-i0vk" class="tool">graph_traverse</span><span data-hf-id="hf-cszv" class="tool-dot">·</span>
+          <span data-hf-id="hf-rq1a" class="tool">graph_query</span><span data-hf-id="hf-d7aw" class="tool-dot">·</span>
+          <span data-hf-id="hf-q05r" class="tool">graph_metrics</span><span data-hf-id="hf-af5p" class="tool-dot">·</span>
+          <span data-hf-id="hf-xca9" class="tool">github_issues</span>
+        </div>
+
+        <div data-hf-id="hf-iomx" id="s3-headline" class="headline" data-layout-allow-caption-zone="">
+          <span data-hf-id="hf-ea9y" class="hl">Python parses to</span>
+          <span data-hf-id="hf-npg2" class="hl">a real call graph.</span>
+          <span data-hf-id="hf-cyel" class="sub">The model never draws it.</span>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          // [x, y, isHub, label] in the 960x560 stage. Authored constants — no DOM measurement.
+          const NODES = [
+            [480, 40, 1, "app.py"],
+            [250, 130, 0, ""],
+            [700, 130, 0, ""],
+            [480, 210, 1, "graph.py"],
+            [200, 296, 0, "intent"],
+            [400, 296, 0, "planner"],
+            [620, 296, 0, ""],
+            [830, 296, 0, "verifier"],
+            [480, 384, 1, "tools"],
+            [130, 466, 0, "read_chunks"],
+            [330, 476, 0, ""],
+            [530, 476, 0, "vector_search"],
+            [742, 466, 0, ""],
+            [60, 210, 0, "pipeline.py"],
+            [60, 120, 0, ""],
+            [150, 40, 0, ""],
+            [300, 40, 0, ""],
+            [900, 210, 0, "state.py"],
+            [900, 120, 0, ""],
+            [900, 384, 0, ""],
+          ];
+          const EDGES = [
+            [0, 1], [0, 2], [0, 3], [1, 3], [2, 3], [3, 4], [3, 5], [3, 6], [3, 7],
+            [4, 5], [5, 6], [5, 8], [6, 8], [7, 8], [8, 9], [8, 10], [8, 11], [8, 12],
+            [13, 14], [14, 15], [15, 16], [13, 3], [17, 3], [18, 17], [19, 12], [6, 7],
+          ];
+
+          const stage = document.getElementById("s3-stage");
+          const svg = document.getElementById("s3-edges");
+          const SVG_NS = "http://www.w3.org/2000/svg";
+
+          EDGES.forEach((pair, i) => {
+            const a = NODES[pair[0]];
+            const b = NODES[pair[1]];
+            const line = document.createElementNS(SVG_NS, "line");
+            line.setAttribute("x1", a[0]);
+            line.setAttribute("y1", a[1]);
+            line.setAttribute("x2", b[0]);
+            line.setAttribute("y2", b[1]);
+            line.setAttribute("class", "edge");
+            line.setAttribute("id", "s3-edge-" + i);
+            // Straight segments: length is arithmetic, not a getTotalLength() measurement.
+            const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+            line.setAttribute("stroke-dasharray", len);
+            line.setAttribute("stroke-dashoffset", len);
+            svg.appendChild(line);
+          });
+
+          NODES.forEach((n, i) => {
+            const dot = document.createElement("span");
+            dot.className = n[2] ? "node node-hub" : "node";
+            dot.id = "s3-node-" + i;
+            dot.style.left = n[0] + "px";
+            dot.style.top = n[1] + "px";
+            stage.appendChild(dot);
+
+            if (n[3]) {
+              const label = document.createElement("span");
+              label.className = "node-label";
+              label.id = "s3-label-" + i;
+              label.style.left = n[0] + "px";
+              label.style.top = n[1] + 26 + "px";
+              label.textContent = n[3];
+              stage.appendChild(label);
+            }
+          });
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // Nodes settle outward from centre — a parse resolving, not a bloom.
+          tl.fromTo(
+            ".node",
+            { scale: 0, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.34,
+              ease: "power3.out",
+              stagger: { each: 0.045, from: "center" },
+            },
+            0.1,
+          );
+
+          // Constant-speed edge draws: mechanical, never a shimmer.
+          tl.fromTo(
+            ".edge",
+            { strokeDashoffset: (i, el) => Number(el.getAttribute("stroke-dasharray")) },
+            {
+              strokeDashoffset: 0,
+              duration: 0.42,
+              ease: "none",
+              stagger: { each: 0.042 },
+            },
+            0.75,
+          );
+
+          tl.fromTo(
+            ".node-label",
+            { opacity: 0, y: 8 },
+            { opacity: 1, y: 0, duration: 0.3, ease: "power2.out", stagger: { each: 0.06 } },
+            1.6,
+          );
+
+          tl.fromTo(
+            ".chip",
+            { opacity: 0, x: -22 },
+            { opacity: 1, x: 0, duration: 0.34, ease: "power2.out", stagger: { each: 0.18 } },
+            2.0,
+          );
+
+          tl.fromTo(
+            ".tool",
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.26, ease: "power2.out", stagger: { each: 0.075 } },
+            2.9,
+          );
+          tl.fromTo(
+            ".tool-dot",
+            { opacity: 0 },
+            { opacity: 1, duration: 0.26, ease: "none", stagger: { each: 0.075 } },
+            3.0,
+          );
+
+          // Clear the lower band, then state the claim in it.
+          tl.to("#s3-stage", { y: -152, scale: 0.82, opacity: 0.26, duration: 0.6, ease: "power2.inOut" }, 4.35);
+          tl.to("#s3-chips", { opacity: 0.4, duration: 0.5, ease: "power2.out" }, 4.35);
+
+          tl.fromTo(
+            ".hl",
+            { opacity: 0, y: 40 },
+            { opacity: 1, y: 0, duration: 0.42, ease: "power3.out", stagger: { each: 0.11 } },
+            4.75,
+          );
+          tl.fromTo(
+            ".sub",
+            { opacity: 0, y: 22 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+            5.55,
+          );
+
+          window.__timelines["s3-graph"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

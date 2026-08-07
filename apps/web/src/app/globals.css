@@ -1719,6 +1719,140 @@ input:focus-visible {
 
 /* Reduced motion means a gentler equivalent, not silence. Movement goes away;
    opacity and colour changes stay, because they carry meaning. */
+/* ── Related code (graph neighbours) ───────────────────────────────────── */
+
+.neighbours {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.neighbours-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.neighbours-toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.neighbours-body {
+  margin-top: 10px;
+}
+
+.neighbour-group + .neighbour-group {
+  margin-top: 12px;
+}
+
+.neighbour-group-label {
+  font-size: 0.72rem;
+  font-weight: 640;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.neighbour-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.neighbour-row {
+  border-radius: 8px;
+}
+
+.neighbour-row[data-unresolved="true"] {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 8px;
+  color: var(--text-tertiary);
+}
+
+.neighbour-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.neighbour-toggle:hover {
+  background: var(--surface-subtle);
+}
+
+.neighbour-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--text-tertiary);
+}
+
+.neighbour-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.neighbour-name {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.neighbour-row[data-unresolved="true"] .neighbour-name {
+  color: var(--text-tertiary);
+}
+
+.neighbour-ref,
+.neighbour-note {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.neighbour-source {
+  margin: 4px 0 8px 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code);
+  overflow: hidden;
+}
+
+.neighbour-source pre {
+  margin: 0;
+  padding: 12px 14px;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--code-text);
+}
+
+.neighbour-source .neighbour-note {
+  padding: 12px 14px;
+  margin: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

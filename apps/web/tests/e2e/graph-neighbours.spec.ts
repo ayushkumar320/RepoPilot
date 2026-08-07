@@ -1,0 +1,252 @@
+import { expect, test } from "@playwright/test";
+
+const repoUrl = process.env.PLAYWRIGHT_REPO_URL ?? "https://github.com/pallets/flask";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+
+const sseHeaders = {
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
+};
+
+/**
+ * Captured verbatim from the live endpoint against an indexed flask snapshot,
+ * not written from the TypeScript type. A mock invented from the type is
+ * exactly what hides a shape mismatch — this project has been bitten by that
+ * before, when a Playwright mock masked the tour SSE event-shape bug.
+ *
+ * Trimmed to four neighbours that cover every branch the UI has: resolved and
+ * clickable, internal but unresolved, and external.
+ */
+const neighboursResponse = JSON.stringify({
+  symbol: "Flask",
+  available: true,
+  found: true,
+  total: 11,
+  truncated: true,
+  neighbours: [
+    {
+      symbol: "flask.sessions.SecureCookieSessionInterface",
+      label: "SecureCookieSessionInterface",
+      edge: "calls",
+      kind: "class",
+      external: false,
+      resolved: true,
+      chunk_id: "chunk-neighbour-1",
+      ref: {
+        file_path: "src/flask/sessions.py",
+        start_line: 284,
+        end_line: 385,
+        symbol: "flask.sessions.SecureCookieSessionInterface",
+      },
+    },
+    {
+      symbol: "flask.sansio.app.App",
+      label: "App",
+      edge: "inherits",
+      kind: "class",
+      external: false,
+      resolved: true,
+      chunk_id: "chunk-neighbour-2",
+      ref: {
+        file_path: "src/flask/sansio/app.py",
+        start_line: 59,
+        end_line: 1013,
+        symbol: "flask.sansio.app.App",
+      },
+    },
+    {
+      symbol: "flask.globals.FlaskProxy",
+      label: "FlaskProxy",
+      edge: "inherited_by",
+      kind: null,
+      external: false,
+      resolved: false,
+      chunk_id: null,
+      ref: null,
+    },
+    {
+      symbol: "datetime.timedelta",
+      label: "timedelta",
+      edge: "calls",
+      kind: null,
+      external: true,
+      resolved: false,
+      chunk_id: null,
+      ref: null,
+    },
+  ],
+});
+
+const answer = JSON.stringify({
+  answer: "Flask is the application object.",
+  claims: [
+    {
+      id: "claim-1",
+      text: "The Flask class is the main app entry.",
+      refs: [{ file_path: "src/flask/app.py", start_line: 1, end_line: 20, symbol: "Flask" }],
+      status: "verified",
+      verifier_note: "Grounded against app.py.",
+      retrieval_path: ["vector_search:k=8"],
+    },
+  ],
+  retrieval_path: ["vector_search:k=8"],
+});
+
+async function mockApi(page: import("@playwright/test").Page, graphBody: string) {
+  await page.route(
+    new RegExp(apiBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+    async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname;
+      const method = route.request().method();
+
+      if (path.includes("/graph/neighbours")) {
+        return route.fulfill({ status: 200, contentType: "application/json", body: graphBody });
+      }
+      if (path.includes("/chunks/")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            chunk_id: "chunk-neighbour-1",
+            repo_id: "repo-123",
+            ref: {
+              file_path: "src/flask/sessions.py",
+              start_line: 284,
+              end_line: 385,
+              symbol: "flask.sessions.SecureCookieSessionInterface",
+            },
+            content: "class SecureCookieSessionInterface(SessionInterface):\n    pass",
+            summary: null,
+          }),
+        });
+      }
+      if (path.endsWith("/account/usage")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            free_repositories_remaining: 1,
+            provider_connected: false,
+            groq_connected: false,
+            huggingface_connected: false,
+            credential_storage: "account_bound",
+          }),
+        });
+      }
+      if (path.endsWith("/repos") && method === "POST") {
+        return route.fulfill({
+          status: 202,
+          contentType: "application/json",
+          body: JSON.stringify({ repo_id: "repo-123", status: "queued" }),
+        });
+      }
+      if (path.includes("/repos/repo-123/status")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ status: "ready", progress: 100 }),
+        });
+      }
+      if (path.includes("/repos/repo-123/first-impression")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "text/event-stream",
+          headers: sseHeaders,
+          body: 'event: first_impression\ndata: {"v":1,"text":"Flask looks routing-heavy."}\n\nevent: done\ndata: {"v":1}\n\n',
+        });
+      }
+      if (path.includes("/repos/repo-123/ask") && method === "POST") {
+        return route.fulfill({ status: 200, contentType: "application/json", body: answer });
+      }
+      if (path.endsWith("/me")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ session_id: "anon", authenticated: false }),
+        });
+      }
+      if (path.endsWith("/tours") && method === "GET") {
+        return route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+      }
+      if (path.endsWith("/tours") && method === "POST") {
+        return route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({ tour_id: "tour-123" }),
+        });
+      }
+      return route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+    },
+  );
+}
+
+async function askAQuestion(page: import("@playwright/test").Page) {
+  await page.goto("/");
+  await page.getByLabel("Public GitHub URL").fill(repoUrl);
+  await page.getByRole("button", { name: "Open-source contributor" }).click();
+  await page.getByRole("button", { name: "Analyze and ask" }).click();
+  await expect(page.getByRole("heading", { name: "Ask this repository" })).toBeVisible({
+    timeout: 15_000,
+  });
+  await page.getByLabel("Ask this repository").fill("What is the tech stack?");
+  await page.getByRole("button", { name: "Ask", exact: true }).click();
+  await expect(page.getByText("Flask is the application object.")).toBeVisible({
+    timeout: 15_000,
+  });
+}
+
+test("related code expands a claim into its graph neighbours", async ({ page }) => {
+  await mockApi(page, neighboursResponse);
+  await askAQuestion(page);
+
+  // Collapsed by default: the panel must not cost a request nobody asked for.
+  await expect(page.getByText("SecureCookieSessionInterface")).toBeHidden();
+
+  await page.getByRole("button", { name: "Related code" }).click();
+
+  // Grouped by edge kind, in reading order.
+  await expect(page.getByText("Calls", { exact: true })).toBeVisible();
+  await expect(page.getByText("Inherits", { exact: true })).toBeVisible();
+
+  // A resolved neighbour shows its real file:line.
+  await expect(page.getByText("src/flask/sansio/app.py:59-1013")).toBeVisible();
+
+  // An unresolved one is present but explains itself instead of offering a
+  // dead link — and is never given an invented file:line.
+  await expect(page.getByText("no indexed source")).toBeVisible();
+  await expect(page.getByText("outside this repository")).toBeVisible();
+
+  // Truncation is stated rather than silently hiding the rest.
+  await expect(page.getByText("Showing 4 of 11.")).toBeVisible();
+});
+
+test("a neighbour expands to its source", async ({ page }) => {
+  await mockApi(page, neighboursResponse);
+  await askAQuestion(page);
+
+  await page.getByRole("button", { name: "Related code" }).click();
+  await page.getByRole("button", { name: /SecureCookieSessionInterface/ }).click();
+
+  await expect(page.getByText("class SecureCookieSessionInterface(SessionInterface):")).toBeVisible(
+    { timeout: 10_000 },
+  );
+});
+
+test("a repo with no python graph says so rather than showing an empty list", async ({ page }) => {
+  await mockApi(
+    page,
+    JSON.stringify({
+      symbol: "Flask",
+      available: false,
+      found: false,
+      neighbours: [],
+      total: 0,
+      truncated: false,
+    }),
+  );
+  await askAQuestion(page);
+
+  await page.getByRole("button", { name: "Related code" }).click();
+  await expect(page.getByText(/Dependency graphs are built from Python source/)).toBeVisible();
+});

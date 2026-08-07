@@ -22,6 +22,7 @@ import {
 } from "@phosphor-icons/react";
 import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
+import { GraphNeighbours } from "./graph-neighbours";
 import {
   ApiError,
   api,
@@ -1055,6 +1056,17 @@ export default function RepoPilotApp({
                             </button>
                           );
                         })}
+                        {/* One panel per exchange, keyed off the first claim that
+                            names a symbol. The graph is keyed by symbol, so a
+                            claim whose ref has none has nothing to look up. */}
+                        {(() => {
+                          const anchor = exchange.claimIds
+                            .map((id) => store.claimsById[id]?.refs[0]?.symbol)
+                            .find((symbol): symbol is string => Boolean(symbol));
+                          return anchor && repoId ? (
+                            <GraphNeighbours repoId={repoId} symbol={anchor} />
+                          ) : null;
+                        })()}
                       </div>
                     ) : null}
                   </article>

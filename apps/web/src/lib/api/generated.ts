@@ -80,6 +80,39 @@ export interface ChunkPayload {
   summary?: string | null;
 }
 
+export type GraphEdgeKind =
+  | "calls"
+  | "called_by"
+  | "imports"
+  | "imported_by"
+  | "inherits"
+  | "inherited_by";
+
+export interface GraphNeighbour {
+  symbol: string;
+  label: string;
+  edge: GraphEdgeKind;
+  kind?: string | null;
+  /** Outside this repo's own packages — stdlib or third party. */
+  external: boolean;
+  /** A file:line was found. Independent of `external`: a symbol can be the
+   *  repo's own and still have no chunk (a nested def the chunker skipped). */
+  resolved: boolean;
+  chunk_id?: string | null;
+  ref?: CodeRef | null;
+}
+
+export interface GraphNeighboursResponse {
+  symbol: string;
+  /** False when the snapshot has no graph at all — the normal case for a repo
+   *  with no Python. Render as not-applicable, never as an empty diagram. */
+  available: boolean;
+  found: boolean;
+  neighbours: GraphNeighbour[];
+  total: number;
+  truncated: boolean;
+}
+
 export interface FirstImpressionEvent {
   event: "first_impression";
   v: 1;
@@ -235,6 +268,14 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ raw_text: rawText }),
     });
+  },
+  getGraphNeighbours(
+    repoId: string,
+    symbol: string,
+    limit = 60,
+  ): Promise<GraphNeighboursResponse> {
+    const query = new URLSearchParams({ symbol, limit: String(limit) });
+    return http(`/repos/${repoId}/graph/neighbours?${query}`);
   },
   getChunk(chunkId: string): Promise<ChunkPayload> {
     return http(`/chunks/${encodeURIComponent(chunkId)}`);

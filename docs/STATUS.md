@@ -3,14 +3,14 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-08 · `main` at `2715599`
+**Last updated:** 2026-08-08 · `main` at `4890ab5`
 
 ---
 
 ## Shipped recently
 
-Five commits, listed in dependency order. The last two only work because of the
-first three — the graph view was estimated at 4.5–6.5 days and took a fraction
+Eight commits. The first five are listed in dependency order, and the graph view
+only works because of the three ingestion fixes above it — the graph view was estimated at 4.5–6.5 days and took a fraction
 of that, because by the time it was built the data underneath was correct.
 Building the panel first would have produced a view where two thirds of
 neighbours had no source and no cross-module edges existed at all.
@@ -22,6 +22,9 @@ neighbours had no source and no cross-module edges existed at all.
 | `764a111` | Re-indexing deleted and recreated the `repos` row, and `ON DELETE SET NULL` silently unpinned every saved tour. Now upserts. |
 | `2368035` | `GET /repos/{repo_id}/graph/neighbours` — the read API behind the graph view. |
 | `2715599` | The "Related code" panel: expand a claim into what it calls, what calls it, what it inherits, what imports it. |
+| `adb2332` | This file. |
+| `248b86b` | The e2e suite runs again — Playwright starts its own server with the sign-in gate cleared. |
+| `4890ab5` | The showcase video's composition and plan layer versioned; its ~75 MB of renders and media ignored. |
 
 ## Measured state of the graph data
 
@@ -54,18 +57,30 @@ Two things this table settles:
 
 ## Next work, in the order it should be done
 
-### 1. Make the frontend tests actually run — ~half a day
+### 1. Put the frontend tests in CI — ~half a day, partly done
 
-Nothing currently checks the visual half of the app. Playwright, the Lighthouse
-audit and `node --test` are all **absent from CI** (`.github/workflows/ci.yml`
-runs only typecheck and build for `web`), and the suite cannot run locally
-either: `apps/web/.env.local` sets `AUTH_GOOGLE_ID` / `AUTH_GITHUB_ID`, so
-`authEnabled` gates the app behind sign-in and every spec times out waiting for
-"Public GitHub URL".
+**Done (`248b86b`):** the suite runs locally again. Playwright starts its own
+server on port 3100 with `AUTH_GOOGLE_ID` / `AUTH_GITHUB_ID` cleared, so
+`npx playwright test` works on any checkout regardless of `.env.local`. Current
+state: `provider-dialog` 5 passed, `graph-neighbours` 3 passed, `persona-ask`
+1 failed.
 
-That is true of `persona-ask.spec.ts` today, not just the new specs. The graph
-panel's three specs pass, but only against a dev server started with the auth
-variables cleared — which is how they were verified.
+**Still to do**, and these two go together because turning CI on with a red test
+makes `main` red immediately:
+
+- Add Playwright and `node --test` to `.github/workflows/ci.yml`. The `web` job
+  runs only typecheck and build today, so nothing checks the visual half of the
+  app on any change.
+- Resolve `persona-ask.spec.ts:179`. It asserts `class Flask:` is visible, which
+  the synchronized code panel deleted in `cf18b1b` used to render. Either drop
+  the assertion (the feature is gone) or retarget it at the new "Related code"
+  panel, which *can* show that source once expanded. That is a product call
+  about whether claim-to-code should exist, which is why it was left visible
+  rather than quietly deleted.
+
+Expect this to surface more than the one known failure — checks that have been
+off usually do. Budget for a full day, and `xfail` with a stated reason anything
+that turns out to be real feature work rather than a test fix.
 
 Do this before more UI work: the newest feature sits in the one part of the
 codebase with no safety net.
@@ -98,8 +113,8 @@ re-index needed, just the summary pass.
 | What | Detail |
 |---|---|
 | `test_httpx_indexing.py` | Both tests fail on `main`, before and after recent changes. The call-chain test wants `Client.send → HTTPTransport.handle_request`, but the resolver does no instance-attribute type inference so `self._transport.handle_request(...)` cannot resolve. CI deselects it, which is why it went unnoticed. Fix the resolver, retarget the test, or `xfail` it — a silently-failing deselected test is the worst of the three. |
-| Frontend tests in CI | See "next work" #1. |
-| e2e suite locally | Blocked by the auth gate. See "next work" #1. |
+| `persona-ask.spec.ts` | Fails at line 179 on `class Flask:`, an assertion for the code panel deleted in `cf18b1b`. Runs the whole flow now, so the failure is isolated and real rather than a timeout. See "next work" #1. |
+| Frontend tests in CI | Still absent. See "next work" #1. |
 | Placeholder summaries | See "next work" #3. |
 
 ## Conventions worth not relearning

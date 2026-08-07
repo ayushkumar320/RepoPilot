@@ -10,6 +10,8 @@ description: RepoPilot project rules and engineering conventions. Tool-neutral m
 ## What this project is
 RepoPilot ("Codebase Archaeologist") generates purpose-driven, multi-agent guided tours of unfamiliar Python codebases. The core bet: capture user pre-context (purpose + focus) **before** any analysis, then inject it into every downstream agent. Full design lives in `docs/`.
 
+**Picking work up cold?** Read [`docs/STATUS.md`](../../docs/STATUS.md) first — what shipped, what is next, and what is known-broken.
+
 ## Engineering conventions
 - Truthful over fluent: every agent claim carries a `file:line` ref; unknowns are stated, never invented.
 - No stat dumps: emit `Insight` objects (finding/because/so_what/goal_link), not raw metrics.

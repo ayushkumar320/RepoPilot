@@ -9,11 +9,10 @@ The one page to read before picking work up. `README.md` says what RepoPilot
 
 ## Shipped recently
 
-Eight commits. The first five are listed in dependency order, and the graph view
-only works because of the three ingestion fixes above it — the graph view was estimated at 4.5–6.5 days and took a fraction
-of that, because by the time it was built the data underneath was correct.
-Building the panel first would have produced a view where two thirds of
-neighbours had no source and no cross-module edges existed at all.
+Eight commits, in dependency order. The graph view was estimated at 4.5–6.5 days
+and took a fraction of that — but only because the three ingestion fixes above it
+landed first. Built in the other order it would have shipped a view where two
+thirds of neighbours had no source and no cross-module edges existed at all.
 
 | Commit | What it did |
 |---|---|

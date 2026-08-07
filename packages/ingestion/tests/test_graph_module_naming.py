@@ -49,6 +49,26 @@ def test_nested_packages_keep_every_packaged_level(tmp_path: Path) -> None:
     assert _path_to_module(rel, root=tmp_path) == "pkg.sub.mod"
 
 
+def test_namespace_subpackage_still_counts_as_part_of_the_package(tmp_path: Path) -> None:
+    """A dir with no __init__.py inside a real package is still importable.
+
+    flask ships exactly this: src/flask/sansio/ has no __init__.py, yet
+    ``from .sansio.app import App`` resolves. Stopping the climb there names the
+    module ``app`` while the graph's import edge says ``flask.sansio.app``, and
+    the two never join — which is how it was found, via an unresolvable
+    neighbour in the graph endpoint.
+    """
+    _mk(tmp_path, "src/pkg/__init__.py")
+    _mk(tmp_path, "src/pkg/sub/mod.py")  # note: no __init__.py in sub/
+    assert _path_to_module(Path("src/pkg/sub/mod.py"), root=tmp_path) == "pkg.sub.mod"
+
+
+def test_directory_outside_any_package_does_not_climb(tmp_path: Path) -> None:
+    """The namespace rule must not swallow unrelated top-level directories."""
+    _mk(tmp_path, "scripts/tool.py")
+    assert _path_to_module(Path("scripts/tool.py"), root=tmp_path) == "tool"
+
+
 def test_package_init_names_the_package_itself(tmp_path: Path) -> None:
     _mk(tmp_path, "src/pkg/__init__.py")
     assert _path_to_module(Path("src/pkg/__init__.py"), root=tmp_path) == "pkg"

@@ -7,9 +7,9 @@ import base64
 import binascii
 import json
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 from urllib.parse import quote, unquote
 from uuid import uuid4
 
@@ -30,6 +30,9 @@ from repopilot_api.models import (
     BaseTourEvent,
     ChunkPayload,
     ClaimPayload,
+    GraphEdgeKind,
+    GraphNeighbour,
+    GraphNeighboursResponse,
     QAAnswerResponse,
     RepoStatus,
     TourDoneEvent,
@@ -42,6 +45,7 @@ from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
 from repopilot_ingestion.db import chunk_embeddings as embeddings_table
 from repopilot_ingestion.db import chunks as chunks_table
+from repopilot_ingestion.db import graph_adjacency as graph_table
 from repopilot_ingestion.db import repos as repos_table
 from repopilot_ingestion.persist import make_engine
 from repopilot_ingestion.pipeline import index_repo, revisit_status
@@ -103,6 +107,12 @@ class ChunkService(Protocol):
     async def get(self, chunk_id: str) -> ChunkPayload: ...
 
 
+class GraphService(Protocol):
+    async def neighbours(
+        self, repo_id: str, symbol: str, *, limit: int = 60
+    ) -> GraphNeighboursResponse: ...
+
+
 class RepoNotReadyError(Exception):
     """Raised when a question is asked before a repo has an indexed snapshot."""
 
@@ -117,6 +127,7 @@ class AppServices:
     repos: RepoService
     qa: QAService
     chunks: ChunkService
+    graph: GraphService | None = None
     access: AccessService = field(default_factory=InMemoryAccessService)
     tours: TourService = field(default_factory=InMemoryTourService)
 
@@ -515,6 +526,198 @@ class LiveChunkService:
         )
 
 
+#: Order neighbours are presented in. Call edges answer "what does this do and
+#: who needs it", which is what a reader looking at a claim actually asks;
+#: import edges are the noisiest and go last.
+_EDGE_ORDER: tuple[GraphEdgeKind, ...] = (
+    "calls",
+    "called_by",
+    "inherits",
+    "inherited_by",
+    "imports",
+    "imported_by",
+)
+
+#: Hard ceiling on one neighbourhood response, whatever the caller asks for.
+MAX_NEIGHBOURS = 200
+
+
+@dataclass(slots=True)
+class LiveGraphService:
+    """Read-only view over the snapshot's persisted code graph.
+
+    This is a read API over data the AST already produced, not a seventh agent
+    tool: no model is involved, nothing enters the tool registry, and no prompt
+    budget is touched. ``services.py`` already calls ``graph_query`` the same
+    way for first impressions.
+    """
+
+    runtime: Runtime
+    repos: LiveRepoService
+
+    async def neighbours(
+        self, repo_id: str, symbol: str, *, limit: int = 60
+    ) -> GraphNeighboursResponse:
+        limit = max(1, min(limit, MAX_NEIGHBOURS))
+        snapshot_repo_id = repo_id
+        if "@" not in repo_id:
+            repo = await self.repos.get(repo_id)
+            if repo.indexed_repo_id is None:
+                raise KeyError(repo_id)
+            snapshot_repo_id = repo.indexed_repo_id
+
+        engine = make_engine(self.runtime.settings)
+        try:
+            async with engine.connect() as conn:
+                adjacency_row = (
+                    await conn.execute(
+                        select(graph_table.c.adjacency).where(
+                            graph_table.c.repo_id == snapshot_repo_id
+                        )
+                    )
+                ).first()
+                # No graph at all is the normal case for a repo with no Python.
+                if adjacency_row is None or not adjacency_row[0]:
+                    return GraphNeighboursResponse(symbol=symbol, available=False, found=False)
+
+                adjacency: dict[str, dict[str, list[str]]] = adjacency_row[0]
+                buckets = adjacency.get(symbol)
+                if buckets is None:
+                    return GraphNeighboursResponse(symbol=symbol, available=True, found=False)
+
+                pairs: list[tuple[str, GraphEdgeKind]] = []
+                seen: set[tuple[str, str]] = set()
+                for edge in _EDGE_ORDER:
+                    for target in sorted(set(buckets.get(edge, []))):
+                        key = (target, edge)
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        pairs.append((target, edge))
+
+                total = len(pairs)
+                truncated = total > limit
+                pairs = pairs[:limit]
+                if not pairs:
+                    return GraphNeighboursResponse(
+                        symbol=symbol, available=True, found=True, total=0
+                    )
+
+                resolved = await self._resolve_symbols(
+                    conn, snapshot_repo_id, [p[0] for p in pairs]
+                )
+                internal_roots = await self._internal_roots(conn, snapshot_repo_id)
+        finally:
+            await engine.dispose()
+
+        neighbours = [
+            self._to_neighbour(target, edge, resolved, internal_roots, snapshot_repo_id)
+            for target, edge in pairs
+        ]
+        # Internal, resolvable symbols first — a reader can act on those. Edge
+        # order is preserved within each group so the grouping still reads.
+        neighbours.sort(key=lambda n: (n.external, not n.resolved))
+        return GraphNeighboursResponse(
+            symbol=symbol,
+            available=True,
+            found=True,
+            neighbours=neighbours,
+            total=total,
+            truncated=truncated,
+        )
+
+    @staticmethod
+    def _to_neighbour(
+        target: str,
+        edge: GraphEdgeKind,
+        resolved: dict[str, tuple[str, int, int, str | None]],
+        internal_roots: set[str],
+        snapshot_repo_id: str,
+    ) -> GraphNeighbour:
+        hit = resolved.get(target)
+        root = target.split(".", 1)[0]
+        ref = None
+        chunk_id = None
+        if hit is not None:
+            file_path, start_line, end_line, _kind = hit
+            ref = CodeRef(
+                file_path=file_path,
+                start_line=start_line,
+                end_line=end_line,
+                symbol=target,
+            )
+            chunk_id = encode_chunk_id(snapshot_repo_id, ref)
+        return GraphNeighbour(
+            symbol=target,
+            label=target.rsplit(".", 1)[-1] or target,
+            edge=edge,
+            kind=None if hit is None else hit[3],
+            external=root not in internal_roots,
+            resolved=hit is not None,
+            chunk_id=chunk_id,
+            ref=ref,
+        )
+
+    @staticmethod
+    async def _resolve_symbols(
+        conn: Any, snapshot_repo_id: str, symbols: Sequence[str]
+    ) -> dict[str, tuple[str, int, int, str | None]]:
+        """Map symbol -> (file_path, start_line, end_line, kind) in one query.
+
+        A symbol can be chunked more than once (an oversized body is split), so
+        the span is the union: the earliest start and the latest end.
+        """
+        if not symbols:
+            return {}
+        rows = (
+            await conn.execute(
+                select(
+                    chunks_table.c.symbol,
+                    chunks_table.c.file_path,
+                    func.min(chunks_table.c.start_line),
+                    func.max(chunks_table.c.end_line),
+                    func.min(chunks_table.c.kind),
+                )
+                .where(
+                    chunks_table.c.repo_id == snapshot_repo_id,
+                    chunks_table.c.symbol.in_(list(dict.fromkeys(symbols))),
+                )
+                .group_by(chunks_table.c.symbol, chunks_table.c.file_path)
+            )
+        ).fetchall()
+        out: dict[str, tuple[str, int, int, str | None]] = {}
+        for sym, file_path, start_line, end_line, kind in rows:
+            # Deterministic when a symbol appears in more than one file: keep
+            # the lexicographically first path rather than whichever row landed.
+            existing = out.get(str(sym))
+            if existing is not None and existing[0] <= str(file_path):
+                continue
+            out[str(sym)] = (
+                str(file_path),
+                int(start_line),
+                int(end_line),
+                None if kind is None else str(kind),
+            )
+        return out
+
+    @staticmethod
+    async def _internal_roots(conn: Any, snapshot_repo_id: str) -> set[str]:
+        """Top-level package names this repo actually defines.
+
+        Anything outside them came in as an import target — stdlib or a third
+        party — and is marked external rather than silently rendered as if it
+        were the user's own code.
+        """
+        rows = (
+            await conn.execute(
+                select(func.split_part(chunks_table.c.symbol, ".", 1))
+                .where(chunks_table.c.repo_id == snapshot_repo_id)
+                .distinct()
+            )
+        ).fetchall()
+        return {str(r[0]) for r in rows if r[0]}
+
+
 async def create_live_services() -> AppServices:
     runtime = await build_runtime()
     # One product engine shared by access and tours; `access.aclose()` disposes it.
@@ -524,7 +727,8 @@ async def create_live_services() -> AppServices:
     repos = LiveRepoService(runtime=runtime)
     qa = LiveQAService(runtime=runtime, repos=repos)
     chunks = LiveChunkService(runtime=runtime, repos=repos)
-    return AppServices(repos=repos, qa=qa, chunks=chunks, access=access, tours=tours)
+    graph = LiveGraphService(runtime=runtime, repos=repos)
+    return AppServices(repos=repos, qa=qa, chunks=chunks, graph=graph, access=access, tours=tours)
 
 
 async def close_live_services(services: AppServices) -> None:

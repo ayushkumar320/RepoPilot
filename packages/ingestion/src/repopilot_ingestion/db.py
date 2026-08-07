@@ -49,7 +49,11 @@ EMBEDDING_DIM: int = 768
 #       path, and relative imports resolve instead of being dropped. Renames
 #       every symbol in a src-layout repo (``src.pkg.mod`` -> ``pkg.mod``) and
 #       rewrites ``graph_adjacency`` plus ``chunks.neighbor_symbols`` for all.
-INDEX_RECIPE_VERSION: int = 3
+#   4 — namespace subpackages (a directory with no ``__init__.py`` nested in a
+#       real package, e.g. flask's ``src/flask/sansio/``) are named as part of
+#       their package instead of by basename. Renames every symbol under one,
+#       which is what makes a graph node join its chunk.
+INDEX_RECIPE_VERSION: int = 4
 
 
 class Vector(UserDefinedType[list[float]]):

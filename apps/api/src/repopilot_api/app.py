@@ -11,7 +11,7 @@ from typing import cast
 from uuid import uuid4
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
@@ -30,6 +30,7 @@ from repopilot_api.models import (
     CreateRepoResponse,
     CreateTourRequest,
     CreateTourResponse,
+    GraphNeighboursResponse,
     IdentityRequest,
     IdentityResponse,
     IntentDraftRequest,
@@ -41,6 +42,7 @@ from repopilot_api.models import (
     TourSummaryResponse,
 )
 from repopilot_api.services import (
+    MAX_NEIGHBOURS,
     AppServices,
     RepoNotReadyError,
     close_live_services,
@@ -438,6 +440,30 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
                 for message in tour.messages
             ],
         )
+
+    @app.get(
+        "/repos/{repo_id:path}/graph/neighbours",
+        response_model=GraphNeighboursResponse,
+    )
+    async def repo_graph_neighbours(
+        repo_id: str,
+        symbol: str = Query(min_length=1, max_length=500),
+        limit: int = Query(default=60, ge=1, le=MAX_NEIGHBOURS),
+        session_id: str = Depends(resolve_session),
+    ) -> GraphNeighboursResponse:
+        """Symbols adjacent to ``symbol`` in the snapshot's code graph.
+
+        Not metered: this reads data the AST already produced and runs no
+        model, so charging for it would make people avoid the one surface that
+        shows where a claim's code sits.
+        """
+        graph = get_services().graph
+        if graph is None:
+            raise HTTPException(status_code=404, detail="graph view is not configured")
+        try:
+            return await graph.neighbours(repo_id, symbol, limit=limit)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="repo not found") from exc
 
     @app.post(
         "/tours/{tour_id}/messages",

@@ -440,9 +440,16 @@ def _path_to_module(rel_path: Path, *, root: Path | None = None) -> str:
     if root is None or not parts:
         return ".".join(parts)
 
+    # Climb while the directory is a package. A directory with no __init__.py
+    # whose parent has one is a namespace subpackage — importable, and common:
+    # flask's src/flask/sansio/ is exactly this, and stopping there names its
+    # modules "app" instead of "flask.sansio.app", which breaks the join from a
+    # graph node to its chunk.
     depth = 0
     directory = (root / rel_path).parent
-    while directory != root and (directory / "__init__.py").exists():
+    while directory != root and (
+        (directory / "__init__.py").exists() or (directory.parent / "__init__.py").exists()
+    ):
         depth += 1
         directory = directory.parent
 

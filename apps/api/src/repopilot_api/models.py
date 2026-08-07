@@ -159,6 +159,46 @@ class ChunkPayload(BaseModel):
     summary: str | None = None
 
 
+GraphEdgeKind = Literal["calls", "called_by", "imports", "imported_by", "inherits", "inherited_by"]
+
+
+class GraphNeighbour(BaseModel):
+    """One symbol adjacent to the queried one, and how to reach its source.
+
+    ``resolved`` and ``external`` are deliberately separate. ``external`` says
+    the symbol sits outside this repo's own top-level packages — stdlib or a
+    third-party name pulled in by an import edge. ``resolved`` says we found a
+    ``file:line`` for it. A node can be internal yet unresolved (a nested def
+    the chunker never chunked), and claiming otherwise would be inventing a
+    source we do not have.
+    """
+
+    symbol: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    edge: GraphEdgeKind
+    kind: str | None = None
+    external: bool = False
+    resolved: bool = False
+    chunk_id: str | None = None
+    ref: CodeRef | None = None
+
+
+class GraphNeighboursResponse(BaseModel):
+    """Neighbourhood of one symbol in the indexed snapshot's code graph.
+
+    ``available`` is false when the snapshot has no graph at all, which is the
+    normal case for a repo with no Python: the AST graph is Python-only, and an
+    empty diagram would read as broken rather than as not-applicable.
+    """
+
+    symbol: str
+    available: bool
+    found: bool
+    neighbours: list[GraphNeighbour] = Field(default_factory=list)
+    total: int = Field(default=0, ge=0)
+    truncated: bool = False
+
+
 class BaseTourEvent(BaseModel):
     v: Literal[1] = 1
     event: str
@@ -220,6 +260,9 @@ __all__ = [
     "CreateRepoResponse",
     "CreateTourRequest",
     "CreateTourResponse",
+    "GraphEdgeKind",
+    "GraphNeighbour",
+    "GraphNeighboursResponse",
     "IdentityRequest",
     "IdentityResponse",
     "IntentDraftRequest",

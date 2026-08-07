@@ -76,7 +76,9 @@ def build_graph(modules: Iterable[ModuleSource]) -> nx.DiGraph[str]:
         mod_tree = parsed_trees.get(mod.module)
         if mod_tree is None:
             continue
-        resolver = _Resolver(module=mod.module, defined=defined)
+        is_package = mod.rel_path.replace("\\", "/").rsplit("/", 1)[-1] == "__init__.py"
+        package = mod.module if is_package else mod.module.rpartition(".")[0]
+        resolver = _Resolver(module=mod.module, defined=defined, package=package)
         resolver.visit(mod_tree)
 
         for src, dst in resolver.imports:
@@ -161,9 +163,12 @@ class _Resolver(ast.NodeVisitor):
       used to attribute call edges to the right node.
     """
 
-    def __init__(self, *, module: str, defined: dict[str, set[str]]) -> None:
+    def __init__(self, *, module: str, defined: dict[str, set[str]], package: str = "") -> None:
         super().__init__()
         self.module = module
+        # The package a relative import counts levels from. For ``a/b/__init__.py``
+        # that is ``a.b`` itself; for ``a/b/c.py`` it is ``a.b``.
+        self.package = package
         self.defined = defined
         self.aliases: dict[str, str] = {}
         self.self_class_stack: list[str] = []
@@ -191,14 +196,23 @@ class _Resolver(ast.NodeVisitor):
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         mod = node.module or ""
-        if node.level:  # relative import — skip; we don't resolve packages in v1
-            log.debug(
-                "graph.relative_import_skipped",
-                module=self.module,
-                level=node.level,
-                target=mod,
-            )
-            return
+        if node.level:
+            # Relative imports are how a package refers to itself, so skipping
+            # them dropped most intra-repo edges AND starved the alias map that
+            # resolves cross-module calls. Level 1 is this module's own package,
+            # each extra level climbs one more.
+            base = self.package
+            for _ in range(node.level - 1):
+                base = base.rpartition(".")[0]
+            if not base:
+                log.debug(
+                    "graph.relative_import_above_root",
+                    module=self.module,
+                    level=node.level,
+                    target=mod,
+                )
+                return
+            mod = f"{base}.{mod}" if mod else base
         for alias in node.names:
             if alias.name == "*":
                 log.debug("graph.star_import_skipped", module=self.module, target=mod)

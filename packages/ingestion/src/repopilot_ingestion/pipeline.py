@@ -256,7 +256,7 @@ def _scan_python_files(
 
     for py_path in _iter_python_files(clone.path):
         rel = py_path.relative_to(clone.path)
-        module = _path_to_module(rel)
+        module = _path_to_module(rel, root=clone.path)
         parsed = parse_file(py_path, module=module)
         loc_total += parsed.line_count
         modules.append(ModuleSource(module=module, rel_path=str(rel), source=parsed.source))
@@ -372,7 +372,7 @@ def _run_scan_jobs(
 def _scan_one_file(job: _ScanJob, *, root: Path, settings: Settings) -> _ScannedFile:
     rel = job.rel_path
     if job.language is None:
-        module = _path_to_module(rel)
+        module = _path_to_module(rel, root=root)
         parsed = parse_file(job.path, module=module)
         return _ScannedFile(
             order=job.order,
@@ -422,10 +422,32 @@ def _iter_python_files(root: Path) -> Iterable[Path]:
         yield path
 
 
-def _path_to_module(rel_path: Path) -> str:
+def _path_to_module(rel_path: Path, *, root: Path | None = None) -> str:
+    """Dotted module name for a repo-relative path, as the code imports itself.
+
+    Naming from the repo-relative path alone splits a src-layout repo in two:
+    ``src/flask/app.py`` becomes ``src.flask.app`` while every import of it
+    says ``flask.app``, so the defining node and the imported node are
+    different strings and no internal edge ever connects. Walking up while
+    each directory is a package finds the real import root instead.
+
+    ``root`` is optional only so callers without a clone on disk keep working;
+    without it the old repo-relative name is returned.
+    """
     parts = list(rel_path.with_suffix("").parts)
     if parts and parts[-1] == "__init__":
         parts.pop()
+    if root is None or not parts:
+        return ".".join(parts)
+
+    depth = 0
+    directory = (root / rel_path).parent
+    while directory != root and (directory / "__init__.py").exists():
+        depth += 1
+        directory = directory.parent
+
+    keep = depth if rel_path.name == "__init__.py" else depth + 1
+    parts = parts[-keep:] if keep > 0 else parts[-1:]
     return ".".join(parts)
 
 

@@ -45,7 +45,11 @@ EMBEDDING_DIM: int = 768
 #       the decoded str with them. Every symbol after a file's first non-ASCII
 #       character was previously truncated or shifted, so ``chunks.symbol`` —
 #       the join key from a graph node to its file:line — is different at rest.
-INDEX_RECIPE_VERSION: int = 2
+#   3 — modules are named from their package root rather than the repo-relative
+#       path, and relative imports resolve instead of being dropped. Renames
+#       every symbol in a src-layout repo (``src.pkg.mod`` -> ``pkg.mod``) and
+#       rewrites ``graph_adjacency`` plus ``chunks.neighbor_symbols`` for all.
+INDEX_RECIPE_VERSION: int = 3
 
 
 class Vector(UserDefinedType[list[float]]):

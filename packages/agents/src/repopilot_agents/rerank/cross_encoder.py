@@ -19,6 +19,7 @@ pairs/s a persistent cache isn't worth the plumbing.
 from __future__ import annotations
 
 import hashlib
+import threading
 from typing import TYPE_CHECKING, Any
 
 import structlog
@@ -44,13 +45,23 @@ class CrossEncoderReranker:
         self.model_name = model_name
         self._encoder: Any = None
         self._cache: dict[str, float] = {}
+        # The startup warm-up runs in a worker thread. Without this lock the
+        # first question, arriving mid-download, sees `_encoder is None` and
+        # builds a *second* TextCrossEncoder — paying the ~91 MB load twice
+        # concurrently. The lock makes the request wait on the warm-up instead.
+        self._load_lock = threading.Lock()
+
+    def _build_encoder(self) -> Any:
+        from fastembed.rerank.cross_encoder import TextCrossEncoder
+
+        log.info("rerank.model_loading", model=self.model_name)
+        return TextCrossEncoder(self.model_name)
 
     def _ensure_loaded(self) -> Any:
         if self._encoder is None:
-            from fastembed.rerank.cross_encoder import TextCrossEncoder
-
-            log.info("rerank.model_loading", model=self.model_name)
-            self._encoder = TextCrossEncoder(self.model_name)
+            with self._load_lock:
+                if self._encoder is None:
+                    self._encoder = self._build_encoder()
         return self._encoder
 
     def warm(self) -> None:

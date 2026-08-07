@@ -8,6 +8,9 @@ bench concern.
 
 from __future__ import annotations
 
+import threading
+import time
+
 import pytest
 
 from repopilot_agents.rerank.cross_encoder import CrossEncoderReranker, rerank_text
@@ -55,6 +58,26 @@ def test_score_cache_avoids_recompute(
 def test_empty_texts_no_model_load() -> None:
     r = CrossEncoderReranker("stub-model")  # _encoder stays None
     assert r.score("q", []) == []
+
+
+def test_concurrent_first_use_loads_model_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The startup warm-up and a racing first question must share one load."""
+    r = CrossEncoderReranker("stub-model")
+    loads = 0
+
+    def slow_build() -> _StubEncoder:
+        nonlocal loads
+        loads += 1
+        time.sleep(0.05)  # stand in for the ~91 MB ONNX download
+        return _StubEncoder()
+
+    monkeypatch.setattr(r, "_build_encoder", slow_build)
+    threads = [threading.Thread(target=r.warm) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert loads == 1
 
 
 def _hit_and_content(path: str, symbol: str, content: str) -> tuple[ChunkHit, ChunkContent]:

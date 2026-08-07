@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 from typing import Any, cast
 
 import pytest
+from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
 from repopilot_agents.qa import QAResult
@@ -167,9 +168,13 @@ def app_services() -> AppServices:
 
 
 @pytest.fixture
-async def api_client(app_services: AppServices) -> AsyncIterator[AsyncClient]:
-    app = create_app(services=app_services)
-    transport = ASGITransport(app=app)
+def api_app(app_services: AppServices) -> FastAPI:
+    return create_app(services=app_services)
+
+
+@pytest.fixture
+async def api_client(api_app: FastAPI) -> AsyncIterator[AsyncClient]:
+    transport = ASGITransport(app=api_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
         yield client
 
@@ -310,6 +315,27 @@ async def test_ask_forwards_the_persona_to_the_qa_service(
     assert qa.ask_calls == [
         ("repo-123", "Where should I start?", "a first-time outside contributor")
     ]
+
+
+@pytest.mark.asyncio
+async def test_ask_waits_for_the_reranker_warmup(api_client: AsyncClient, api_app: FastAPI) -> None:
+    """The cold cross-encoder load is paid before the question, not inside it."""
+    loaded = False
+
+    async def slow_warm() -> None:
+        nonlocal loaded
+        await asyncio.sleep(0.05)
+        loaded = True
+
+    api_app.state.rerank_warm = asyncio.create_task(slow_warm())
+
+    response = await api_client.post(
+        "/repos/repo-123/ask",
+        json={"question": "Where should I start?", "intent_profile": None},
+    )
+
+    assert response.status_code == 200
+    assert loaded, "the question ran before the warm-up finished"
 
 
 @pytest.mark.asyncio
@@ -527,7 +553,7 @@ async def test_live_qa_ask_passes_persona_into_answer_question(
             "repo_id": "repo-123@abc",
             "k": "8",
             "use_compress": "False",
-            "retry_429_attempts": "2",
+            "retry_429_attempts": "1",
             "audience": "a competing product strategist",
         }
     ]

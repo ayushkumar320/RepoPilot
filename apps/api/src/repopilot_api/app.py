@@ -69,6 +69,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             asyncio.to_thread(shared_reranker(settings.rerank_model).warm),
             name="rerank-warmup",
         )
+        app.state.rerank_warm = warm
         try:
             yield {"services": resolved}
         finally:
@@ -100,6 +101,23 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
 
     def get_services() -> AppServices:
         return cast(AppServices, app.state.services)
+
+    async def rerank_ready() -> None:
+        """Hold a question until the startup cross-encoder warm-up finishes.
+
+        Without this the first question races the ~91 MB ONNX load and pays it
+        inside the request, which the web proxy sees as a hang. Waiting here is
+        the same wall-clock, but it happens before we reserve usage or spend a
+        provider call. A failed warm-up is not fatal — the lazy load inside
+        ``score`` retries — so the error is logged and the question proceeds.
+        """
+        warm = getattr(app.state, "rerank_warm", None)
+        if warm is None or warm.done():
+            return
+        try:
+            await asyncio.shield(warm)
+        except Exception:
+            log.exception("rerank.warmup_failed")
 
     session_cookie = "repopilot_session"
 
@@ -262,6 +280,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         request: AskRequest,
         session_id: str = Depends(resolve_session),
     ) -> QAAnswerResponse:
+        await rerank_ready()
         reservation = await get_services().access.reserve_question(session_id, repo_id)
         provider = (
             await get_services().access.provider_for(session_id)

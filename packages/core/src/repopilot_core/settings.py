@@ -146,7 +146,12 @@ class Settings(BaseSettings):
     # on the long retry budget used by indexing/evals. Compression is gated by
     # ``compress_enabled`` above (now off), so this flag is belt-and-braces:
     # ``use_compress=True`` alone no longer enables compression for any caller.
-    qa_llm_max_429_retries: int = 2
+    # 1 = no 429 sleep at all on the click-and-wait path. A provider's
+    # Retry-After in the free tier is 50-60s, so retrying in-request only turns
+    # a fast fail-over into a two-minute hang the web proxy kills anyway: groq
+    # 429 now falls straight through to cerebras, and both exhausted flags the
+    # claim instead of waiting out the quota window.
+    qa_llm_max_429_retries: int = 1
     qa_compress_enabled: bool = False
 
     # ── GitHub ───────────────────────────────────────────────────────────────

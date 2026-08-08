@@ -14,7 +14,8 @@ RepoPilot is now organized as a runnable beta with a small public doc set. The l
 2. [`STARTUP_GUIDE.md`](STARTUP_GUIDE.md) — install, environment, services, API, web, checks.
 3. [`../README.md`](../README.md) — product overview, architecture diagrams, source map.
 4. [`03_ARCHITECTURE.md`](03_ARCHITECTURE.md) — agent topology, state schema, tools, verifier.
-5. [`archive/`](archive/) — product thesis and historical stack rationale.
+5. [`HOW_THE_GRAPH_WORKS.md`](HOW_THE_GRAPH_WORKS.md) — what the code graph is, how it is built, and why it costs no AI tokens. Written for non-specialists.
+6. [`archive/`](archive/) — product thesis and historical stack rationale.
 
 ## Layout
 
@@ -24,6 +25,7 @@ docs/
 ├── STATUS.md              current state: shipped, next, known-broken
 ├── STARTUP_GUIDE.md       local startup and operator commands
 ├── 03_ARCHITECTURE.md     agent topology, state, tools, verifier
+├── HOW_THE_GRAPH_WORKS.md the code graph in plain terms: what it is, what it costs
 ├── DEPLOYMENT.md          production containers, migration, release sequence
 ├── STATEFUL.md            accounts, saved tours, BYOK provider keys
 └── archive/               reference — product thesis + tech stack (git retains everything)

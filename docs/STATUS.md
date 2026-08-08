@@ -20,7 +20,14 @@ checks on is what made the rest safe to do quickly.
 | `12c8428` | "Related code" follows the claim you click. It had only ever anchored on the exchange's first claim, so clicking any other row restyled it and showed the wrong neighbours. |
 | `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it, so a class can list its own methods. 1,564 new edges on flask. Panel-only: `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. Same commit adds multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
 | `05320a4` | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. No re-index and no recipe bump — `imports` edges already start at a module. |
+| `4cab1c4` | Non-Python files kept off the module map. `README.md` and `requirements.txt` are stored with `kind = 'module'`, so they were drawn as boxes that can never have a dependency. Found by running the app, not by a test. |
+| `653235c` | Snapshots built by an older recipe are no longer served. `_latest_repo_snapshot_id` had no `index_version` filter, so a repo indexed at recipe 3 stayed at recipe 3 through two bumps — meaning **no shipped ingestion work had reached any indexed repository**. Each existing repo now rebuilds once, on next visit. |
 | `62b9e58` | Claim-to-code. A claim expands inline to the source it cites, with real file line numbers. Settles the product question carried since `cf18b1b`: the capability came back, the third column it used to live in did not. |
+
+Two of these were found only by running the app against the real database.
+Neither could have been caught by the specs, which mock the API: one needed a
+repository containing a `README.md`, the other needed a snapshot older than the
+current recipe. **Run it, at least once, after shipping ingestion work.**
 
 Two things this session settled that are worth not relitigating:
 
@@ -159,4 +166,8 @@ re-index, so batch them.
   is no OpenAPI codegen; a new endpoint means editing it by hand.
 - **Changing what is stored at rest means bumping `INDEX_RECIPE_VERSION`**
   (`packages/ingestion/src/repopilot_ingestion/db.py`). Snapshots below it rebuild
-  on next visit.
+  on next visit — but that is only true because `653235c` made it true. Three
+  separate queries decide whether a snapshot counts as usable
+  (`repo_already_indexed`, `known_head_sha`, `_latest_repo_snapshot_id`), and
+  they must all filter on the version. One of them not doing so silently
+  disabled the whole mechanism for two releases.

@@ -598,6 +598,16 @@ def _rollup_modules(
     if not owners:
         return GraphModulesResponse(available=False)
 
+    # `chunks.kind = 'module'` is broader than "Python module": the generic
+    # chunker files README.md and requirements.txt under it too, and those
+    # arrived on the map as boxes that can never have a dependency. The graph
+    # is Python-only by construction and `build_graph` adds a node for every
+    # module it parses, so being an adjacency key *is* the test for whether a
+    # module participates in the dependency structure at all.
+    owners = {name: value for name, value in owners.items() if name in adjacency}
+    if not owners:
+        return GraphModulesResponse(available=False)
+
     module_names = sorted(owners, key=len, reverse=True)
     edges: set[tuple[str, str]] = set()
     for source, buckets in adjacency.items():

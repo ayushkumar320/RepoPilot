@@ -186,7 +186,7 @@ export function GraphNeighbours({
   }, [expanded, state.phase, repoId, symbol]);
 
   return (
-    <div className="neighbours" data-depth={depth}>
+    <div className="neighbours">
       <button
         type="button"
         className="neighbours-toggle"

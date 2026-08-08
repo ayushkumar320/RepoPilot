@@ -1772,9 +1772,11 @@ input:focus-visible {
 
 /* A nested panel is one hop further out. The rule and the inset are what keep
    "who calls the thing that calls this" readable as it recedes; without them
-   the third level reads as a flat sibling of the first. */
-.neighbours[data-depth="1"],
-.neighbours[data-depth="2"] {
+   the third level reads as a flat sibling of the first.
+
+   Matched by nesting rather than by depth number, so raising MAX_DEPTH in
+   graph-neighbours.tsx cannot leave a level unstyled. */
+.neighbours .neighbours {
   margin-top: 8px;
   padding-top: 8px;
   padding-left: 10px;

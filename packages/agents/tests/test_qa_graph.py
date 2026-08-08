@@ -15,6 +15,7 @@ import pytest
 from repopilot_agents.qa import graph as qa_graph
 from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, answer_question
 from repopilot_agents.qa.query_spec import fallback_query_spec
+from repopilot_agents.state import IntentProfile
 from repopilot_agents.types import ChunkContent, ChunkHit, CodeRef, Path
 from repopilot_core.settings import get_settings
 
@@ -362,6 +363,48 @@ async def test_rerank_pool_size_comes_from_settings(monkeypatch: pytest.MonkeyPa
     assert seen["max_pool"] == 12
     assert seen["lambda_"] == 0.5, "settings.rerank_lambda ignored"
     assert "rerank:pool=12:k=8" in result.retrieval_path
+
+
+@pytest.mark.asyncio
+async def test_persona_priorities_unlock_the_paths_they_need(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A reader who asks about tests must be able to retrieve ``tests/``.
+
+    The contributor persona's prompt demands the test that guards each edit
+    site while the default recall lane excluded ``tests/`` as noise, so the
+    answer could only hedge.
+    """
+    seen: dict[str, Any] = {}
+
+    async def spy_search(question: str, **kw: Any) -> list[ChunkHit]:
+        seen["exclude"] = list(kw.get("exclude_path_prefixes") or [])
+        return [ChunkHit(ref=_ref("sym0", line=1), distance=0.1, kind="function")]
+
+    monkeypatch.setattr(qa_graph, "hybrid_search", spy_search)
+    monkeypatch.setattr(qa_graph, "vector_search", spy_search)
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "sym0 returns one. [0]",
+        ]
+    )
+    await answer_question(
+        "What guards sym0?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        intent_profile=IntentProfile(
+            raw_text="first-time contributor preparing a pull request",
+            focus_keywords=["tests", "contributing"],
+        ),
+    )
+
+    assert "tests/" not in seen["exclude"]
+    assert "docs/" not in seen["exclude"]
+    # Priorities unlock only what they name — examples/ stays filtered out.
+    assert "examples/" in seen["exclude"]
 
 
 @pytest.mark.asyncio

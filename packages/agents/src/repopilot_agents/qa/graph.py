@@ -188,6 +188,7 @@ async def answer_question(
     """
     settings = get_settings()
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
+    exclude_path_prefixes = _persona_scoped_exclusions(exclude_path_prefixes, intent_profile)
 
     with _timed(ctx, "retrieval"):
         hits = await _initial_retrieval(
@@ -383,6 +384,44 @@ async def answer_question(
 
 
 # ── internals ───────────────────────────────────────────────────────────────
+
+
+# A priority the reader named -> the recall-lane prefixes that priority needs.
+# The contributor persona asks for "tests" and "contributing" while the default
+# recall lane excludes tests/ and docs/ as noise, so the answer prompt demanded
+# evidence retrieval could never supply and the model hedged instead.
+_PRIORITY_UNLOCKS: dict[str, tuple[str, ...]] = {
+    "test": ("tests/",),
+    "tests": ("tests/",),
+    "testing": ("tests/",),
+    "coverage": ("tests/",),
+    "contributing": ("docs/", "docs_src/"),
+    "docs": ("docs/", "docs_src/"),
+    "documentation": ("docs/", "docs_src/"),
+    "example": ("examples/",),
+    "examples": ("examples/",),
+    "usage": ("examples/",),
+    "onboarding": ("docs/", "examples/"),
+}
+
+
+def _persona_scoped_exclusions(
+    exclude_path_prefixes: Sequence[str], profile: IntentProfile | None
+) -> Sequence[str]:
+    """Stop excluding the paths this reader's priorities actually live in.
+
+    No profile (evals, API callers that pass none) keeps the default policy
+    byte-for-byte.
+    """
+    if profile is None or not profile.focus_keywords:
+        return exclude_path_prefixes
+    unlocked: set[str] = set()
+    for keyword in profile.focus_keywords:
+        for word in re.findall(r"[a-z]+", keyword.lower()):
+            unlocked.update(_PRIORITY_UNLOCKS.get(word, ()))
+    if not unlocked:
+        return exclude_path_prefixes
+    return [prefix for prefix in exclude_path_prefixes if prefix not in unlocked]
 
 
 def _extend_context(ctx: _Context, chunks: list[ChunkContent]) -> None:

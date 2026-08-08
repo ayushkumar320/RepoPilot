@@ -192,6 +192,12 @@ def _context_language(name: str) -> str | None:
         return "markdown"
     if lowered.startswith("requirements") and lowered.endswith(".txt"):
         return "requirements"
+    # The contributor persona's whole job starts here, and it was the one
+    # high-value root file the index skipped.
+    if lowered.startswith("contributing") and lowered.endswith(
+        (".md", ".markdown", ".rst", ".txt")
+    ):
+        return "markdown"
     if lowered in _EXACT_CONTEXT_NAMES:
         suffix = Path(lowered).suffix.lstrip(".")
         return suffix or lowered

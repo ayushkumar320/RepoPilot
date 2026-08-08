@@ -526,6 +526,13 @@ export default function RepoPilotApp({
   const askAnything = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!repoId || !askPrompt.trim() || asking) return;
+    // An answer with no persona is a different product. The only way to get
+    // here without one is "Something else" left blank, so say that instead of
+    // silently asking unpersonalized.
+    if (!profile) {
+      setErrorMessage("Choose a persona, or describe your own, before asking.");
+      return;
+    }
     setAsking(true);
     setErrorMessage(null);
     try {

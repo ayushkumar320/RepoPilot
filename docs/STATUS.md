@@ -27,8 +27,8 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
 | `b3f43f5` | The graph resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges instead of drops. `INDEX_RECIPE_VERSION` → 5. |
 | `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
-| _pending_ | `defines` edges: a class or module is linked to the symbols nested inside it, so the panel can list a class's own methods. 1,564 new edges on flask, 1,224 on httpx; 102 of flask's 143 classes now list theirs. Panel-only — `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. |
-| _pending_ | Multi-hop: a neighbour expands into its own neighbours, up to three panels deep, one request per step the reader takes. Reuses the existing component and endpoint — no depth parameter, no prefetched tree. |
+| `b3661ac` | `defines` edges: a class or module is linked to the symbols nested inside it, so the panel can list a class's own methods. 1,564 new edges on flask, 1,224 on httpx; 102 of flask's 143 classes now list theirs. Panel-only — `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. |
+| `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, up to three panels deep, one request per step the reader takes. Reuses the existing component and endpoint — no depth parameter, no prefetched tree. |
 
 ## Measured state of the graph data
 

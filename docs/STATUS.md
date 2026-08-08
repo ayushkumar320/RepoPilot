@@ -107,10 +107,20 @@ Three items, one blocker. Groq and Cerebras returned 429 throughout 2026-08-08,
 so none could be finished; all three want a working provider and two want a
 re-index, so batch them.
 
-- **Re-run summaries.** Every chunk indexed on 2026-08-08 carries a placeholder
-  summary. Symbols, spans, embeddings and graph edges are all correct; only
-  summaries are affected, and they feed retrieval quality. No re-index needed,
-  just the summary pass.
+- **Re-run summaries.** `make resummarise-check` reports what is outstanding;
+  `make resummarise REPO=<id>` (or `REPO=--all`) repairs it. Measured
+  2026-08-08: **9,395 placeholder summaries across all eight snapshots**, fastapi
+  alone holding 6,288 — far more than "the chunks indexed that day". No
+  re-index is needed and none is safe to skip lightly either: `embedding_text`
+  reads `content`/`enriched_text` and never `summary`, so rewriting one changes
+  what the answer prompt is told without moving the chunk in vector space.
+
+  The pass is incremental and safe to repeat. `summarise_chunks` opens its
+  circuit on the first provider error and falls back for everything after it,
+  so a quota-limited run repairs a prefix and leaves the rest — a proven run
+  went 28 -> 13 repaired, then a second attempt examined only the remaining 15.
+  It exits non-zero when it repaired nothing, so a retry loop can tell a
+  stalled sweep from a finished one.
 - **Bench `b3f43f5`.** It adds call edges, which change
   `chunks.neighbor_symbols`, which the retrieval path reads. It plausibly moves
   ranking and has never been measured — it landed by direct push while the

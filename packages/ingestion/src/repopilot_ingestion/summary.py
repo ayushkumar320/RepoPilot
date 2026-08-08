@@ -45,6 +45,21 @@ def _prompt(chunk: Chunk) -> list[Message]:
     return [Message("system", _SYSTEM), Message("user", user)]
 
 
+#: Marks a summary the model never produced. Written by ``_fallback_summary``
+#: and read back by ``is_placeholder_summary`` — the two must not drift, or the
+#: re-summarise pass silently stops finding anything to fix.
+SUMMARY_UNAVAILABLE_SUFFIX = " (summary unavailable)"
+
+
+def is_placeholder_summary(summary: str | None) -> bool:
+    """Whether ``summary`` stands in for one the summariser could not produce.
+
+    ``None`` counts: a chunk written before summaries existed, or by a run that
+    failed before reaching them, is in exactly the same position.
+    """
+    return summary is None or summary.endswith(SUMMARY_UNAVAILABLE_SUFFIX)
+
+
 def _fallback_summary(chunk: Chunk) -> str:
     """Deterministic stand-in when the summariser can't run (e.g. every provider
     is exhausted). More useful than the literal ``"unknown"`` — it still tells
@@ -52,7 +67,7 @@ def _fallback_summary(chunk: Chunk) -> str:
     """
     name = chunk.symbol.rsplit(".", 1)[-1] if chunk.symbol else chunk.file_path
     kind = chunk.kind.replace("_", " ")
-    return f"{kind} `{name}` in {chunk.file_path} (summary unavailable)"
+    return f"{kind} `{name}` in {chunk.file_path}{SUMMARY_UNAVAILABLE_SUFFIX}"
 
 
 async def summarise_chunks(
@@ -137,4 +152,9 @@ async def summarise_chunks(
     return out
 
 
-__all__ = ["SummarisedChunk", "summarise_chunks"]
+__all__ = [
+    "SUMMARY_UNAVAILABLE_SUFFIX",
+    "SummarisedChunk",
+    "is_placeholder_summary",
+    "summarise_chunks",
+]

@@ -1,4 +1,4 @@
-.PHONY: help setup services backend frontend dev install lint typecheck test test-slow test-eval-sampled test-eval-full cov ci precommit fmt clean docker-up docker-down db-migrate
+.PHONY: help setup services backend frontend dev install lint typecheck test test-slow test-eval-sampled test-eval-full cov ci precommit fmt clean docker-up docker-down db-migrate resummarise resummarise-check
 
 help:
 	@echo "RepoPilot — common targets"
@@ -20,6 +20,8 @@ help:
 	@echo "  precommit    run pre-commit on all files"
 	@echo "  docker-up    docker compose up -d (Postgres+pgvector, Redis)"
 	@echo "  docker-down  docker compose down -v"
+	@echo "  resummarise        re-run summaries for REPO=<id> (or REPO=--all)"
+	@echo "  resummarise-check  report placeholder summaries, write nothing"
 	@echo "  db-migrate   alembic upgrade head (runs ingestion migrations)"
 
 setup:
@@ -92,6 +94,13 @@ docker-up:
 
 docker-down:
 	docker compose down -v
+
+resummarise:
+	@test -n "$(REPO)" || (echo 'usage: make resummarise REPO=owner/name@sha  (or REPO=--all)'; exit 1)
+	uv run python -m repopilot_ingestion.resummarise $(REPO)
+
+resummarise-check:
+	uv run python -m repopilot_ingestion.resummarise --all --dry-run
 
 db-migrate:
 	cd packages/ingestion && uv run alembic upgrade head

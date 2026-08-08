@@ -25,10 +25,18 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `248b86b` | The e2e suite runs again — Playwright starts its own server with the sign-in gate cleared. |
 | `4890ab5` | The showcase video's composition and plan layer versioned; its ~75 MB of renders and media ignored. |
 | `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
+| `b3f43f5` | The graph resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges instead of drops. `INDEX_RECIPE_VERSION` → 5. |
+| `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
 
 ## Measured state of the graph data
 
-All eight indexed repos are on `INDEX_RECIPE_VERSION = 4` with **zero** symbol
+> **Stale as of `INDEX_RECIPE_VERSION = 5`.** The table below was measured at
+> version 4. Version 5 adds call edges (see "Shipped recently") without renaming
+> any symbol, so *Graph nodes*, *Symbols* and *In graph* still hold — but
+> *With ≥1 neighbour* can only rise, and has not been re-measured against the
+> database. Re-index and re-run the queries before quoting that column.
+
+All eight indexed repos were on `INDEX_RECIPE_VERSION = 4` with **zero** symbol
 corruption. Re-measure with the queries in this section after any ingestion
 change; every number here was measured, not estimated.
 
@@ -84,7 +92,7 @@ re-index needed, just the summary pass.
 
 | What | Detail |
 |---|---|
-| `test_httpx_indexing.py` | Both tests fail on `main`, before and after recent changes. The call-chain test wants `Client.send → HTTPTransport.handle_request`, but the resolver does no instance-attribute type inference so `self._transport.handle_request(...)` cannot resolve. CI deselects it, which is why it went unnoticed. Fix the resolver, retarget the test, or `xfail` it — a silently-failing deselected test is the worst of the three. |
+| `test_httpx_indexing.py` | Both tests pass now — the resolver was fixed and the call-chain test retargeted. Still `slow`/`integration` and still deselected by CI, and both clone over the network, so a failure here is as likely to be a rate limit or a provider 429 as a regression. Run it by hand after any resolver change. |
 | Placeholder summaries | See "next work" #2. |
 
 ## Open product questions
@@ -106,6 +114,17 @@ any more, so it lives here.
   in `apps/api/`, which also keeps it clear of the `retrieval-eval-artifact-gate`
   in `ci.yml`, which fails any PR touching `packages/agents/src/repopilot_agents/(tools|qa|rerank)/`
   or `packages/ingestion/` without a fresh RAG bench artifact.
+- **The resolver types from declarations, never from guesses.** An attribute or
+  local gets a type from an annotation, a constructor call, or a declared return
+  — and the resulting `owner.member` is emitted *only* if some file defines it.
+  Both guards exist because the obvious shortcuts each invent a symbol: an
+  untyped `self.x = build()` invents a class, and a typed receiver whose method
+  comes from a third-party base class invents a method. Related: a call through
+  a base-class-typed variable resolves to the **base**, not to whichever subclass
+  runs. `Client.send` reaches `BaseTransport.handle_request`, not
+  `HTTPTransport.handle_request`; the concrete class is a runtime fact and the
+  inherits edge is how the two connect. Do not "fix" that by following
+  subclasses — it is the difference between a fact and a plausible story.
 - **`resolved` and `external` are different things.** A symbol can be the repo's
   own and still have no chunk (a nested def the chunker skipped). Collapsing them
   means either hiding the user's own code or inventing a source for it, and

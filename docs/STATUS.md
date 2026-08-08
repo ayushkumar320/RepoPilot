@@ -24,7 +24,7 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `adb2332` | This file. |
 | `248b86b` | The e2e suite runs again — Playwright starts its own server with the sign-in gate cleared. |
 | `4890ab5` | The showcase video's composition and plan layer versioned; its ~75 MB of renders and media ignored. |
-| _uncommitted_ | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
+| `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
 
 ## Measured state of the graph data
 

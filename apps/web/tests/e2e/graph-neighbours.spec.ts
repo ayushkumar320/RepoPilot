@@ -342,3 +342,47 @@ test("the panel follows the selected claim rather than always the first", async 
 
   expect(asked).toEqual(["Flask", "flask.sessions.SessionInterface"]);
 });
+
+test("a neighbour opens its own neighbours, and the walk stops at a stated depth", async ({
+  page,
+}) => {
+  // Each symbol's only neighbour is the next link, so the chain is unambiguous.
+  const chain: Record<string, string> = {
+    Flask: "one",
+    "flask.one": "two",
+    "flask.two": "three",
+  };
+  const asked: string[] = [];
+  await mockApi(page, (symbol) => {
+    asked.push(symbol);
+    return neighbourNamed(chain[symbol] ?? "end");
+  });
+  await askAQuestion(page);
+
+  // Depth 0 — the claim's own panel.
+  await page.getByRole("button", { name: "Related code" }).click();
+  await expect(page.getByText("one")).toBeVisible({ timeout: 10_000 });
+
+  // Each hop: open the neighbour, then open the panel that appears under it.
+  // The nested toggle is named for the symbol, so "who calls the thing that
+  // calls this" stays legible rather than three identical "Related code" rows.
+  for (const [row, next] of [
+    ["one", "two"],
+    ["two", "three"],
+  ] as const) {
+    await page.getByRole("button", { name: new RegExp(row) }).first().click();
+    const nested = page.getByRole("button", { name: `Related to ${row}` });
+    await expect(nested).toBeVisible({ timeout: 10_000 });
+    await nested.click();
+    await expect(page.getByText(next)).toBeVisible({ timeout: 10_000 });
+  }
+
+  // MAX_DEPTH reached. The panel says so rather than offering a control that
+  // would keep nesting forever — cycles are normal in a call graph.
+  await page.getByRole("button", { name: /three/ }).first().click();
+  await expect(page.getByText("Deepest step shown.")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("button", { name: "Related to three" })).toHaveCount(0);
+
+  // One request per step the reader actually took — no prefetched tree.
+  expect(asked).toEqual(["Flask", "flask.one", "flask.two"]);
+});

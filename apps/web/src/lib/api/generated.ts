@@ -81,12 +81,14 @@ export interface ChunkPayload {
 }
 
 export type GraphEdgeKind =
+  | "defined_by"
   | "calls"
   | "called_by"
-  | "imports"
-  | "imported_by"
   | "inherits"
-  | "inherited_by";
+  | "inherited_by"
+  | "defines"
+  | "imports"
+  | "imported_by";
 
 export interface GraphNeighbour {
   symbol: string;

@@ -361,8 +361,13 @@ The tools layer is the truthfulness floor. **The LLMs never compute these. They 
 
 **Why these and not more.** Every additional tool is a surface where an agent might invent. Six tools is enough. Any new tool needs a justification that begins with "the model cannot do this from existing tools because…".
 
-**What the three graph tools are reading, and what they are not.** Edges come
-from an AST pass over Python source only (`packages/ingestion/.../graph.py`) —
+**What the three graph tools are reading, and what they are not.** They see
+`calls`, `imports` and `inherits` — `tools/_adjacency.py` whitelists exactly
+those when it rebuilds the graph, so the `defines` (containment) edges added in
+recipe 6 are invisible here by design: a star edge from every class to every
+method would give each symbol an in-edge, and "entry points = in-degree 0"
+would return nothing. Edges come from an AST pass over Python source only
+(`packages/ingestion/.../graph.py`) —
 a repo with no Python produces no graph at all, and the tools must degrade
 rather than pretend. Call edges resolve a receiver's type from *declarations*:
 an annotation, a constructor call, or a declared return. An untyped

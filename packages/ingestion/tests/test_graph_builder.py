@@ -6,7 +6,7 @@ from textwrap import dedent
 
 import networkx as nx
 
-from repopilot_ingestion.graph import ModuleSource, build_graph
+from repopilot_ingestion.graph import ModuleSource, build_graph, graph_to_adjacency
 
 
 def _src(text: str) -> str:
@@ -279,3 +279,63 @@ def test_a_function_local_import_does_not_bind_file_wide() -> None:
     g = build_graph(modules)
     assert not g.has_edge("pkg.mod.early", "other.helper")
     assert g.has_edge("pkg.mod.late", "other.helper")
+
+
+def test_a_class_is_linked_to_its_own_methods() -> None:
+    """The panel's "Defines" row. Both nodes always existed; the edge did not."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Client:
+                    def send(self):
+                        return 1
+
+                    def close(self):
+                        return 2
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert g.has_edge("pkg.mod.Client", "pkg.mod.Client.send")
+    assert g["pkg.mod.Client"]["pkg.mod.Client.send"]["type"] == "defines"
+    assert g.has_edge("pkg.mod.Client", "pkg.mod.Client.close")
+    # And the module owns the class, so a module node lists what is in the file.
+    assert g.has_edge("pkg.mod", "pkg.mod.Client")
+
+
+def test_containment_is_kept_out_of_the_agent_facing_graph() -> None:
+    """`defines` must not reach fan-in, hubs, or entry points.
+
+    `tools/_adjacency.py` rebuilds the agent graph from three whitelisted
+    buckets. A star edge per method would give every symbol an in-edge and make
+    "entry points = in-degree 0" return nothing.
+    """
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Client:
+                    def send(self):
+                        return 1
+                """
+            ),
+        )
+    ]
+    adj = graph_to_adjacency(build_graph(modules))
+    rebuilt_edges = [
+        (node, target)
+        for node, buckets in adj.items()
+        for kind in ("calls", "imports", "inherits")
+        for target in buckets.get(kind, [])
+    ]
+    assert ("pkg.mod.Client", "pkg.mod.Client.send") not in rebuilt_edges
+    assert ("pkg.mod", "pkg.mod.Client") not in rebuilt_edges
+    # But it is present for the panel, which reads the buckets directly.
+    assert adj["pkg.mod.Client"]["defines"] == ["pkg.mod.Client.send"]
+    assert adj["pkg.mod.Client.send"]["defined_by"] == ["pkg.mod.Client"]

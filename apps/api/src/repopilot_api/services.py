@@ -533,14 +533,20 @@ class LiveChunkService:
         )
 
 
-#: Order neighbours are presented in. Call edges answer "what does this do and
-#: who needs it", which is what a reader looking at a claim actually asks;
-#: import edges are the noisiest and go last.
+#: Order neighbours are presented in, and — because the limit truncates from
+#: the end — the order they survive in. `defined_by` is one row that orients
+#: the reader ("this method belongs to that class"), so it leads. Call edges
+#: answer "what does this do and who needs it", which is what a reader looking
+#: at a claim actually asks. `defines` can be long on a module, so it sits
+#: below the call edges rather than crowding them out. Imports are the noisiest
+#: and go last.
 _EDGE_ORDER: tuple[GraphEdgeKind, ...] = (
+    "defined_by",
     "calls",
     "called_by",
     "inherits",
     "inherited_by",
+    "defines",
     "imports",
     "imported_by",
 )

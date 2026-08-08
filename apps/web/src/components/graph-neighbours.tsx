@@ -11,21 +11,30 @@ import {
   type GraphNeighboursResponse,
 } from "../lib/api/generated";
 
-/** Reading order: what this symbol does and who needs it, then imports. */
+/**
+ * Reading order: where this lives, what it does and who needs it, what is
+ * inside it, then imports. Must stay in step with `_EDGE_ORDER` in
+ * `apps/api/src/repopilot_api/services.py` — the server truncates in its own
+ * order, so a different one here would show the surviving rows out of order.
+ */
 const EDGE_ORDER: GraphEdgeKind[] = [
+  "defined_by",
   "calls",
   "called_by",
   "inherits",
   "inherited_by",
+  "defines",
   "imports",
   "imported_by",
 ];
 
 const EDGE_LABEL: Record<GraphEdgeKind, string> = {
+  defined_by: "Defined in",
   calls: "Calls",
   called_by: "Called by",
   inherits: "Inherits",
   inherited_by: "Inherited by",
+  defines: "Defines",
   imports: "Imports",
   imported_by: "Imported by",
 };
@@ -42,8 +51,26 @@ function groupByEdge(neighbours: GraphNeighbour[]): [GraphEdgeKind, GraphNeighbo
   ).filter(([, items]) => items.length > 0);
 }
 
-/** One neighbour. Expands to show its source, but only if we actually have one. */
-function NeighbourRow({ neighbour }: { neighbour: GraphNeighbour }) {
+/**
+ * How many times a reader may keep walking outward from the claim.
+ *
+ * Each nested panel is one more hop, so this caps the chain rather than any
+ * single response. Three is where the indentation stops being readable, and it
+ * also ends the walk in a graph where cycles are normal — A calls B, B is
+ * called_by A, and a reader can otherwise descend forever.
+ */
+const MAX_DEPTH = 3;
+
+/** One neighbour. Expands to its source and, from there, to its own neighbours. */
+function NeighbourRow({
+  neighbour,
+  repoId,
+  depth,
+}: {
+  neighbour: GraphNeighbour;
+  repoId: string;
+  depth: number;
+}) {
   const [source, setSource] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,13 +138,31 @@ function NeighbourRow({ neighbour }: { neighbour: GraphNeighbour }) {
               <code>{source}</code>
             </pre>
           )}
+          {/* The next hop. Rendered collapsed and fetched only on click, so
+              walking outward costs one request per step the reader actually
+              takes rather than a tree nobody asked for. */}
+          {depth + 1 < MAX_DEPTH ? (
+            <GraphNeighbours repoId={repoId} symbol={neighbour.symbol} depth={depth + 1} />
+          ) : (
+            <p className="neighbour-note">
+              Deepest step shown. Open this symbol from a claim to keep going.
+            </p>
+          )}
         </div>
       ) : null}
     </li>
   );
 }
 
-export function GraphNeighbours({ repoId, symbol }: { repoId: string; symbol: string }) {
+export function GraphNeighbours({
+  repoId,
+  symbol,
+  depth = 0,
+}: {
+  repoId: string;
+  symbol: string;
+  depth?: number;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [state, setState] = useState<LoadState>({ phase: "idle" });
 
@@ -141,7 +186,7 @@ export function GraphNeighbours({ repoId, symbol }: { repoId: string; symbol: st
   }, [expanded, state.phase, repoId, symbol]);
 
   return (
-    <div className="neighbours">
+    <div className="neighbours" data-depth={depth}>
       <button
         type="button"
         className="neighbours-toggle"
@@ -149,21 +194,38 @@ export function GraphNeighbours({ repoId, symbol }: { repoId: string; symbol: st
         onClick={() => void open()}
       >
         <ArrowsOutSimple size={15} aria-hidden="true" />
-        Related code
+        {/* Named for what the click does at this level: the first panel is
+            "related to the claim", a nested one is "related to that symbol". */}
+        {depth === 0 ? "Related code" : `Related to ${shortLabel(symbol)}`}
       </button>
 
       {expanded ? (
         <div className="neighbours-body">
           {state.phase === "loading" ? <p className="neighbour-note">Reading the code graph…</p> : null}
           {state.phase === "error" ? <p className="neighbour-note">{state.message}</p> : null}
-          {state.phase === "loaded" ? <NeighbourList data={state.data} /> : null}
+          {state.phase === "loaded" ? (
+            <NeighbourList data={state.data} repoId={repoId} depth={depth} />
+          ) : null}
         </div>
       ) : null}
     </div>
   );
 }
 
-function NeighbourList({ data }: { data: GraphNeighboursResponse }) {
+/** Last dotted segment — the qualified name is too long for a button. */
+function shortLabel(symbol: string): string {
+  return symbol.split(".").pop() || symbol;
+}
+
+function NeighbourList({
+  data,
+  repoId,
+  depth,
+}: {
+  data: GraphNeighboursResponse;
+  repoId: string;
+  depth: number;
+}) {
   // A repo with no Python has no graph. Say that plainly — an empty list here
   // reads as a broken feature rather than one that does not apply.
   if (!data.available) {
@@ -184,7 +246,12 @@ function NeighbourList({ data }: { data: GraphNeighboursResponse }) {
           <div className="neighbour-group-label">{EDGE_LABEL[edge]}</div>
           <ul>
             {items.map((n) => (
-              <NeighbourRow key={`${n.edge}:${n.symbol}`} neighbour={n} />
+              <NeighbourRow
+                key={`${n.edge}:${n.symbol}`}
+                neighbour={n}
+                repoId={repoId}
+                depth={depth}
+              />
             ))}
           </ul>
         </div>

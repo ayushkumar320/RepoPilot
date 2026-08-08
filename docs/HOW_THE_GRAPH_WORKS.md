@@ -23,12 +23,21 @@ becomes a **node**. Every reference between them becomes an **edge**:
 | `calls` | this function runs that one |
 | `imports` | this file needs that one |
 | `inherits` | this class is built on that one |
+| `defines` | this class or file contains that symbol |
 
 Each edge is also readable backwards, which is usually the more useful
 direction: `called_by` answers "who depends on this?" — the question you
 actually have before changing something.
 
-That is the entire vocabulary. Six directions, three relationships.
+That is the entire vocabulary. Eight directions, four relationships.
+
+`defines` is the odd one out, and deliberately so. The other three describe
+what a symbol *reaches*; this one describes what is *inside* it, and needs no
+name resolution at all — the parent is simply whatever the source nests it
+under. It is also the only edge kind the AI-facing tools cannot see: the loader
+they use whitelists the other three, because a link from every class to every
+one of its methods would swamp the "what calls what" structure that hub and
+entry-point ranking depends on. The panel reads it; the agents do not.
 
 ## How it gets built
 
@@ -141,9 +150,6 @@ never computes the call graph.
 - **Runtime behaviour is out of reach.** Dynamic dispatch, `getattr`,
   decorators that rewrite functions — all unresolvable from source, all
   deliberately omitted.
-- **A class isn't linked to its own methods.** They are all present as nodes,
-  but no edge connects them, so expanding a class won't list what's inside it.
-  A known gap, not a design choice.
 - **It's a snapshot.** It reflects the code at the moment of indexing.
 
 ## Roughly how big it gets

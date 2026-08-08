@@ -6,6 +6,8 @@ Edges (Phase 1, deterministic — the LLM never invents these):
                 scope-aware AST walk over Python's own ``ast`` module)
 * ``imports`` — file F imports symbol S (qualified)
 * ``inherits``— class C extends class D (qualified)
+* ``defines`` — module/class M lexically contains symbol S (no resolution
+                needed; the parent is whatever the source nests it under)
 
 Unresolvable patterns (decorators that rewrite signatures, ``getattr``,
 dynamic dispatch) **log a warning** and are dropped. We never invent edges.
@@ -80,6 +82,12 @@ def build_graph(modules: Iterable[ModuleSource]) -> nx.DiGraph[str]:
             symbols.add(sym.qual)
             if sym.kind == "class":
                 classes.add(sym.qual)
+            # Containment. Every other edge answers "what does this reach?";
+            # this one answers "what is inside this?", which is the first thing
+            # anyone asks of a class and the only structure the AST hands us
+            # for free. Emitted here rather than in pass 2 because it needs no
+            # name resolution — the parent is lexical.
+            graph.add_edge(sym.parent, sym.qual, type="defines")
 
     # Pass 2: edges. We need the alias map per module, so we walk the AST
     # one more time per file rather than threading it through pass 1.
@@ -115,6 +123,11 @@ def graph_to_adjacency(graph: nx.DiGraph[str]) -> dict[str, dict[str, list[str]]
     ``{node: {calls: [...], called_by: [...], imports: [...], inherits: [...]}}``.
     Keys are stable so the deterministic tools layer (Phase 2) can read them
     without further parsing.
+
+    ``defines``/``defined_by`` are read by the "Related code" panel only. The
+    agent-facing loader (``tools/_adjacency.py``) whitelists the other three
+    kinds, so containment cannot reach fan-in counts, hub ranking, or entry
+    points — where a star edge per method would drown the call structure.
     """
     out: dict[str, dict[str, list[str]]] = {}
     for node in graph.nodes:
@@ -125,6 +138,8 @@ def graph_to_adjacency(graph: nx.DiGraph[str]) -> dict[str, dict[str, list[str]]
             "imported_by": [],
             "inherits": [],
             "inherited_by": [],
+            "defines": [],
+            "defined_by": [],
         }
     for src, dst, data in graph.edges(data=True):
         etype = str(data.get("type", ""))
@@ -137,6 +152,9 @@ def graph_to_adjacency(graph: nx.DiGraph[str]) -> dict[str, dict[str, list[str]]
         elif etype == "inherits":
             out[src]["inherits"].append(dst)
             out[dst]["inherited_by"].append(src)
+        elif etype == "defines":
+            out[src]["defines"].append(dst)
+            out[dst]["defined_by"].append(src)
     return out
 
 
@@ -147,6 +165,7 @@ def graph_to_adjacency(graph: nx.DiGraph[str]) -> dict[str, dict[str, list[str]]
 class _DefSymbol:
     qual: str
     kind: str
+    parent: str
 
 
 def _walk_definitions(tree: ast.Module, module: str) -> list[_DefSymbol]:
@@ -158,11 +177,11 @@ def _walk_definitions(tree: ast.Module, module: str) -> list[_DefSymbol]:
                 qual = f"{parent_qual}.{child.name}"
                 kind = "method" if parent_qual != module else "function"
                 # Treat nested defs under classes as methods, otherwise functions.
-                out.append(_DefSymbol(qual=qual, kind=kind))
+                out.append(_DefSymbol(qual=qual, kind=kind, parent=parent_qual))
                 visit(child, qual)
             elif isinstance(child, ast.ClassDef):
                 qual = f"{parent_qual}.{child.name}"
-                out.append(_DefSymbol(qual=qual, kind="class"))
+                out.append(_DefSymbol(qual=qual, kind="class", parent=parent_qual))
                 visit(child, qual)
 
     visit(tree, module)

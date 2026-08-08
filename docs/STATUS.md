@@ -27,6 +27,8 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
 | `b3f43f5` | The graph resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges instead of drops. `INDEX_RECIPE_VERSION` → 5. |
 | `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
+| _pending_ | `defines` edges: a class or module is linked to the symbols nested inside it, so the panel can list a class's own methods. 1,564 new edges on flask, 1,224 on httpx; 102 of flask's 143 classes now list theirs. Panel-only — `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. |
+| _pending_ | Multi-hop: a neighbour expands into its own neighbours, up to three panels deep, one request per step the reader takes. Reuses the existing component and endpoint — no depth parameter, no prefetched tree. |
 
 ## Measured state of the graph data
 
@@ -89,11 +91,12 @@ provider and two of them want a re-index, so batch them.
   summary. Symbols, spans, embeddings and graph edges are all correct; only
   summaries are affected, and they feed retrieval quality. No re-index needed,
   just the summary pass.
-- **Bench the resolver change.** `b3f43f5` landed on `main` by a direct push, so
-  `retrieval-eval-artifact-gate` never ran — it is `pull_request`-only. The
-  change adds call edges, which change `chunks.neighbor_symbols`, which the
-  retrieval path reads. It plausibly moves ranking and has not been measured.
-  Run the bench and commit `evals/results/rag_phaseN/_after.json`.
+- **Bench the resolver change.** `b3f43f5` adds call edges, which change
+  `chunks.neighbor_symbols`, which the retrieval path reads. It plausibly moves
+  ranking and has never been measured — it landed by direct push while the
+  artifact gate still existed, and `d84e98d` has since removed that gate
+  entirely. Nothing will catch this now, so it is a deliberate `make
+  test-eval-sampled` run rather than something CI will remind anyone about.
 - **Re-measure the graph table.** Recipe version 5 means snapshots rebuild on
   next visit; the "With ≥1 neighbour" column above was measured at version 4 and
   can only have risen.
@@ -106,7 +109,7 @@ provider and two of them want a re-index, so batch them.
 |---|---|
 | `test_httpx_indexing.py` | Both tests pass now — the resolver was fixed and the call-chain test retargeted. Still `slow`/`integration` and still deselected by CI, and both clone over the network, so a failure here is as likely to be a rate limit or a provider 429 as a regression. Run it by hand after any resolver change. |
 | Placeholder summaries | See "next work" #2. |
-| `b3f43f5` never benched | It changes `chunks.neighbor_symbols` and reached `main` by direct push, so the `pull_request`-only retrieval gate did not run. Not a defect — an unmeasured change on the retrieval path. See "next work" #2. |
+| `b3f43f5` never benched | It changes `chunks.neighbor_symbols` and was never measured: it landed by direct push past the then-`pull_request`-only gate, which `d84e98d` has since removed. Not a defect — an unmeasured change on the retrieval path, and now nothing automated will notice. See "next work" #2. |
 
 ## Open product questions
 
@@ -124,9 +127,9 @@ any more, so it lives here.
 - **A graph read API is not a seventh agent tool.** `services.py` already calls
   `graph_query` directly with no model involved, and `tools/__init__.py` states
   that living in `tools/` does not make something an agent tool. Keep this code
-  in `apps/api/`, which also keeps it clear of the `retrieval-eval-artifact-gate`
-  in `ci.yml`, which fails any PR touching `packages/agents/src/repopilot_agents/(tools|qa|rerank)/`
-  or `packages/ingestion/` without a fresh RAG bench artifact.
+  in `apps/api/`. (This also used to keep it clear of the
+  `retrieval-eval-artifact-gate`, removed in `d84e98d` — the separation is still
+  right on its own merits, but it no longer has a CI job enforcing it.)
 - **The resolver types from declarations, never from guesses.** An attribute or
   local gets a type from an annotation, a constructor call, or a declared return
   — and the resulting `owner.member` is emitted *only* if some file defines it.

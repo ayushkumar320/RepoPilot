@@ -58,7 +58,12 @@ EMBEDDING_DIM: int = 768
 #       ``t = self._pick(); t.handle(...)`` produce call edges instead of being
 #       dropped. Adds edges to ``graph_adjacency`` and ``chunks.neighbor_symbols``
 #       (+4% on httpx, +1% on flask); no symbol is renamed and none is invented.
-INDEX_RECIPE_VERSION: int = 5
+#   6 — the graph carries ``defines`` edges: a module or class is linked to the
+#       symbols nested inside it. Purely additive, and read only by the
+#       "Related code" panel — ``tools/_adjacency.py`` whitelists the other
+#       kinds, so fan-in, hubs and entry points are unchanged. Snapshots below
+#       this rebuild so a class can list its own methods.
+INDEX_RECIPE_VERSION: int = 6
 
 
 class Vector(UserDefinedType[list[float]]):

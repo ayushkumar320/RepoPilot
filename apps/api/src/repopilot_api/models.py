@@ -159,7 +159,16 @@ class ChunkPayload(BaseModel):
     summary: str | None = None
 
 
-GraphEdgeKind = Literal["calls", "called_by", "imports", "imported_by", "inherits", "inherited_by"]
+GraphEdgeKind = Literal[
+    "defined_by",
+    "calls",
+    "called_by",
+    "inherits",
+    "inherited_by",
+    "defines",
+    "imports",
+    "imported_by",
+]
 
 
 class GraphNeighbour(BaseModel):

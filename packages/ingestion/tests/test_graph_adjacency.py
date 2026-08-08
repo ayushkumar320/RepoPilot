@@ -65,6 +65,8 @@ def test_adjacency_keys_are_stable() -> None:
         "imported_by",
         "inherits",
         "inherited_by",
+        "defines",
+        "defined_by",
     }
     for node, buckets in adj.items():
         assert set(buckets) == expected_keys, f"node {node!r} missing keys"

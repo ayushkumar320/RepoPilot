@@ -176,7 +176,13 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
   await expect(page.getByText("Answered for a first-time outside contributor")).toBeVisible({
     timeout: 15_000,
   });
-  await expect(page.getByText("class Flask:")).toBeVisible({ timeout: 15_000 });
+
+  // A claim states its file:line; showing that file's source is a feature the
+  // app no longer has (the synchronized code panel went in cf18b1b). The
+  // nearest surviving thing, "Related code", renders a claim's *neighbours*
+  // rather than the claim's own source, and graph-neighbours.spec.ts covers
+  // it. So this test asserts the reference, which is what actually ships.
+  await expect(page.getByText("src/flask/app.py:1-20")).toBeVisible({ timeout: 15_000 });
 
   // Switch lens mid-session and re-ask: the same question must go out under a
   // different persona.

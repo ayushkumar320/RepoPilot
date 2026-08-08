@@ -119,7 +119,7 @@ jobs:
 
   web:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: apps/web
@@ -139,8 +139,37 @@ jobs:
       - name: Typecheck web
         run: npm run typecheck
 
+      # Pure-logic tests: the session store, identity signing, motion tokens.
+      # Cheap and dependency-free, so they run before the build to fail fast.
+      - name: Store tests (node --test)
+        run: npm run test:store
+
       - name: Build web
         run: npm run build
+
+      # Only chromium: playwright.config.ts declares no `projects`, so the
+      # suite runs on the default chromium device and the other engines would
+      # be download time spent on nothing.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Playwright starts its own `next dev` on port 3100 with the OAuth ids
+      # cleared (see playwright.config.ts); CI needs no server of its own and
+      # no .env.local — every spec mocks the API at the network layer.
+      - name: E2E (Playwright)
+        run: npm run test:e2e
+
+      # `trace: "retain-on-failure"` is already set, but a trace left inside a
+      # torn-down runner is unreadable. Without this, a red e2e job on CI shows
+      # only the assertion text.
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/web/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
   # The eval runner has been split into two dedicated workflows:
   #   - .github/workflows/eval-pr.yml    (PR-time, sampled, ≤5 min)

@@ -3,13 +3,13 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-08 · `main` at `4890ab5`
+**Last updated:** 2026-08-08 · `main` at `0fd9405`
 
 ---
 
 ## Shipped recently
 
-Eight commits, in dependency order. The graph view was estimated at 4.5–6.5 days
+In dependency order. The graph view was estimated at 4.5–6.5 days
 and took a fraction of that — but only because the three ingestion fixes above it
 landed first. Built in the other order it would have shipped a view where two
 thirds of neighbours had no source and no cross-module edges existed at all.
@@ -24,6 +24,7 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `adb2332` | This file. |
 | `248b86b` | The e2e suite runs again — Playwright starts its own server with the sign-in gate cleared. |
 | `4890ab5` | The showcase video's composition and plan layer versioned; its ~75 MB of renders and media ignored. |
+| _uncommitted_ | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
 
 ## Measured state of the graph data
 
@@ -56,35 +57,7 @@ Two things this table settles:
 
 ## Next work, in the order it should be done
 
-### 1. Put the frontend tests in CI — ~half a day, partly done
-
-**Done (`248b86b`):** the suite runs locally again. Playwright starts its own
-server on port 3100 with `AUTH_GOOGLE_ID` / `AUTH_GITHUB_ID` cleared, so
-`npx playwright test` works on any checkout regardless of `.env.local`. Current
-state: `provider-dialog` 5 passed, `graph-neighbours` 3 passed, `persona-ask`
-1 failed.
-
-**Still to do**, and these two go together because turning CI on with a red test
-makes `main` red immediately:
-
-- Add Playwright and `node --test` to `.github/workflows/ci.yml`. The `web` job
-  runs only typecheck and build today, so nothing checks the visual half of the
-  app on any change.
-- Resolve `persona-ask.spec.ts:179`. It asserts `class Flask:` is visible, which
-  the synchronized code panel deleted in `cf18b1b` used to render. Either drop
-  the assertion (the feature is gone) or retarget it at the new "Related code"
-  panel, which *can* show that source once expanded. That is a product call
-  about whether claim-to-code should exist, which is why it was left visible
-  rather than quietly deleted.
-
-Expect this to surface more than the one known failure — checks that have been
-off usually do. Budget for a full day, and `xfail` with a stated reason anything
-that turns out to be real feature work rather than a test fix.
-
-Do this before more UI work: the newest feature sits in the one part of the
-codebase with no safety net.
-
-### 2. The module dependency map — 1–2 weeks
+### 1. The module dependency map — 1–2 weeks
 
 The drawn picture, extending the same endpoint the panel already uses. Nodes are
 modules, edges are real intra-repo imports, server-scoped to a readable count
@@ -98,7 +71,7 @@ Do not ship a whole-repo symbol-level node-link view. fastapi is 7,470 nodes wit
 a median degree of 1–2 — sparse dust rather than structure, and no renderer fixes
 that.
 
-### 3. Re-run summaries when provider quota returns — minutes of work
+### 2. Re-run summaries when provider quota returns — minutes of work
 
 Every chunk indexed on 2026-08-08 carries a placeholder summary: Groq and
 Cerebras returned 429 throughout. Symbols, spans, embeddings and graph edges are
@@ -112,9 +85,18 @@ re-index needed, just the summary pass.
 | What | Detail |
 |---|---|
 | `test_httpx_indexing.py` | Both tests fail on `main`, before and after recent changes. The call-chain test wants `Client.send → HTTPTransport.handle_request`, but the resolver does no instance-attribute type inference so `self._transport.handle_request(...)` cannot resolve. CI deselects it, which is why it went unnoticed. Fix the resolver, retarget the test, or `xfail` it — a silently-failing deselected test is the worst of the three. |
-| `persona-ask.spec.ts` | Fails at line 179 on `class Flask:`, an assertion for the code panel deleted in `cf18b1b`. Runs the whole flow now, so the failure is isolated and real rather than a timeout. See "next work" #1. |
-| Frontend tests in CI | Still absent. See "next work" #1. |
-| Placeholder summaries | See "next work" #3. |
+| Placeholder summaries | See "next work" #2. |
+
+## Open product questions
+
+**Should claim-to-code come back?** A claim states a `file:line`; nothing in the
+app renders that file's source. The synchronized code panel that did was deleted
+in `cf18b1b`, and "Related code" is not a replacement — it shows a claim's graph
+*neighbours*, so reaching the claim's own source means finding it in a
+neighbour list that may not contain it. `persona-ask.spec.ts` asserted the old
+panel's output until this was resolved; it now asserts the reference text, which
+is what actually ships. Nothing in the test suite is holding the question open
+any more, so it lives here.
 
 ## Conventions worth not relearning
 

@@ -526,6 +526,13 @@ export default function RepoPilotApp({
   const askAnything = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!repoId || !askPrompt.trim() || asking) return;
+    // An answer with no persona is a different product. The only way to get
+    // here without one is "Something else" left blank, so say that instead of
+    // silently asking unpersonalized.
+    if (!profile) {
+      setErrorMessage("Choose a persona, or describe your own, before asking.");
+      return;
+    }
     setAsking(true);
     setErrorMessage(null);
     try {
@@ -1019,8 +1026,18 @@ export default function RepoPilotApp({
                     <AnswerBody text={exchange.answer} />
 
                     {exchange.claimIds.length > 0 ? (
-                      <div className="claim-group" aria-label={`Sources for ${exchange.question}`}>
-                        <div className="claim-group-label">Verified sources</div>
+                      <details
+                        className="claim-group"
+                        open
+                        aria-label={`Sources for ${exchange.question}`}
+                      >
+                        <summary className="claim-group-label">
+                          Verified sources
+                          <span className="claim-group-count">{exchange.claimIds.length}</span>
+                        </summary>
+                        {/* Scrolls past ~4 rows so a twelve-claim answer does
+                            not bury the next question. */}
+                        <div className="claim-scroll">
                         {exchange.claimIds.map((claimId) => {
                           const claim = store.claimsById[claimId];
                           const flagged = claim.status === "flagged" || claim.status === "rejected";
@@ -1056,6 +1073,7 @@ export default function RepoPilotApp({
                             </button>
                           );
                         })}
+                        </div>
                         {/* One panel per exchange, following the selected claim
                             when the selection is one of this exchange's — so
                             clicking a row changes what the panel expands rather
@@ -1078,7 +1096,7 @@ export default function RepoPilotApp({
                             <GraphNeighbours key={anchor} repoId={repoId} symbol={anchor} />
                           ) : null;
                         })()}
-                      </div>
+                      </details>
                     ) : null}
                   </article>
                 ))

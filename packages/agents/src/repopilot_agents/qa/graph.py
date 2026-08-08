@@ -56,6 +56,7 @@ from repopilot_agents.verifier.grounding import (
     VERIFIER_PROVIDER_ERROR_REASON,
     Claim,
     VerifierObjection,
+    strip_reasoning,
     verify_claims,
 )
 from repopilot_core.llm.models import ModelId
@@ -187,6 +188,7 @@ async def answer_question(
     """
     settings = get_settings()
     ctx = _Context(seen_refs=set(), chunks=[], retrieval_path=[])
+    exclude_path_prefixes = _persona_scoped_exclusions(exclude_path_prefixes, intent_profile)
 
     with _timed(ctx, "retrieval"):
         hits = await _initial_retrieval(
@@ -226,17 +228,27 @@ async def answer_question(
                 # the event loop that stalls every other request on the worker
                 # until it finishes, which the web proxy sees as a socket hang
                 # up (ECONNRESET).
-                ranked = await asyncio.to_thread(
-                    rerank_and_diversify,
-                    question,
-                    pool_hits,
-                    pool_chunks,
-                    k=k,
-                    lambda_=settings.rerank_lambda,
-                    max_pool=max_pool,
-                )
-                ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
-                initial_chunks = [content for _, content in ranked]
+                try:
+                    ranked = await asyncio.to_thread(
+                        rerank_and_diversify,
+                        question,
+                        pool_hits,
+                        pool_chunks,
+                        k=k,
+                        lambda_=settings.rerank_lambda,
+                        max_pool=max_pool,
+                    )
+                except Exception as exc:
+                    # Reranking is ordering, not answering. A missing/corrupt
+                    # ONNX cache used to raise here and drop the whole question
+                    # to the keyword-only deterministic fallback; degrade to the
+                    # retrieval order instead and keep the LLM answer.
+                    log.warning("rerank.failed", error=str(exc))
+                    ctx.retrieval_path.append(f"rerank_skipped:{type(exc).__name__}")
+                    initial_chunks = pool_chunks[:k]
+                else:
+                    ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
+                    initial_chunks = [content for _, content in ranked]
             else:
                 # read_chunks dropped refs (stale index?) — fall back untranked.
                 initial_chunks = pool_chunks[:k]
@@ -372,6 +384,44 @@ async def answer_question(
 
 
 # ── internals ───────────────────────────────────────────────────────────────
+
+
+# A priority the reader named -> the recall-lane prefixes that priority needs.
+# The contributor persona asks for "tests" and "contributing" while the default
+# recall lane excludes tests/ and docs/ as noise, so the answer prompt demanded
+# evidence retrieval could never supply and the model hedged instead.
+_PRIORITY_UNLOCKS: dict[str, tuple[str, ...]] = {
+    "test": ("tests/",),
+    "tests": ("tests/",),
+    "testing": ("tests/",),
+    "coverage": ("tests/",),
+    "contributing": ("docs/", "docs_src/"),
+    "docs": ("docs/", "docs_src/"),
+    "documentation": ("docs/", "docs_src/"),
+    "example": ("examples/",),
+    "examples": ("examples/",),
+    "usage": ("examples/",),
+    "onboarding": ("docs/", "examples/"),
+}
+
+
+def _persona_scoped_exclusions(
+    exclude_path_prefixes: Sequence[str], profile: IntentProfile | None
+) -> Sequence[str]:
+    """Stop excluding the paths this reader's priorities actually live in.
+
+    No profile (evals, API callers that pass none) keeps the default policy
+    byte-for-byte.
+    """
+    if profile is None or not profile.focus_keywords:
+        return exclude_path_prefixes
+    unlocked: set[str] = set()
+    for keyword in profile.focus_keywords:
+        for word in re.findall(r"[a-z]+", keyword.lower()):
+            unlocked.update(_PRIORITY_UNLOCKS.get(word, ()))
+    if not unlocked:
+        return exclude_path_prefixes
+    return [prefix for prefix in exclude_path_prefixes if prefix not in unlocked]
 
 
 def _extend_context(ctx: _Context, chunks: list[ChunkContent]) -> None:
@@ -546,7 +596,13 @@ async def _generate_answer(
         max_tokens=4096,
         retry_429_attempts=retry_429_attempts,
     )
-    return response.text.strip()
+    # Reasoning models (qwen3, Qwen-Coder) prefix the answer with a
+    # ``<think>…</think>`` block that restates the system prompt. It is not an
+    # answer and every line of it would parse as a claim, so drop it — unless
+    # stripping leaves nothing (unclosed block, budget ran out mid-thought),
+    # where the raw text is still better than a blank answer.
+    text = response.text.strip()
+    return strip_reasoning(text) or text
 
 
 def _is_not_found(answer: str) -> bool:

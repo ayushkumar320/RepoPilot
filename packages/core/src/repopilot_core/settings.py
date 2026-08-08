@@ -99,7 +99,11 @@ class Settings(BaseSettings):
     # section's claims stampedes the free-tier per-second quota so hard that
     # backoff never catches up (both Groq and Cerebras 429 at once). A small
     # cap lets the 429 backoff actually drain the quota window. 0 = unbounded.
-    llm_verifier_max_concurrency: int = 10
+    # 10 -> 3 on 2026-08-08: a 12-claim answer on a free-tier BYOK key sent 10
+    # verifier calls at once, every one 429'd, the retries exhausted together,
+    # and the whole answer rendered "Unverified" — the failure mode this cap
+    # exists to prevent.
+    llm_verifier_max_concurrency: int = 3
 
     # ── Reranking (RAG Phase 4) ──────────────────────────────────────────────
     # Cross-encoder over the post-retrieval pool. MiniLM-L-6-v2 is 80 MB ONNX,

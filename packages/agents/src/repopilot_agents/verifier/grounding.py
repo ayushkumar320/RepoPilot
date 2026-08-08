@@ -162,7 +162,7 @@ _JSON_OBJ_RE = re.compile(r"\{[^{}]*\}", re.DOTALL)
 _JSON_SPAN_RE = re.compile(r"\{.*\}", re.DOTALL)
 
 
-def _strip_reasoning(raw: str) -> str:
+def strip_reasoning(raw: str) -> str:
     """Remove ``<think>`` reasoning so only the answer payload remains."""
     without_closed = _THINK_RE.sub("", raw)
     return _OPEN_THINK_RE.sub("", without_closed).strip()
@@ -175,7 +175,7 @@ def _parse_verdict(raw: str) -> VerifierVerdict | None:
     model may emit throwaway objects first); falls back to the widest brace
     span so a plain ``{...}`` answer still parses.
     """
-    cleaned = _strip_reasoning(raw)
+    cleaned = strip_reasoning(raw)
     candidates = [m.group(0) for m in _JSON_OBJ_RE.finditer(cleaned)]
     span = _JSON_SPAN_RE.search(cleaned)
     if span is not None:

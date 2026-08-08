@@ -1033,10 +1033,30 @@ a {
 }
 
 .claim-group-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
   color: var(--text-tertiary);
   font-size: 0.68rem;
   font-weight: 590;
+  cursor: pointer;
+}
+
+.claim-group-count {
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+}
+
+/* ~4 rows, then scroll: a twelve-claim answer pushed the next question off
+   the screen entirely. */
+.claim-scroll {
+  max-height: 23rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .claim-row {

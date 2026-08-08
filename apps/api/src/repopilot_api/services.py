@@ -13,6 +13,7 @@ from typing import Any, Protocol
 from urllib.parse import quote, unquote
 from uuid import uuid4
 
+import structlog
 from arq.connections import ArqRedis, RedisSettings, create_pool
 from arq.jobs import Job
 from sqlalchemy import func, select
@@ -49,6 +50,8 @@ from repopilot_ingestion.db import graph_adjacency as graph_table
 from repopilot_ingestion.db import repos as repos_table
 from repopilot_ingestion.persist import make_engine
 from repopilot_ingestion.pipeline import index_repo, revisit_status
+
+log = structlog.get_logger(__name__)
 
 
 def repo_slug(repo_url: str) -> str:
@@ -466,6 +469,10 @@ class LiveQAService:
                     intent_profile=intent_profile,
                 )
             except Exception as exc:
+                # Log before degrading: the keyword-only answer looks like a
+                # product behaviour in the UI, so without this the real cause
+                # (provider error, model load, DB) leaves no trace anywhere.
+                log.exception("qa.llm_failed_falling_back", repo_id=repo_id)
                 result = await answer_deterministically(
                     engine=engine,
                     snapshot_repo_id=snapshot_repo_id,

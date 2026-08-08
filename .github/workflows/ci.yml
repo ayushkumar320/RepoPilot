@@ -18,68 +18,6 @@ permissions:
   pull-requests: read
 
 jobs:
-  retrieval-eval-artifact-gate:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Require fresh RAG after artifact for retrieval changes
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}")"
-          retrieval_changed="$(printf '%s\n' "$changed_files" | grep -E '^(packages/agents/src/repopilot_agents/(tools|qa|rerank)/|packages/ingestion/)' || true)"
-
-          if [[ -z "$retrieval_changed" ]]; then
-            echo "No retrieval-path changes detected."
-            exit 0
-          fi
-
-          # A migration alone cannot change retrieval quality, and product-layer
-          # migrations (product_tours, usage_events, ...) touch nothing the
-          # retrieval path reads. Exempt them only when they are the *only*
-          # retrieval-path change in the PR: a migration that does affect
-          # retrieval — a new index, a chunks column — lands with ingestion or
-          # agents code beside it, and that combination still trips the gate.
-          non_migration_changed="$(printf '%s\n' "$retrieval_changed" | grep -vE '^packages/ingestion/src/repopilot_ingestion/migrations/versions/[^/]+\.py$' || true)"
-
-          if [[ -z "$non_migration_changed" ]]; then
-            echo "Only migration files changed on the retrieval path; no bench artifact required:"
-            printf '%s\n' "$retrieval_changed"
-            exit 0
-          fi
-
-          after_changed="$(printf '%s\n' "$changed_files" | grep -E '^evals/results/rag_phase[0-9]+/_after\.json$' || true)"
-
-          if [[ -n "$after_changed" ]]; then
-            echo "Retrieval changes include a fresh RAG _after.json artifact:"
-            printf '%s\n' "$after_changed"
-            exit 0
-          fi
-
-          # Escape hatch for changes on these paths that provably cannot move
-          # ranking -- concurrency (moving a sync call to a thread), warmup,
-          # logging, type annotations. A bench run there only reproves the
-          # status quo. It is a label rather than a commit-message token on
-          # purpose: labelling is a deliberate act by someone with write
-          # access, is visible on the PR, and shows up in its timeline.
-          if printf '%s\n' '${{ toJSON(github.event.pull_request.labels.*.name) }}' | grep -q '"retrieval-eval-exempt"'; then
-            echo "PR is labelled retrieval-eval-exempt; skipping the artifact requirement for:"
-            printf '%s\n' "$non_migration_changed"
-            exit 0
-          fi
-
-          echo "::error title=Missing RAG eval artifact::Retrieval-path changes must include evals/results/rag_phaseN/_after.json from a fresh bench run."
-          echo "Changed retrieval files (migration-only changes are exempt):"
-          printf '%s\n' "$non_migration_changed"
-          echo "If the change cannot affect ranking, label the PR retrieval-eval-exempt."
-          exit 1
-
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -171,7 +109,7 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-  # The eval runner has been split into two dedicated workflows:
-  #   - .github/workflows/eval-pr.yml    (PR-time, sampled, ≤5 min)
-  #   - .github/workflows/eval-main.yml  (post-merge, full matrix, ≤30 min)
-  # This file (ci.yml) covers lint/typecheck/test/coverage/gitleaks only.
+  # The eval workflows (eval-pr, eval-main) and the retrieval artifact gate were
+  # removed on 2026-08-08: the RAG phases they guarded are finished, and the gate
+  # failed every feature PR that so much as touched a file under those paths.
+  # The bench still runs locally via the Makefile targets.

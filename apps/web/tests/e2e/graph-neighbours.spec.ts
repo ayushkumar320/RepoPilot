@@ -92,7 +92,11 @@ const answer = JSON.stringify({
   retrieval_path: ["vector_search:k=8"],
 });
 
-async function mockApi(page: import("@playwright/test").Page, graphBody: string) {
+async function mockApi(
+  page: import("@playwright/test").Page,
+  graphBody: string | ((symbol: string) => string),
+  answerBody: string = answer,
+) {
   await page.route(
     new RegExp(apiBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
     async (route) => {
@@ -101,7 +105,12 @@ async function mockApi(page: import("@playwright/test").Page, graphBody: string)
       const method = route.request().method();
 
       if (path.includes("/graph/neighbours")) {
-        return route.fulfill({ status: 200, contentType: "application/json", body: graphBody });
+        // Keyed by symbol, so a test can prove *which* claim the panel asked about.
+        const body =
+          typeof graphBody === "string"
+            ? graphBody
+            : graphBody(url.searchParams.get("symbol") ?? "");
+        return route.fulfill({ status: 200, contentType: "application/json", body });
       }
       if (path.includes("/chunks/")) {
         return route.fulfill({
@@ -157,7 +166,7 @@ async function mockApi(page: import("@playwright/test").Page, graphBody: string)
         });
       }
       if (path.includes("/repos/repo-123/ask") && method === "POST") {
-        return route.fulfill({ status: 200, contentType: "application/json", body: answer });
+        return route.fulfill({ status: 200, contentType: "application/json", body: answerBody });
       }
       if (path.endsWith("/me")) {
         return route.fulfill({
@@ -249,4 +258,87 @@ test("a repo with no python graph says so rather than showing an empty list", as
 
   await page.getByRole("button", { name: "Related code" }).click();
   await expect(page.getByText(/Dependency graphs are built from Python source/)).toBeVisible();
+});
+
+/** Two claims on one answer, each naming a different symbol. */
+const twoClaimAnswer = JSON.stringify({
+  answer: "Flask is the application object.",
+  claims: [
+    {
+      id: "claim-1",
+      text: "The Flask class is the main app entry.",
+      refs: [{ file_path: "src/flask/app.py", start_line: 1, end_line: 20, symbol: "Flask" }],
+      status: "verified",
+      verifier_note: null,
+      retrieval_path: ["vector_search:k=8"],
+    },
+    {
+      id: "claim-2",
+      text: "Sessions are handled by the session interface.",
+      refs: [
+        {
+          file_path: "src/flask/sessions.py",
+          start_line: 100,
+          end_line: 160,
+          symbol: "flask.sessions.SessionInterface",
+        },
+      ],
+      status: "verified",
+      verifier_note: null,
+      retrieval_path: ["vector_search:k=8"],
+    },
+  ],
+  retrieval_path: ["vector_search:k=8"],
+});
+
+function neighbourNamed(label: string): string {
+  return JSON.stringify({
+    symbol: "whatever",
+    available: true,
+    found: true,
+    total: 1,
+    truncated: false,
+    neighbours: [
+      {
+        symbol: `flask.${label}`,
+        label,
+        edge: "calls",
+        kind: "function",
+        external: false,
+        resolved: true,
+        chunk_id: "chunk-neighbour-1",
+        ref: {
+          file_path: "src/flask/x.py",
+          start_line: 1,
+          end_line: 2,
+          symbol: `flask.${label}`,
+        },
+      },
+    ],
+  });
+}
+
+test("the panel follows the selected claim rather than always the first", async ({ page }) => {
+  const asked: string[] = [];
+  await mockApi(
+    page,
+    (symbol) => {
+      asked.push(symbol);
+      return neighbourNamed(symbol === "Flask" ? "AppNeighbour" : "SessionNeighbour");
+    },
+    twoClaimAnswer,
+  );
+  await askAQuestion(page);
+
+  // Untouched, the panel anchors on the first claim that names a symbol.
+  await page.getByRole("button", { name: "Related code" }).click();
+  await expect(page.getByText("AppNeighbour")).toBeVisible({ timeout: 10_000 });
+
+  // Selecting the second claim re-anchors it. Before this was wired, clicking
+  // a claim only restyled the row and the panel kept showing the first one's.
+  await page.getByRole("button", { name: /Sessions are handled/ }).click();
+  await page.getByRole("button", { name: "Related code" }).click();
+  await expect(page.getByText("SessionNeighbour")).toBeVisible({ timeout: 10_000 });
+
+  expect(asked).toEqual(["Flask", "flask.sessions.SessionInterface"]);
 });

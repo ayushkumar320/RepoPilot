@@ -1056,15 +1056,26 @@ export default function RepoPilotApp({
                             </button>
                           );
                         })}
-                        {/* One panel per exchange, keyed off the first claim that
-                            names a symbol. The graph is keyed by symbol, so a
-                            claim whose ref has none has nothing to look up. */}
+                        {/* One panel per exchange, following the selected claim
+                            when the selection is one of this exchange's — so
+                            clicking a row changes what the panel expands rather
+                            than only restyling it. Falls back to the first claim
+                            that names a symbol: the graph is keyed by symbol, and
+                            a claim whose ref has none has nothing to look up. */}
                         {(() => {
-                          const anchor = exchange.claimIds
+                          const selected = store.selectedClaimId;
+                          const ordered =
+                            selected && exchange.claimIds.includes(selected)
+                              ? [selected, ...exchange.claimIds]
+                              : exchange.claimIds;
+                          const anchor = ordered
                             .map((id) => store.claimsById[id]?.refs[0]?.symbol)
                             .find((symbol): symbol is string => Boolean(symbol));
+                          // Keyed so a new anchor remounts: the panel caches the
+                          // neighbours it fetched, and without this it would keep
+                          // showing the previous claim's.
                           return anchor && repoId ? (
-                            <GraphNeighbours repoId={repoId} symbol={anchor} />
+                            <GraphNeighbours key={anchor} repoId={repoId} symbol={anchor} />
                           ) : null;
                         })()}
                       </div>

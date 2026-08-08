@@ -53,7 +53,12 @@ EMBEDDING_DIM: int = 768
 #       real package, e.g. flask's ``src/flask/sansio/``) are named as part of
 #       their package instead of by basename. Renames every symbol under one,
 #       which is what makes a graph node join its chunk.
-INDEX_RECIPE_VERSION: int = 4
+#   5 — the graph resolver types instance attributes and locals from declared
+#       types, so ``self._transport.handle_request(...)`` and
+#       ``t = self._pick(); t.handle(...)`` produce call edges instead of being
+#       dropped. Adds edges to ``graph_adjacency`` and ``chunks.neighbor_symbols``
+#       (+4% on httpx, +1% on flask); no symbol is renamed and none is invented.
+INDEX_RECIPE_VERSION: int = 5
 
 
 class Vector(UserDefinedType[list[float]]):

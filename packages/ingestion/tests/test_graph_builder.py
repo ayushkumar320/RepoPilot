@@ -124,3 +124,158 @@ def test_path_via_graph_traversal() -> None:
     ]
     g = build_graph(modules)
     assert nx.has_path(g, "a.run", "b.helper")
+
+
+def test_instance_attribute_type_resolves_the_call() -> None:
+    """``self.x.y()`` binds through x's declared type, not just ``self.y()``."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Transport:
+                    def handle(self):
+                        return 1
+
+                class Client:
+                    def __init__(self):
+                        self._transport = Transport()
+
+                    def send(self):
+                        return self._transport.handle()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert g.has_edge("pkg.mod.Client.send", "pkg.mod.Transport.handle")
+
+
+def test_attribute_type_from_annotation_survives_optional_and_quotes() -> None:
+    """``T | None`` and a quoted forward reference both name T."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Transport:
+                    def handle(self):
+                        return 1
+
+                class Client:
+                    _t: "Transport | None" = None
+
+                    def send(self):
+                        return self._t.handle()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert g.has_edge("pkg.mod.Client.send", "pkg.mod.Transport.handle")
+
+
+def test_local_variable_type_comes_from_the_declared_return() -> None:
+    """The two-hop shape: local = self.pick(); local.method()."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Transport:
+                    def handle(self):
+                        return 1
+
+                class Client:
+                    def _pick(self) -> Transport:
+                        return Transport()
+
+                    def send(self):
+                        transport = self._pick()
+                        return transport.handle()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert nx.has_path(g, "pkg.mod.Client.send", "pkg.mod.Transport.handle")
+
+
+def test_untyped_attribute_yields_no_edge() -> None:
+    """No declared type means no guess. Inventing here invents a symbol."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                class Client:
+                    def __init__(self, thing):
+                        self._thing = thing
+
+                    def send(self):
+                        return self._thing.handle()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert not [n for n in g.nodes if n.endswith(".handle")]
+
+
+def test_a_member_no_file_defines_is_not_invented() -> None:
+    """The receiver's type is ours; ``close`` is inherited from a third party.
+
+    Emitting ``pkg.mod.Session.close`` would put a repo-shaped symbol in the
+    graph that no file defines, and the panel would offer a dead row.
+    """
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                from thirdparty import SessionBase
+
+                class Session(SessionBase):
+                    pass
+
+                class Client:
+                    def __init__(self):
+                        self._session = Session()
+
+                    def stop(self):
+                        return self._session.close()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert "pkg.mod.Session.close" not in g.nodes
+
+
+def test_a_function_local_import_does_not_bind_file_wide() -> None:
+    """Preparing aliases up front must not hoist a name out of its function."""
+    modules = [
+        ModuleSource(
+            module="pkg.mod",
+            rel_path="pkg/mod.py",
+            source=_src(
+                """
+                def early():
+                    return helper()
+
+                def late():
+                    from other import helper
+
+                    return helper()
+                """
+            ),
+        )
+    ]
+    g = build_graph(modules)
+    assert not g.has_edge("pkg.mod.early", "other.helper")
+    assert g.has_edge("pkg.mod.late", "other.helper")

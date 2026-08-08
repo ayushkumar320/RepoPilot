@@ -60,11 +60,25 @@ async def test_graph_known_call_chain_httpx() -> None:
             modules.append(ModuleSource(module=mod, rel_path=str(rel), source=parsed.source))
         graph = build_graph(modules)
 
-    # The exact symbol IDs depend on httpx's package layout; we assert a
-    # path exists between Client.send and the lower-level transport hop.
+    # The exact symbol IDs depend on httpx's package layout, so match by suffix.
+    #
+    # The hop asserted is to *BaseTransport*, not HTTPTransport. `send` reaches
+    # `transport.handle_request(...)` where `transport` is declared
+    # `BaseTransport`; which concrete subclass it holds is decided at runtime
+    # by `_init_transport`. A static path to HTTPTransport.handle_request would
+    # have to be invented, and the builder's contract is that it never is.
+    # HTTPTransport is tied in through the inherits edge instead.
     candidates_from = [n for n in graph.nodes if n.endswith("Client.send")]
-    candidates_to = [n for n in graph.nodes if n.endswith("HTTPTransport.handle_request")]
+    candidates_to = [n for n in graph.nodes if n.endswith("BaseTransport.handle_request")]
     assert candidates_from and candidates_to, "expected httpx symbols missing"
     assert any(nx.has_path(graph, src, dst) for src in candidates_from for dst in candidates_to), (
-        "no graph path Client.send → HTTPTransport.handle_request"
+        "no graph path Client.send → BaseTransport.handle_request"
+    )
+
+    # And the concrete transport is reachable as a subclass of the one called.
+    concrete = [n for n in graph.nodes if n.endswith("_transports.default.HTTPTransport")]
+    base = [n for n in graph.nodes if n.endswith("_transports.base.BaseTransport")]
+    assert concrete and base, "expected httpx transport classes missing"
+    assert any(graph.has_edge(sub, sup) for sub in concrete for sup in base), (
+        "HTTPTransport is not connected to BaseTransport"
     )

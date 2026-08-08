@@ -1739,6 +1739,63 @@ input:focus-visible {
 
 /* Reduced motion means a gentler equivalent, not silence. Movement goes away;
    opacity and colour changes stay, because they carry meaning. */
+/* ── Module map (repo-level dependency graph) ──────────────────────────── */
+
+.module-map {
+  margin-bottom: 18px;
+}
+
+.module-map-body {
+  margin-top: 10px;
+}
+
+/* React Flow needs a definite height — its canvas is absolutely positioned, so
+   an auto-height parent collapses to nothing and the map renders invisible. */
+.module-map-canvas {
+  height: 420px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Width and height must match NODE_WIDTH / NODE_HEIGHT in module-map.tsx —
+   dagre places boxes by those numbers before anything is measured. */
+.module-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.module-box-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.module-box-meta {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.module-map-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
 /* ── Related code (graph neighbours) ───────────────────────────────────── */
 
 .neighbours {

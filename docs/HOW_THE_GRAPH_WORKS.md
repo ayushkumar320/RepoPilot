@@ -166,8 +166,15 @@ From repositories indexed on this project:
 Most nodes have very few connections — a median of one or two. This is why the
 graph is shown as "what's related to *this*" rather than as one giant picture:
 at repository scale a node-link diagram of every function is visual noise, not
-structure. Any future map should be drawn at the level of modules, where the
-shape is real.
+structure.
+
+The **module map** is the same graph seen from further away, and it is drawn,
+because at that level the shape is real: flask has 83 modules joined by 81
+dependencies, httpx 60 and 72. One box per module, one arrow per import that
+stays inside the repository — an import of `os` or `httpx` is a true edge and
+tells a reader nothing about how *this* codebase is arranged. Big repositories
+are scoped to the busiest modules, and the map says so rather than quietly
+drawing a subset.
 
 ---
 

@@ -27,8 +27,9 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
 | `b3f43f5` | The graph resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges instead of drops. `INDEX_RECIPE_VERSION` → 5. |
 | `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
-| `b3661ac` | `defines` edges: a class or module is linked to the symbols nested inside it, so the panel can list a class's own methods. 1,564 new edges on flask, 1,224 on httpx; 102 of flask's 143 classes now list theirs. Panel-only — `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. |
-| `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, up to three panels deep, one request per step the reader takes. Reuses the existing component and endpoint — no depth parameter, no prefetched tree. |
+| `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it. Panel-only; the agent-facing loader whitelists the other kinds. `INDEX_RECIPE_VERSION` → 6. |
+| `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
+| _pending_ | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. |
 
 ## Measured state of the graph data
 
@@ -67,21 +68,7 @@ Two things this table settles:
 
 ## Next work, in the order it should be done
 
-### 1. The module dependency map — 1–2 weeks
-
-The drawn picture, extending the same endpoint the panel already uses. Nodes are
-modules, edges are real intra-repo imports, server-scoped to a readable count
-with an honest `truncated` flag, click a node to reach its source.
-
-This was impossible before `93e77fe`: a module-level rollup produced **zero**
-cross-module edges on any src-layout repo. It now yields 379 cross-package edges
-on fastapi and 213 on flask.
-
-Do not ship a whole-repo symbol-level node-link view. fastapi is 7,470 nodes with
-a median degree of 1–2 — sparse dust rather than structure, and no renderer fixes
-that.
-
-### 2. The quota-blocked batch — do these together when a provider answers
+### 1. The quota-blocked batch — do these together when a provider answers
 
 Three separate items, one blocker. Groq and Cerebras returned 429 throughout
 2026-08-08, so none of them could be finished; all three want a working
@@ -97,7 +84,11 @@ provider and two of them want a re-index, so batch them.
   artifact gate still existed, and `d84e98d` has since removed that gate
   entirely. Nothing will catch this now, so it is a deliberate `make
   test-eval-sampled` run rather than something CI will remind anyone about.
-- **Re-measure the graph table.** Recipe version 5 means snapshots rebuild on
+- **Re-measure the graph table, and the map's own numbers.** STATUS previously
+  claimed 379 cross-package edges on fastapi and 213 on flask. Rolling the graph
+  up per module measures 81 unique module→module pairs on flask, so those two
+  figures describe something else and should not be quoted until re-derived.
+- **Re-measure the neighbour column.** Recipe version 5 means snapshots rebuild on
   next visit; the "With ≥1 neighbour" column above was measured at version 4 and
   can only have risen.
 

@@ -23,6 +23,7 @@ import {
 import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { GraphNeighbours } from "./graph-neighbours";
+import { ModuleMap } from "./module-map";
 import {
   ApiError,
   api,
@@ -971,6 +972,13 @@ export default function RepoPilotApp({
               {store.firstImpression ? (
                 <p className="first-impression">{store.firstImpression}</p>
               ) : null}
+
+              {/* Repo-level, above the first question: "Related code" answers
+                  "what touches this claim", which only helps once you have an
+                  answer to anchor on. This answers "how is the repository laid
+                  out", which is what a newcomer needs before asking anything.
+                  Collapsed, so it costs no request until someone wants it. */}
+              {repoId ? <ModuleMap repoId={repoId} /> : null}
 
               <form className="ask-panel" onSubmit={askAnything}>
                 <div className="ask-heading">

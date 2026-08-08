@@ -104,6 +104,38 @@ export interface GraphNeighbour {
   ref?: CodeRef | null;
 }
 
+export interface GraphModule {
+  /** Dotted module name; unique in a snapshot, so it doubles as the node id. */
+  symbol: string;
+  label: string;
+  /** Null when the module is a real import target with no chunk of its own —
+   *  a namespace package, say. It stays on the map as a dependency target
+   *  rather than being dropped or given a source it does not have. */
+  file_path: string | null;
+  chunk_id: string | null;
+  symbol_count: number;
+  depends_on: number;
+  depended_on_by: number;
+}
+
+export interface GraphModuleEdge {
+  source: string;
+  target: string;
+}
+
+export interface GraphModulesResponse {
+  /** False when the snapshot has no graph at all. Same contract as the
+   *  neighbourhood read: render as not-applicable, never as an empty map. */
+  available: boolean;
+  modules: GraphModule[];
+  edges: GraphModuleEdge[];
+  /** True counts, even when the map was scoped — so the UI can say
+   *  "showing 40 of 210" instead of implying it drew everything. */
+  total_modules: number;
+  total_edges: number;
+  truncated: boolean;
+}
+
 export interface GraphNeighboursResponse {
   symbol: string;
   /** False when the snapshot has no graph at all — the normal case for a repo
@@ -278,6 +310,10 @@ export const api = {
   ): Promise<GraphNeighboursResponse> {
     const query = new URLSearchParams({ symbol, limit: String(limit) });
     return http(`/repos/${repoId}/graph/neighbours?${query}`);
+  },
+  getGraphModules(repoId: string, limit = 60): Promise<GraphModulesResponse> {
+    const query = new URLSearchParams({ limit: String(limit) });
+    return http(`/repos/${repoId}/graph/modules?${query}`);
   },
   getChunk(chunkId: string): Promise<ChunkPayload> {
     return http(`/chunks/${encodeURIComponent(chunkId)}`);

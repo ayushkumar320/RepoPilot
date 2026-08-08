@@ -30,7 +30,7 @@ from test_api_contract import (  # type: ignore[import-not-found]
 
 from repopilot_agents.types import CodeRef
 from repopilot_api.app import create_app
-from repopilot_api.models import GraphNeighbour, GraphNeighboursResponse
+from repopilot_api.models import GraphModulesResponse, GraphNeighbour, GraphNeighboursResponse
 from repopilot_api.services import AppServices, LiveGraphService
 
 
@@ -38,6 +38,13 @@ class FakeGraphService:
     def __init__(self, response: GraphNeighboursResponse | None = None) -> None:
         self.response = response
         self.calls: list[tuple[str, str, int]] = []
+
+    async def modules(self, repo_id: str, *, limit: int = 60) -> GraphModulesResponse:
+        """Present so this fake still satisfies ``GraphService``. The module
+        map has its own tests; these are about the neighbourhood read."""
+        if repo_id == "unknown-repo":
+            raise KeyError(repo_id)
+        return GraphModulesResponse(available=False)
 
     async def neighbours(
         self, repo_id: str, symbol: str, *, limit: int = 60

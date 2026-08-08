@@ -208,6 +208,54 @@ class GraphNeighboursResponse(BaseModel):
     truncated: bool = False
 
 
+class GraphModule(BaseModel):
+    """One module in the dependency map.
+
+    ``symbol`` is the dotted module name and doubles as the node id — module
+    names are unique within a snapshot. ``file_path`` is present whenever the
+    module was chunked, which is what makes a node clickable; a module can be
+    a real import target and still have no chunk (a namespace package with no
+    code of its own), and those stay in the map as dependency targets rather
+    than being dropped or given a source they do not have.
+    """
+
+    symbol: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    file_path: str | None = None
+    chunk_id: str | None = None
+    symbol_count: int = Field(default=0, ge=0)
+    depends_on: int = Field(default=0, ge=0)
+    depended_on_by: int = Field(default=0, ge=0)
+
+
+class GraphModuleEdge(BaseModel):
+    """``source`` imports something from ``target``. Both are module names."""
+
+    source: str = Field(min_length=1)
+    target: str = Field(min_length=1)
+
+
+class GraphModulesResponse(BaseModel):
+    """The repository's intra-repo module dependency map.
+
+    Only edges *within* the repository are here. An import of `os` or `httpx`
+    is a real edge in the symbol graph but tells a reader nothing about how
+    this codebase is arranged, and drawing every third-party target is what
+    turns a map into a hairball.
+
+    ``truncated`` is set when the map was scoped to the busiest modules;
+    ``total_modules`` always reports the true count so the UI can say "showing
+    40 of 210" rather than implying it drew everything.
+    """
+
+    available: bool
+    modules: list[GraphModule] = Field(default_factory=list)
+    edges: list[GraphModuleEdge] = Field(default_factory=list)
+    total_modules: int = Field(default=0, ge=0)
+    total_edges: int = Field(default=0, ge=0)
+    truncated: bool = False
+
+
 class BaseTourEvent(BaseModel):
     v: Literal[1] = 1
     event: str
@@ -270,6 +318,9 @@ __all__ = [
     "CreateTourRequest",
     "CreateTourResponse",
     "GraphEdgeKind",
+    "GraphModule",
+    "GraphModuleEdge",
+    "GraphModulesResponse",
     "GraphNeighbour",
     "GraphNeighboursResponse",
     "IdentityRequest",

@@ -47,6 +47,7 @@ from repopilot_api.tours import InMemoryTourService, PostgresTourService, TourSe
 from repopilot_core.llm.provider import LLMProvider
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
+from repopilot_ingestion.db import INDEX_RECIPE_VERSION
 from repopilot_ingestion.db import chunk_embeddings as embeddings_table
 from repopilot_ingestion.db import chunks as chunks_table
 from repopilot_ingestion.db import graph_adjacency as graph_table
@@ -369,7 +370,18 @@ class LiveRepoService:
                         embeddings_table,
                         embeddings_table.c.chunk_id == chunks_table.c.id,
                     )
-                    .where(repos_table.c.url == repo_url)
+                    .where(
+                        repos_table.c.url == repo_url,
+                        # A snapshot built by an older recipe is not a usable
+                        # snapshot, exactly as `repo_already_indexed` and
+                        # `known_head_sha` in persist.py already say. Without
+                        # this the app serves stale data forever: a repo
+                        # indexed at recipe 3 resolves here, `_load_record_from_db`
+                        # reports it "stale" rather than absent, and `enqueue`
+                        # returns early instead of rebuilding — so bumping
+                        # INDEX_RECIPE_VERSION changed nothing anyone could see.
+                        repos_table.c.index_version >= INDEX_RECIPE_VERSION,
+                    )
                     .group_by(repos_table.c.id, repos_table.c.indexed_at)
                     .having(func.count(chunks_table.c.id) > 0)
                     .having(

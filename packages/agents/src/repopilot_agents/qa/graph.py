@@ -56,6 +56,7 @@ from repopilot_agents.verifier.grounding import (
     VERIFIER_PROVIDER_ERROR_REASON,
     Claim,
     VerifierObjection,
+    strip_reasoning,
     verify_claims,
 )
 from repopilot_core.llm.models import ModelId
@@ -556,7 +557,13 @@ async def _generate_answer(
         max_tokens=4096,
         retry_429_attempts=retry_429_attempts,
     )
-    return response.text.strip()
+    # Reasoning models (qwen3, Qwen-Coder) prefix the answer with a
+    # ``<think>…</think>`` block that restates the system prompt. It is not an
+    # answer and every line of it would parse as a claim, so drop it — unless
+    # stripping leaves nothing (unclosed block, budget ran out mid-thought),
+    # where the raw text is still better than a blank answer.
+    text = response.text.strip()
+    return strip_reasoning(text) or text
 
 
 def _is_not_found(answer: str) -> bool:

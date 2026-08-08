@@ -365,6 +365,37 @@ async def test_rerank_pool_size_comes_from_settings(monkeypatch: pytest.MonkeyPa
 
 
 @pytest.mark.asyncio
+async def test_reasoning_block_never_reaches_the_answer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``<think>`` output is the model's scratchpad, not part of the answer."""
+
+    async def one_hit(question: str, **kw: Any) -> list[ChunkHit]:
+        return [ChunkHit(ref=_ref("sym0", line=1), distance=0.1, kind="function")]
+
+    monkeypatch.setattr(qa_graph, "hybrid_search", one_hit)
+    monkeypatch.setattr(qa_graph, "vector_search", one_hit)
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "<think>Thinking Process: restate the prompt, list constraints.</think>\n"
+            "## How it works\nsym0 returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does sym0 return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+
+    assert "<think>" not in result.answer
+    assert "Thinking Process" not in result.answer
+    assert result.answer.startswith("## How it works")
+
+
+@pytest.mark.asyncio
 async def test_rerank_failure_degrades_instead_of_killing_the_answer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

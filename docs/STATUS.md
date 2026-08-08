@@ -3,42 +3,59 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-08 · `main` at `93f1de4`
+**Last updated:** 2026-08-08 · `main` at `fdab4b2`
 
 ---
 
-## Shipped recently
+## Shipped today
 
-In dependency order. The graph view was estimated at 4.5–6.5 days
-and took a fraction of that — but only because the three ingestion fixes above it
-landed first. Built in the other order it would have shipped a view where two
-thirds of neighbours had no source and no cross-module edges existed at all.
+One session, in the order it happened. It began with "put the frontend tests in
+CI" and ended with the graph feature having no known gaps — because turning the
+checks on is what made the rest safe to do quickly.
+
+| Commit | What it did |
+|---|---|
+| `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. Nothing had been checking the visual half of the app on any change. Traces upload on failure. |
+| `b3f43f5` | The resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges rather than drops. +66 call edges on httpx, +14 on flask, zero invented symbols. `INDEX_RECIPE_VERSION` → 5. |
+| `12c8428` | "Related code" follows the claim you click. It had only ever anchored on the exchange's first claim, so clicking any other row restyled it and showed the wrong neighbours. |
+| `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it, so a class can list its own methods. 1,564 new edges on flask. Panel-only: `tools/_adjacency.py` whitelists the other kinds, so fan-in, hubs and entry points are untouched. `INDEX_RECIPE_VERSION` → 6. Same commit adds multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
+| `05320a4` | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. No re-index and no recipe bump — `imports` edges already start at a module. |
+| `62b9e58` | Claim-to-code. A claim expands inline to the source it cites, with real file line numbers. Settles the product question carried since `cf18b1b`: the capability came back, the third column it used to live in did not. |
+
+Two things this session settled that are worth not relitigating:
+
+- **The graph feature has no known gaps.** Every item from the audit — dropped
+  `self.x.y()` calls, the panel ignoring the clicked claim, classes not linked to
+  their methods, one-hop-only, no module map, no claim-to-code — is shipped.
+- **CI now covers the frontend**, so the newest work is no longer the part with
+  no safety net. 15 store tests and 15 e2e specs run on every push to `main` and
+  every pull request.
+
+## Shipped earlier (the graph foundation)
+
+In dependency order. The graph view was estimated at 4.5–6.5 days and took a
+fraction of that — but only because the three ingestion fixes above it landed
+first. Built in the other order it would have shipped a view where two thirds of
+neighbours had no source and no cross-module edges existed at all.
 
 | Commit | What it did |
 |---|---|
 | `b9b39bc` | Parser sliced source by tree-sitter's **byte** offsets instead of indexing the decoded `str` with them. 71% of symbol names were corrupt; graph nodes resolving to a `file:line` went 34% → 91%. |
-| `93e77fe` | Modules named from the package root rather than the repo-relative path, and relative imports resolved instead of dropped. Cross-module edges went 0 → 342 on this repo. |
+| `93e77fe` | Modules named from the package root rather than the repo-relative path, and relative imports resolved instead of dropped. |
 | `764a111` | Re-indexing deleted and recreated the `repos` row, and `ON DELETE SET NULL` silently unpinned every saved tour. Now upserts. |
 | `2368035` | `GET /repos/{repo_id}/graph/neighbours` — the read API behind the graph view. |
 | `2715599` | The "Related code" panel: expand a claim into what it calls, what calls it, what it inherits, what imports it. |
 | `adb2332` | This file. |
 | `248b86b` | The e2e suite runs again — Playwright starts its own server with the sign-in gate cleared. |
 | `4890ab5` | The showcase video's composition and plan layer versioned; its ~75 MB of renders and media ignored. |
-| `6524263` | The `web` CI job runs `node --test` and Playwright, not just typecheck and build. 15 store tests + 9 e2e specs, all green; traces upload on failure. |
-| `b3f43f5` | The graph resolver types instance attributes and locals from **declared** types, so `self._transport.handle_request(...)` and `t = self._pick(); t.handle(...)` are edges instead of drops. `INDEX_RECIPE_VERSION` → 5. |
-| `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
-| `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it. Panel-only; the agent-facing loader whitelists the other kinds. `INDEX_RECIPE_VERSION` → 6. |
-| `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
-| `62b9e58` | Claim-to-code: a claim expands to the source it cites, with real file line numbers. Answers the open product question that had been carried since `cf18b1b`. |
-| `05320a4` | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. |
 
 ## Measured state of the graph data
 
-> **Stale as of `INDEX_RECIPE_VERSION = 5`.** The table below was measured at
-> version 4. Version 5 adds call edges (see "Shipped recently") without renaming
-> any symbol, so *Graph nodes*, *Symbols* and *In graph* still hold — but
-> *With ≥1 neighbour* can only rise, and has not been re-measured against the
-> database. Re-index and re-run the queries before quoting that column.
+> **Stale as of `INDEX_RECIPE_VERSION = 6`.** The table below was measured at
+> version 4. Versions 5 and 6 both add edges without renaming any symbol, so
+> *Graph nodes*, *Symbols* and *In graph* still hold — but *With ≥1 neighbour*
+> can only have risen, and has not been re-measured against the database.
+> Re-index and re-run the queries before quoting that column.
 
 All eight indexed repos were on `INDEX_RECIPE_VERSION = 4` with **zero** symbol
 corruption. Re-measure with the queries in this section after any ingestion
@@ -55,7 +72,15 @@ change; every number here was measured, not estimated.
 | iprashantraj/leetcode-tracker | **0** | — | — | — |
 | iprashantraj/mcp-discord-bridge | **0** | — | — | — |
 
-Two things this table settles:
+Rolled up per module — the map's own scale, measured on clones rather than on
+the database:
+
+| Repo | Module nodes | Intra-repo module→module edges |
+|---|---|---|
+| pallets/flask | 83 | 81 |
+| encode/httpx | 60 | 72 |
+
+Two things the symbol table settles:
 
 - **The graph view has content.** Every symbol a claim can cite is a graph node,
   and 67–100% have neighbours to display. The panel appears essentially always
@@ -71,27 +96,28 @@ Two things this table settles:
 
 ### 1. The quota-blocked batch — do these together when a provider answers
 
-Three separate items, one blocker. Groq and Cerebras returned 429 throughout
-2026-08-08, so none of them could be finished; all three want a working
-provider and two of them want a re-index, so batch them.
+Three items, one blocker. Groq and Cerebras returned 429 throughout 2026-08-08,
+so none could be finished; all three want a working provider and two want a
+re-index, so batch them.
 
 - **Re-run summaries.** Every chunk indexed on 2026-08-08 carries a placeholder
   summary. Symbols, spans, embeddings and graph edges are all correct; only
   summaries are affected, and they feed retrieval quality. No re-index needed,
   just the summary pass.
-- **Bench the resolver change.** `b3f43f5` adds call edges, which change
+- **Bench `b3f43f5`.** It adds call edges, which change
   `chunks.neighbor_symbols`, which the retrieval path reads. It plausibly moves
   ranking and has never been measured — it landed by direct push while the
   artifact gate still existed, and `d84e98d` has since removed that gate
-  entirely. Nothing will catch this now, so it is a deliberate `make
-  test-eval-sampled` run rather than something CI will remind anyone about.
-- **Re-measure the graph table, and the map's own numbers.** STATUS previously
-  claimed 379 cross-package edges on fastapi and 213 on flask. Rolling the graph
-  up per module measures 81 unique module→module pairs on flask, so those two
-  figures describe something else and should not be quoted until re-derived.
-- **Re-measure the neighbour column.** Recipe version 5 means snapshots rebuild on
-  next visit; the "With ≥1 neighbour" column above was measured at version 4 and
-  can only have risen.
+  entirely. Nothing automated will catch this now, so it is a deliberate
+  `make test-eval-sampled` run. **Only this one needs it**: recipe 6's `defines`
+  edges never reach retrieval, because `neighbor_symbols` comes from the parser
+  rather than from adjacency, and the agent-facing loader does not read them.
+- **Re-measure, and drop two figures that do not survive checking.** Re-index at
+  recipe 6, then re-run the queries for the *With ≥1 neighbour* column, which
+  was measured at version 4 and can only have risen. While there: this file used
+  to claim 379 cross-package edges on fastapi and 213 on flask. Rolled up per
+  module the map measures 81 unique module→module pairs on flask, so those two
+  numbers describe something else and should not be quoted until re-derived.
 
 ---
 

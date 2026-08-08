@@ -226,17 +226,27 @@ async def answer_question(
                 # the event loop that stalls every other request on the worker
                 # until it finishes, which the web proxy sees as a socket hang
                 # up (ECONNRESET).
-                ranked = await asyncio.to_thread(
-                    rerank_and_diversify,
-                    question,
-                    pool_hits,
-                    pool_chunks,
-                    k=k,
-                    lambda_=settings.rerank_lambda,
-                    max_pool=max_pool,
-                )
-                ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
-                initial_chunks = [content for _, content in ranked]
+                try:
+                    ranked = await asyncio.to_thread(
+                        rerank_and_diversify,
+                        question,
+                        pool_hits,
+                        pool_chunks,
+                        k=k,
+                        lambda_=settings.rerank_lambda,
+                        max_pool=max_pool,
+                    )
+                except Exception as exc:
+                    # Reranking is ordering, not answering. A missing/corrupt
+                    # ONNX cache used to raise here and drop the whole question
+                    # to the keyword-only deterministic fallback; degrade to the
+                    # retrieval order instead and keep the LLM answer.
+                    log.warning("rerank.failed", error=str(exc))
+                    ctx.retrieval_path.append(f"rerank_skipped:{type(exc).__name__}")
+                    initial_chunks = pool_chunks[:k]
+                else:
+                    ctx.retrieval_path.append(f"rerank:pool={len(pool_hits)}:k={len(ranked)}")
+                    initial_chunks = [content for _, content in ranked]
             else:
                 # read_chunks dropped refs (stale index?) — fall back untranked.
                 initial_chunks = pool_chunks[:k]

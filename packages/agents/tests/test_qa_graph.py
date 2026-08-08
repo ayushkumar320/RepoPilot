@@ -365,6 +365,48 @@ async def test_rerank_pool_size_comes_from_settings(monkeypatch: pytest.MonkeyPa
 
 
 @pytest.mark.asyncio
+async def test_rerank_failure_degrades_instead_of_killing_the_answer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A broken cross-encoder must cost ordering, not the whole answer.
+
+    A wiped/partial ONNX cache raised out of ``rerank_and_diversify`` and took
+    the question down to the API's keyword-only deterministic fallback.
+    """
+
+    async def many_hits(question: str, **kw: Any) -> list[ChunkHit]:
+        return [
+            ChunkHit(ref=_ref(f"sym{i}", line=i + 1), distance=0.01 * i, kind="function")
+            for i in range(40)
+        ]
+
+    def boom(query: str, hits: Any, contents: Any, **kw: Any) -> list[Any]:
+        raise RuntimeError("NO_SUCHFILE: model.onnx missing")
+
+    monkeypatch.setattr(qa_graph, "hybrid_search", many_hits)
+    monkeypatch.setattr(qa_graph, "vector_search", many_hits)
+    monkeypatch.setattr(qa_graph, "rerank_and_diversify", boom)
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "sym0 returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does sym0 return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        k=8,
+        recall_k=50,
+    )
+
+    assert "rerank_skipped:RuntimeError" in result.retrieval_path
+    assert result.claims, "answer should still be produced without the reranker"
+
+
+@pytest.mark.asyncio
 async def test_compression_is_off_by_default_even_when_requested(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

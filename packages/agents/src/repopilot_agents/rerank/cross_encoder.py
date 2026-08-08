@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import threading
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import structlog
@@ -55,7 +56,13 @@ class CrossEncoderReranker:
         from fastembed.rerank.cross_encoder import TextCrossEncoder
 
         log.info("rerank.model_loading", model=self.model_name)
-        return TextCrossEncoder(self.model_name)
+        # fastembed defaults its cache to tempfile.gettempdir(); macOS reaps
+        # /var/folders/... periodically, which leaves a half-populated snapshot
+        # dir and makes the ONNX load fail with NO_SUCHFILE. Keep the weights
+        # under the user cache dir so a tmp sweep can't gut them.
+        cache_dir = Path.home() / ".cache" / "repopilot" / "fastembed"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        return TextCrossEncoder(self.model_name, cache_dir=str(cache_dir))
 
     def _ensure_loaded(self) -> Any:
         if self._encoder is None:

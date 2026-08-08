@@ -313,7 +313,6 @@ RepoPilot follows a few hard rules:
 - Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
 - Docker Compose is for local data services; the app dev flow runs API/web directly.
 - Identity is only as strong as the signed session cookie: the web app asserts who signed in, and the API trusts that cookie.
-- The synchronized side-by-side code panel was removed; claims still carry exact `file:line` spans, and `/chunks/{chunk_id}` still serves the source.
 
 ## License
 

@@ -22,13 +22,13 @@ import {
 } from "@phosphor-icons/react";
 import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
+import { ClaimRow } from "./claim-row";
 import { GraphNeighbours } from "./graph-neighbours";
 import { ModuleMap } from "./module-map";
 import {
   ApiError,
   api,
   type AccountUsage,
-  type ClaimStatus,
   type IntentProfile,
   type RepoEvent,
   type RepoStatus,
@@ -50,24 +50,6 @@ import {
   selectClaim,
   type SessionState,
 } from "@/lib/session-store";
-
-function claimBadgeClass(status: ClaimStatus): string {
-  if (status === "flagged" || status === "rejected") {
-    return "status-badge status-badge-warning";
-  }
-  // "unverified" = the verifier could not run (e.g. every provider was
-  // exhausted). Neutral treatment — neither confirmed nor found wanting.
-  if (status === "unverified") {
-    return "status-badge status-badge-neutral";
-  }
-  return "status-badge status-badge-success";
-}
-
-function claimBadgeLabel(status: ClaimStatus): string {
-  if (status === "flagged" || status === "rejected") return "Review";
-  if (status === "unverified") return "Unverified";
-  return "Verified";
-}
 
 function statusLabel(status?: RepoStatus): string {
   if (!status) return "Not started";
@@ -1046,41 +1028,16 @@ export default function RepoPilotApp({
                         {/* Scrolls past ~4 rows so a twelve-claim answer does
                             not bury the next question. */}
                         <div className="claim-scroll">
-                        {exchange.claimIds.map((claimId) => {
-                          const claim = store.claimsById[claimId];
-                          const flagged = claim.status === "flagged" || claim.status === "rejected";
-                          const unverified = claim.status === "unverified";
-                          return (
-                            <button
-                              key={claimId}
-                              type="button"
-                              className="claim-row"
-                              data-active={store.selectedClaimId === claimId}
-                              data-flagged={flagged}
-                              data-unverified={unverified}
-                              onClick={() => setStore((current) => selectClaim(current, claimId))}
-                            >
-                              <span className="claim-icon" aria-hidden="true">
-                                {flagged || unverified ? (
-                                  <WarningCircle size={19} weight="fill" />
-                                ) : (
-                                  <ShieldCheck size={19} weight="fill" />
-                                )}
-                              </span>
-                              <span className="claim-content">
-                                <strong>{claim.text}</strong>
-                                <span className="claim-reference">
-                                  {claim.refs[0].file_path}:{claim.refs[0].start_line}-
-                                  {claim.refs[0].end_line}
-                                </span>
-                                {claim.verifier_note ? <small>{claim.verifier_note}</small> : null}
-                              </span>
-                              <span className={claimBadgeClass(claim.status)}>
-                                {claimBadgeLabel(claim.status)}
-                              </span>
-                            </button>
-                          );
-                        })}
+                        {exchange.claimIds.map((claimId) => (
+                          <ClaimRow
+                            key={claimId}
+                            claim={store.claimsById[claimId]}
+                            active={store.selectedClaimId === claimId}
+                            onSelect={() =>
+                              setStore((current) => selectClaim(current, claimId))
+                            }
+                          />
+                        ))}
                         </div>
                         {/* One panel per exchange, following the selected claim
                             when the selection is one of this exchange's — so

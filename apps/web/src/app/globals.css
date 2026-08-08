@@ -1796,6 +1796,56 @@ input:focus-visible {
   background: var(--surface);
 }
 
+/* ── Claim to code ──────────────────────────────────────────────────────── */
+
+.claim-row-wrap + .claim-row-wrap {
+  margin-top: 2px;
+}
+
+.claim-source {
+  margin: 2px 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code);
+  overflow: hidden;
+}
+
+.claim-source .neighbour-note {
+  padding: 12px 14px;
+}
+
+.source-view {
+  margin: 0;
+  padding: 10px 0;
+  max-height: 340px;
+  overflow: auto;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--code-text);
+}
+
+.source-line {
+  display: flex;
+  gap: 12px;
+}
+
+/* Fixed width and right-aligned so the code starts at the same column on every
+   row — a ragged gutter is harder to read than no gutter at all. `tabular-nums`
+   keeps it steady when the range crosses a digit boundary (99 -> 100). */
+.source-line-number {
+  flex: 0 0 3.4em;
+  padding-left: 12px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  user-select: none;
+}
+
+.source-line-content {
+  padding-right: 14px;
+  white-space: pre;
+}
+
 /* ── Related code (graph neighbours) ───────────────────────────────────── */
 
 .neighbours {

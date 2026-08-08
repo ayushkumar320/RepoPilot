@@ -607,16 +607,13 @@ The Verifier is the single biggest performance risk in the design. `Qwen/Qwen2.5
 
 ## Q&A drives the synchronized code viewer
 
-> **Not currently shipped.** The synchronized code viewer was removed in
-> `cf18b1b`. Everything below the UI boundary is still true and still built:
-> Q&A answers carry `Claim[]`, every claim carries `refs[]`, and
-> `/chunks/{chunk_id}` still serves the source those refs point at. What no
-> longer exists is the panel that rendered it — so today a claim states a
-> `file:line` and nothing in the app shows that file. Whether to bring it back
-> is an open product question; see "Open product questions" in
-> [`STATUS.md`](STATUS.md). The nearest surviving surface, "Related code",
-> is *not* a replacement: it renders a claim's graph neighbours, not the claim's
-> own source. This section is kept as the design intent it would return to.
+> **Shipped, in a different shape.** The synchronized viewer described below
+> occupied a permanent third column and was removed in `cf18b1b`. Claim-to-code
+> came back without it: a claim expands *inline* to the source it cites, with
+> real file line numbers in the gutter. The column is gone for good — it stood
+> empty most of the time — but the capability it existed for is back, and the
+> layer below the UI never changed. Read the rest as design intent; the
+> mechanism is accurate, the placement is not.
 
 The Q&A subgraph is the user's escape hatch, but its answers are not text-only. Every Q&A answer carries the same `Claim[]` structure as tour sections — meaning every Q&A claim has `refs[]`, and **the UI scrolls the synchronized code viewer to the first ref of the first claim automatically** on answer. The user asks "where does the request lifecycle start?" and the viewer opens the file at the function. This is the synchronized code viewer pulled through the entire product, not just the scripted tour.
 

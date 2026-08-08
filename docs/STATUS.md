@@ -29,6 +29,7 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
 | `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it. Panel-only; the agent-facing loader whitelists the other kinds. `INDEX_RECIPE_VERSION` → 6. |
 | `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
+| _pending_ | Claim-to-code: a claim expands to the source it cites, with real file line numbers. Answers the open product question that had been carried since `cf18b1b`. |
 | `05320a4` | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. |
 
 ## Measured state of the graph data
@@ -99,19 +100,8 @@ provider and two of them want a re-index, so batch them.
 | What | Detail |
 |---|---|
 | `test_httpx_indexing.py` | Both tests pass now — the resolver was fixed and the call-chain test retargeted. Still `slow`/`integration` and still deselected by CI, and both clone over the network, so a failure here is as likely to be a rate limit or a provider 429 as a regression. Run it by hand after any resolver change. |
-| Placeholder summaries | See "next work" #2. |
-| `b3f43f5` never benched | It changes `chunks.neighbor_symbols` and was never measured: it landed by direct push past the then-`pull_request`-only gate, which `d84e98d` has since removed. Not a defect — an unmeasured change on the retrieval path, and now nothing automated will notice. See "next work" #2. |
-
-## Open product questions
-
-**Should claim-to-code come back?** A claim states a `file:line`; nothing in the
-app renders that file's source. The synchronized code panel that did was deleted
-in `cf18b1b`, and "Related code" is not a replacement — it shows a claim's graph
-*neighbours*, so reaching the claim's own source means finding it in a
-neighbour list that may not contain it. `persona-ask.spec.ts` asserted the old
-panel's output until this was resolved; it now asserts the reference text, which
-is what actually ships. Nothing in the test suite is holding the question open
-any more, so it lives here.
+| Placeholder summaries | See "next work" #1. |
+| `b3f43f5` never benched | It changes `chunks.neighbor_symbols` and was never measured: it landed by direct push past the then-`pull_request`-only gate, which `d84e98d` has since removed. Not a defect — an unmeasured change on the retrieval path, and now nothing automated will notice. See "next work" #1. |
 
 ## Conventions worth not relearning
 

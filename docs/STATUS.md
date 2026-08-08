@@ -29,7 +29,7 @@ thirds of neighbours had no source and no cross-module edges existed at all.
 | `12c8428` | "Related code" follows the claim you click instead of always anchoring on the exchange's first claim. |
 | `b3661ac` | `defines` edges — a class or module links to the symbols nested inside it. Panel-only; the agent-facing loader whitelists the other kinds. `INDEX_RECIPE_VERSION` → 6. |
 | `b3661ac` | Multi-hop: a neighbour expands into its own neighbours, three panels deep, one request per step. |
-| _pending_ | Claim-to-code: a claim expands to the source it cites, with real file line numbers. Answers the open product question that had been carried since `cf18b1b`. |
+| `62b9e58` | Claim-to-code: a claim expands to the source it cites, with real file line numbers. Answers the open product question that had been carried since `cf18b1b`. |
 | `05320a4` | The module dependency map. `GET /repos/{id}/graph/modules` rolls the symbol graph up to one node per module; the UI draws it with React Flow + dagre. |
 
 ## Measured state of the graph data

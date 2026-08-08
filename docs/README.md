@@ -6,7 +6,7 @@ The product slice (clone → index → retrieve → answer → verify) ships on 
 
 ## The one-paragraph story
 
-RepoPilot is now organized as a runnable beta with a small public doc set. The live docs explain how to run, understand, and validate the app. Historical product and stack rationale lives under `archive/`; temporary build/phase docs have been removed.
+RepoPilot is now organized as a runnable beta with a small public doc set. The live docs explain how to run, understand, and validate the app. Historical product and stack rationale used to live under `archive/`, removed in `59ac870`; recover it with `git show 59ac870^:docs/archive/02_TECH_STACK.md`. Temporary build/phase docs have been removed too.
 
 ## Read in order (cold pickup)
 
@@ -14,7 +14,7 @@ RepoPilot is now organized as a runnable beta with a small public doc set. The l
 2. [`STARTUP_GUIDE.md`](STARTUP_GUIDE.md) — install, environment, services, API, web, checks.
 3. [`../README.md`](../README.md) — product overview, architecture diagrams, source map.
 4. [`03_ARCHITECTURE.md`](03_ARCHITECTURE.md) — agent topology, state schema, tools, verifier.
-5. [`archive/`](archive/) — product thesis and historical stack rationale.
+5. Product thesis and historical stack rationale — no longer on disk; see `git show 59ac870^:docs/archive/`.
 
 ## Layout
 
@@ -26,5 +26,5 @@ docs/
 ├── 03_ARCHITECTURE.md     agent topology, state, tools, verifier
 ├── DEPLOYMENT.md          production containers, migration, release sequence
 ├── STATEFUL.md            accounts, saved tours, BYOK provider keys
-└── archive/               reference — product thesis + tech stack (git retains everything)
+                           (archive/ removed in 59ac870 — git retains everything)
 ```

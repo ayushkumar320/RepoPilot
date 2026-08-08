@@ -10,14 +10,14 @@ This file is the **primary, always-loaded set of project rules** for RepoPilot. 
 
 **RepoPilot** (internally "Codebase Archaeologist") is a web app where a developer pastes a public GitHub repo URL and gets a **purpose-driven, guided onboarding tour** of an unfamiliar codebase, powered by a multi-agent AI system. Beachhead: junior devs and first-time OSS contributors on **Python** repos.
 
-The distinguishing bet: **before analyzing anything, the system captures pre-context (purpose + focus) and adapts every downstream agent to it.** Product thesis and tech-stack rationale are archived under [`docs/archive/`](docs/archive/) — still true, no longer load-bearing for current work.
+The distinguishing bet: **before analyzing anything, the system captures pre-context (purpose + focus) and adapts every downstream agent to it.** Product thesis and tech-stack rationale used to live in `docs/archive/`; that directory was removed in `59ac870` and the three files are recoverable from `59ac870^`. Still true, no longer load-bearing for current work.
 
 | Want to understand… | Read |
 |---|---|
 | Where the project stands right now | [`docs/STATUS.md`](docs/STATUS.md) |
 | How to run the project locally | [`docs/STARTUP_GUIDE.md`](docs/STARTUP_GUIDE.md) |
 | Agent topology, state schema, tools, verifier | [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) |
-| Historical: product thesis, tech-stack rationale | [`docs/archive/`](docs/archive/) |
+| Historical: product thesis, tech-stack rationale | `git show 59ac870^:docs/archive/01_PROBLEM_AND_SOLUTION.md` (directory removed) |
 
 ---
 
@@ -38,7 +38,7 @@ RepoPilot uses four layers of project knowledge. Know which one to edit.
 
 ## 3. Engineering conventions
 
-Enforced in code review and CI — not optional. Full rationale in [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) (and, historically, in [`docs/archive/02_TECH_STACK.md`](docs/archive/02_TECH_STACK.md)).
+Enforced in code review and CI — not optional. Full rationale in [`docs/03_ARCHITECTURE.md`](docs/03_ARCHITECTURE.md) (and, historically, in `git show 59ac870^:docs/archive/02_TECH_STACK.md`).
 
 - **Truthful over fluent.** Every factual claim from an agent carries a `file:line` ref. Unknown → say so; never invent. Verifier rejections render as "flagged", never silently dropped.
 - **No stat dumps.** Agents emit `Insight` objects (`finding` / `because` / `so_what` / `goal_link`), not raw metrics. Empty `so_what`/`goal_link` fails Pydantic validation by design.

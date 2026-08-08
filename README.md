@@ -301,11 +301,12 @@ RepoPilot follows a few hard rules:
 | [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md) | Local runbook: install, env, services, API, web, checks |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production containers, environment, migration, worker, and release sequence |
 | [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
-| [docs/archive/](docs/archive/) | Product thesis and historical stack rationale |
+| `git show 59ac870^:docs/archive/` | Product thesis and historical stack rationale (directory removed in `59ac870`) |
 
 ## Known Limitations
 
 - AST dependency graphs are currently Python-only; other supported languages use grounded textual retrieval without invented graph edges.
+- Call edges resolve a receiver from its declared type, so a call through a base-class-typed variable lands on the **base**, not on whichever subclass runs. Dynamic dispatch, `getattr`, and untyped attributes yield no edge rather than a guessed one.
 - Public GitHub repos only.
 - Large live repo demos depend on external model/provider quotas.
 - Query Understanding, Ingestion Enrichment, and Context Compression are implemented/evaluated but switched off because their gates missed.

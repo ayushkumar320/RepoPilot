@@ -3,7 +3,7 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-08 · `main` at `0fd9405`
+**Last updated:** 2026-08-08 · `main` at `93f1de4`
 
 ---
 
@@ -79,12 +79,24 @@ Do not ship a whole-repo symbol-level node-link view. fastapi is 7,470 nodes wit
 a median degree of 1–2 — sparse dust rather than structure, and no renderer fixes
 that.
 
-### 2. Re-run summaries when provider quota returns — minutes of work
+### 2. The quota-blocked batch — do these together when a provider answers
 
-Every chunk indexed on 2026-08-08 carries a placeholder summary: Groq and
-Cerebras returned 429 throughout. Symbols, spans, embeddings and graph edges are
-all correct; only summaries are affected, and they feed retrieval quality. No
-re-index needed, just the summary pass.
+Three separate items, one blocker. Groq and Cerebras returned 429 throughout
+2026-08-08, so none of them could be finished; all three want a working
+provider and two of them want a re-index, so batch them.
+
+- **Re-run summaries.** Every chunk indexed on 2026-08-08 carries a placeholder
+  summary. Symbols, spans, embeddings and graph edges are all correct; only
+  summaries are affected, and they feed retrieval quality. No re-index needed,
+  just the summary pass.
+- **Bench the resolver change.** `b3f43f5` landed on `main` by a direct push, so
+  `retrieval-eval-artifact-gate` never ran — it is `pull_request`-only. The
+  change adds call edges, which change `chunks.neighbor_symbols`, which the
+  retrieval path reads. It plausibly moves ranking and has not been measured.
+  Run the bench and commit `evals/results/rag_phaseN/_after.json`.
+- **Re-measure the graph table.** Recipe version 5 means snapshots rebuild on
+  next visit; the "With ≥1 neighbour" column above was measured at version 4 and
+  can only have risen.
 
 ---
 
@@ -94,6 +106,7 @@ re-index needed, just the summary pass.
 |---|---|
 | `test_httpx_indexing.py` | Both tests pass now — the resolver was fixed and the call-chain test retargeted. Still `slow`/`integration` and still deselected by CI, and both clone over the network, so a failure here is as likely to be a rate limit or a provider 429 as a regression. Run it by hand after any resolver change. |
 | Placeholder summaries | See "next work" #2. |
+| `b3f43f5` never benched | It changes `chunks.neighbor_symbols` and reached `main` by direct push, so the `pull_request`-only retrieval gate did not run. Not a defect — an unmeasured change on the retrieval path. See "next work" #2. |
 
 ## Open product questions
 

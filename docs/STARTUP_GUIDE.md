@@ -221,13 +221,27 @@ npm run typecheck
 npm run test:store
 ```
 
-Browser and Lighthouse checks need the web app running:
+The e2e suite needs no server of its own — Playwright starts one on port 3100
+with the OAuth ids cleared, and every spec mocks the API at the network layer.
+Do not point it at 3000: `reuseExistingServer` would hand it whatever dev server
+you already have running, sign-in gate included, and the override would silently
+not apply.
 
 ```bash
 cd apps/web
 npm run test:e2e
+```
+
+Lighthouse does need the app running:
+
+```bash
+cd apps/web
 npm run test:lighthouse
 ```
+
+`typecheck`, `test:store` and `test:e2e` all run in CI on every pull request and
+every push to `main` (the `web` job in `.github/workflows/ci.yml`). Lighthouse
+does not.
 
 The CI retrieval gate requires a fresh `evals/results/rag_phaseN/_after.json` whenever a pull request touches retrieval paths. Two exemptions: a pull request whose only retrieval-path change is a migration, and one labelled `retrieval-eval-exempt` — for edits on those paths that cannot move ranking (concurrency, warmup, logging, annotations). Use the label deliberately; anything that touches what is retrieved or how it is ordered needs the bench run.
 

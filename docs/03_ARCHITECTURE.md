@@ -66,7 +66,7 @@ This is the design document. It is detailed by intent: getting the topology, sta
    │     Hybrid retrieval (≤3 hops):                                         │
    │       vector_search → graph_traverse → judge sufficiency                │
    │     Reads the same IntentProfile; answers are framed accordingly.       │
-   │     Drives the synchronized code viewer just like tour claims do.       │
+   │     Claims carry file:line refs (viewer removed in cf18b1b — see below). │
    └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -76,7 +76,7 @@ A few topology notes the diagram alone doesn't show:
 - **No fixed purpose enum, no fixed lens enum.** The Intent Profiler takes free text and emits a structured `IntentProfile`. Anything a user can articulate is supported. Adding a new kind of stated intent never requires schema changes — only (possibly) a new planner heuristic, and only if existing heuristics don't already produce a good plan.
 - **The Capability Planner is deterministic.** It is not an LLM. It maps `IntentProfile → plan` via testable rules. This is deliberate: planning correctness is verifiable in CI, and the planner does not consume Groq quota.
 - **The capability library is independently invocable.** Each block (Cartographer, Flow Tracer, Lane A/B/C, Decision Archaeology, Teacher, Q&A) takes the `IntentProfile` as input and runs standalone. The library has no internal "this only makes sense if X also ran" assumptions. This is what lets the planner compose freely.
-- **Q&A is universal, not branched.** It is a cross-cutting concern available throughout the lifecycle — before the tour, during the tour, after the tour. It reads the same `IntentProfile` as every other capability, so answers are always goal-anchored. It drives the synchronized code viewer the same way tour claims do.
+- **Q&A is universal, not branched.** It is a cross-cutting concern available throughout the lifecycle — before the tour, during the tour, after the tour. It reads the same `IntentProfile` as every other capability, so answers are always goal-anchored. Its claims carry the same `file:line` refs as tour claims (the viewer that rendered them was removed in `cf18b1b` — see "Q&A drives the synchronized code viewer").
 - **The Verifier wraps every generating capability**, with a conditional retry edge back to the source. It is a sub-graph that fires repeatedly across the run, not a single terminal node.
 - **One shared `ArchaeologistState`.** No subgraph owns its own state; the graph applies typed diffs from each capability's returns.
 - **Capabilities the planner activates in parallel run in parallel.** LangGraph concurrency handles this — e.g., Lane A/B/C in the contribute-shaped plans, or Cartographer + Decision Archaeology in the build-shaped plans.
@@ -97,7 +97,7 @@ A few topology notes the diagram alone doesn't show:
 | **Lane C — Suspicion** | `qwen3-32b` | (Optional, planner-activated.) Explain pre-filtered structural anomalies with guarded language. Every suspicion includes a `to_confirm:` step. Detector subset filterable by `focus_keywords` (security-shaped, async-shaped, IO-shaped). | `graph_metrics`, `read_chunks` | `repo_id`, `intent_profile` | contributes to `opportunity_list[]` |
 | **Decision Archaeology** | `llama-3.3-70b-versatile` | **Schema-reserved, deferred to v0.2.** Will extract architectural decisions + rationale from `git log`, README, commit messages, and the import graph. The state schema and capability-library slot are reserved so v0.2 is a drop-in; the v1 planner does not activate it (the default plan for evaluate-heavy intents falls back to Cartographer + Lane B in `tradeoffs_visible_in_code` framing). | `graph_query`, `graph_metrics`, `read_chunks`, GitPython | `repo_id`, `intent_profile` | `decision_dossier[]` |
 | **Opportunity Ranker** | (deterministic, no LLM) | Combine Lane A/B/C outputs into a single ranked `opportunity_list`. Ranking weights read from `capability_plan.ranker_weights` (planner-derived from `intent_profile.modality_weights`). | (none) | A, B, C outputs, `capability_plan` | `opportunity_list[]` |
-| **Q&A** | `llama-3.3-70b-versatile` (qwen3-32b fallback) | **Universal — always-on, available throughout the lifecycle.** Hybrid retrieval loop with sufficiency judge, ≤ 3 hops. Reads `intent_profile` to frame the answer. Drives the synchronized code viewer like any tour claim. | `vector_search`, `graph_traverse`, `read_chunks` | `user_question`, `repo_id`, `intent_profile` | `draft_tour[]` (appended) |
+| **Q&A** | `llama-3.3-70b-versatile` (qwen3-32b fallback) | **Universal — always-on, available throughout the lifecycle.** Hybrid retrieval loop with sufficiency judge, ≤ 3 hops. Reads `intent_profile` to frame the answer. Emits claims with `file:line` refs (viewer removed in `cf18b1b`). | `vector_search`, `graph_traverse`, `read_chunks` | `user_question`, `repo_id`, `intent_profile` | `draft_tour[]` (appended) |
 | **Verifier** | `Qwen/Qwen2.5-Coder-7B-Instruct` (Hugging Face) | **Universal.** Per-claim grounding check against `read_chunks` PLUS Iteration-2 actionability rubric (goal-relevance against `intent_profile`). Wraps every generating capability. | `read_chunks` | `draft_tour[]` (latest section), `intent_profile` | `verifier_objections[]`, mutates `claim.status` |
 
 ---
@@ -361,6 +361,19 @@ The tools layer is the truthfulness floor. **The LLMs never compute these. They 
 
 **Why these and not more.** Every additional tool is a surface where an agent might invent. Six tools is enough. Any new tool needs a justification that begins with "the model cannot do this from existing tools because…".
 
+**What the three graph tools are reading, and what they are not.** Edges come
+from an AST pass over Python source only (`packages/ingestion/.../graph.py`) —
+a repo with no Python produces no graph at all, and the tools must degrade
+rather than pretend. Call edges resolve a receiver's type from *declarations*:
+an annotation, a constructor call, or a declared return. An untyped
+`self.x = build()` yields no edge, and `owner.member` is emitted only when some
+file defines it. Both rules exist so the graph never contains a symbol no file
+defines. The consequence worth knowing before reading a traversal: a call
+through a base-class-typed variable resolves to the **base**, not to whichever
+subclass runs at runtime — `Client.send` reaches `BaseTransport.handle_request`,
+and `HTTPTransport` connects to it by an inherits edge rather than by the call.
+An agent narrating "send calls HTTPTransport" from that path would be inventing.
+
 ---
 
 ## Hybrid retrieval pattern (the Q&A spine)
@@ -589,6 +602,17 @@ The Verifier is the single biggest performance risk in the design. `Qwen/Qwen2.5
 
 ## Q&A drives the synchronized code viewer
 
+> **Not currently shipped.** The synchronized code viewer was removed in
+> `cf18b1b`. Everything below the UI boundary is still true and still built:
+> Q&A answers carry `Claim[]`, every claim carries `refs[]`, and
+> `/chunks/{chunk_id}` still serves the source those refs point at. What no
+> longer exists is the panel that rendered it — so today a claim states a
+> `file:line` and nothing in the app shows that file. Whether to bring it back
+> is an open product question; see "Open product questions" in
+> [`STATUS.md`](STATUS.md). The nearest surviving surface, "Related code",
+> is *not* a replacement: it renders a claim's graph neighbours, not the claim's
+> own source. This section is kept as the design intent it would return to.
+
 The Q&A subgraph is the user's escape hatch, but its answers are not text-only. Every Q&A answer carries the same `Claim[]` structure as tour sections — meaning every Q&A claim has `refs[]`, and **the UI scrolls the synchronized code viewer to the first ref of the first claim automatically** on answer. The user asks "where does the request lifecycle start?" and the viewer opens the file at the function. This is the synchronized code viewer pulled through the entire product, not just the scripted tour.
 
 Implementation note: the SSE stream for Q&A answers emits the same `claim` events as the tour. The frontend's claim → code-viewer reducer is the same handler in both modes.
@@ -659,7 +683,7 @@ Sign-in ([`apps/web/src/auth.ts`](../apps/web/src/auth.ts), GitHub + JWT, no dat
 | **Active capabilities run (possibly in parallel)** | LangGraph activates only the capability nodes named in `capability_plan.active`. Each reads `intent_profile` and its own entry in `capability_plan.tilts`. Capabilities the planner did not activate do not run — that is the elasticity. |
 | **Verifier wraps every generating capability** | Per-claim grounding check + actionability rubric. The rubric checks goal-relevance against `intent_profile`, not against any fixed purpose enum. |
 | **Teacher composes the output** | Reads `intent_profile.output_shape_preference` (and `capability_plan.output_shape` if the planner overrode it) to choose narrative / ranked_list / dossier / comparison_table. Audience framing comes from `intent_profile.audience_framing`. Lead paragraph echoes `intent_profile.raw_text` verbatim. |
-| **Q&A is reachable throughout** | Universal, cross-cutting. Reads the same `intent_profile`. Drives the synchronized code viewer. Available before, during, and after the planned capabilities have run. |
+| **Q&A is reachable throughout** | Universal, cross-cutting. Reads the same `intent_profile`. Emits claims with `file:line` refs (viewer removed in `cf18b1b`). Available before, during, and after the planned capabilities have run. |
 | **User changes their mind** | The "You said:" chip strip stays editable. Editing the intent re-runs the Profiler + Planner only — no re-indexing. Capabilities that are still relevant under the new plan reuse their cached output; newly-activated capabilities run; deactivated ones don't. |
 
 The traceability property: for every paragraph the user sees, they can point at the entry in `intent_profile` and the capability in `capability_plan` that produced it. This is what "meet the purpose" looks like in practice when the purpose is open-ended.
@@ -672,11 +696,12 @@ The Q&A subgraph is not a node in the planned pipeline — it is a separate subg
 - A user can ask a question **between** planned capabilities. The Q&A subgraph reads whatever capability outputs exist so far; if it needs context the planned pipeline hasn't produced yet, it falls back to hybrid retrieval over the indexed repo.
 - A user can ask a question **after** the planned pipeline completes. Q&A reads the full state and the full `IntentProfile`.
 
-This is what the user means by "Q&A is for everyone" — there is no Q&A-vs-non-Q&A user. Every user has Q&A available the whole time. Every Q&A answer is verified by the same Verifier. Every Q&A answer drives the same synchronized code viewer.
+This is what the user means by "Q&A is for everyone" — there is no Q&A-vs-non-Q&A user. Every user has Q&A available the whole time. Every Q&A answer is verified by the same Verifier. Every Q&A answer carries the same `file:line` refs (the viewer that rendered them was removed in `cf18b1b`).
 
 ### Q&A multi-turn (schema-reserved in v1, surfaced post-v0.1)
 
-`ArchaeologistState.qa_history` is an append-only list of `QAExchange(question: str, answer_claims: list[Claim], asked_at: datetime)`. In v1 the Q&A node *writes* each completed exchange to `qa_history` (capped at the last 8), but the Q&A prompt only consumes the **current** `user_question` plus the `IntentProfile` — each question is answered independently. The slot exists so that the post-v0.1 multi-turn upgrade is a prompt-shape change (inject the last 3 exchanges into the Q&A prompt context) rather than a state-schema migration. See backlog item 13 in [docs/04_BUILD_PLAN.md](04_BUILD_PLAN.md).
+`ArchaeologistState.qa_history` is an append-only list of `QAExchange(question: str, answer_claims: list[Claim], asked_at: datetime)`. In v1 the Q&A node *writes* each completed exchange to `qa_history` (capped at the last 8), but the Q&A prompt only consumes the **current** `user_question` plus the `IntentProfile` — each question is answered independently. The slot exists so that the post-v0.1 multi-turn upgrade is a prompt-shape change (inject the last 3 exchanges into the Q&A prompt context) rather than a state-schema migration. (The build-plan doc that tracked this as backlog item 13 was one of the
+temporary phase docs since removed; git retains it.)
 
 ---
 

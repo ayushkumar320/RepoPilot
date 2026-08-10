@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { askStreamBody, sseHeaders } from "./sse";
+
 const repoUrl = process.env.PLAYWRIGHT_REPO_URL ?? "https://github.com/pallets/flask";
 
 // The app reads NEXT_PUBLIC_API_BASE_URL from .env.local at build time. The
@@ -7,11 +9,6 @@ const repoUrl = process.env.PLAYWRIGHT_REPO_URL ?? "https://github.com/pallets/f
 // next.config.mjs) so the session cookie survives; we must match whatever the
 // running app actually uses.
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
-
-const sseHeaders = {
-  "Cache-Control": "no-cache",
-  Connection: "keep-alive",
-};
 
 const chunkResponse = JSON.stringify({
   chunk_id: "chunk-123",
@@ -106,10 +103,19 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
         };
         const framing = body.intent_profile?.audience_framing ?? null;
         askedFramings.push(framing);
+        const answer = answerFor(framing ?? "nobody");
+        if (path.endsWith("/stream")) {
+          return route.fulfill({
+            status: 200,
+            contentType: "text/event-stream",
+            headers: sseHeaders,
+            body: askStreamBody(answer),
+          });
+        }
         return route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: answerFor(framing ?? "nobody"),
+          body: answer,
         });
       }
 
@@ -184,7 +190,7 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
 
   // Switch lens mid-session and re-ask: the same question must go out under a
   // different persona.
-  await page.getByRole("button", { name: "Competitive analyst" }).click();
+  await page.getByLabel("Answering as").selectOption({ label: "Competitive analyst" });
   await page.getByLabel("Ask this repository").fill("What is the tech stack?");
   await page.getByRole("button", { name: "Ask", exact: true }).click();
 
@@ -247,11 +253,16 @@ test("a claim opens the code it cites, with real file line numbers", async ({ pa
         });
       }
       if (path.includes("/repos/repo-123/ask") && method === "POST") {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: answerFor("a first-time outside contributor preparing a pull request"),
-        });
+        const answer = answerFor("a first-time outside contributor preparing a pull request");
+        if (path.endsWith("/stream")) {
+          return route.fulfill({
+            status: 200,
+            contentType: "text/event-stream",
+            headers: sseHeaders,
+            body: askStreamBody(answer),
+          });
+        }
+        return route.fulfill({ status: 200, contentType: "application/json", body: answer });
       }
       if (path.includes("/chunks/")) {
         chunkRequests.push(path);

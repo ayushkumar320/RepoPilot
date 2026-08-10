@@ -1,12 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { askStreamBody, sseHeaders } from "./sse";
+
 const repoUrl = process.env.PLAYWRIGHT_REPO_URL ?? "https://github.com/pallets/flask";
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
-
-const sseHeaders = {
-  "Cache-Control": "no-cache",
-  Connection: "keep-alive",
-};
 
 /**
  * Captured verbatim from the live endpoint against an indexed flask snapshot,
@@ -165,7 +162,15 @@ async function mockApi(
           body: 'event: first_impression\ndata: {"v":1,"text":"Flask looks routing-heavy."}\n\nevent: done\ndata: {"v":1}\n\n',
         });
       }
-      if (path.includes("/repos/repo-123/ask") && method === "POST") {
+      if (path.endsWith("/repos/repo-123/ask/stream") && method === "POST") {
+        return route.fulfill({
+          status: 200,
+          contentType: "text/event-stream",
+          headers: sseHeaders,
+          body: askStreamBody(answerBody),
+        });
+      }
+      if (path.endsWith("/repos/repo-123/ask") && method === "POST") {
         return route.fulfill({ status: 200, contentType: "application/json", body: answerBody });
       }
       if (path.endsWith("/me")) {

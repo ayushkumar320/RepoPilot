@@ -28,7 +28,7 @@ import asyncio
 import json
 import re
 import time
-from collections.abc import Iterator, Sequence
+from collections.abc import Awaitable, Callable, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 
@@ -136,6 +136,9 @@ def _timed(ctx: _Context, stage: str) -> Iterator[None]:
 
 _JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
 
+# Called with each newly visible slice of the answer as it is generated.
+TokenSink = Callable[[str], Awaitable[None]]
+
 
 async def answer_question(
     question: str,
@@ -153,6 +156,7 @@ async def answer_question(
     use_compress: bool = True,
     retry_429_attempts: int | None = None,
     intent_profile: IntentProfile | None = None,
+    on_token: TokenSink | None = None,
 ) -> QAResult:
     """Run the hybrid-retrieval Q&A loop for ``question``.
 
@@ -312,6 +316,7 @@ async def answer_question(
             ctx.chunks,
             retry_429_attempts=retry_429_attempts,
             intent_profile=intent_profile,
+            on_token=on_token,
         )
 
     if _is_not_found(answer_text):
@@ -573,6 +578,38 @@ async def _judge_sufficiency(
         return SufficiencyVerdict(decision="sufficient", reason="schema_error")
 
 
+async def _stream_answer(
+    provider: LLMProvider,
+    messages: list[Message],
+    *,
+    retry_429_attempts: int | None,
+    on_token: TokenSink,
+) -> str:
+    """Stream the answer, publishing only text the reader should actually see.
+
+    Reasoning models open with a ``<think>`` block that restates the prompt.
+    ``strip_reasoning`` over the accumulated buffer is the same filter the
+    non-streaming path applies at the end — run per delta, it hides the block
+    while it is still open and reveals the answer once it closes, so the
+    reader never watches the model think out loud.
+    """
+    raw = ""
+    published = 0
+    async for delta in provider.generate_stream(
+        ModelId.QA_PRIMARY,
+        messages,
+        temperature=0.0,
+        max_tokens=4096,
+        retry_429_attempts=retry_429_attempts,
+    ):
+        raw += delta
+        visible = strip_reasoning(raw)
+        if len(visible) > published:
+            await on_token(visible[published:])
+            published = len(visible)
+    return strip_reasoning(raw) or raw.strip()
+
+
 async def _generate_answer(
     provider: LLMProvider,
     question: str,
@@ -580,14 +617,20 @@ async def _generate_answer(
     *,
     retry_429_attempts: int | None,
     intent_profile: IntentProfile | None = None,
+    on_token: TokenSink | None = None,
 ) -> str:
     user_prompt = answer_user_prompt(question, chunks)
+    messages = [
+        Message("system", answer_system(intent_profile)),
+        Message("user", user_prompt),
+    ]
+    if on_token is not None:
+        return await _stream_answer(
+            provider, messages, retry_429_attempts=retry_429_attempts, on_token=on_token
+        )
     response = await provider.generate(
         ModelId.QA_PRIMARY,
-        [
-            Message("system", answer_system(intent_profile)),
-            Message("user", user_prompt),
-        ],
+        messages,
         temperature=0.0,
         # Reasoning-model headroom: Cerebras gpt-oss-120b spends its budget in
         # a separate `reasoning` field before emitting content — a hard
@@ -676,5 +719,6 @@ __all__ = [
     "NOT_FOUND_SENTINEL",
     "RECALL_K",
     "QAResult",
+    "TokenSink",
     "answer_question",
 ]

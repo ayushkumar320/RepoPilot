@@ -297,6 +297,81 @@ export const api = {
       body: JSON.stringify({ question, intent_profile: intentProfile }),
     });
   },
+  /** Same answer as `askRepo`, with `onToken` called as the text arrives.
+   *
+   *  The resolved answer — not the streamed text — is the real one: it went
+   *  through claim parsing and the verifier, and replaces whatever was shown
+   *  while it generated. Falls back to the buffered endpoint if the stream is
+   *  unavailable (an old API, or a proxy that buffers `text/event-stream`). */
+  async askRepoStreaming(
+    repoId: string,
+    question: string,
+    intentProfile: IntentProfile | null,
+    onToken: (text: string) => void,
+  ): Promise<QAAnswerResponse> {
+    let response: Response;
+    try {
+      response = await fetch(`${API_BASE}/repos/${repoId}/ask/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, intent_profile: intentProfile }),
+        cache: "no-store",
+        credentials: "include",
+      });
+    } catch {
+      return api.askRepo(repoId, question, intentProfile);
+    }
+    if (!response.ok || !response.body) {
+      return api.askRepo(repoId, question, intentProfile);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let answer: QAAnswerResponse | undefined;
+    let failure: ApiError | undefined;
+
+    // SSE frames are separated by a blank line; a chunk can split one in half.
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const frames = buffer.split("\n\n");
+      buffer = frames.pop() ?? "";
+      for (const frame of frames) {
+        // The event name rides its own line; only the rest is JSON.
+        const lines = frame.split("\n");
+        const name = lines
+          .find((line) => line.startsWith("event:"))
+          ?.slice(6)
+          .trim();
+        const data = lines
+          .filter((line) => line.startsWith("data:"))
+          .map((line) => line.slice(5).trim())
+          .join("");
+        if (!name || !data) continue;
+        const payload = JSON.parse(data) as {
+          text?: string;
+          answer?: QAAnswerResponse;
+          code?: string;
+          message?: string;
+        };
+        if (name === "answer_token" && payload.text) onToken(payload.text);
+        if (name === "answer_done" && payload.answer) answer = payload.answer;
+        if (name === "error") {
+          failure = new ApiError(
+            payload.message ?? "Could not answer that question.",
+            503,
+            payload.code,
+          );
+        }
+      }
+    }
+
+    if (failure) throw failure;
+    if (!answer) throw new ApiError("The answer stream ended early.", 503, "QA_FAILED");
+    return answer;
+  },
   draftIntent(rawText: string): Promise<IntentProfile> {
     return http("/intent", {
       method: "POST",

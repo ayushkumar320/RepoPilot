@@ -270,6 +270,26 @@ class TourDoneEvent(BaseTourEvent):
     event: Literal["done"] = "done"
 
 
+class AnswerTokenEvent(BaseTourEvent):
+    """One newly generated slice of an answer, as the model produces it."""
+
+    event: Literal["answer_token"] = "answer_token"
+    text: str = Field(min_length=1)
+
+
+class AnswerDoneEvent(BaseTourEvent):
+    """The finished answer with its verified claims.
+
+    Carries the whole answer, not a terminator: the streamed text is a preview
+    of one model call, while this is what survived claim parsing and the
+    verifier (and, if the model failed outright, the deterministic fallback).
+    Clients replace what they streamed with ``answer``.
+    """
+
+    event: Literal["answer_done"] = "answer_done"
+    answer: QAAnswerResponse
+
+
 class TourErrorEvent(BaseTourEvent):
     event: Literal["error"] = "error"
     code: str = Field(min_length=1)
@@ -277,7 +297,7 @@ class TourErrorEvent(BaseTourEvent):
 
 
 TourEventType = Annotated[
-    TourFirstImpressionEvent | TourDoneEvent | TourErrorEvent,
+    TourFirstImpressionEvent | AnswerTokenEvent | AnswerDoneEvent | TourDoneEvent | TourErrorEvent,
     Field(discriminator="event"),
 ]
 
@@ -307,6 +327,8 @@ def event_payload(event: BaseTourEvent) -> dict[str, Any]:
 
 __all__ = [
     "AccountUsageResponse",
+    "AnswerDoneEvent",
+    "AnswerTokenEvent",
     "AppendTourMessageRequest",
     "AppendTourMessageResponse",
     "AskRequest",

@@ -5,6 +5,7 @@ import type { ClaimPayload } from "./api/generated.ts";
 import {
   appendExchange,
   applyRepoStatus,
+  chatTitle,
   encodeChunkId,
   hydrateFromTour,
   initialSessionState,
@@ -176,4 +177,12 @@ test("hydrateFromTour replays persisted exchanges in ask order", () => {
   );
   assert.deepEqual(Object.keys(state.claimsById).sort(), ["c1", "c2"]);
   assert.equal(state.selectedClaimId, "c2");
+});
+
+test("chatTitle names a chat after its first question", () => {
+  assert.equal(chatTitle("  What   is the tech stack?  "), "What is the tech stack");
+  assert.equal(
+    chatTitle("Explain how the routing layer resolves a request end to end please"),
+    "Explain how the routing layer resolves a request…",
+  );
 });

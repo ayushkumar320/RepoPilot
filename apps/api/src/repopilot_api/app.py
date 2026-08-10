@@ -15,11 +15,14 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from repopilot_agents.qa import TokenSink
 from repopilot_agents.rerank.cross_encoder import shared_reranker
 from repopilot_agents.state import IntentProfile
 from repopilot_api.access import AccountUsage, AllowanceExceededError
 from repopilot_api.models import (
     AccountUsageResponse,
+    AnswerDoneEvent,
+    AnswerTokenEvent,
     AppendTourMessageRequest,
     AppendTourMessageResponse,
     AskRequest,
@@ -39,6 +42,7 @@ from repopilot_api.models import (
     QAAnswerResponse,
     RepoStatusResponse,
     TourDetailResponse,
+    TourErrorEvent,
     TourMessagePayload,
     TourSummaryResponse,
 )
@@ -278,12 +282,17 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         provider = await get_services().access.provider_for(session_id)
         return await get_services().qa.draft_intent(request.raw_text, provider=provider)
 
-    @app.post("/repos/{repo_id:path}/ask", response_model=QAAnswerResponse)
-    async def ask_repo(
+    async def answer_metered(
         repo_id: str,
         request: AskRequest,
-        session_id: str = Depends(resolve_session),
+        session_id: str,
+        on_token: TokenSink | None = None,
     ) -> QAAnswerResponse:
+        """Reserve the question, answer it, and settle the reservation.
+
+        Shared by the buffered and streaming ask routes so metering and the
+        error contract cannot drift apart between them.
+        """
         await rerank_ready()
         reservation = await get_services().access.reserve_question(session_id, repo_id)
         provider = (
@@ -297,6 +306,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
                 request.question,
                 intent_profile=request.intent_profile,
                 provider=provider,
+                on_token=on_token,
             )
         except RepoNotReadyError as exc:
             await get_services().access.release(reservation)
@@ -327,6 +337,71 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             ) from exc
         await get_services().access.complete(reservation)
         return answer
+
+    @app.post("/repos/{repo_id:path}/ask", response_model=QAAnswerResponse)
+    async def ask_repo(
+        repo_id: str,
+        request: AskRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> QAAnswerResponse:
+        return await answer_metered(repo_id, request, session_id)
+
+    @app.post("/repos/{repo_id:path}/ask/stream")
+    async def ask_repo_stream(
+        repo_id: str,
+        request: AskRequest,
+        session_id: str = Depends(resolve_session),
+    ) -> StreamingResponse:
+        """The same answer as ``/ask``, delivered as it is generated.
+
+        Errors ride the stream as an ``error`` event rather than a status code:
+        the response headers are long gone by the time the model fails.
+        """
+
+        async def event_source() -> AsyncIterator[BaseTourEvent]:
+            queue: asyncio.Queue[BaseTourEvent | None] = asyncio.Queue()
+
+            async def on_token(text: str) -> None:
+                await queue.put(AnswerTokenEvent(text=text))
+
+            async def run() -> None:
+                try:
+                    answer = await answer_metered(repo_id, request, session_id, on_token=on_token)
+                    await queue.put(AnswerDoneEvent(answer=answer))
+                except HTTPException as exc:
+                    # The buffered route's structured detail ({code, message})
+                    # carried over verbatim, so both routes fail the same way.
+                    detail: object = exc.detail
+                    if isinstance(detail, dict):
+                        code = str(detail.get("code", "ASK_FAILED"))
+                        message = str(detail.get("message", detail))
+                    else:
+                        code, message = "ASK_FAILED", str(detail)
+                    await queue.put(TourErrorEvent(code=code, message=message))
+                except Exception:
+                    log.exception("repo.ask_stream_failed", repo_id=repo_id)
+                    await queue.put(
+                        TourErrorEvent(
+                            code="QA_FAILED",
+                            message="RepoPilot could not answer that question right now.",
+                        )
+                    )
+                finally:
+                    await queue.put(None)
+
+            task = asyncio.create_task(run())
+            try:
+                while (event := await queue.get()) is not None:
+                    yield event
+            finally:
+                # The reader closed the tab: stop paying for the answer.
+                task.cancel()
+
+        return StreamingResponse(
+            with_heartbeats(event_source()),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+        )
 
     @app.get("/me", response_model=IdentityResponse)
     async def read_identity(session_id: str = Depends(resolve_session)) -> IdentityResponse:

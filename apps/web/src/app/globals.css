@@ -2052,6 +2052,10 @@ input:focus-visible {
     animation: none;
     background: var(--surface-subtle);
   }
+
+  .answer-caret {
+    animation: none;
+  }
 }
 
 @keyframes fade-in {
@@ -2108,25 +2112,126 @@ input:focus-visible {
   gap: 4px;
 }
 
-/* In the sidebar the picker is a compact single column: it stays reachable
-   for mid-session lens switching without competing with the answers. */
-.tour-navigation .persona-grid {
-  grid-template-columns: 1fr;
+/* The lens sits under the ask box: one row, dropdown plus the free-text
+   field when "Something else" is chosen. */
+.ask-persona {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ask-persona label {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  margin-top: 10px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
 }
 
-.tour-navigation .persona-option {
-  min-height: 0;
-  padding: 10px 12px;
+/* The open list is drawn by the OS, so `accent-color` is the only hook for its
+   selected row — without it macOS paints its own system blue. */
+.ask-persona select {
+  width: auto;
+  min-width: 180px;
+  padding: 7px 30px 7px 10px;
+  font-size: 0.78rem;
+  accent-color: var(--accent);
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-secondary) 50%),
+    linear-gradient(135deg, var(--text-secondary) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
 }
 
-.tour-navigation .persona-option small {
-  display: none;
+.ask-persona select:hover {
+  border-color: var(--accent);
 }
 
-.tour-navigation .feature-field {
-  margin-top: 10px;
+/* Honoured on Windows/Linux, ignored by macOS's native popup. */
+.ask-persona option {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.ask-persona input {
+  flex: 1 1 220px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+}
+
+/* ── Chat session list (sidebar) ────────────────────────────────────────── */
+
+.new-chat-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: calc(100% - 16px);
+  margin: 0 8px 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.new-chat-button:hover {
+  background: var(--surface-subtle);
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-list li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  border-radius: 8px;
+}
+
+.chat-list li:hover,
+.chat-list li[data-active="true"] {
+  background: var(--surface-subtle);
+}
+
+.chat-list li > button:first-child {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chat-list strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-list small {
+  color: var(--text-tertiary);
+  font-size: 0.68rem;
 }
 
 .first-impression {
@@ -2227,4 +2332,28 @@ input:focus-visible {
 .tour-history small {
   color: var(--text-tertiary);
   font-size: 0.72rem;
+}
+
+/* ── Streaming answer ───────────────────────────────────────────────────── */
+
+.answer-pending {
+  color: var(--text-tertiary);
+}
+
+/* Blinking block after the last streamed character, the way a terminal marks
+   "still writing". Respects reduced-motion by holding steady instead. */
+.answer-caret {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: answer-caret-blink 1s steps(2, start) infinite;
+}
+
+@keyframes answer-caret-blink {
+  to {
+    visibility: hidden;
+  }
 }

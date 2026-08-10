@@ -627,7 +627,7 @@ async def _stream_answer(
         if len(visible) > published:
             await on_token(visible[published:])
             published = len(visible)
-    return strip_reasoning(raw) or raw.strip()
+    return strip_reasoning(raw) or NOT_FOUND_SENTINEL
 
 
 async def _generate_answer(
@@ -661,11 +661,12 @@ async def _generate_answer(
     )
     # Reasoning models (qwen3, Qwen-Coder) prefix the answer with a
     # ``<think>…</think>`` block that restates the system prompt. It is not an
-    # answer and every line of it would parse as a claim, so drop it — unless
-    # stripping leaves nothing (unclosed block, budget ran out mid-thought),
-    # where the raw text is still better than a blank answer.
+    # answer and every line of it would parse as a claim, so drop it. If
+    # stripping leaves nothing the block never closed — the token budget ran
+    # out mid-thought and there is no answer at all. Fail clean: publishing the
+    # raw monologue leaks the reasoning and every line of it parses as a claim.
     text = response.text.strip()
-    return strip_reasoning(text) or text
+    return strip_reasoning(text) or NOT_FOUND_SENTINEL
 
 
 def _is_not_found(answer: str) -> bool:

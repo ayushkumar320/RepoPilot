@@ -139,6 +139,33 @@ _SYSTEM_PROMPT = (
 )
 
 
+# Headroom for reasoning models: qwen3 spends its budget inside a <think>
+# block before emitting the verdict JSON, and 1024 ran out mid-thought often
+# enough that `verifier_parse_error` was the commonest rejection reason on a
+# probe run — flagging claims whose only sin was a verifier that never finished
+# its sentence. The verdict itself is one short line; this is thinking room.
+_VERIFIER_MAX_TOKENS = 4096
+
+# Character ceiling on one verifier prompt's chunk payload. Groq rejects an
+# oversized body with 413 before the model ever sees it, which cost the recheck
+# path a wasted call and a provider failover every single time.
+_MAX_PROMPT_CHARS = 40_000
+
+
+def _fit_prompt_budget(
+    cited: Sequence[ChunkContent], extra: Sequence[ChunkContent]
+) -> list[ChunkContent]:
+    """Cited chunks always ride; extras fill whatever budget is left."""
+    used = sum(len(c.content) for c in cited)
+    out = list(cited)
+    for chunk in extra:
+        used += len(chunk.content)
+        if used > _MAX_PROMPT_CHARS:
+            break
+        out.append(chunk)
+    return out
+
+
 def _user_prompt(claim: Claim, chunks: Sequence[ChunkContent]) -> str:
     parts: list[str] = [f"CLAIM:\n{claim.text}\n\nCODE CHUNKS:"]
     for chunk in chunks:
@@ -240,9 +267,7 @@ async def verify_claim(
             ModelId.VERIFIER,
             [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, chunks))],
             temperature=0.0,
-            # Headroom for reasoning models: qwen3 spends its budget in a
-            # <think> block first, so 200 tokens starved the JSON entirely.
-            max_tokens=1024,
+            max_tokens=_VERIFIER_MAX_TOKENS,
             retry_429_attempts=retry_429_attempts,
         )
     except ProviderError as exc:
@@ -335,7 +360,10 @@ async def _recheck_against_answer_context(
     extra_chunks = await read_chunks(extra, engine=engine, repo_id=repo_id)
     if not extra_chunks:
         return None
-    widened = [*cited, *extra_chunks]
+    widened = _fit_prompt_budget(cited, extra_chunks)
+    if len(widened) == len(cited):
+        # Nothing new fit — the recheck would re-ask the identical question.
+        return None
 
     cache_key = _CACHE.key(claim.text, widened)
     cached = _CACHE.get(cache_key)
@@ -347,7 +375,7 @@ async def _recheck_against_answer_context(
             ModelId.VERIFIER,
             [Message("system", _SYSTEM_PROMPT), Message("user", _user_prompt(claim, widened))],
             temperature=0.0,
-            max_tokens=1024,
+            max_tokens=_VERIFIER_MAX_TOKENS,
             retry_429_attempts=retry_429_attempts,
         )
     except ProviderError:

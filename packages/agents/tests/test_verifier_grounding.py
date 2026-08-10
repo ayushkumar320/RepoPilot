@@ -8,7 +8,9 @@ import pytest
 
 from repopilot_agents.types import ChunkContent, CodeRef
 from repopilot_agents.verifier.grounding import (
+    _MAX_PROMPT_CHARS,
     Claim,
+    _fit_prompt_budget,
     _parse_verdict,
     verify_claim,
     verify_claims,
@@ -303,3 +305,27 @@ async def test_verify_claim_uses_full_chunk_content_even_when_compressed(
         repo_id="repo",
     )
     assert result.verdict.decision == "supported"
+
+
+def _chunk(name: str, size: int) -> ChunkContent:
+    return ChunkContent(
+        ref=CodeRef(file_path=f"{name}.py", start_line=1, end_line=2),
+        content="x" * size,
+    )
+
+
+def test_fit_prompt_budget_drops_extras_that_would_overflow() -> None:
+    """A 413 from an oversized body costs a wasted call and a failover."""
+    cited = [_chunk("cited", 30_000)]
+    extra = [_chunk("small", 5_000), _chunk("huge", 50_000), _chunk("late", 1_000)]
+
+    fitted = _fit_prompt_budget(cited, extra)
+
+    assert [c.ref.file_path for c in fitted] == ["cited.py", "small.py"]
+    assert sum(len(c.content) for c in fitted) <= _MAX_PROMPT_CHARS
+
+
+def test_fit_prompt_budget_always_keeps_cited_chunks() -> None:
+    cited = [_chunk("cited", _MAX_PROMPT_CHARS + 1)]
+
+    assert _fit_prompt_budget(cited, [_chunk("extra", 10)]) == cited

@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from repopilot_agents.qa.graph import _stream_answer
+from repopilot_agents.qa.graph import NOT_FOUND_SENTINEL, _stream_answer
 from repopilot_core.llm.models import ModelId
 from repopilot_core.llm.provider import Message
 
@@ -65,3 +65,12 @@ async def test_reasoning_block_is_withheld_until_the_answer_starts() -> None:
     assert "".join(published) == "The router resolves it."
     assert "think" not in answer
     assert answer == "The router resolves it."
+
+
+@pytest.mark.asyncio
+async def test_unclosed_reasoning_block_fails_clean() -> None:
+    """Budget ran out mid-thought: no answer exists, so publish none of it."""
+    answer, published = await _run(["<think>", "weighing the ", "chunks and then it cut"])
+
+    assert published == []
+    assert answer == NOT_FOUND_SENTINEL

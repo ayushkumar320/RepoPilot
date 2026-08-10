@@ -121,3 +121,11 @@ def test_persona_block_stays_within_the_prompt_budget() -> None:
     # success rules. It still has to stay a minority of the 2000-token node
     # budget — the chunks are what the answer is made of.
     assert len(reader_context(CONTRIBUTOR)) // 4 < 350
+
+
+def test_answer_template_leads_with_the_answer_not_a_repo_tour() -> None:
+    """Sections used to be free-form, and the model filled the first one with
+    whatever it had retrieved. The reply to the question has to come first."""
+    assert "'## Answer'" in ANSWER_SYSTEM
+    assert "Introduction to the codebase" in ANSWER_SYSTEM  # named as the anti-pattern
+    assert "because it was retrieved" in ANSWER_SYSTEM

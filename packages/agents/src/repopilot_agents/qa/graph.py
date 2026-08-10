@@ -654,8 +654,16 @@ def _is_not_found(answer: str) -> bool:
     A detailed answer is allowed to say "I couldn't find a test for this" in
     one of its lines; substring-matching the whole body threw away the other
     twelve grounded claims with it. Only a short, sentinel-shaped reply counts.
+
+    Headers are dropped first: the answer template asks for '## Answer' and
+    '## Where to look next', so a model that has nothing to say still wraps the
+    sentinel in section headings, and counting those hid the sentinel entirely.
     """
-    lines = [line for line in answer.strip().splitlines() if line.strip()]
+    lines = [
+        line
+        for line in answer.strip().splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
     if len(lines) != 1:
         return False
     norm = lines[0].strip().lower()

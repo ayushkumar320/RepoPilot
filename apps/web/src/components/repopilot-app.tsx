@@ -282,16 +282,48 @@ export interface Viewer {
   image: string | null;
 }
 
-/** Render the answer body: "## " lines become headings, "[3]" citation
- *  markers become superscripts, everything else is a paragraph. The claim
- *  list below the answer carries the actual source links. */
+/** Render one answer line: `backticked` spans become code, "[3]" citation
+ *  markers become superscripts. The claim list below the answer carries the
+ *  actual source links. */
+function AnswerLine({ text }: { text: string }) {
+  // Splitting on both patterns at once keeps a citation that lands inside a
+  // code span from being swallowed by it.
+  const parts = text.split(/(`[^`]+`|\[\d+\])/g).filter(Boolean);
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (/^\[\d+\]$/.test(part)) {
+          return (
+            <sup className="answer-citation" key={index}>
+              {part.slice(1, -1)}
+            </sup>
+          );
+        }
+        if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
+          return (
+            <code className="answer-code" key={index}>
+              {part.slice(1, -1)}
+            </code>
+          );
+        }
+        return <span key={index}>{part}</span>;
+      })}
+    </>
+  );
+}
+
+/** Render the answer body: "## " lines become headings, everything else is a
+ *  claim line. The first section is the direct answer to the question, so it
+ *  is styled to lead rather than reading like one more detail. */
 function AnswerBody({ text }: { text: string }) {
   const lines = text.split("\n").filter((line) => line.trim().length > 0);
+  let sectionIndex = -1;
   return (
     <div className="section-body answer-body">
       {lines.map((line, index) => {
         const trimmed = line.trim();
         if (trimmed.startsWith("#")) {
+          sectionIndex += 1;
           return (
             <h3 className="answer-heading" key={index}>
               {trimmed.replace(/^#+\s*/, "")}
@@ -299,18 +331,9 @@ function AnswerBody({ text }: { text: string }) {
           );
         }
         const body = trimmed.replace(/^[-•*]\s*/, "");
-        const parts = body.split(/(\[\d+\])/g).filter(Boolean);
         return (
-          <p className="answer-line" key={index}>
-            {parts.map((part, partIndex) =>
-              /^\[\d+\]$/.test(part) ? (
-                <sup className="answer-citation" key={partIndex}>
-                  {part.slice(1, -1)}
-                </sup>
-              ) : (
-                <span key={partIndex}>{part}</span>
-              ),
-            )}
+          <p className="answer-line" data-lead={sectionIndex === 0} key={index}>
+            <AnswerLine text={body} />
           </p>
         );
       })}

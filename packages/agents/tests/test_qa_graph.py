@@ -123,6 +123,25 @@ async def test_hallucination_short_circuit_returns_not_found_sentinel() -> None:
 
 
 @pytest.mark.asyncio
+async def test_not_found_is_recognised_inside_the_section_template() -> None:
+    """The template asks for headers, so even "no answer" arrives wrapped."""
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "## Answer\nI couldn't find that in the repo.\n\n## Where to look next",
+        ]
+    )
+    result = await answer_question(
+        "Why was Python chosen over JavaScript?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert result.answer == NOT_FOUND_SENTINEL
+    assert result.claims == []
+
+
+@pytest.mark.asyncio
 async def test_grounded_answer_produces_verified_claims() -> None:
     provider = _ScriptedProvider(
         [

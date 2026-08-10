@@ -993,6 +993,24 @@ a {
   margin: 0 0 6px;
 }
 
+/* The '## Answer' section is the reply to the question; everything after it is
+   support. Size it so a reader who stops after two lines still got an answer. */
+.answer-line[data-lead="true"] {
+  color: var(--text);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.answer-code {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface-subtle);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.86em;
+  overflow-wrap: anywhere;
+}
+
 .answer-citation {
   margin-left: 2px;
   padding: 0 3px;

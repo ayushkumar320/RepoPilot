@@ -288,13 +288,21 @@ async def answer_question(
 
         with _timed(ctx, "expand"):
             ctx.retrieval_path.append(f"graph_traverse:{verdict.next_symbol}")
-            paths = await graph_traverse(
-                verdict.next_symbol,
-                engine=engine,
-                repo_id=repo_id,
-                edge_types=("calls", "imports", "inherits"),
-                max_depth=2,
-            )
+            try:
+                paths = await graph_traverse(
+                    verdict.next_symbol,
+                    engine=engine,
+                    repo_id=repo_id,
+                    edge_types=("calls", "imports", "inherits"),
+                    max_depth=2,
+                )
+            except Exception as exc:
+                # Expansion is extra context, not the answer. A repo with no
+                # graph_adjacency row (LookupError) or a DB hiccup must not
+                # cost the reader the answer we can already give.
+                log.warning("graph_traverse.failed", error=str(exc))
+                ctx.retrieval_path.append(f"graph_traverse_skipped:{type(exc).__name__}")
+                break
             if not paths:
                 ctx.retrieval_path.append("graph_traverse:empty")
                 break
@@ -537,7 +545,11 @@ def _single_path_prefix(spec: QuerySpec) -> str | None:
     if len(spec.extracted_paths) != 1:
         return None
     path = spec.extracted_paths[0]
-    if path.endswith(".py"):
+    # A dot in the last segment means a file, whatever the language. Testing
+    # for ``.py`` alone turned ``src/index.ts`` into the directory prefix
+    # ``src/index.ts/``, which matches no row — the whole question then
+    # retrieved nothing and answered "I couldn't find that in the repo."
+    if "." in path.rsplit("/", 1)[-1]:
         return path
     return path.rstrip("/") + "/"
 
@@ -555,16 +567,24 @@ async def _judge_sufficiency(
     *,
     retry_429_attempts: int | None,
 ) -> SufficiencyVerdict:
-    response = await provider.generate(
-        ModelId.QA_PRIMARY,
-        [
-            Message("system", SUFFICIENCY_SYSTEM),
-            Message("user", sufficiency_user_prompt(question, chunks)),
-        ],
-        temperature=0.0,
-        max_tokens=1024,
-        retry_429_attempts=retry_429_attempts,
-    )
+    # The judge only decides whether to spend another hop. When it fails the
+    # run must continue with what retrieval already found — letting the error
+    # escape dropped the whole question to the API's keyword-only fallback
+    # ("The language model could not answer this question").
+    try:
+        response = await provider.generate(
+            ModelId.QA_PRIMARY,
+            [
+                Message("system", SUFFICIENCY_SYSTEM),
+                Message("user", sufficiency_user_prompt(question, chunks)),
+            ],
+            temperature=0.0,
+            max_tokens=1024,
+            retry_429_attempts=retry_429_attempts,
+        )
+    except Exception as exc:
+        log.warning("sufficiency.failed", error=str(exc))
+        return SufficiencyVerdict(decision="sufficient", reason="provider_error")
     match = _JSON_RE.search(response.text)
     if match is None:
         return SufficiencyVerdict(decision="sufficient", reason="parse_error")

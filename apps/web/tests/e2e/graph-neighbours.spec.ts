@@ -200,7 +200,7 @@ async function askAQuestion(page: import("@playwright/test").Page) {
   await page.getByLabel("Public GitHub URL").fill(repoUrl);
   await page.getByRole("button", { name: "Open-source contributor" }).click();
   await page.getByRole("button", { name: "Analyze and ask" }).click();
-  await expect(page.getByRole("heading", { name: "Ask this repository" })).toBeVisible({
+  await expect(page.getByLabel("Ask this repository")).toBeVisible({
     timeout: 15_000,
   });
   await page.getByLabel("Ask this repository").fill("What is the tech stack?");
@@ -208,6 +208,14 @@ async function askAQuestion(page: import("@playwright/test").Page) {
   await expect(page.getByText("Flask is the application object.")).toBeVisible({
     timeout: 15_000,
   });
+  // Sources now fold into a "Verified sources" disclosure, so everything a
+  // claim carries — its citation, the Related code panel — is inside it.
+  await openSources(page);
+}
+
+/** Unfold the per-answer sources list. */
+async function openSources(page: import("@playwright/test").Page) {
+  await page.locator("summary.claim-group-label").first().click();
 }
 
 test("related code expands a claim into its graph neighbours", async ({ page }) => {

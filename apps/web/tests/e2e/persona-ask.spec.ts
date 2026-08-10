@@ -172,7 +172,7 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
   await page.getByRole("button", { name: "Analyze and ask" }).click();
 
   // One action gets us all the way to the ask surface — no "start tour" click.
-  await expect(page.getByRole("heading", { name: "Ask this repository" })).toBeVisible({
+  await expect(page.getByLabel("Ask this repository")).toBeVisible({
     timeout: 15_000,
   });
 
@@ -182,6 +182,10 @@ test("paste a repo, pick a persona, and ask — no tour step in between", async 
   await expect(page.getByText("Answered for a first-time outside contributor")).toBeVisible({
     timeout: 15_000,
   });
+
+  // Sources fold into a "Verified sources" disclosure; the citation lives
+  // inside it.
+  await page.locator("summary.claim-group-label").first().click();
 
   // The claim states where it came from. Opening that source is covered by
   // "a claim opens the code it cites" below; this test stays about persona
@@ -304,13 +308,14 @@ test("a claim opens the code it cites, with real file line numbers", async ({ pa
   await page.getByLabel("Public GitHub URL").fill(repoUrl);
   await page.getByRole("button", { name: "Open-source contributor" }).click();
   await page.getByRole("button", { name: "Analyze and ask" }).click();
-  await expect(page.getByRole("heading", { name: "Ask this repository" })).toBeVisible({
+  await expect(page.getByLabel("Ask this repository")).toBeVisible({
     timeout: 15_000,
   });
   await page.getByLabel("Ask this repository").fill("What is the tech stack?");
   await page.getByRole("button", { name: "Ask", exact: true }).click();
 
   const claim = page.getByRole("button", { name: /The Flask class is the main app entry/ });
+  await page.locator("summary.claim-group-label").first().click({ timeout: 15_000 });
   await expect(claim).toBeVisible({ timeout: 15_000 });
 
   // Collapsed until asked for: a claim nobody opens costs no chunk fetch.

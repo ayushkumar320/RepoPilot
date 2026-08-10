@@ -419,8 +419,14 @@ export const api = {
       }),
     });
   },
-  listTours(): Promise<TourSummary[]> {
-    return http("/tours");
+  async listTours(): Promise<TourSummary[]> {
+    // The sidebar maps over this directly. Any non-array body — an error
+    // envelope, a stubbed endpoint, a 200 with `{}` — threw "tours.map is not
+    // a function" during render, which React escalates to a blank page with
+    // "Application error: a client-side exception has occurred". One bad
+    // response for the chat list must not take the whole app down.
+    const tours = await http<TourSummary[]>("/tours");
+    return Array.isArray(tours) ? tours : [];
   },
   getTour(tourId: string): Promise<TourDetail> {
     return http(`/tours/${encodeURIComponent(tourId)}`);

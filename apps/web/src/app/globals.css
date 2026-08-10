@@ -40,6 +40,12 @@
      a surface leaves by accelerating away, the inverse of how it arrived. */
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --exit-duration: 220ms;
+  /* Height of the sticky app header; the chat drawer starts below it so the
+     brand and account controls stay reachable while it is open. */
+  --header-height: 64px;
+  /* Height of the sticky app header; the chat drawer and its backdrop start
+     below it, so the brand and account controls stay reachable. */
+  --header-height: 64px;
 
   /* Spring motion, expressed in Apple's damping/response terms and sampled
      into a linear() ramp. Nothing here is gesture-driven, so we need the
@@ -110,7 +116,6 @@
 }
 
 html {
-  min-width: 320px;
   scroll-behavior: smooth;
   background: var(--canvas);
 }
@@ -160,7 +165,7 @@ a {
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   min-height: 64px;
   padding: 0 max(24px, calc((100vw - 1440px) / 2));
   background: color-mix(in srgb, var(--canvas) 82%, transparent);
@@ -187,8 +192,6 @@ a {
 .product-brand,
 .header-context,
 .repo-status,
-.workspace-meta,
-.workspace-title,
 .navigation-heading,
 .section-complete,
 .claim-reference,
@@ -199,6 +202,8 @@ a {
 }
 
 .product-brand {
+  /* Header reads hamburger, brand, then account controls at the far end. */
+  margin-right: auto;
   gap: 10px;
   font-size: 0.95rem;
   font-weight: 680;
@@ -495,8 +500,7 @@ a {
 .mode-button,
 .claim-row,
 .icon-button,
-.usage-control,
-.tour-history li > button:first-child {
+.usage-control {
   transition-property: background, border-color, color, box-shadow, transform;
   transition-duration: 140ms, 140ms, 140ms, 140ms, var(--press-out);
   transition-timing-function: ease, ease, ease, ease, var(--ease-out);
@@ -507,8 +511,7 @@ a {
 .mode-button:active,
 .claim-row:active,
 .icon-button:active:not(:disabled),
-.usage-control:active,
-.tour-history li > button:first-child:active {
+.usage-control:active {
   transform: scale(0.97);
   /* Down is near-instant; only the release gets eased. */
   transition-duration: 140ms, 140ms, 140ms, 140ms, var(--press-in);
@@ -759,37 +762,6 @@ a {
   padding: 24px 0 40px;
 }
 
-.workspace-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  min-height: 58px;
-  margin-bottom: 20px;
-}
-
-.workspace-title {
-  gap: 12px;
-}
-
-.workspace-title > div:last-child {
-  display: grid;
-  gap: 2px;
-}
-
-.workspace-title span {
-  color: var(--text-tertiary);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.69rem;
-}
-
-.workspace-title h1 {
-  margin: 0;
-  font-size: 1.08rem;
-  font-weight: 650;
-  letter-spacing: -0.025em;
-}
-
 .icon-button {
   display: grid;
   width: 36px;
@@ -807,30 +779,8 @@ a {
   background: var(--surface-subtle);
 }
 
-.workspace-meta {
-  justify-content: flex-end;
-  gap: 10px;
-  min-width: 0;
-}
-
-.focus-summary {
-  overflow: hidden;
-  max-width: 42vw;
-  color: var(--text-secondary);
-  font-size: 0.76rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .workspace-alert {
   margin: 0 0 16px;
-}
-
-.workspace-grid {
-  display: grid;
-  grid-template-columns: minmax(170px, 0.42fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
 }
 
 .tour-navigation,
@@ -839,11 +789,6 @@ a {
   border-radius: var(--radius-panel);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-}
-
-.tour-navigation {
-  position: sticky;
-  top: 88px;
 }
 
 .tour-navigation {
@@ -856,34 +801,6 @@ a {
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 620;
-}
-
-.tour-navigation nav {
-  display: grid;
-  gap: 3px;
-}
-
-.tour-navigation nav a {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 36px;
-  padding: 8px;
-  border-radius: 6px;
-  color: var(--text-secondary);
-  font-size: 0.74rem;
-  line-height: 1.35;
-}
-
-.tour-navigation nav a:hover {
-  color: var(--text);
-  background: var(--surface-subtle);
-}
-
-.tour-navigation nav a svg {
-  flex: 0 0 auto;
-  color: var(--accent);
 }
 
 .navigation-empty {
@@ -921,9 +838,16 @@ a {
 }
 
 .tour-content {
+  display: flex;
   min-width: 0;
-  padding: 4px 28px 24px;
+  /* Fills the viewport so the sticky composer sits at the bottom edge even
+     with a single answer — or none — above it. */
+  min-height: calc(100dvh - var(--header-height) - 120px);
+  flex-direction: column;
+  /* Room for the fixed composer, so the last answer is never behind it. */
+  padding: 4px 28px 168px;
 }
+
 
 .tour-section {
   padding: 28px 0 30px;
@@ -1051,14 +975,36 @@ a {
 }
 
 .claim-group-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-  color: var(--text-tertiary);
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
   font-size: 0.68rem;
   font-weight: 590;
   cursor: pointer;
+  list-style: none;
+}
+
+.claim-group-label::-webkit-details-marker {
+  display: none;
+}
+
+.claim-group-label:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.claim-group-label svg {
+  color: var(--text-tertiary);
+  transition: transform 160ms ease;
+}
+
+.claim-group[open] > .claim-group-label svg {
+  transform: rotate(180deg);
 }
 
 .claim-group-count {
@@ -1067,14 +1013,6 @@ a {
   border-radius: 999px;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.62rem;
-}
-
-/* ~4 rows, then scroll: a twelve-claim answer pushed the next question off
-   the screen entirely. */
-.claim-scroll {
-  max-height: 23rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .claim-row {
@@ -1558,11 +1496,6 @@ input:focus-visible {
     grid-template-columns: minmax(280px, 0.62fr) minmax(560px, 1.38fr);
     gap: 48px;
   }
-
-  .tour-navigation {
-    position: static;
-    display: none;
-  }
 }
 
 @media (max-width: 960px) {
@@ -1597,12 +1530,13 @@ input:focus-visible {
     padding-top: 0;
   }
 
-  .workspace-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 680px) {
+  :root {
+    --header-height: 56px;
+  }
+
   .app-header {
     min-height: 56px;
     padding: 0 16px;
@@ -1628,6 +1562,12 @@ input:focus-visible {
     width: 36px;
     padding: 0;
     justify-content: center;
+  }
+
+  /* Who is signed in is implied by being signed in; the name is the first
+     thing to go when the header runs out of room. */
+  .account-name {
+    display: none;
   }
 
   .onboarding-layout {
@@ -1677,8 +1617,7 @@ input:focus-visible {
     width: 100%;
   }
 
-  .mode-switch,
-  .persona-grid {
+  .mode-switch {
     grid-template-columns: 1fr;
   }
 
@@ -1699,16 +1638,14 @@ input:focus-visible {
     padding-top: 14px;
   }
 
-  .workspace-header {
-    align-items: flex-start;
-  }
-
-  .workspace-meta {
-    display: none;
-  }
-
   .tour-content {
-    padding: 4px 18px 18px;
+    padding: 4px 14px 180px;
+  }
+
+  /* Identifiers and paths in answers have no spaces to break on. */
+  .answer-line,
+  .tour-section-heading h2 {
+    overflow-wrap: anywhere;
   }
 
   .tour-section {
@@ -1757,113 +1694,6 @@ input:focus-visible {
 
 /* Reduced motion means a gentler equivalent, not silence. Movement goes away;
    opacity and colour changes stay, because they carry meaning. */
-/* ── Module map (repo-level dependency graph) ──────────────────────────── */
-
-.module-map {
-  margin-bottom: 18px;
-}
-
-.module-map-body {
-  margin-top: 10px;
-}
-
-/* React Flow needs a definite height — its canvas is absolutely positioned, so
-   an auto-height parent collapses to nothing and the map renders invisible. */
-.module-map-canvas {
-  height: 420px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-/* Width and height must match NODE_WIDTH / NODE_HEIGHT in module-map.tsx —
-   dagre places boxes by those numbers before anything is measured. */
-.module-box {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  justify-content: center;
-  height: 100%;
-  padding: 0 10px;
-  text-align: left;
-}
-
-.module-box-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.module-box-meta {
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-}
-
-.module-map-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-top: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-}
-
-/* ── Claim to code ──────────────────────────────────────────────────────── */
-
-.claim-row-wrap + .claim-row-wrap {
-  margin-top: 2px;
-}
-
-.claim-source {
-  margin: 2px 0 8px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--code);
-  overflow: hidden;
-}
-
-.claim-source .neighbour-note {
-  padding: 12px 14px;
-}
-
-.source-view {
-  margin: 0;
-  padding: 10px 0;
-  max-height: 340px;
-  overflow: auto;
-  font-size: 0.78rem;
-  line-height: 1.55;
-  color: var(--code-text);
-}
-
-.source-line {
-  display: flex;
-  gap: 12px;
-}
-
-/* Fixed width and right-aligned so the code starts at the same column on every
-   row — a ragged gutter is harder to read than no gutter at all. `tabular-nums`
-   keeps it steady when the range crosses a digit boundary (99 -> 100). */
-.source-line-number {
-  flex: 0 0 3.4em;
-  padding-left: 12px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-tertiary);
-  user-select: none;
-}
-
-.source-line-content {
-  padding-right: 14px;
-  white-space: pre;
-}
-
 /* ── Related code (graph neighbours) ───────────────────────────────────── */
 
 .neighbours {
@@ -2034,8 +1864,7 @@ input:focus-visible {
   .mode-button:active,
   .claim-row:active,
   .icon-button:active:not(:disabled),
-  .usage-control:active,
-  .tour-history li > button:first-child:active {
+  .usage-control:active {
     transform: none;
   }
 
@@ -2181,7 +2010,25 @@ input:focus-visible {
   font-size: 0.78rem;
 }
 
-/* ── Chat session list (sidebar) ────────────────────────────────────────── */
+/* ── Chat session list (drawer) ─────────────────────────────────────────── */
+
+.sidebar-close {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: var(--header-height) 0 0;
+  z-index: 39;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--canvas) 55%, #000);
+  cursor: pointer;
+}
 
 .new-chat-button {
   display: flex;
@@ -2265,6 +2112,8 @@ input:focus-visible {
 
 .answers-empty {
   display: grid;
+  flex: 1;
+  align-content: center;
   justify-items: center;
   gap: 8px;
   padding: 48px 24px;
@@ -2303,55 +2152,6 @@ input:focus-visible {
   font-size: 0.8rem;
 }
 
-.tour-history {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 24px;
-}
-
-.tour-history ul {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tour-history li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tour-history li > button:first-child {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.tour-history li > button:first-child:hover {
-  border-color: var(--text-tertiary);
-}
-
-.tour-history strong {
-  font-size: 0.85rem;
-}
-
-.tour-history small {
-  color: var(--text-tertiary);
-  font-size: 0.72rem;
-}
-
 /* ── Streaming answer ───────────────────────────────────────────────────── */
 
 .answer-pending {
@@ -2374,4 +2174,136 @@ input:focus-visible {
   to {
     visibility: hidden;
   }
+}
+
+
+/* ── Chat drawer ───────────────────────────────────────────────────────────
+   One surface at every width, opened from the hamburger in the app header, so
+   a saved chat is the same click away from the setup screen and from an
+   answer. Last in the file so it wins over the panel styling above. */
+.tour-navigation {
+  position: fixed;
+  top: var(--header-height);
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  width: min(310px, 84vw);
+  overflow-y: auto;
+  border-radius: 0;
+  border-width: 0 1px 0 0;
+  transform: translateX(-100%);
+  transition: transform 180ms ease;
+}
+
+.tour-navigation[data-open="true"] {
+  transform: translateX(0);
+}
+
+/* ── Persona picker, narrow layouts ────────────────────────────────────────
+   Seven cards is two screens of scrolling on a phone, so the same choices
+   collapse behind a disclosure. Styled rather than a native <select> so the
+   open list follows the app's theme instead of the OS popup. */
+.persona-dropdown {
+  display: none;
+}
+
+.persona-dropdown summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  cursor: pointer;
+  list-style: none;
+}
+
+.persona-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.persona-dropdown summary strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.persona-dropdown summary small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.persona-dropdown summary svg {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  transition: transform 160ms ease;
+}
+
+.persona-dropdown[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.persona-menu {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+@media (max-width: 680px) {
+  .persona-dropdown {
+    display: block;
+  }
+
+  .persona-grid {
+    display: none;
+  }
+}
+
+/* ── Composer ──────────────────────────────────────────────────────────────
+   The ask box rides the bottom of the viewport while the answers scroll
+   behind it. Sticky rather than fixed: it inherits the column's width, so
+   there is no fixed-position width to keep in sync with the layout. */
+.ask-panel {
+  /* Fixed to the viewport, mirroring the workspace's own width, so it stays
+     put while the answers scroll behind it. */
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  z-index: 30;
+  width: min(1600px, calc(100% - 40px));
+  margin: 0;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  /* Fully opaque: answers scrolling underneath must not read through it. */
+  background: var(--surface);
+}
+
+/* Fills the gap between the composer and the window edge, so nothing shows
+   through below it either. */
+.ask-panel::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: -1px;
+  left: -1px;
+  height: 18px;
+  background: var(--canvas);
+}
+
+.ask-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ask-tools .ask-persona {
+  margin-top: 0;
 }

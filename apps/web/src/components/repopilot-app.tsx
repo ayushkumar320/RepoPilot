@@ -671,6 +671,27 @@ export default function RepoPilotApp({
 
   const personaPicker = (
     <div className="persona-picker">
+      {/* Seven cards is a long scroll on a phone. Same choices, one native
+          control — the grid takes over again from 680px up. */}
+      <div className="persona-dropdown">
+        <select
+          className="text-input"
+          value={personaId}
+          onChange={(event) => setPersonaId(event.target.value)}
+          aria-label="Who is asking"
+        >
+          {PERSONAS.map((persona) => (
+            <option key={persona.id} value={persona.id}>
+              {persona.label}
+            </option>
+          ))}
+          <option value={CUSTOM_PERSONA_ID}>Something else…</option>
+        </select>
+        <p className="field-help">
+          {isCustom ? "Describe who you are below." : personaById(personaId)?.blurb}
+        </p>
+      </div>
+
       <div className="persona-grid" role="group" aria-label="Answer persona">
         {PERSONAS.map((persona) => {
           const active = personaId === persona.id;

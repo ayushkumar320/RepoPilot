@@ -1680,8 +1680,7 @@ input:focus-visible {
     width: 100%;
   }
 
-  .mode-switch,
-  .persona-grid {
+  .mode-switch {
     grid-template-columns: 1fr;
   }
 
@@ -2166,7 +2165,8 @@ input:focus-visible {
 
 /* The open list is drawn by the OS, so `accent-color` is the only hook for its
    selected row — without it macOS paints its own system blue. */
-.ask-persona select {
+.ask-persona select,
+.persona-dropdown select {
   width: auto;
   min-width: 180px;
   padding: 7px 30px 7px 10px;
@@ -2180,12 +2180,18 @@ input:focus-visible {
   background-repeat: no-repeat;
 }
 
-.ask-persona select:hover {
+.persona-dropdown select {
+  width: 100%;
+}
+
+.ask-persona select:hover,
+.persona-dropdown select:hover {
   border-color: var(--accent);
 }
 
 /* Honoured on Windows/Linux, ignored by macOS's native popup. */
-.ask-persona option {
+.ask-persona option,
+.persona-dropdown option {
   color: var(--text);
   background: var(--surface);
 }
@@ -2451,5 +2457,23 @@ input:focus-visible {
 
   .tour-navigation[data-open="true"] {
     transform: translateX(0);
+  }
+}
+
+/* ── Persona picker, narrow layouts ────────────────────────────────────────
+   Seven persona cards is a long scroll on a phone, so the same choices
+   collapse to the native dropdown. Last in the file for the same
+   specificity reason as the drawer block above. */
+.persona-dropdown {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .persona-dropdown {
+    display: block;
+  }
+
+  .persona-grid {
+    display: none;
   }
 }

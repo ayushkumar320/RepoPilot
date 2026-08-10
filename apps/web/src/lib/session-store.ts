@@ -127,6 +127,12 @@ export function applyRepoStatus(state: SessionState, status: RepoStatusResponse)
   return { ...state, repoStatus: status };
 }
 
+/** Name a chat after the question that opened it, the way ChatGPT does. */
+export function chatTitle(question: string): string {
+  const cleaned = question.trim().replace(/\s+/g, " ").replace(/[?.!,;:]+$/, "");
+  return cleaned.length > 48 ? `${cleaned.slice(0, 48).trimEnd()}…` : cleaned;
+}
+
 /** Short human label for a profile, shown against each answer. */
 export function personaLabel(profile: IntentProfile | null): string {
   if (!profile) return "No lens";

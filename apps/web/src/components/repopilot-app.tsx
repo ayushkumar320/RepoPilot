@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   ArrowRight,
+  ChatCircleText,
   CheckCircle,
   ClockCountdown,
   Eye,
@@ -13,6 +14,7 @@ import {
   LockKey,
   MagnifyingGlass,
   PaperPlaneTilt,
+  Plus,
   ShieldCheck,
   SignOut,
   Trash,
@@ -44,6 +46,7 @@ import {
   appendExchange,
   applyFirstImpression,
   applyRepoStatus,
+  chatTitle,
   hydrateFromTour,
   initialSessionState,
   personaLabel,
@@ -333,6 +336,8 @@ export default function RepoPilotApp({
   const [askPrompt, setAskPrompt] = useState("");
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(false);
+  // The answer as it generates, before claims and verification land.
+  const [streaming, setStreaming] = useState<{ question: string; text: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [usage, setUsage] = useState<AccountUsage | null>(null);
   const [providerDialogOpen, setProviderDialogOpen] = useState(false);
@@ -474,15 +479,8 @@ export default function RepoPilotApp({
       const created = await api.createRepo(repoUrl.trim());
       setUsage(await api.getAccountUsage());
       setRepoId(created.repo_id);
-      // History is a convenience, not part of the analyze path: if the tour
-      // cannot be recorded the session still works, just unsaved.
-      void api
-        .createTour(created.repo_id, profile, repositoryName(repoUrl))
-        .then(async ({ tour_id }) => {
-          setTourId(tour_id);
-          setTours(await api.listTours());
-        })
-        .catch(() => undefined);
+      // No tour yet: a chat is created by the first question, so it can be
+      // named after it. Indexing a repo and never asking leaves no empty chat.
       setStore((current) =>
         applyRepoStatus(current, {
           status: created.status,
@@ -520,7 +518,12 @@ export default function RepoPilotApp({
     setErrorMessage(null);
     try {
       const question = askPrompt.trim();
-      const answer = await api.askRepo(repoId, question, profile);
+      setStreaming({ question, text: "" });
+      const answer = await api.askRepoStreaming(repoId, question, profile, (token) =>
+        setStreaming((current) =>
+          current ? { ...current, text: current.text + token } : current,
+        ),
+      );
       setUsage(await api.getAccountUsage());
       setStore((current) =>
         appendExchange(current, {
@@ -532,16 +535,23 @@ export default function RepoPilotApp({
         }),
       );
       setAskPrompt("");
-      if (tourId) {
-        void api
-          .appendTourMessage(tourId, {
-            question,
-            answer: answer.answer,
-            claims: answer.claims,
-            persona_label: personaLabel(profile),
-          })
-          .catch(() => undefined);
-      }
+      // History is a convenience, not part of the ask path: if the chat cannot
+      // be recorded the answer still stands, just unsaved.
+      void (async () => {
+        let chatId = tourId;
+        if (!chatId) {
+          chatId = (await api.createTour(repoId, profile, chatTitle(question))).tour_id;
+          setTourId(chatId);
+        }
+        await api.appendTourMessage(chatId, {
+          question,
+          answer: answer.answer,
+          claims: answer.claims,
+          persona_label: personaLabel(profile),
+        });
+        // Keep the sidebar's titles and question counts honest.
+        setTours(await api.listTours());
+      })().catch(() => undefined);
     } catch (error) {
       if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
         setProviderDialogOpen(true);
@@ -549,6 +559,7 @@ export default function RepoPilotApp({
       setErrorMessage(error instanceof Error ? error.message : "Unable to query this snapshot.");
     } finally {
       setAsking(false);
+      setStreaming(null);
     }
   };
 
@@ -687,6 +698,65 @@ export default function RepoPilotApp({
       ) : null}
     </div>
   );
+
+  // Compact lens control for the workspace: the sidebar is the chat session
+  // list now, so the persona lives under the ask box as a plain <select>.
+  const personaSelect = (
+    <div className="ask-persona">
+      <label htmlFor="ask-persona-select">
+        <UserFocus size={15} aria-hidden="true" />
+        Answering as
+      </label>
+      <select
+        id="ask-persona-select"
+        className="text-input"
+        value={personaId}
+        onChange={(event) => setPersonaId(event.target.value)}
+      >
+        {PERSONAS.map((persona) => (
+          <option key={persona.id} value={persona.id}>
+            {persona.label}
+          </option>
+        ))}
+        <option value={CUSTOM_PERSONA_ID}>Something else…</option>
+      </select>
+      {isCustom ? (
+        <input
+          className="text-input"
+          value={customText}
+          onChange={(event) => {
+            setCustomText(event.target.value);
+            setCustomProfile(null);
+          }}
+          onBlur={() => void structureCustomPersona()}
+          placeholder="I'm writing a migration guide and need the breaking changes"
+          aria-label="Describe who you are and what you need"
+        />
+      ) : null}
+    </div>
+  );
+
+  /** Leave the workspace entirely, back to repository setup. */
+  const leaveWorkspace = () => {
+    setRepoId(undefined);
+    setTourId(undefined);
+    setStore(initialSessionState);
+    window.history.replaceState(null, "", "/");
+    void api.listTours().then(setTours).catch(() => undefined);
+  };
+
+  /** Blank conversation on the same snapshot — the reader stays put, and the
+   *  next question opens (and names) a fresh chat. */
+  const startNewChat = () => {
+    setTourId(undefined);
+    setAskPrompt("");
+    setErrorMessage(null);
+    setStore((current) => ({
+      ...initialSessionState,
+      repoStatus: current.repoStatus,
+      firstImpression: current.firstImpression,
+    }));
+  };
 
   return (
     <main className="app-shell">
@@ -900,13 +970,7 @@ export default function RepoPilotApp({
               <button
                 className="icon-button"
                 type="button"
-                onClick={() => {
-                  setRepoId(undefined);
-                  setTourId(undefined);
-                  setStore(initialSessionState);
-                  window.history.replaceState(null, "", "/");
-                  void api.listTours().then(setTours).catch(() => undefined);
-                }}
+                onClick={leaveWorkspace}
                 aria-label="Back to repository setup"
               >
                 <ArrowLeft size={19} />
@@ -932,22 +996,45 @@ export default function RepoPilotApp({
           ) : null}
 
           <div className="workspace-grid">
-            <aside className="tour-navigation" aria-label="Session lens">
+            {/* Saved chat sessions, newest first — the persistent memory of
+                every repo this reader has asked about. The lens moved under
+                the ask box; it is switchable mid-session either way. */}
+            <aside className="tour-navigation" aria-label="Chat sessions">
+              <button className="new-chat-button" type="button" onClick={startNewChat}>
+                <Plus size={15} weight="bold" aria-hidden="true" />
+                New chat
+              </button>
               <div className="navigation-heading">
-                <UserFocus size={18} aria-hidden="true" />
-                <span>Answering as</span>
+                <ChatCircleText size={18} aria-hidden="true" />
+                <span>Chats</span>
               </div>
-              {/* The lens is switchable mid-session: ask the same question
-                  again as someone else and compare the two answers. */}
-              {personaPicker}
-              <div className="navigation-focus">
-                <span>Priorities</span>
-                <div className="keyword-list">
-                  {(profile?.focus_keywords ?? []).map((keyword) => (
-                    <span key={keyword}>{keyword}</span>
+              {tours.length === 0 ? (
+                <p className="navigation-empty">
+                  Your chats appear here once you ask a repository something.
+                </p>
+              ) : (
+                <ul className="chat-list">
+                  {tours.map((tour) => (
+                    <li key={tour.tour_id} data-active={tour.tour_id === tourId}>
+                      <button type="button" onClick={() => void resumeTour(tour.tour_id)}>
+                        <strong>{tour.title || decodeURIComponent(tour.repo_id)}</strong>
+                        <small>
+                          {tour.message_count} question{tour.message_count === 1 ? "" : "s"} ·{" "}
+                          {new Date(tour.updated_at).toLocaleDateString()}
+                        </small>
+                      </button>
+                      <button
+                        className="icon-button"
+                        type="button"
+                        onClick={() => void removeTour(tour.tour_id)}
+                        aria-label={`Delete chat for ${decodeURIComponent(tour.repo_id)}`}
+                      >
+                        <Trash size={15} />
+                      </button>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              )}
             </aside>
 
             <section className="tour-content" aria-label="Answers" aria-live="polite">
@@ -988,13 +1075,32 @@ export default function RepoPilotApp({
                     {asking ? "Asking" : "Ask"}
                   </button>
                 </div>
+                {personaSelect}
                 <p>
                   Answers use only the indexed snapshot, include source references, and are
                   prioritized for {personaLabel(profile)}.
                 </p>
               </form>
 
-              {store.exchanges.length === 0 ? (
+              {streaming ? (
+                <article className="tour-section tour-section-streaming">
+                  <div className="tour-section-heading">
+                    <h2>{streaming.question}</h2>
+                    <span className="section-complete">
+                      <UserFocus size={15} aria-hidden="true" />
+                      {personaLabel(profile)}
+                    </span>
+                  </div>
+                  {streaming.text ? (
+                    <AnswerBody text={streaming.text} />
+                  ) : (
+                    <p className="answer-line answer-pending">Reading the snapshot…</p>
+                  )}
+                  <span className="answer-caret" aria-hidden="true" />
+                </article>
+              ) : null}
+
+              {store.exchanges.length === 0 && !streaming ? (
                 <div className="answers-empty">
                   <MagnifyingGlass size={26} aria-hidden="true" />
                   <strong>Ask your first question</strong>

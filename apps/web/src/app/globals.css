@@ -40,6 +40,9 @@
      a surface leaves by accelerating away, the inverse of how it arrived. */
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --exit-duration: 220ms;
+  /* Height of the sticky app header; the chat drawer and its backdrop start
+     below it, so the brand and account controls stay reachable. */
+  --header-height: 64px;
 
   /* Spring motion, expressed in Apple's damping/response terms and sampled
      into a linear() ramp. Nothing here is gesture-driven, so we need the
@@ -1559,10 +1562,6 @@ input:focus-visible {
     gap: 48px;
   }
 
-  .tour-navigation {
-    position: static;
-    display: none;
-  }
 }
 
 @media (max-width: 960px) {
@@ -1603,6 +1602,10 @@ input:focus-visible {
 }
 
 @media (max-width: 680px) {
+  :root {
+    --header-height: 56px;
+  }
+
   .app-header {
     min-height: 56px;
     padding: 0 16px;
@@ -1708,7 +1711,19 @@ input:focus-visible {
   }
 
   .tour-content {
-    padding: 4px 18px 18px;
+    padding: 4px 14px 18px;
+  }
+
+  /* A definite height is required (see .module-map-canvas); 420px eats a phone
+     screen whole, so shrink it rather than dropping the map. */
+  .module-map-canvas {
+    height: 260px;
+  }
+
+  /* Identifiers and paths in answers have no spaces to break on. */
+  .answer-line,
+  .tour-section-heading h2 {
+    overflow-wrap: anywhere;
   }
 
   .tour-section {
@@ -2183,6 +2198,32 @@ input:focus-visible {
 
 /* ── Chat session list (sidebar) ────────────────────────────────────────── */
 
+/* Drawer affordances exist only in the narrow layout; the wide layout keeps
+   the sidebar permanently on screen. */
+.sidebar-toggle,
+.sidebar-close,
+.sidebar-backdrop {
+  display: none;
+}
+
+.sidebar-close {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: var(--header-height) 0 0;
+  z-index: 39;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--canvas) 55%, #000);
+  cursor: pointer;
+}
+
 .new-chat-button {
   display: flex;
   align-items: center;
@@ -2310,10 +2351,14 @@ input:focus-visible {
   padding-top: 24px;
 }
 
+/* Scrolls past ~4 entries: a long history must not push the repository form
+   below several screens on a phone. */
 .tour-history ul {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 292px;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2373,5 +2418,38 @@ input:focus-visible {
 @keyframes answer-caret-blink {
   to {
     visibility: hidden;
+  }
+}
+
+/* ── Chat drawer (narrow layouts) ──────────────────────────────────────────
+   Last in the file on purpose: these override the base `display: none` on the
+   drawer controls, and every rule here has the same specificity. */
+@media (max-width: 1220px) {
+  .sidebar-toggle,
+  .sidebar-close {
+    display: grid;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  /* Off-canvas instead of a column, so the answers keep the full width. */
+  .tour-navigation {
+    position: fixed;
+    top: var(--header-height);
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: min(310px, 84vw);
+    overflow-y: auto;
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+  }
+
+  .tour-navigation[data-open="true"] {
+    transform: translateX(0);
   }
 }

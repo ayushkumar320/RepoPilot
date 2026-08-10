@@ -11,6 +11,7 @@ import {
   FileCode,
   GitBranch,
   GithubLogo,
+  List,
   LockKey,
   MagnifyingGlass,
   PaperPlaneTilt,
@@ -369,6 +370,8 @@ export default function RepoPilotApp({
   const [store, setStore] = useState<SessionState>(initialSessionState);
   const [tours, setTours] = useState<TourSummary[]>([]);
   const [tourId, setTourId] = useState<string>();
+  // Off-canvas chat list on narrow screens; always visible from 1220px up.
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
 
   const isCustom = personaId === CUSTOM_PERSONA_ID;
@@ -433,6 +436,16 @@ export default function RepoPilotApp({
     setRepoId(routeRepoId);
     setRepoUrl(`https://github.com/${decodeURIComponent(routeRepoId)}`);
   }, [repoId]);
+
+  // Escape closes the drawer, matching the dialog it visually behaves like.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sidebarOpen]);
 
   useEffect(() => {
     if (!repoId) return;
@@ -588,6 +601,7 @@ export default function RepoPilotApp({
 
   const resumeTour = async (id: string) => {
     setErrorMessage(null);
+    setSidebarOpen(false);
     try {
       const tour = await api.getTour(id);
       // Fetch the snapshot status up front: the workspace only opens once the
@@ -771,6 +785,7 @@ export default function RepoPilotApp({
   /** Blank conversation on the same snapshot — the reader stays put, and the
    *  next question opens (and names) a fresh chat. */
   const startNewChat = () => {
+    setSidebarOpen(false);
     setTourId(undefined);
     setAskPrompt("");
     setErrorMessage(null);
@@ -991,6 +1006,16 @@ export default function RepoPilotApp({
           <header className="workspace-header">
             <div className="workspace-title">
               <button
+                className="icon-button sidebar-toggle"
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open chats"
+                aria-expanded={sidebarOpen}
+                aria-controls="chat-sidebar"
+              >
+                <List size={19} />
+              </button>
+              <button
                 className="icon-button"
                 type="button"
                 onClick={leaveWorkspace}
@@ -1022,7 +1047,20 @@ export default function RepoPilotApp({
             {/* Saved chat sessions, newest first — the persistent memory of
                 every repo this reader has asked about. The lens moved under
                 the ask box; it is switchable mid-session either way. */}
-            <aside className="tour-navigation" aria-label="Chat sessions">
+            {sidebarOpen ? (
+              <button
+                className="sidebar-backdrop"
+                type="button"
+                aria-label="Close chats"
+                onClick={() => setSidebarOpen(false)}
+              />
+            ) : null}
+            <aside
+              className="tour-navigation"
+              id="chat-sidebar"
+              data-open={sidebarOpen}
+              aria-label="Chat sessions"
+            >
               <button className="new-chat-button" type="button" onClick={startNewChat}>
                 <Plus size={15} weight="bold" aria-hidden="true" />
                 New chat
@@ -1030,6 +1068,14 @@ export default function RepoPilotApp({
               <div className="navigation-heading">
                 <ChatCircleText size={18} aria-hidden="true" />
                 <span>Chats</span>
+                <button
+                  className="icon-button sidebar-close"
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  aria-label="Close chats"
+                >
+                  <X size={16} />
+                </button>
               </div>
               {tours.length === 0 ? (
                 <p className="navigation-empty">

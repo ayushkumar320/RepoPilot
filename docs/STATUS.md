@@ -3,7 +3,31 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-08 · `main` at `fdab4b2`
+**Last updated:** 2026-08-10 · `main` at `27fe7c9`
+
+---
+
+## Scope decision — 2026-08-10: no further graph or map work
+
+The "Related code" panel, the module dependency map and both read endpoints
+**remain in the codebase and still ship.** Nothing was removed. What stopped is
+further investment: no symbol-level node-link view, no map iteration, no new
+graph surfaces.
+
+**Open question, and it needs an answer before anyone touches this area.** If
+"not implementing" was meant as *remove*, that is real work, not a doc edit —
+`apps/web/src/components/graph-neighbours.tsx` and `module-map.tsx`,
+`GET /repos/{id}/graph/neighbours` and `/graph/modules`, their services, models
+and specs, plus the `defines` edges added at `INDEX_RECIPE_VERSION = 6`. Until
+that is decided, treat the feature as **frozen, not deprecated**, and leave it
+working.
+
+The 60s promo no longer depicts either surface (`4a92fac`, `27fe7c9`): frame 3
+shows spans resolving out of source, frame 4 shows findings reordering per
+persona. `BRIEF.md` records the constraint so a later pass does not reintroduce
+it. One loose end — narration line 3 still *says* "call graph"; re-synthesizing
+that single line needs HeyGen quota and takes about a minute.
+
 
 ---
 
@@ -31,9 +55,10 @@ current recipe. **Run it, at least once, after shipping ingestion work.**
 
 Two things this session settled that are worth not relitigating:
 
-- **The graph feature has no known gaps.** Every item from the audit — dropped
-  `self.x.y()` calls, the panel ignoring the clicked claim, classes not linked to
-  their methods, one-hop-only, no module map, no claim-to-code — is shipped.
+- **The graph feature has no known gaps** as built. Every item from the audit —
+  dropped `self.x.y()` calls, the panel ignoring the clicked claim, classes not
+  linked to their methods, one-hop-only, no module map, no claim-to-code — is
+  shipped. It is now frozen; see the scope decision above.
 - **CI now covers the frontend**, so the newest work is no longer the part with
   no safety net. 15 store tests and 15 e2e specs run on every push to `main` and
   every pull request.

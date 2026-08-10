@@ -20,7 +20,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_agents.intent.profiler import profile_intent
-from repopilot_agents.qa import QAResult, answer_question
+from repopilot_agents.qa import QAResult, TokenSink, answer_question
 from repopilot_agents.state import IntentProfile
 from repopilot_agents.tools.graph_query import graph_query
 from repopilot_agents.tools.read_chunks import read_chunks
@@ -103,6 +103,7 @@ class QAService(Protocol):
         *,
         intent_profile: IntentProfile | None = None,
         provider: LLMProvider | None = None,
+        on_token: TokenSink | None = None,
     ) -> QAAnswerResponse: ...
 
     async def draft_intent(
@@ -471,6 +472,7 @@ class LiveQAService:
         *,
         intent_profile: IntentProfile | None = None,
         provider: LLMProvider | None = None,
+        on_token: TokenSink | None = None,
     ) -> QAAnswerResponse:
         snapshot_repo_id = await self._snapshot_repo_id(repo_id)
         engine = make_engine(self.runtime.settings)
@@ -484,6 +486,7 @@ class LiveQAService:
                     use_compress=self.runtime.settings.qa_compress_enabled,
                     retry_429_attempts=self.runtime.settings.qa_llm_max_429_retries,
                     intent_profile=intent_profile,
+                    on_token=on_token,
                 )
             except Exception as exc:
                 # Log before degrading: the keyword-only answer looks like a

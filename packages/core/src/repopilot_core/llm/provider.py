@@ -33,7 +33,7 @@ import random
 import sqlite3
 import time
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import AsyncIterator, Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -317,6 +317,17 @@ class _BaseClient:
     ) -> LLMResponse:
         raise NotImplementedError
 
+    def supports_streaming(self) -> bool:
+        return False
+
+    def stream(
+        self,
+        binding: ModelBinding,
+        messages: Sequence[Message],
+        kwargs: dict[str, Any],
+    ) -> AsyncIterator[str]:
+        raise NotImplementedError
+
 
 class _OpenAICompatibleClient(_BaseClient):
     """Speaks the OpenAI chat-completions shape. Used for Groq and Cerebras."""
@@ -370,6 +381,56 @@ class _OpenAICompatibleClient(_BaseClient):
             prompt_tokens=int(usage.get("prompt_tokens", 0)),
             completion_tokens=int(usage.get("completion_tokens", 0)),
         )
+
+    def supports_streaming(self) -> bool:
+        return True
+
+    async def stream(
+        self,
+        binding: ModelBinding,
+        messages: Sequence[Message],
+        kwargs: dict[str, Any],
+    ) -> AsyncIterator[str]:
+        """Yield content deltas from an OpenAI-compatible SSE completion."""
+        body = {
+            "model": binding.physical_model,
+            "messages": [m.to_openai() for m in messages],
+            "stream": True,
+            **kwargs,
+        }
+        headers = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json",
+        }
+        async with self._http.stream(
+            "POST",
+            f"{self._base_url}/chat/completions",
+            json=body,
+            headers=headers,
+        ) as resp:
+            if resp.status_code == 429:
+                await resp.aread()
+                raise RateLimitError(
+                    f"{self.provider.value} returned 429",
+                    retry_after=_parse_retry_after(resp.headers.get("retry-after")),
+                )
+            if resp.status_code >= 400:
+                await resp.aread()
+                resp.raise_for_status()
+            async for line in resp.aiter_lines():
+                if not line.startswith("data:"):
+                    continue
+                payload = line[len("data:") :].strip()
+                if not payload or payload == "[DONE]":
+                    continue
+                try:
+                    chunk = json.loads(payload)
+                except json.JSONDecodeError:
+                    continue
+                for choice in chunk.get("choices") or []:
+                    delta = (choice.get("delta") or {}).get("content")
+                    if delta:
+                        yield str(delta)
 
 
 def _extract_openai_compatible_text(data: dict[str, Any]) -> str:
@@ -622,6 +683,79 @@ class LLMProvider:
         raise ProviderError(
             f"all providers failed for {model.value}: {last_error!r}"
         ) from last_error
+
+    async def generate_stream(
+        self,
+        model: ModelId,
+        messages: Sequence[Message],
+        retry_429_attempts: int | None = None,
+        **kwargs: Any,
+    ) -> AsyncIterator[str]:
+        """Yield a completion incrementally, for UIs that render as it arrives.
+
+        Streaming is an optimisation on top of ``generate``, never a weaker
+        substitute: a cache hit replays in one piece, and any streaming failure
+        (unconfigured provider, 429, mid-stream transport error before the
+        first token) falls back to the full ``generate`` chain — retries,
+        provider fallback and cache write included. Only the *first* binding is
+        streamed; a stream that dies after emitting text cannot be retried
+        without showing the reader the answer twice, so it surfaces as an error.
+        """
+        key = _cache_key(model, messages, kwargs)
+        cached = await self.cache.get(key)
+        if cached is not None:
+            log.debug("llm.cache_hit", model=model.value, provider=cached.provider.value)
+            yield cached.text
+            return
+
+        chain = RESOLUTION.get(model) or ()
+        binding = next(
+            (
+                candidate
+                for candidate in chain
+                if (client := self.clients.get(candidate.provider)) is not None
+                and client.supports_streaming()
+            ),
+            None,
+        )
+        text = ""
+        if binding is not None:
+            client = self.clients[binding.provider]
+            try:
+                async for delta in client.stream(binding, messages, kwargs):
+                    text += delta
+                    yield delta
+            except Exception as exc:
+                if text:
+                    raise ProviderError(f"stream failed mid-answer for {model.value}") from exc
+                log.warning(
+                    "llm.stream_failed",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    error=str(exc),
+                )
+
+        if text and binding is not None:
+            # Cached so a repeat of the same question replays instantly. Token
+            # counts stay 0: the streamed chunks carry no usage block, and the
+            # counter is accounting, not billing.
+            await self.cache.put(
+                key,
+                LLMResponse(
+                    text=text,
+                    model=model,
+                    provider=binding.provider,
+                    physical_model=binding.physical_model,
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                ),
+            )
+            return
+
+        response = await self.generate(
+            model, messages, retry_429_attempts=retry_429_attempts, **kwargs
+        )
+        yield response.text
 
     async def embed(self, text: str, *, model: ModelId = ModelId.EMBEDDINGS) -> EmbeddingResponse:
         """Embed ``text`` via the in-process sentence-transformers embedder.

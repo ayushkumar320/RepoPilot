@@ -109,6 +109,7 @@ class FakeQAService:
         *,
         intent_profile: IntentProfile | None = None,
         provider: Any = None,
+        on_token: Any = None,
     ) -> QAAnswerResponse:
         del provider
         if repo_id not in self.repo_service.records:
@@ -120,6 +121,9 @@ class FakeQAService:
         self.ask_calls.append((repo_id, question, framing))
         if question == "explode":
             raise RuntimeError("qa exploded")
+        if on_token is not None:
+            await on_token("Start with ")
+            await on_token("the Flask class.")
         return QAAnswerResponse(
             answer="Start with the Flask class in `app.py`.",
             claims=[
@@ -318,6 +322,43 @@ async def test_ask_forwards_the_persona_to_the_qa_service(
 
 
 @pytest.mark.asyncio
+async def test_ask_stream_emits_tokens_then_the_verified_answer(
+    api_client: AsyncClient,
+) -> None:
+    """Streamed text is a preview; the final event carries the real answer."""
+    async with api_client.stream(
+        "POST",
+        "/repos/repo-123/ask/stream",
+        json={"question": "Where should I start?", "intent_profile": None},
+    ) as response:
+        assert response.status_code == 200
+        body = "".join([chunk async for chunk in response.aiter_text()])
+
+    frames = [TourEvent.parse_sse_frame(f) for f in body.split("\n\n") if "event:" in f]
+    tokens = [f.text for f in frames if f.event == "answer_token"]
+    done = [f for f in frames if f.event == "answer_done"]
+
+    assert tokens == ["Start with ", "the Flask class."]
+    assert len(done) == 1
+    assert done[0].answer.claims[0].refs[0].file_path == "src/flask/app.py"
+
+
+@pytest.mark.asyncio
+async def test_ask_stream_reports_failure_as_an_event(api_client: AsyncClient) -> None:
+    """Headers are long gone when the model dies, so errors ride the stream."""
+    async with api_client.stream(
+        "POST",
+        "/repos/repo-123/ask/stream",
+        json={"question": "explode", "intent_profile": None},
+    ) as response:
+        body = "".join([chunk async for chunk in response.aiter_text()])
+
+    frames = [TourEvent.parse_sse_frame(f) for f in body.split("\n\n") if "event:" in f]
+    errors = [f for f in frames if f.event == "error"]
+    assert [f.code for f in errors] == ["QA_FAILED"]
+
+
+@pytest.mark.asyncio
 async def test_ask_waits_for_the_reranker_warmup(api_client: AsyncClient, api_app: FastAPI) -> None:
     """The cold cross-encoder load is paid before the question, not inside it."""
     loaded = False
@@ -511,7 +552,9 @@ async def test_live_qa_ask_passes_persona_into_answer_question(
         use_compress: bool = True,
         retry_429_attempts: int | None = None,
         intent_profile: IntentProfile | None = None,
+        on_token: Any = None,
     ) -> QAResult:
+        del on_token
         calls.append(
             {
                 "question": question,

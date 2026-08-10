@@ -9,6 +9,7 @@ import pytest
 from repopilot_agents.types import ChunkContent, CodeRef
 from repopilot_agents.verifier.grounding import (
     _MAX_PROMPT_CHARS,
+    _SYSTEM_PROMPT,
     Claim,
     _fit_prompt_budget,
     _parse_verdict,
@@ -329,3 +330,9 @@ def test_fit_prompt_budget_always_keeps_cited_chunks() -> None:
     cited = [_chunk("cited", _MAX_PROMPT_CHARS + 1)]
 
     assert _fit_prompt_budget(cited, [_chunk("extra", 10)]) == cited
+
+
+def test_verifier_prompt_distinguishes_absence_scopes() -> None:
+    """Chunk-scoped absence is checkable; repo-scoped absence is not."""
+    assert "SUPPORTED when the chunks indeed do not contain it" in _SYSTEM_PROMPT
+    assert "is REJECTED" in _SYSTEM_PROMPT

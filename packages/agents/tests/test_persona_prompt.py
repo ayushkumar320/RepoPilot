@@ -129,3 +129,8 @@ def test_answer_template_leads_with_the_answer_not_a_repo_tour() -> None:
     assert "'## Answer'" in ANSWER_SYSTEM
     assert "Introduction to the codebase" in ANSWER_SYSTEM  # named as the anti-pattern
     assert "because it was retrieved" in ANSWER_SYSTEM
+
+
+def test_answer_prompt_scopes_absence_to_the_chunks() -> None:
+    """An answer may not claim the repo lacks what the slice merely omits."""
+    assert "Scope every statement of absence to the retrieved chunks" in ANSWER_SYSTEM

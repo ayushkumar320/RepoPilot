@@ -144,6 +144,10 @@ ANSWER_SYSTEM = (
     "the specific files or symbols to read.\n"
     "- Say plainly when the chunks only partly answer the question, and name "
     "what is missing. Never fill a gap with a plausible guess.\n"
+    "- Scope every statement of absence to the retrieved chunks, never to the "
+    "repository: 'these chunks show no Kubernetes config', never 'this repo "
+    "has no Kubernetes config'. You were given a slice of the codebase, so "
+    "what you cannot see is not thereby absent.\n"
     "- No preamble, no restating the question, no filler.\n\n" + _DATA_NOT_INSTRUCTIONS
 )
 

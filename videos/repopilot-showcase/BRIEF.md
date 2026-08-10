@@ -74,8 +74,10 @@ Grounding sources for on-screen copy:
 - **Muted-first.** The video must land with sound off: on-screen kinetic type is
   the primary carrier, narration is a secondary track. `SCRIPT.md` lines and the
   on-screen text are deliberately the same words so one pass serves both.
-- **Node-graph growth** on Frame 3 — the call graph assembles itself mechanically,
-  deliberately without any "AI shimmer" treatment.
+- **Span resolution** on Frame 3 — source lines resolve into exact, boxed spans
+  mechanically, deliberately without any "AI shimmer" treatment. (Was node-graph
+  growth; the graph and module-map surfaces are out of scope, so the video no
+  longer depicts one.)
 - **Thread-to-source path draw** on Frame 6 — each claim card draws a line down to
   the exact source span it cites. This is the video's signature shot.
 - **Stamp impact** on Frame 7 for the `flagged` badge.
@@ -84,9 +86,12 @@ Grounding sources for on-screen copy:
 
 ## Notes
 
-- **Accuracy constraints — do not overstate.** The AST call graph is Python-only;
-  other supported languages get line-aware retrieval chunks with no invented graph
-  edges. Public GitHub repos only. Frame 3 must scope its claim to Python.
+- **Accuracy constraints — do not overstate.** Public GitHub repos only. Python
+  is parsed by tree-sitter into exact spans; other supported languages get
+  line-aware chunks. Neither invents anything, which is the only claim Frame 3
+  makes. **No frame may depict a graph or dependency-map UI** — those surfaces
+  are out of scope, and showing one would promise a screen the product does not
+  have.
 - Six persona presets plus a free-text option. Say "six lenses, or describe your
   own" — not "six lenses" alone.
 - **Legibility ceiling for feed playback:** never more than 6 lines of code on

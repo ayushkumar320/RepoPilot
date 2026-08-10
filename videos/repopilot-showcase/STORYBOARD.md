@@ -66,35 +66,39 @@ rationed to mean *verified source* and never decorates.
 
 ## Frame 3 — Facts before words
 
-- scene: The code wall reorganizes itself into a call graph, mechanically
+- scene: The code wall resolves into exact, boxed source spans
 - duration: 7s
 - transition_in: cut
 - status: animated
 - poster: 4.2s
 - src: compositions/s3-graph.html
 - rules: svg-path-draw · center-outward-expansion
-- voiceover: "For Python, the call graph comes from parsing. Not from a model."
+- voiceover: "Every span comes from parsing the source. Not from a model."
 
-20 nodes settle outward from center, then 26 edges draw between them at **constant
-speed** — mechanical, no glow pulses, no shimmer. It reads as a compiler working, not
-as a model thinking. Ten nodes carry labels drawn from real modules (`app.py`,
-`graph.py`, `tools`, `verifier`, `pipeline.py`, `state.py`, `read_chunks`,
-`vector_search`, `intent`, `planner`).
+A file resolves into exact spans, mechanically. Source lines sweep past, then
+tree-sitter's boundaries land on them one function at a time — each symbol
+boxed with its real start and end line, constant speed, no glow pulses. It
+reads as a parser working, not as a model thinking.
 
-Chips fade in top-left at 0.18s intervals from 2.0s: `tree-sitter AST` · `NetworkX` ·
-`pgvector`. The six deterministic tools arrive along the bottom from 2.9s, one every
-0.075s.
+Chips fade in top-left at 0.18s intervals from 2.0s: `tree-sitter AST` ·
+`pgvector` · `Postgres`. The six deterministic tools arrive along the bottom
+from 2.9s, one every 0.075s.
 
-At 4.35s the graph lifts, shrinks to 0.82 and drops to 26% opacity, clearing the lower
-band. `Python parses to` / `a real call graph.` lands at 4.75s in 96px Archivo Black;
-`The model never draws it.` follows at 5.55s in 54px `--text-secondary`.
+At 4.35s the spans lift, shrink and dim, clearing the lower band.
+`Every span comes from` / `parsing the source.` lands at 4.75s in 96px Archivo
+Black; `Not from a model.` follows at 5.55s in 54px `--text-secondary`.
 
-**Notes — accuracy gate:** the line says **Python** on purpose. AST graphs are
-Python-only; other languages get line-aware chunks with no invented edges.
+**Scope note:** this frame previously drew the call graph assembling itself.
+The graph and module-map surfaces are not being built, so the visual shows what
+the product actually ships — deterministic parsing into exact spans — rather
+than a picture the UI never renders.
+
+**Notes — accuracy gate:** Python gets tree-sitter spans; other languages get
+line-aware chunks. Neither invents anything, which is the claim being made.
 
 ## Frame 4 — Six lenses
 
-- scene: One persona is chosen; the same graph re-lights for each lens
+- scene: One persona is chosen; the same findings reorder for each lens
 - duration: 10s
 - transition_in: cut
 - status: animated
@@ -103,8 +107,8 @@ Python-only; other languages get line-aware chunks with no invented edges.
 - rules: depth-of-field-blur · discrete-text-sequence
 - voiceover: "Six lenses, or describe your own. Same verified facts — a different finding leads."
 
-The same graph at half scale holds the left third. The right two thirds carry the real
-persona grid — six cards with the product's own labels and blurbs:
+The left third holds the answer as it stands — a short stack of findings. The
+right two thirds carry the real persona grid — six cards with the product's own labels and blurbs:
 
 | Label | Blurb |
 |---|---|
@@ -115,9 +119,10 @@ persona grid — six cards with the product's own labels and blurbs:
 | Learner | How the system is shaped and why. |
 | Maintainer | Fragility, debt, and what needs attention. |
 
-Three selections, each re-lighting a **visibly different** node subset — every node
-dims to 20% first, then that lens's subset rises to `--accent`. The windows never
-overlap on the same property, so GSAP's overwrite order can't decide the frame.
+Three selections, each **reordering the findings** rather than re-lighting a graph:
+every row dims to 20% first, then the rows that lens puts first rise to
+`--accent` and move to the top. The windows never overlap on the same property,
+so GSAP's overwrite order can't decide the frame.
 
 | At (local) | Persona | Finding strip |
 |---|---|---|

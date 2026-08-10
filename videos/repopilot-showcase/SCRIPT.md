@@ -42,9 +42,10 @@ right as `RepoPilot starts with you.` sets on screen at 11.05s.
 
 **Time:** 14.70 – 19.61s
 **Delivery:** Matter-of-fact. It is a technical claim, not a boast. "Not from a model"
-lands with the sub-line at 18.55s.
+lands with the sub-line at 18.55s. Says what the product does — parse and store exact
+spans — without promising a graph or map surface, which is out of scope.
 
-    For Python, the call graph comes from parsing. Not from a model.
+    Every span comes from parsing the source. Not from a model.
 
 ## Line 4 — Six lenses (Frame 4)
 

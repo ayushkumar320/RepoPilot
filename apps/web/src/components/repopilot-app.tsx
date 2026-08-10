@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  ArrowLeft,
   ArrowRight,
+  CaretDown,
   ChatCircleText,
   CheckCircle,
   ClockCountdown,
@@ -27,7 +27,6 @@ import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from
 
 import { ClaimRow } from "./claim-row";
 import { GraphNeighbours } from "./graph-neighbours";
-import { ModuleMap } from "./module-map";
 import {
   ApiError,
   api,
@@ -342,6 +341,41 @@ function AnswerBody({ text }: { text: string }) {
   );
 }
 
+/** Types a line out and erases it, on a loop — the empty workspace has
+ *  nothing moving in it otherwise. Static for anyone who asked for less
+ *  motion. */
+function Typewriter({ text }: { text: string }) {
+  const [shown, setShown] = useState(text);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let length = 0;
+    let erasing = false;
+    setShown("");
+    const timer = window.setInterval(() => {
+      if (!erasing && length === text.length) {
+        // Hold the finished line for a beat before erasing it.
+        erasing = true;
+        return;
+      }
+      if (erasing && length === 0) {
+        erasing = false;
+        return;
+      }
+      length += erasing ? -1 : 1;
+      setShown(text.slice(0, length));
+    }, 90);
+    return () => window.clearInterval(timer);
+  }, [text]);
+
+  return (
+    <strong>
+      {shown}
+      <span className="answer-caret" aria-hidden="true" />
+    </strong>
+  );
+}
+
 export interface RepoPilotAppProps {
   signOutAction?: () => Promise<void>;
   viewer?: Viewer | null;
@@ -370,8 +404,9 @@ export default function RepoPilotApp({
   const [store, setStore] = useState<SessionState>(initialSessionState);
   const [tours, setTours] = useState<TourSummary[]>([]);
   const [tourId, setTourId] = useState<string>();
-  // Off-canvas chat list on narrow screens; always visible from 1220px up.
+  // The chat drawer, opened from the hamburger in the app header.
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [personaMenuOpen, setPersonaMenuOpen] = useState(false);
   const [pollTick, forcePoll] = useReducer((value: number) => value + 1, 0);
 
   const isCustom = personaId === CUSTOM_PERSONA_ID;
@@ -552,14 +587,65 @@ export default function RepoPilotApp({
     }
     setAsking(true);
     setErrorMessage(null);
+    // Providers emit tokens in bursts of wildly uneven size — a whole
+    // paragraph can land in one frame, and the keyword-match fallback returns
+    // the answer in a single piece with no tokens at all. Queue whatever
+    // arrives and release it a word at a time so every answer types out.
+    const queue: string[] = [];
+    let shown = "";
+    const words = (text: string) => text.match(/\S+\s*|\s+/g) ?? [];
+    // Follow the answer as it types, but only while the reader is already at
+    // the end of it — scrolling up to re-read an earlier answer must not be
+    // yanked back down.
+    const followBottom = (force = false) => {
+      const distance =
+        document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
+      if (!force && distance > 200) return;
+      requestAnimationFrame(() =>
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: force ? "smooth" : "auto",
+        }),
+      );
+    };
+    const ticker = window.setInterval(() => {
+      if (queue.length === 0) return;
+      // One word normally; a long backlog catches up rather than lagging
+      // minutes behind an answer that has already fully arrived.
+      const next = queue.splice(0, queue.length > 150 ? 3 : 1).join("");
+      shown += next;
+      setStreaming((current) => (current ? { ...current, text: current.text + next } : current));
+      followBottom();
+    }, 18);
+    const drained = () =>
+      new Promise<void>((resolve) => {
+        const poll = window.setInterval(() => {
+          if (queue.length > 0) return;
+          window.clearInterval(poll);
+          resolve();
+        }, 30);
+      });
     try {
       const question = askPrompt.trim();
       setStreaming({ question, text: "" });
-      const answer = await api.askRepoStreaming(repoId, question, profile, (token) =>
-        setStreaming((current) =>
-          current ? { ...current, text: current.text + token } : current,
-        ),
-      );
+      // Asking from halfway up the history should land on the new answer.
+      followBottom(true);
+      const answer = await api.askRepoStreaming(repoId, question, profile, (token) => {
+        // Each entry keeps its own trailing whitespace, so newlines and the
+        // spacing between words survive the split.
+        queue.push(...words(token));
+      });
+      // Type out whatever the stream did not deliver — the whole answer when
+      // it never streamed — instead of snapping to the finished text.
+      if (answer.answer.startsWith(shown)) {
+        queue.push(...words(answer.answer.slice(shown.length)));
+      } else {
+        queue.length = 0;
+        shown = "";
+        setStreaming({ question, text: "" });
+        queue.push(...words(answer.answer));
+      }
+      await drained();
       setUsage(await api.getAccountUsage());
       setStore((current) =>
         appendExchange(current, {
@@ -594,6 +680,7 @@ export default function RepoPilotApp({
       }
       setErrorMessage(error instanceof Error ? error.message : "Unable to query this snapshot.");
     } finally {
+      window.clearInterval(ticker);
       setAsking(false);
       setStreaming(null);
     }
@@ -669,66 +756,75 @@ export default function RepoPilotApp({
     }
   };
 
+  // Both the card grid and the phone disclosure list offer the same choices,
+  // "Something else" included.
+  const personaChoices = [
+    ...PERSONAS.map((persona) => ({
+      id: persona.id,
+      label: persona.label,
+      blurb: persona.blurb,
+    })),
+    {
+      id: CUSTOM_PERSONA_ID,
+      label: "Something else",
+      blurb: "Describe who you are and what you need.",
+    },
+  ];
+  const chosenPersona =
+    personaChoices.find((choice) => choice.id === personaId) ?? personaChoices[0];
+
+  const personaOption = (choice: (typeof personaChoices)[number], onPick: () => void) => {
+    const active = personaId === choice.id;
+    return (
+      <button
+        key={choice.id}
+        type="button"
+        className="persona-option"
+        data-active={active}
+        aria-pressed={active}
+        onClick={onPick}
+      >
+        <span className="option-check" aria-hidden="true">
+          {active ? <CheckCircle size={19} weight="fill" /> : null}
+        </span>
+        <span>
+          <strong>{choice.label}</strong>
+          <small>{choice.blurb}</small>
+        </span>
+      </button>
+    );
+  };
+
   const personaPicker = (
     <div className="persona-picker">
-      {/* Seven cards is a long scroll on a phone. Same choices, one native
-          control — the grid takes over again from 680px up. */}
-      <div className="persona-dropdown">
-        <select
-          className="text-input"
-          value={personaId}
-          onChange={(event) => setPersonaId(event.target.value)}
-          aria-label="Who is asking"
-        >
-          {PERSONAS.map((persona) => (
-            <option key={persona.id} value={persona.id}>
-              {persona.label}
-            </option>
-          ))}
-          <option value={CUSTOM_PERSONA_ID}>Something else…</option>
-        </select>
-        <p className="field-help">
-          {isCustom ? "Describe who you are below." : personaById(personaId)?.blurb}
-        </p>
-      </div>
+      {/* Seven cards is two screens of scrolling on a phone. A disclosure keeps
+          the list to one row until it is wanted — and unlike a native <select>
+          the open list is ours to style, so it matches the theme. The grid
+          takes over again from 680px up. */}
+      <details
+        className="persona-dropdown"
+        open={personaMenuOpen}
+        onToggle={(event) => setPersonaMenuOpen(event.currentTarget.open)}
+      >
+        <summary>
+          <span>
+            <strong>{chosenPersona.label}</strong>
+            <small>{chosenPersona.blurb}</small>
+          </span>
+          <CaretDown size={16} weight="bold" aria-hidden="true" />
+        </summary>
+        <div className="persona-menu" role="group" aria-label="Who is asking">
+          {personaChoices.map((choice) =>
+            personaOption(choice, () => {
+              setPersonaId(choice.id);
+              setPersonaMenuOpen(false);
+            }),
+          )}
+        </div>
+      </details>
 
       <div className="persona-grid" role="group" aria-label="Answer persona">
-        {PERSONAS.map((persona) => {
-          const active = personaId === persona.id;
-          return (
-            <button
-              key={persona.id}
-              type="button"
-              className="persona-option"
-              data-active={active}
-              aria-pressed={active}
-              onClick={() => setPersonaId(persona.id)}
-            >
-              <span className="option-check" aria-hidden="true">
-                {active ? <CheckCircle size={19} weight="fill" /> : null}
-              </span>
-              <span>
-                <strong>{persona.label}</strong>
-                <small>{persona.blurb}</small>
-              </span>
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          className="persona-option"
-          data-active={isCustom}
-          aria-pressed={isCustom}
-          onClick={() => setPersonaId(CUSTOM_PERSONA_ID)}
-        >
-          <span className="option-check" aria-hidden="true">
-            {isCustom ? <CheckCircle size={19} weight="fill" /> : null}
-          </span>
-          <span>
-            <strong>Something else</strong>
-            <small>Describe who you are and what you need.</small>
-          </span>
-        </button>
+        {personaChoices.map((choice) => personaOption(choice, () => setPersonaId(choice.id)))}
       </div>
 
       {isCustom ? (
@@ -820,6 +916,16 @@ export default function RepoPilotApp({
   return (
     <main className="app-shell">
       <header className="app-header">
+        <button
+          className="icon-button sidebar-toggle"
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open chats"
+          aria-expanded={sidebarOpen}
+          aria-controls="chat-sidebar"
+        >
+          <List size={19} />
+        </button>
         <a className="product-brand" href="/" aria-label="RepoPilot home">
           <span className="brand-symbol" aria-hidden="true">
             <GitBranch size={19} weight="bold" />
@@ -852,6 +958,78 @@ export default function RepoPilotApp({
           ) : null}
         </div>
       </header>
+
+      {/* Every saved chat, newest first, one hamburger away from anywhere in
+          the app — including the setup screen, so reopening a repository that
+          is already indexed never goes through indexing again. */}
+      {sidebarOpen ? (
+        <button
+          className="sidebar-backdrop"
+          type="button"
+          aria-label="Close chats"
+          onClick={() => setSidebarOpen(false)}
+        />
+      ) : null}
+      <aside
+        className="tour-navigation"
+        id="chat-sidebar"
+        data-open={sidebarOpen}
+        aria-label="Chat sessions"
+      >
+        <button
+          className="new-chat-button"
+          type="button"
+          onClick={inWorkspace ? startNewChat : () => setSidebarOpen(false)}
+        >
+          <Plus size={15} weight="bold" aria-hidden="true" />
+          New chat
+        </button>
+        {inWorkspace ? (
+          <button className="new-chat-button" type="button" onClick={leaveWorkspace}>
+            <GithubLogo size={15} aria-hidden="true" />
+            Another repository
+          </button>
+        ) : null}
+        <div className="navigation-heading">
+          <ChatCircleText size={18} aria-hidden="true" />
+          <span>Chats</span>
+          <button
+            className="icon-button sidebar-close"
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close chats"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        {tours.length === 0 ? (
+          <p className="navigation-empty">
+            Your chats appear here once you ask a repository something.
+          </p>
+        ) : (
+          <ul className="chat-list">
+            {tours.map((tour) => (
+              <li key={tour.tour_id} data-active={tour.tour_id === tourId}>
+                <button type="button" onClick={() => void resumeTour(tour.tour_id)}>
+                  <strong>{tour.title || decodeURIComponent(tour.repo_id)}</strong>
+                  <small>
+                    {tour.message_count} question{tour.message_count === 1 ? "" : "s"} ·{" "}
+                    {new Date(tour.updated_at).toLocaleDateString()}
+                  </small>
+                </button>
+                <button
+                  className="icon-button"
+                  type="button"
+                  onClick={() => void removeTour(tour.tour_id)}
+                  aria-label={`Delete chat for ${decodeURIComponent(tour.repo_id)}`}
+                >
+                  <Trash size={15} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </aside>
 
       {!inWorkspace ? (
         <div className="onboarding-layout">
@@ -889,33 +1067,6 @@ export default function RepoPilotApp({
                 </div>
               </div>
             </div>
-
-            {tours.length > 0 ? (
-              <div className="tour-history" aria-label="Your tours">
-                <span className="section-kicker">Your tours</span>
-                <ul>
-                  {tours.map((tour) => (
-                    <li key={tour.tour_id}>
-                      <button type="button" onClick={() => void resumeTour(tour.tour_id)}>
-                        <strong>{tour.title || decodeURIComponent(tour.repo_id)}</strong>
-                        <small>
-                          {tour.message_count} question{tour.message_count === 1 ? "" : "s"} ·{" "}
-                          {new Date(tour.updated_at).toLocaleDateString()}
-                        </small>
-                      </button>
-                      <button
-                        className="icon-button"
-                        type="button"
-                        onClick={() => void removeTour(tour.tour_id)}
-                        aria-label={`Delete tour for ${decodeURIComponent(tour.repo_id)}`}
-                      >
-                        <Trash size={16} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
 
             <p className="scope-note">
               Supports Python, TypeScript, JavaScript, Java, Go, Rust, C-family languages, Ruby,
@@ -1024,38 +1175,6 @@ export default function RepoPilotApp({
         </div>
       ) : (
         <div className="workspace">
-          <header className="workspace-header">
-            <div className="workspace-title">
-              <button
-                className="icon-button sidebar-toggle"
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open chats"
-                aria-expanded={sidebarOpen}
-                aria-controls="chat-sidebar"
-              >
-                <List size={19} />
-              </button>
-              <button
-                className="icon-button"
-                type="button"
-                onClick={leaveWorkspace}
-                aria-label="Back to repository setup"
-              >
-                <ArrowLeft size={19} />
-              </button>
-              <div>
-                <span>{repoDisplayName}</span>
-                <h1>Ask this repository</h1>
-              </div>
-            </div>
-            <div className="workspace-meta">
-              <span className="repo-status repo-status-ready">
-                <CheckCircle size={16} weight="fill" aria-hidden="true" />
-                Snapshot ready
-              </span>
-            </div>
-          </header>
 
           {errorMessage || store.error ? (
             <div className="workspace-alert inline-alert" role="alert">
@@ -1064,143 +1183,22 @@ export default function RepoPilotApp({
             </div>
           ) : null}
 
-          <div className="workspace-grid">
-            {/* Saved chat sessions, newest first — the persistent memory of
-                every repo this reader has asked about. The lens moved under
-                the ask box; it is switchable mid-session either way. */}
-            {sidebarOpen ? (
-              <button
-                className="sidebar-backdrop"
-                type="button"
-                aria-label="Close chats"
-                onClick={() => setSidebarOpen(false)}
-              />
-            ) : null}
-            <aside
-              className="tour-navigation"
-              id="chat-sidebar"
-              data-open={sidebarOpen}
-              aria-label="Chat sessions"
-            >
-              <button className="new-chat-button" type="button" onClick={startNewChat}>
-                <Plus size={15} weight="bold" aria-hidden="true" />
-                New chat
-              </button>
-              <div className="navigation-heading">
-                <ChatCircleText size={18} aria-hidden="true" />
-                <span>Chats</span>
-                <button
-                  className="icon-button sidebar-close"
-                  type="button"
-                  onClick={() => setSidebarOpen(false)}
-                  aria-label="Close chats"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              {tours.length === 0 ? (
-                <p className="navigation-empty">
-                  Your chats appear here once you ask a repository something.
-                </p>
-              ) : (
-                <ul className="chat-list">
-                  {tours.map((tour) => (
-                    <li key={tour.tour_id} data-active={tour.tour_id === tourId}>
-                      <button type="button" onClick={() => void resumeTour(tour.tour_id)}>
-                        <strong>{tour.title || decodeURIComponent(tour.repo_id)}</strong>
-                        <small>
-                          {tour.message_count} question{tour.message_count === 1 ? "" : "s"} ·{" "}
-                          {new Date(tour.updated_at).toLocaleDateString()}
-                        </small>
-                      </button>
-                      <button
-                        className="icon-button"
-                        type="button"
-                        onClick={() => void removeTour(tour.tour_id)}
-                        aria-label={`Delete chat for ${decodeURIComponent(tour.repo_id)}`}
-                      >
-                        <Trash size={15} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </aside>
-
-            <section className="tour-content" aria-label="Answers" aria-live="polite">
+          <section className="tour-content" aria-label="Answers" aria-live="polite">
               {store.firstImpression ? (
                 <p className="first-impression">{store.firstImpression}</p>
-              ) : null}
-
-              {/* Repo-level, above the first question: "Related code" answers
-                  "what touches this claim", which only helps once you have an
-                  answer to anchor on. This answers "how is the repository laid
-                  out", which is what a newcomer needs before asking anything.
-                  Collapsed, so it costs no request until someone wants it. */}
-              {repoId ? <ModuleMap repoId={repoId} /> : null}
-
-              <form className="ask-panel" onSubmit={askAnything}>
-                <div className="ask-heading">
-                  <label htmlFor="ask-repository">Ask this repository</label>
-                  <button type="button" onClick={() => setProviderDialogOpen(true)}>
-                    <LockKey size={15} aria-hidden="true" />
-                    {usage?.provider_connected ? "Using your provider" : "Using the shared key"}
-                  </button>
-                </div>
-                <div className="ask-row">
-                  <input
-                    id="ask-repository"
-                    className="text-input ask-input"
-                    value={askPrompt}
-                    onChange={(event) => setAskPrompt(event.target.value)}
-                    placeholder="What is the tech stack?"
-                    disabled={asking}
-                  />
-                  <button
-                    className="button button-primary ask-button"
-                    type="submit"
-                    disabled={!askPrompt.trim() || asking}
-                  >
-                    <PaperPlaneTilt size={18} weight="fill" aria-hidden="true" />
-                    {asking ? "Asking" : "Ask"}
-                  </button>
-                </div>
-                {personaSelect}
-                <p>
-                  Answers use only the indexed snapshot, include source references, and are
-                  prioritized for {personaLabel(profile)}.
-                </p>
-              </form>
-
-              {streaming ? (
-                <article className="tour-section tour-section-streaming">
-                  <div className="tour-section-heading">
-                    <h2>{streaming.question}</h2>
-                    <span className="section-complete">
-                      <UserFocus size={15} aria-hidden="true" />
-                      {personaLabel(profile)}
-                    </span>
-                  </div>
-                  {streaming.text ? (
-                    <AnswerBody text={streaming.text} />
-                  ) : (
-                    <p className="answer-line answer-pending">Reading the snapshot…</p>
-                  )}
-                  <span className="answer-caret" aria-hidden="true" />
-                </article>
               ) : null}
 
               {store.exchanges.length === 0 && !streaming ? (
                 <div className="answers-empty">
                   <MagnifyingGlass size={26} aria-hidden="true" />
-                  <strong>Ask your first question</strong>
+                  <Typewriter text="Ask your first question" />
                   <span>
                     Answers are drawn from the indexed snapshot and prioritized for the lens you
                     picked.
                   </span>
                 </div>
               ) : (
-                [...store.exchanges].reverse().map((exchange) => (
+                store.exchanges.map((exchange) => (
                   <article className="tour-section" id={`answer-${exchange.id}`} key={exchange.id}>
                     <div className="tour-section-heading">
                       <h2>{exchange.question}</h2>
@@ -1211,19 +1209,19 @@ export default function RepoPilotApp({
                     </div>
                     <AnswerBody text={exchange.answer} />
 
+                    {/* Folded by default: the answer is the thing being read,
+                        and a dozen source rows between two answers is a wall
+                        to scroll past. */}
                     {exchange.claimIds.length > 0 ? (
                       <details
                         className="claim-group"
-                        open
                         aria-label={`Sources for ${exchange.question}`}
                       >
                         <summary className="claim-group-label">
+                          <CaretDown size={13} weight="bold" aria-hidden="true" />
                           Verified sources
                           <span className="claim-group-count">{exchange.claimIds.length}</span>
                         </summary>
-                        {/* Scrolls past ~4 rows so a twelve-claim answer does
-                            not bury the next question. */}
-                        <div className="claim-scroll">
                         {exchange.claimIds.map((claimId) => (
                           <ClaimRow
                             key={claimId}
@@ -1234,7 +1232,6 @@ export default function RepoPilotApp({
                             }
                           />
                         ))}
-                        </div>
                         {/* One panel per exchange, following the selected claim
                             when the selection is one of this exchange's — so
                             clicking a row changes what the panel expands rather
@@ -1262,10 +1259,50 @@ export default function RepoPilotApp({
                   </article>
                 ))
               )}
+              {streaming ? (
+                <article className="tour-section tour-section-streaming">
+                  <div className="tour-section-heading">
+                    <h2>{streaming.question}</h2>
+                    <span className="section-complete">
+                      <UserFocus size={15} aria-hidden="true" />
+                      {personaLabel(profile)}
+                    </span>
+                  </div>
+                  {streaming.text ? (
+                    <AnswerBody text={streaming.text} />
+                  ) : (
+                    <p className="answer-line answer-pending">Reading the snapshot…</p>
+                  )}
+                  <span className="answer-caret" aria-hidden="true" />
+                </article>
+              ) : null}
 
-            </section>
-
-          </div>
+            {/* Pinned to the bottom, the way a chat composer is: the box, the
+                repo-level module map, and the lens answers come through.
+                Everything else that used to sit up here was commentary. */}
+            <form className="ask-panel" onSubmit={askAnything}>
+              <div className="ask-row">
+                <input
+                  id="ask-repository"
+                  className="text-input ask-input"
+                  value={askPrompt}
+                  onChange={(event) => setAskPrompt(event.target.value)}
+                  placeholder="What is the tech stack?"
+                  aria-label="Ask this repository"
+                  disabled={asking}
+                />
+                <button
+                  className="button button-primary ask-button"
+                  type="submit"
+                  disabled={!askPrompt.trim() || asking}
+                >
+                  <PaperPlaneTilt size={18} weight="fill" aria-hidden="true" />
+                  {asking ? "Asking" : "Ask"}
+                </button>
+              </div>
+              <div className="ask-tools">{personaSelect}</div>
+            </form>
+          </section>
         </div>
       )}
       <ProviderDialog

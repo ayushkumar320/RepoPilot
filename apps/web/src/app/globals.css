@@ -2307,3 +2307,25 @@ input:focus-visible {
 .ask-tools .ask-persona {
   margin-top: 0;
 }
+
+/* Why an answer degraded to keyword matching — the API sends the exception in
+   retrieval_path, and hiding it makes the fallback look like a product bug. */
+.fallback-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 9px 12px;
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-control);
+  color: var(--warning);
+  background: var(--warning-soft);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.fallback-reason svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}

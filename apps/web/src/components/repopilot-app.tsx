@@ -1209,6 +1209,22 @@ export default function RepoPilotApp({
                     </div>
                     <AnswerBody text={exchange.answer} />
 
+                    {/* The API degrades to keyword matching whenever the model
+                        call raises, and puts the reason in retrieval_path.
+                        Showing it turns "the model could not answer" from a
+                        mystery into something actionable. */}
+                    {(() => {
+                      const reason = exchange.claimIds
+                        .flatMap((claimId) => store.claimsById[claimId]?.retrieval_path ?? [])
+                        .find((entry) => entry.startsWith("rag_fallback:"));
+                      return reason ? (
+                        <p className="fallback-reason">
+                          <WarningCircle size={15} weight="fill" aria-hidden="true" />
+                          Model call failed: {reason.slice("rag_fallback:".length)}
+                        </p>
+                      ) : null;
+                    })()}
+
                     {/* Folded by default: the answer is the thing being read,
                         and a dozen source rows between two answers is a wall
                         to scroll past. */}

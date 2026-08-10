@@ -312,9 +312,9 @@ def answer_user_prompt(question: str, chunks: Sequence[ChunkContent]) -> str:
 
 __all__ = [
     "ANSWER_SYSTEM",
+    "COMPRESS_SYSTEM",
     "MAX_CHUNKS_CHARS",
     "MAX_CHUNK_CHARS",
-    "COMPRESS_SYSTEM",
     "QUERY_SPEC_SYSTEM",
     "SUFFICIENCY_SYSTEM",
     "_render_numbered_chunk",

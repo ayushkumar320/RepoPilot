@@ -17,12 +17,16 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 from repopilot_agents.qa.prompts import QUERY_SPEC_SYSTEM, query_spec_user_prompt
 from repopilot_core.llm.models import ModelId
 from repopilot_core.llm.provider import LLMProvider, Message
+from repopilot_ingestion.generic_chunk import SOURCE_LANGUAGES
 
 IntentClass = Literal["factual", "procedural", "architectural", "where_is", "compare"]
 
 _JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
 _BACKTICK_RE = re.compile(r"`([^`]+)`")
-_PATH_HINT_RE = re.compile(r"[\w./-]+\.py\b")
+# Every extension the indexer can chunk, not just ``.py`` — a question naming
+# ``src/index.ts`` on a TypeScript repo used to extract no path hint at all.
+_SOURCE_SUFFIXES = ("py", *sorted(suffix.lstrip(".") for suffix in SOURCE_LANGUAGES))
+_PATH_HINT_RE = re.compile(rf"[\w./-]+\.(?:{'|'.join(_SOURCE_SUFFIXES)})\b")
 
 
 class QuerySpec(BaseModel):
@@ -89,7 +93,7 @@ def fallback_query_spec(question: str) -> QuerySpec:
     symbols: list[str] = []
     paths: list[str] = []
     for hint in _BACKTICK_RE.findall(question):
-        if "/" in hint or hint.endswith(".py"):
+        if "/" in hint or _PATH_HINT_RE.fullmatch(hint):
             paths.append(hint)
         elif "." in hint or "_" in hint:
             symbols.append(hint)

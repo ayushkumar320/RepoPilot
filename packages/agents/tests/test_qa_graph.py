@@ -568,3 +568,62 @@ async def test_compression_is_recorded_in_retrieval_path(monkeypatch: pytest.Mon
         use_compress=True,
     )
     assert "compress:k=2" in result.retrieval_path
+
+
+@pytest.mark.asyncio
+async def test_sufficiency_failure_still_answers() -> None:
+    """A dead sufficiency judge must not cost the reader the whole answer.
+
+    It only decides whether to spend another hop; letting its provider error
+    escape dropped the question to the API's keyword-only fallback.
+    """
+
+    class _FailFirst(_ScriptedProvider):
+        async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
+            if self.call_count == 0:
+                self.call_count += 1
+                raise RuntimeError("all providers failed for qa_primary")
+            return await super().generate(model, messages, **kwargs)
+
+    provider = _FailFirst(["alpha returns one. [0]"])
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert result.answer == "alpha returns one. [0]"
+    assert result.claims and result.claims[0].status == "verified"
+
+
+@pytest.mark.asyncio
+async def test_graph_expansion_failure_still_answers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A repo with no graph_adjacency row raises LookupError; answer anyway."""
+
+    async def exploding_traverse(start: str, **kw: Any) -> list[Path]:
+        raise LookupError("no graph_adjacency row for repo_id='repo'")
+
+    monkeypatch.setattr(qa_graph, "graph_traverse", exploding_traverse)
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"insufficient","reason":"need more","next_symbol":"gamma"}',
+            "alpha returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+    assert result.answer == "alpha returns one. [0]"
+    assert "graph_traverse_skipped:LookupError" in result.retrieval_path
+
+
+def test_non_python_file_hint_is_a_file_prefix_not_a_directory() -> None:
+    """``src/index.ts`` must filter on the file, not the impossible ``…/`` dir."""
+    spec = fallback_query_spec("where is the handler defined in src/index.ts?")
+    assert spec.extracted_paths == ["src/index.ts"]
+    assert qa_graph._single_path_prefix(spec) == "src/index.ts"

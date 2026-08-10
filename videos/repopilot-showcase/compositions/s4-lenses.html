@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
   </head>
   <body>
     <template>
@@ -17,9 +17,6 @@
           inset: 0;
           background: #0d1117;
         }
-        /* Background light: one soft neutral source lifting the frame off flat black.
-           Deliberately NOT accent-tinted — accent means "verified source" and stays
-           rationed. Static, so it costs nothing in determinism. */
         .glow {
           position: absolute;
           inset: 0;
@@ -39,41 +36,30 @@
           line-height: 1.2;
           color: #818b98;
         }
-        .stage {
+        /* Left: the same findings throughout. Only their order changes. */
+        .findings {
           position: absolute;
           left: 120px;
-          top: 340px;
-          width: 480px;
-          height: 280px;
+          top: 170px;
+          width: 520px;
+          height: 618px;
         }
-        .edges {
+        .finding {
           position: absolute;
           left: 0;
-          top: 0;
-          width: 480px;
-          height: 280px;
-          overflow: visible;
+          width: 520px;
+          height: 96px;
+          padding: 14px 18px;
+          border-radius: 12px;
+          background: #151b23;
+          border: 1px solid #2b3440;
+          border-left: 5px solid #2b3440;
         }
-        .edge {
-          stroke: #2b3440;
-          stroke-width: 1.5;
-          fill: none;
-        }
-        .node {
-          position: absolute;
+        .finding-text {
           display: block;
-          width: 14px;
-          height: 14px;
-          margin-left: -7px;
-          margin-top: -7px;
-          border-radius: 50%;
-          background: #697583;
-        }
-        .node-hub {
-          width: 20px;
-          height: 20px;
-          margin-left: -10px;
-          margin-top: -10px;
+          font-size: 25px;
+          line-height: 1.32;
+          color: #aab3bd;
         }
         .grid {
           position: absolute;
@@ -159,30 +145,34 @@
         }
       </style>
 
-      <div data-hf-id="hf-w0vf" id="root" data-composition-id="s4-lenses" data-width="1920" data-height="1080">
-        <div data-hf-id="hf-4qej" class="fill"></div>
-        <div data-hf-id="hf-2s7n" class="glow"></div>
+      <div id="root" data-composition-id="s4-lenses" data-width="1920" data-height="1080">
+        <div class="fill"></div>
+        <div class="glow"></div>
 
-        <div data-hf-id="hf-1er7" id="s4-kicker" class="kicker">Six lenses, or describe your own.</div>
+        <div id="s4-kicker" class="kicker">Six lenses, or describe your own.</div>
 
-        <div data-hf-id="hf-f3hs" id="s4-stage" class="stage">
-          <svg data-hf-id="hf-yadc" id="s4-edges" class="edges" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" />
-        </div>
+        <div id="s4-findings" class="findings" data-layout-ignore></div>
 
-        <div data-hf-id="hf-4ys0" id="s4-grid" class="grid"></div>
+        <div id="s4-grid" class="grid"></div>
 
-        <div data-hf-id="hf-g8hs" id="s4-strip" class="strip" data-layout-allow-caption-zone="">
-          <span data-hf-id="hf-i8t3" id="s4-find-0" class="strip-item">
-            <span data-hf-id="hf-5kzz" class="strip-role">Security reviewer</span>
-            <span data-hf-id="hf-lbi3" class="strip-text">Session identity is asserted by the web app; the API trusts the cookie.</span>
+        <div id="s4-strip" class="strip" data-layout-allow-caption-zone>
+          <span id="s4-find-0" class="strip-item">
+            <span class="strip-role">Security reviewer</span>
+            <span class="strip-text"
+              >Session identity is asserted by the web app; the API trusts the cookie.</span
+            >
           </span>
-          <span data-hf-id="hf-c33a" id="s4-find-1" class="strip-item">
-            <span data-hf-id="hf-1hvc" class="strip-role">Maintainer</span>
-            <span data-hf-id="hf-qi13" class="strip-text">Three capabilities are implemented but gated off — their eval gates missed.</span>
+          <span id="s4-find-1" class="strip-item">
+            <span class="strip-role">Maintainer</span>
+            <span class="strip-text"
+              >Three capabilities are implemented but gated off — their eval gates missed.</span
+            >
           </span>
-          <span data-hf-id="hf-84z9" id="s4-find-2" class="strip-item">
-            <span data-hf-id="hf-0sjn" class="strip-role">Learner</span>
-            <span data-hf-id="hf-59wn" class="strip-text">Intent is captured before analysis; every downstream agent reads it.</span>
+          <span id="s4-find-2" class="strip-item">
+            <span class="strip-role">Learner</span>
+            <span class="strip-text"
+              >Intent is captured before analysis; every downstream agent reads it.</span
+            >
           </span>
         </div>
       </div>
@@ -198,43 +188,35 @@
             ["Maintainer", "Fragility, debt, and what needs attention."],
           ];
 
-          // Half-scale of scene 3's layout — same graph, read as the same object.
-          const NODES = [
-            [240, 20, 1], [125, 65, 0], [350, 65, 0], [240, 105, 1],
-            [100, 148, 0], [200, 148, 0], [310, 148, 0], [415, 148, 0],
-            [240, 192, 1], [65, 233, 0], [165, 238, 0], [265, 238, 0],
-            [371, 233, 0], [30, 105, 0], [30, 60, 0], [75, 20, 0],
-            [150, 20, 0], [450, 105, 0], [450, 60, 0], [450, 192, 0],
+          // The same six findings all the way through. A lens changes which
+          // rise to the top, never which exist — that is the whole argument.
+          const FINDINGS = [
+            "Session cookie is the only identity assertion.",
+            "Three capabilities are gated off; eval gates missed.",
+            "Intent is captured before any analysis runs.",
+            "Provider keys are encrypted at rest.",
+            "Six deterministic tools; the AST builds the graph.",
+            "Python parses to exact spans; other languages chunk.",
           ];
-          const EDGES = [
-            [0, 1], [0, 2], [0, 3], [1, 3], [2, 3], [3, 4], [3, 5], [3, 6], [3, 7],
-            [4, 5], [5, 6], [5, 8], [6, 8], [7, 8], [8, 9], [8, 10], [8, 11], [8, 12],
-            [13, 14], [14, 15], [15, 16], [13, 3], [17, 3], [18, 17], [19, 12], [6, 7],
-          ];
+          // Which findings each lens puts first, by index.
+          const ORDER = {
+            security: [0, 3, 4, 1, 2, 5],
+            maintainer: [1, 4, 3, 0, 5, 2],
+            learner: [2, 5, 4, 0, 1, 3],
+          };
 
-          const stage = document.getElementById("s4-stage");
-          const svg = document.getElementById("s4-edges");
-          const SVG_NS = "http://www.w3.org/2000/svg";
-
-          EDGES.forEach((pair) => {
-            const a = NODES[pair[0]];
-            const b = NODES[pair[1]];
-            const line = document.createElementNS(SVG_NS, "line");
-            line.setAttribute("x1", a[0]);
-            line.setAttribute("y1", a[1]);
-            line.setAttribute("x2", b[0]);
-            line.setAttribute("y2", b[1]);
-            line.setAttribute("class", "edge");
-            svg.appendChild(line);
-          });
-
-          NODES.forEach((n, i) => {
-            const dot = document.createElement("span");
-            dot.className = n[2] ? "node node-hub" : "node";
-            dot.id = "s4-node-" + i;
-            dot.style.left = n[0] + "px";
-            dot.style.top = n[1] + "px";
-            stage.appendChild(dot);
+          const ROW = 103; // 96px card + 7px gap
+          const host = document.getElementById("s4-findings");
+          FINDINGS.forEach((text, i) => {
+            const row = document.createElement("div");
+            row.className = "finding";
+            row.id = "s4-f-" + i;
+            row.style.top = i * ROW + "px";
+            const body = document.createElement("span");
+            body.className = "finding-text";
+            body.textContent = text;
+            row.appendChild(body);
+            host.appendChild(row);
           });
 
           const grid = document.getElementById("s4-grid");
@@ -260,13 +242,16 @@
             grid.appendChild(card);
           });
 
-          const sel = (indices) => indices.map((i) => "#s4-node-" + i).join(",");
-
           window.__timelines = window.__timelines || {};
           const tl = gsap.timeline({ paused: true });
 
           tl.fromTo("#s4-kicker", { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.2);
-          tl.fromTo("#s4-stage", { opacity: 0, x: -26 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.45);
+          tl.fromTo(
+            ".finding",
+            { opacity: 0, x: -20 },
+            { opacity: 1, x: 0, duration: 0.34, ease: "power2.out", stagger: { each: 0.06 } },
+            0.45,
+          );
           tl.fromTo(
             ".pcard",
             { opacity: 0, y: 26 },
@@ -275,30 +260,38 @@
           );
           tl.fromTo("#s4-strip", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.5);
 
-          // Three lenses over the SAME graph. Each swap re-lights a visibly different subset;
-          // every state is an explicit fromTo/to so a backward seek lands on the right frame.
           const BEATS = [
-            { at: 1.75, card: 2, set: [0, 1, 2, 7, 17, 18] },
-            { at: 4.65, card: 5, set: [8, 9, 10, 11, 12, 19] },
-            { at: 7.55, card: 4, set: [3, 4, 5, 6, 13] },
+            { at: 1.75, card: 2, order: ORDER.security },
+            { at: 4.45, card: 5, order: ORDER.maintainer },
+            { at: 7.35, card: 4, order: ORDER.learner },
           ];
 
           BEATS.forEach((beat, bi) => {
             const t = beat.at;
-
             if (bi > 0) {
               tl.to("#s4-glow-" + BEATS[bi - 1].card, { opacity: 0, duration: 0.24, ease: "power2.in" }, t - 0.14);
               tl.to("#s4-find-" + (bi - 1), { opacity: 0, duration: 0.18, ease: "none" }, t - 0.14);
             }
-
             tl.fromTo("#s4-glow-" + beat.card, { opacity: 0 }, { opacity: 1, duration: 0.28, ease: "power2.out" }, t);
             tl.to("#s4-card-" + beat.card, { scale: 1.03, duration: 0.18, ease: "power2.out" }, t);
             tl.to("#s4-card-" + beat.card, { scale: 1, duration: 0.3, ease: "power2.inOut" }, t + 0.18);
 
-            // Dim everything, then light this lens's subset — never overlapping windows on
-            // the same property, or GSAP's overwrite order decides the frame instead of us.
-            tl.to(".node", { opacity: 0.2, backgroundColor: "#697583", duration: 0.22, ease: "power2.out" }, t);
-            tl.to(sel(beat.set), { opacity: 1, backgroundColor: "#49b9ad", duration: 0.28, ease: "power2.out" }, t + 0.24);
+            // Reorder: every row slides to its new slot, and the two this lens
+            // leads with take the accent. Transform-only, so nothing reflows.
+            beat.order.forEach((findingIndex, slot) => {
+              const lead = slot < 2;
+              tl.to(
+                "#s4-f-" + findingIndex,
+                {
+                  y: (slot - findingIndex) * ROW,
+                  opacity: lead ? 1 : 0.34,
+                  borderLeftColor: lead ? "#49b9ad" : "#2b3440",
+                  duration: 0.5,
+                  ease: "power3.inOut",
+                },
+                t + 0.06,
+              );
+            });
 
             tl.fromTo("#s4-find-" + bi, { opacity: 0 }, { opacity: 1, duration: 0.24, ease: "none" }, t + 0.1);
           });

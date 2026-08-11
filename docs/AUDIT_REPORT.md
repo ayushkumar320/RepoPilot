@@ -56,6 +56,7 @@ What is wrong falls into four groups:
 | 18 | **P3** | ✅ fixed | `packages/ingestion/src/repopilot_ingestion/pipeline.py:201` | `gather` leaves the sibling task running when one side raises |
 | 19 | **P3** | ✏️ withdrawn | `apps/web/tests/e2e/` | The deleted spec covered deleted code |
 | 20 | **P3** | ✅ fixed | `scratch_index.py`, `httpx_index_time.txt`, `test-results/.last-run.json` | Scratch files tracked in the repository |
+| 21 | **P2** | ✅ fixed | `.pre-commit-config.yaml:23` | The mypy hook could never pass — the root cause of finding 1 |
 
 ---
 
@@ -500,6 +501,42 @@ Recorded so they are not re-audited later without reason.
 - **Repository weight.** 2.72 MiB packed; the 89 MB of video renders are
   correctly ignored, with only 26 source files under `videos/` tracked.
 - **Accessibility.** See pass 8.
+
+---
+
+### 21 — The pre-commit mypy hook could never pass · **P2**
+
+Found after the audit, by installing the hooks that finding 1 recommended —
+the first commit attempt was blocked by 72 errors:
+
+```
+packages/ingestion/.../db.py:16: error: Cannot find implementation or library
+stub for module named "sqlalchemy"  [import-not-found]
+...
+Found 72 errors in 22 files (checked 2 source files)
+```
+
+`mirrors-mypy` runs mypy inside a pre-commit-managed virtualenv containing
+only what `additional_dependencies` lists — `pydantic`, `pydantic-settings`,
+`structlog`. The project imports sqlalchemy, fastapi, httpx, arq, networkx,
+git, tree_sitter, cryptography, sentence_transformers and fastembed, none of
+which were installed there. Every one became an unresolved import.
+`uv run mypy packages apps` — what CI runs — passes clean on the same tree.
+
+**This is the root cause of finding 1.** A hook that fails on every commit
+regardless of the change is a hook everyone learns to bypass, and bypassing
+the hooks is exactly how an unformatted file reached `main` and left CI red
+across three pushes. The formatting was the symptom; this was the cause.
+
+Replaced with a `repo: local` hook running the same command as CI, through
+uv, with `pass_filenames: false` because mypy needs the whole program rather
+than the changed files. It now passes, along with every other hook.
+
+Worth noting how this was found: not by reading the config, but by taking the
+audit's own advice and installing the hooks. The audit checked that the gates
+*existed* and that CI *ran* them; it did not check that a developer could
+satisfy them locally. That is a gap in the method, and pass 1 of
+[`AUDIT_PLAN.md`](AUDIT_PLAN.md) should say so next time.
 
 ---
 

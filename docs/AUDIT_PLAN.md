@@ -43,6 +43,12 @@ Run `ruff check`, `ruff format --check`, `mypy --strict`, `pytest` with the
 Playwright suite. Compare against what `.github/workflows/ci.yml` actually
 runs — a gate that exists locally but not in CI is a finding of its own.
 
+**Also install and run the pre-commit hooks** (`uv run pre-commit install`,
+then `run --all-files`). The 2026-08-11 run checked that the gates existed and
+that CI ran them, and missed that the mypy hook could not pass on any commit —
+which turned out to be the cause of the one P1 the audit did find. Verifying a
+gate exists is not verifying a developer can satisfy it.
+
 ### Pass 2 — Security and abuse surface
 
 Trust boundaries first: session cookie signing, BYOK credential storage and

@@ -174,12 +174,27 @@ def _fit_prompt_budget(
 
 
 def _user_prompt(claim: Claim, chunks: Sequence[ChunkContent]) -> str:
+    """Render the verifier prompt, held under the provider's body limit.
+
+    One chunk is one AST node, and an AST node can be a 1500-line class, so
+    even a single cited chunk can exceed the limit on its own — selecting
+    fewer chunks cannot help. Truncate each one instead, marking the cut so
+    the verifier does not read a class that merely stops as the whole
+    implementation and reject a claim about the part it never saw.
+    """
     parts: list[str] = [f"CLAIM:\n{claim.text}\n\nCODE CHUNKS:"]
+    remaining = _MAX_PROMPT_CHARS
     for chunk in chunks:
+        if remaining <= 0:
+            break
+        body = chunk.content.rstrip()
+        if len(body) > remaining:
+            body = f"{body[:remaining].rsplit('\n', 1)[0]}\n… (chunk truncated for prompt size)"
+        remaining -= len(body)
         parts.append(
             f"\n<source file={chunk.ref.file_path}:{chunk.ref.start_line}-"
             f"{chunk.ref.end_line} symbol={chunk.ref.symbol!r}>\n"
-            f"{chunk.content.rstrip()}\n</source>"
+            f"{body}\n</source>"
         )
     return "\n".join(parts)
 

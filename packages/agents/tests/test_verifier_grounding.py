@@ -13,6 +13,7 @@ from repopilot_agents.verifier.grounding import (
     Claim,
     _fit_prompt_budget,
     _parse_verdict,
+    _user_prompt,
     verify_claim,
     verify_claims,
 )
@@ -336,3 +337,25 @@ def test_verifier_prompt_distinguishes_absence_scopes() -> None:
     """Chunk-scoped absence is checkable; repo-scoped absence is not."""
     assert "SUPPORTED when the chunks indeed do not contain it" in _SYSTEM_PROMPT
     assert "is REJECTED" in _SYSTEM_PROMPT
+
+
+def test_user_prompt_truncates_a_single_oversized_chunk() -> None:
+    """One AST node can be a whole class — selecting fewer chunks can't help."""
+    claim = Claim(
+        text="c",
+        refs=[CodeRef(file_path="big.py", start_line=1, end_line=2)],
+    )
+
+    rendered = _user_prompt(claim, [_chunk("big", _MAX_PROMPT_CHARS * 2)])
+
+    assert len(rendered) < _MAX_PROMPT_CHARS + 500
+    assert "chunk truncated for prompt size" in rendered
+
+
+def test_user_prompt_caps_the_total_across_many_chunks() -> None:
+    chunks = [_chunk(f"c{i}", 15_000) for i in range(6)]
+    claim = Claim(text="c", refs=[CodeRef(file_path="c0.py", start_line=1, end_line=2)])
+
+    rendered = _user_prompt(claim, chunks)
+
+    assert len(rendered) < _MAX_PROMPT_CHARS + 500

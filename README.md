@@ -320,4 +320,4 @@ Stated plainly, because the project's whole argument is about not overclaiming:
 
 ## License
 
-Proprietary. See [pyproject.toml](pyproject.toml). The source is public to read; it is not licensed for reuse.
+[MIT](LICENSE) — use it, fork it, build on it. © 2026 Prashant Raj and Ayush Kumar.

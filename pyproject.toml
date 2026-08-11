@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "RepoPilot — purpose-driven, grounded codebase onboarding tours."
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 
 [tool.uv.workspace]
 members = [

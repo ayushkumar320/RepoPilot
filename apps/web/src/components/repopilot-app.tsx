@@ -564,7 +564,10 @@ export default function RepoPilotApp({
         `/?repo=${encodeURIComponent(created.repo_id)}&persona=${personaId}`,
       );
     } catch (error) {
-      if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
+      if (
+        error instanceof ApiError &&
+        (error.code === "PROVIDER_KEY_REQUIRED" || error.code === "PROVIDER_KEY_REJECTED")
+      ) {
         setProviderDialogOpen(true);
       }
       setErrorMessage(
@@ -675,7 +678,10 @@ export default function RepoPilotApp({
         setTours(await api.listTours());
       })().catch(() => undefined);
     } catch (error) {
-      if (error instanceof ApiError && error.code === "PROVIDER_KEY_REQUIRED") {
+      if (
+        error instanceof ApiError &&
+        (error.code === "PROVIDER_KEY_REQUIRED" || error.code === "PROVIDER_KEY_REJECTED")
+      ) {
         setProviderDialogOpen(true);
       }
       setErrorMessage(error instanceof Error ? error.message : "Unable to query this snapshot.");

@@ -33,6 +33,7 @@ from repopilot_api.services import (
     encode_chunk_id,
 )
 from repopilot_api.sse import format_sse_comment, format_sse_event, with_heartbeats
+from repopilot_core.llm.provider import ProviderCredentialsError
 from repopilot_core.settings import Settings
 
 CONTRIBUTOR_PROFILE = {
@@ -121,6 +122,12 @@ class FakeQAService:
         self.ask_calls.append((repo_id, question, framing))
         if question == "explode":
             raise RuntimeError("qa exploded")
+        if question == "broke":
+            raise ProviderCredentialsError(
+                "huggingface rejected the request (402)",
+                provider="huggingface",
+                status_code=402,
+            )
         if on_token is not None:
             await on_token("Start with ")
             await on_token("the Flask class.")
@@ -423,6 +430,20 @@ async def test_ask_failure_returns_structured_503(api_client: AsyncClient) -> No
 
     assert response.status_code == 503
     assert response.json()["detail"]["code"] == "QA_FAILED"
+
+
+@pytest.mark.asyncio
+async def test_ask_reports_an_out_of_credit_provider_key(api_client: AsyncClient) -> None:
+    """402 from the reader's own key must name the key, not blame the question."""
+    response = await api_client.post(
+        "/repos/repo-123/ask",
+        json={"question": "broke"},
+    )
+
+    assert response.status_code == 402
+    detail = response.json()["detail"]
+    assert detail["code"] == "PROVIDER_KEY_REJECTED"
+    assert "out of credit" in detail["message"]
 
 
 @pytest.mark.asyncio

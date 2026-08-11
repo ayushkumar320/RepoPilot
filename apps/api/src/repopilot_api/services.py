@@ -41,7 +41,7 @@ from repopilot_api.models import (
     TourFirstImpressionEvent,
 )
 from repopilot_api.tours import InMemoryTourService, PostgresTourService, TourService
-from repopilot_core.llm.provider import LLMProvider
+from repopilot_core.llm.provider import LLMProvider, ProviderCredentialsError
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
 from repopilot_ingestion.db import INDEX_RECIPE_VERSION
@@ -508,6 +508,10 @@ class LiveQAService:
         try:
             try:
                 result = await attempt()
+            except ProviderCredentialsError:
+                # Money or auth, not the question. Retrying and keyword-dumping
+                # both hide the one thing the reader can act on.
+                raise
             except Exception:
                 # Every optional stage (query understanding, hybrid's sparse
                 # lane, rerank, compression, hops, the verifier) degrades in

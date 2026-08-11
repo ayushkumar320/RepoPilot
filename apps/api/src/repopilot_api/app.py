@@ -55,6 +55,7 @@ from repopilot_api.services import (
 )
 from repopilot_api.sse import with_heartbeats
 from repopilot_api.tours import Identity
+from repopilot_core.llm.provider import ProviderCredentialsError
 from repopilot_core.logging import configure_logging
 from repopilot_core.settings import get_settings
 
@@ -330,6 +331,32 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
         except KeyError as exc:
             await get_services().access.release(reservation)
             raise HTTPException(status_code=404, detail="repo not found") from exc
+        except ProviderCredentialsError as exc:
+            # The reader is not out of questions and the question is not the
+            # problem — their key is out of credit or no longer valid. Say so:
+            # the generic 503 sent them back to rephrasing a fine question.
+            await get_services().access.release(reservation)
+            log.warning(
+                "repo.ask_provider_credentials",
+                repo_id=repo_id,
+                provider=exc.provider,
+                status_code=exc.status_code,
+            )
+            reason = (
+                "is out of credit"
+                if exc.status_code == 402
+                else "rejected the key (it may be invalid or revoked)"
+            )
+            raise HTTPException(
+                status_code=402,
+                detail={
+                    "code": "PROVIDER_KEY_REJECTED",
+                    "message": (
+                        f"Your connected {exc.provider} key {reason}. "
+                        "Update it in provider settings, then ask again."
+                    ),
+                },
+            ) from exc
         except Exception as exc:
             await get_services().access.release(reservation)
             log.exception("repo.ask_failed", repo_id=repo_id)

@@ -67,6 +67,21 @@ class ProviderError(RuntimeError):
     """All providers in the fallback chain failed."""
 
 
+class ProviderCredentialsError(ProviderError):
+    """Every binding was rejected for money or auth, not for capacity.
+
+    401/403 (bad or revoked key) and 402 (credit exhausted) are terminal: no
+    retry, no fallback model and no amount of waiting changes them, and the
+    reader must be told to fix the key rather than shown a degraded answer
+    that blames the question.
+    """
+
+    def __init__(self, message: str, *, provider: str, status_code: int) -> None:
+        super().__init__(message)
+        self.provider = provider
+        self.status_code = status_code
+
+
 class TruncatedReasoningError(ProviderError):
     """The model spent its whole budget thinking and emitted no answer.
 
@@ -691,6 +706,7 @@ class LLMProvider:
 
         candidate_models = (model, *_MODEL_FALLBACKS.get(model, ()))
         last_error: Exception | None = None
+        credentials_error: ProviderCredentialsError | None = None
         for candidate in candidate_models:
             try:
                 response = await self._generate_uncached(
@@ -701,6 +717,8 @@ class LLMProvider:
                 )
             except ProviderError as exc:
                 last_error = exc
+                if isinstance(exc, ProviderCredentialsError):
+                    credentials_error = exc
                 if candidate != model:
                     log.warning(
                         "llm.model_fallback_failed",
@@ -723,6 +741,8 @@ class LLMProvider:
             await self.cache.put(key, response)
             return response
 
+        if credentials_error is not None:
+            raise credentials_error from last_error
         raise ProviderError(
             f"all providers failed for {model.value}: {last_error!r}"
         ) from last_error
@@ -947,6 +967,7 @@ class LLMProvider:
             chain = (*chain, HF_CHAT_FALLBACK[model])
 
         last_error: Exception | None = None
+        credentials_error: ProviderCredentialsError | None = None
         for binding in chain:
             client = self.clients.get(binding.provider)
             if client is None:
@@ -999,6 +1020,20 @@ class LLMProvider:
                 continue
             except (httpx.HTTPError, ConnectionError, OSError) as exc:
                 last_error = exc
+                if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code in (
+                    401,
+                    402,
+                    403,
+                ):
+                    # Billing/auth, not capacity. Remember it so the caller can
+                    # tell the reader to top up or re-connect the key instead
+                    # of reporting a failure the question could never fix.
+                    credentials_error = ProviderCredentialsError(
+                        f"{binding.provider.value} rejected the request "
+                        f"({exc.response.status_code})",
+                        provider=binding.provider.value,
+                        status_code=exc.response.status_code,
+                    )
                 log.warning(
                     "llm.provider_transport_error",
                     model=model.value,
@@ -1010,6 +1045,8 @@ class LLMProvider:
             response.model = model
             return response
 
+        if credentials_error is not None:
+            raise credentials_error from last_error
         raise ProviderError(
             f"all providers failed for {model.value}: {last_error!r}"
         ) from last_error

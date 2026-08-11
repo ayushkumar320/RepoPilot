@@ -16,6 +16,7 @@ from repopilot_core.llm.models import ModelId, ProviderName
 from repopilot_core.llm.provider import (
     LLMProvider,
     Message,
+    ProviderCredentialsError,
     ProviderError,
     RateLimitError,
     TruncatedReasoningError,
@@ -672,3 +673,28 @@ async def test_generate_stream_falls_back_when_no_client_can_stream(
     )
 
     assert deltas == ["no streaming here"]
+
+
+async def test_payment_required_surfaces_as_a_credentials_error(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """402 is terminal: the caller must be able to tell the reader to top up."""
+
+    def _http_402() -> httpx.HTTPStatusError:
+        request = httpx.Request("POST", "https://router.huggingface.co/v1/chat/completions")
+        return httpx.HTTPStatusError(
+            "Client error '402 Payment Required'",
+            request=request,
+            response=httpx.Response(402, request=request),
+        )
+
+    groq = FakeClient(ProviderName.GROQ, [_http_402() for _ in range(4)])
+    cerebras = FakeClient(ProviderName.CEREBRAS, [_http_402() for _ in range(5)])
+    provider = make_provider(
+        tmp_settings,
+        {ProviderName.GROQ: groq, ProviderName.CEREBRAS: cerebras},
+    )
+
+    with pytest.raises(ProviderCredentialsError) as excinfo:
+        await provider.generate(ModelId.QA_PRIMARY, _msgs(), retry_429_attempts=1)
+
+    assert excinfo.value.status_code == 402
+    assert excinfo.value.provider in {"groq", "cerebras"}

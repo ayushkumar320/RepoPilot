@@ -1,53 +1,66 @@
 # RepoPilot
 
-RepoPilot is a purpose-driven codebase onboarding tool for public software repositories. A user pastes a GitHub URL, explains what they are trying to do, and gets a grounded tour of the codebase where every factual claim is tied back to concrete `file:line` references. Python receives AST-level structural analysis; other supported languages receive line-aware retrieval chunks.
+**Paste a public GitHub URL, say why you are here, and get a guided tour of the codebase where every factual claim is tied to a real `file:line`.**
 
-The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
+Reading an unfamiliar repository is not a search problem. The hard part is not finding a function — it is knowing which twenty of four thousand functions matter *for what you are trying to do*, and being able to trust what you are told about them. A first-time contributor, a security reviewer, and someone evaluating the library for adoption are looking at the same code and need three different tours.
+
+RepoPilot is built around that: **it asks why you are here before it analyzes anything**, and every downstream step adapts to the answer.
 
 > Current status: launch-ready. Run it locally with the [startup guide](docs/STARTUP_GUIDE.md); deploy it with the [deployment guide](docs/DEPLOYMENT.md). Where the project stands day to day is in [docs/STATUS.md](docs/STATUS.md).
 
-> **Deploy privately.** RepoPilot is built to run where everyone who can reach
-> the API is someone who pays for it, and it has no spend ceiling on the
-> platform's model key by deliberate, recorded decision. Before exposing it to
-> anyone else — including an "unlisted" link or a shared staging URL — read the
-> **2026-08-11 scope decision** in [docs/STATUS.md](docs/STATUS.md): it lists
-> what has to be closed first and what each item costs to close.
+---
 
-## What It Does
+## The two bets
 
-RepoPilot turns a repository into a purpose-aware map:
+**1. Pre-context beats post-filtering.** Most code assistants answer the question you typed. RepoPilot first captures a short statement of intent — either a preset persona (open-source contributor, security reviewer, adopter, learner, maintainer, competitive analyst) or free text like *"I'm writing a migration guide and need the breaking changes"* — and turns it into a structured `IntentProfile`. That profile decides which analysis capabilities run at all, and what shape the answer takes: a narrative, a ranked list, a dossier, a comparison table. The persona changes what the answer *does*, not just its tone.
 
-- Clones and indexes a public GitHub repository.
-- Parses Python with tree-sitter and builds a deterministic code graph with NetworkX.
-- Indexes TypeScript/JavaScript, Java/Kotlin, Go, Rust, C/C++, C#, Ruby, PHP, Swift, Scala, Vue/Svelte, and shell using bounded line-aware chunks.
-- Indexes high-value repository context including README and dependency/build manifests.
-- Stores exact source spans in Postgres for grounded citations.
-- Embeds chunks into pgvector for semantic retrieval.
-- Captures the user's free-text intent and converts it into an `IntentProfile`.
-- Plans which agent capabilities should run using deterministic planner rules.
-- Shapes each answer around the reader's persona: the persona decides what the answer must *do* (narrative, ranked list, dossier, comparison table), not just how it is worded.
-- Verifies factual claims against retrieved source before showing them, and labels anything unsupported instead of dropping it.
-- Signs the reader in, keeps their tours, and lets them bring their own model provider key.
-- Streams progress through a FastAPI SSE API into a Next.js tour UI.
+**2. Deterministic facts, generated prose — never the reverse.** The call graph is built by an AST, not guessed by a model. Retrieval is hybrid vector + keyword + graph. Every factual claim carries a `CodeRef` (`file_path:start-end:symbol`), and before an answer reaches you a **verifier** re-reads the cited source and asks whether the claim is actually supported. Unsupported claims are labelled and shown, never silently deleted — a flagged claim is information, a disappeared one is a lie by omission.
 
-RepoPilot is not a general chatbot over code. The LLM never invents the call graph; deterministic parsing and graph tools provide the facts, and generation is wrapped by a verifier.
+The rule the whole project is organised around: **truthful over fluent.** If the system does not know, it says so.
 
-## Current Build State
+---
 
-| Area | Status |
-|---|---|
-| Foundation | Monorepo, settings, LLM provider, lint/type/test tooling, Docker services |
-| Ingestion | Clone → parse → chunk → graph → embed → persist |
-| Q&A spine | Hybrid vector + graph retrieval, persona-shaped answers, verifier loop |
-| Orchestration | Intent profiler, deterministic capability planner, LangGraph state graph |
-| Experience | FastAPI + Next.js product slice, SSE streams, claim-level verification badges |
-| Accounts | Sign-in gate (Google/GitHub), stable session identity, saved tours, BYOK provider keys |
-| Contribute mode | Lane A/B/C cores, ranker, and eval registration scaffold |
-| Ship hardening | RAG ship report; CI runs lint, `mypy --strict`, tests at 80% coverage, gitleaks, and the web typecheck/build/e2e suite |
+## What you get
 
-The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md). Architecture details live in [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md).
+- **A grounded answer with expandable citations.** Each claim can be opened inline to the exact source it cites, with real line numbers.
+- **Per-claim verification badges.** Verified, flagged, or unverified — visible, not buried.
+- **A "Related code" panel.** Expand any claim into what it calls, what calls it, what it inherits from, what imports it — walked from the AST graph, several hops deep, one request per step.
+- **Answers streamed as they generate**, over SSE, with a first-impression summary while indexing is still running.
+- **Saved tours.** Sign in with Google or GitHub and your tours follow you across devices.
+- **Bring your own key.** Connect a Groq key (optionally a Hugging Face token) and your questions run on it. Keys are encrypted at rest and never stored in the browser.
 
-## Architecture At A Glance
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+    url["Public GitHub URL"]
+    intent["Free-text intent<br/>or preset persona"]
+    index["Index<br/>clone, parse, chunk, graph, embed"]
+    profile["IntentProfile"]
+    plan["Capability planner<br/>deterministic rules"]
+    retrieve["Hybrid retrieval<br/>vector + BM25 + graph"]
+    answer["Persona-shaped answer"]
+    verify["Verifier<br/>re-reads the cited source"]
+    out["Answer with per-claim<br/>file:line refs and badges"]
+
+    url --> index
+    intent --> profile --> plan
+    index --> retrieve
+    plan --> retrieve
+    retrieve --> answer --> verify --> out
+```
+
+**Indexing.** The repository is shallow-cloned, then parsed: Python through tree-sitter into an AST-level graph of imports, calls and inheritance; TypeScript/JavaScript, Java/Kotlin, Go, Rust, C/C++, C#, Ruby, PHP, Swift, Scala, Vue/Svelte and shell into bounded line-aware chunks. READMEs and dependency manifests are indexed too, because "what is this project" is usually answered there. Every chunk keeps its exact source span, so a citation is a location rather than a paraphrase. Chunks are embedded into pgvector; the graph is stored as JSONB adjacency.
+
+**Answering.** Retrieval fuses a dense lane (pgvector) and a sparse lane (Postgres full-text, BM25-style `ts_rank_cd`), reranks the pool with a cross-encoder, and diversifies with MMR so five neighbouring lines of the same file do not crowd out the rest. Graph facts — fan-in, hubs, entry points, neighbours — come from the stored adjacency, never from the model. The answer prompt is assembled from those chunks, shaped by the persona.
+
+**Verifying.** Each claim goes back to the verifier with the source it cites and one question: *is this fully supported?* A rejected claim gets one recheck against the wider context the answerer actually saw, because the most common failure is not a fabricated claim — it is a true claim citing the wrong chunk. What survives is badged; what does not is flagged in place.
+
+---
+
+## Architecture
 
 ```mermaid
 flowchart TB
@@ -77,40 +90,11 @@ flowchart TB
     api -- "SSE events" --> web
 ```
 
-## Runtime Flow
+**Stack.** Python 3.12 backend (FastAPI, LangGraph, Pydantic v2, SQLAlchemy, tree-sitter, NetworkX, sentence-transformers), Next.js 15 + React frontend, Postgres with pgvector, Redis for background indexing jobs. Models are reached through one provider layer with an explicit fallback chain — Groq, then Cerebras, then optionally Hugging Face — with SQLite response caching and 429-aware retry budgets.
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant W as Web App
-    participant A as FastAPI
-    participant I as Ingestion Pipeline
-    participant DB as Postgres/pgvector
-    participant G as LangGraph Agents
-    participant V as Verifier
+### The agent graph
 
-    U->>W: Sign in (Google/GitHub)
-    W->>A: PUT /me — bind session to account
-    U->>W: Paste GitHub URL
-    W->>A: POST /repos
-    A->>I: enqueue indexing
-    I->>DB: persist chunks, embeddings, graph adjacency
-    W->>U: Ask "Who is asking?"
-    U->>W: Persona (preset or free text)
-    W->>A: POST /repos/{repo_id}/ask with question + intent profile
-    A->>G: retrieve, answer, verify
-    G->>DB: read chunks / vector hits / graph facts
-    G->>V: verify claims against source refs
-    V-->>G: verified or flagged claims
-    G-->>A: answer and verified claims
-    A-->>W: JSON answer + claim refs
-    W->>A: POST /tours/{tour_id}/messages — persist the turn
-    W-->>U: Persona-shaped answer with per-claim `file:line` refs
-```
-
-## Agent Graph
-
-The agent system uses one shared `ArchaeologistState`. The generic intent layer always runs first; the capability planner then activates whichever capabilities match the user's stated intent.
+One shared `ArchaeologistState` flows through the graph. The intent layer always runs first; the planner then activates only the capabilities the stated intent justifies. There is deliberately **no `learn | contribute | audit` enum** — planner rules read continuous intent weights and raw-text signals, because real users do not fit three buckets.
 
 ```mermaid
 flowchart LR
@@ -143,9 +127,11 @@ flowchart LR
     qa --> verifier
 ```
 
-### Graph Connections That Matter
+Lane C — "this looks worth investigating" — is deliberately constrained: it must use guarded language, never assert a bug, and always end with a confirmation step before anything resembling a patch. That constraint is enforced in the prompt *and* post-checked by the verifier.
 
-The **code graph** built from the target repository powers product behavior:
+### Facts in, language out
+
+The code graph built from the target repository is what makes grounding possible:
 
 ```mermaid
 flowchart TB
@@ -178,7 +164,7 @@ flowchart TB
     pggraph --> tools
 ```
 
-The six deterministic tools are the boundary between facts and language:
+Six deterministic tools are the boundary between fact and prose. Adding a seventh requires a justification that starts with *"the model cannot do this from the existing tools because…"*.
 
 ```mermaid
 flowchart LR
@@ -199,7 +185,53 @@ flowchart LR
     issues --> agents
 ```
 
-## Repository Structure
+---
+
+## Design principles
+
+These are enforced in review and CI, not aspirational:
+
+- **Truthful over fluent.** Claims need `CodeRef` spans. Unknown means "I don't know".
+- **No stat dumps.** Metrics become `Insight` objects with a consequence — an empty "so what" fails validation by design.
+- **Intent first.** Every capability reads the user's stated purpose.
+- **Deterministic facts, LLM narration.** Parsing, graph construction, retrieval and metrics are tool-driven.
+- **Verifier wrapped.** Unsupported claims are flagged, not silently shipped.
+- **No fixed purpose enum.** Continuous intent weights, not three branches.
+
+---
+
+## Run it locally
+
+Prerequisites: Python 3.12+, Node 22+, Docker (for Postgres and Redis), and a [Groq API key](https://console.groq.com/).
+
+```bash
+make setup
+cp .env.example .env     # add GROQ_API_KEY
+make services            # Postgres + pgvector, Redis, migrations
+make dev                 # API on :8000, web on :3000
+```
+
+Open `http://127.0.0.1:3000`. Full walkthrough in the [startup guide](docs/STARTUP_GUIDE.md).
+
+Sign-in is optional locally: leave `AUTH_GOOGLE_ID` and `AUTH_GITHUB_ID` empty and the app runs anonymously. Set either one (plus `AUTH_SECRET`) and it is gated behind sign-in, with tours following the account. Callback URL: `<web-origin>/api/auth/callback/{google,github}`.
+
+On first run, sentence-transformer weights (~250 MB) and the reranker (~91 MB) download into the local Hugging Face cache.
+
+### Development
+
+```bash
+make lint             # ruff check + format check
+make typecheck        # mypy --strict
+make test             # fast pytest lane
+make ci               # lint + typecheck + coverage (matches GitHub Actions)
+make test-slow        # integration tests; needs services and provider keys
+```
+
+Quality gates: `ruff`, `mypy --strict` from day one, `pytest` at 80% coverage minimum, `gitleaks`, plus frontend typecheck, build, unit and Playwright suites. All of it runs on every push and pull request.
+
+---
+
+## Project layout
 
 ```text
 .
@@ -211,35 +243,30 @@ flowchart LR
 │   ├── ingestion/            # clone, parse, chunk, graph, embed, persist
 │   ├── agents/               # LangGraph state, tools, capabilities, verifier, contribute mode
 │   └── evals/                # eval registry, datasets, runners, reports
-├── infra/
-│   └── postgres/             # pgvector init SQL
-├── docs/                     # startup guide, architecture, and historical product rationale
+├── infra/postgres/           # pgvector init SQL
+├── docs/                     # startup guide, architecture, status, audit
 ├── docker-compose.yml        # Postgres + pgvector, Redis
 ├── Makefile                  # common dev/test commands
 └── pyproject.toml            # uv workspace + Python quality config
 ```
 
-### Key Source Areas
-
 | Path | Purpose |
 |---|---|
-| `packages/core/src/repopilot_core/settings.py` | Runtime configuration from `.env` |
-| `packages/core/src/repopilot_core/llm/provider.py` | Provider fallback, caching, and 429 handling |
 | `packages/ingestion/src/repopilot_ingestion/pipeline.py` | End-to-end indexing pipeline |
+| `packages/ingestion/src/repopilot_ingestion/parse.py` | tree-sitter parse and symbol resolution |
 | `packages/agents/src/repopilot_agents/state.py` | Shared Pydantic state contract |
 | `packages/agents/src/repopilot_agents/graph.py` | Main LangGraph wiring |
-| `packages/agents/src/repopilot_agents/tools/` | Deterministic tool layer |
+| `packages/agents/src/repopilot_agents/tools/` | The six deterministic tools |
 | `packages/agents/src/repopilot_agents/verifier/` | Grounding and actionability checks |
-| `packages/agents/src/repopilot_agents/contribute/` | Contribute-mode Lane A/B/C and ranker scaffolding |
 | `packages/agents/src/repopilot_agents/qa/prompts.py` | Persona-driven answer prompts and output shapes |
+| `packages/core/src/repopilot_core/llm/provider.py` | Provider fallback, caching, 429 handling |
 | `apps/api/src/repopilot_api/app.py` | FastAPI routes and SSE endpoints |
-| `apps/api/src/repopilot_api/access.py` | Sessions, free allowance, encrypted BYOK provider keys |
-| `apps/web/src/app/api/auth/[...nextauth]/route.ts` | Google/GitHub sign-in |
+| `apps/api/src/repopilot_api/access.py` | Sessions, allowances, encrypted BYOK keys |
 | `apps/web/src/components/repopilot-app.tsx` | Main web experience |
 
-## API Surface
+### API surface
 
-Every request carries a signed session cookie; account, tour, and usage routes are scoped to it.
+Every request carries a signed session cookie; account, tour and usage routes are scoped to it.
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -247,84 +274,50 @@ Every request carries a signed session cookie; account, tour, and usage routes a
 | `POST` | `/repos` | Enqueue repo indexing |
 | `GET` | `/repos/{repo_id}/status` | Poll indexing/readiness state |
 | `GET` | `/repos/{repo_id}/first-impression` | SSE first-impression stream |
-| `POST` | `/intent` | Structure a free-text persona into an `IntentProfile` |
+| `POST` | `/intent` | Structure free text into an `IntentProfile` |
 | `POST` | `/repos/{repo_id}/ask` | Ask a grounded question through a persona |
-| `GET` `PUT` | `/me` | Read or bind the signed-in identity for this session |
-| `GET` | `/account/usage` | Free repository allowance and connected providers |
-| `POST` | `/account/provider` | Connect a bring-your-own provider key (encrypted at rest) |
-| `POST` `GET` | `/tours` | Create a saved tour / list this account's tours |
-| `GET` `DELETE` | `/tours/{tour_id}` | Load or delete a saved tour with its messages |
-| `POST` | `/tours/{tour_id}/messages` | Append a question/answer turn to a tour |
-| `GET` | `/chunks/{chunk_id}` | Fetch exact source for a claim's `file:line` span |
+| `POST` | `/repos/{repo_id}/ask/stream` | The same answer, streamed as it generates |
+| `GET` | `/repos/{repo_id}/graph/neighbours` | Symbols adjacent to a claim's symbol |
+| `GET` `PUT` | `/me` | Read or bind the signed-in identity |
+| `GET` | `/account/usage` | Allowance and connected providers |
+| `POST` `DELETE` | `/account/provider` | Connect or disconnect a BYOK key |
+| `POST` `GET` | `/tours` | Create / list saved tours |
+| `GET` `DELETE` | `/tours/{tour_id}` | Load or delete a tour with its messages |
+| `POST` | `/tours/{tour_id}/messages` | Append a turn to a tour |
+| `GET` | `/chunks/{chunk_id}` | Exact source for a claim's span |
 
-In development, FastAPI docs are available at `http://127.0.0.1:8000/docs`.
+In development, FastAPI docs are at `http://127.0.0.1:8000/docs`.
 
-## Setup Your Own Local Instance
+---
 
-Use the dedicated [local startup guide](docs/STARTUP_GUIDE.md). The short version is:
+## Known limitations
 
-```bash
-make setup
-cp .env.example .env
-make services
-make dev
-```
+Stated plainly, because the project's whole argument is about not overclaiming:
 
-Open `http://127.0.0.1:3000`. `make dev` runs the backend at `http://127.0.0.1:8000` and the frontend at `http://127.0.0.1:3000`.
+- **AST dependency graphs are Python-only.** Other languages get grounded textual retrieval without invented graph edges. A repo with no Python produces no graph, and the UI says so rather than showing an empty panel.
+- **Call edges resolve from declared types.** A call through a base-class-typed variable lands on the **base**, not on whichever subclass runs at runtime. Dynamic dispatch, `getattr` and untyped attributes produce no edge rather than a guessed one.
+- **Public GitHub repositories only.**
+- **Large-repo demos depend on external provider quotas.** A free-tier key can rate-limit mid-tour.
+- **Query Understanding, Ingestion Enrichment and Context Compression are implemented and measured but switched off** — their evaluation gates missed, and shipping a feature that did not clear its own bar would contradict the point.
+- **Grounding is strong per claim, weaker all-or-nothing.** Most claims verify; a whole answer with every claim verified is the harder bar and remains follow-up work.
+- **Identity is only as strong as the signed session cookie.** The web app asserts who signed in and the API trusts that cookie.
+- **No spend ceiling on the platform model key.** Safe while access is private; read the 2026-08-11 scope decision in [docs/STATUS.md](docs/STATUS.md) before exposing an instance more widely.
+- **No automated retrieval-regression gate.** The eval workflows were removed in `d84e98d`; retrieval-affecting changes are measured by running `make test-eval-sampled` deliberately.
 
-Sign-in is optional locally. Leave `AUTH_GOOGLE_ID` and `AUTH_GITHUB_ID` empty in `.env` and the app runs anonymously; set either one (plus `AUTH_SECRET`) and the app is gated behind sign-in, with tours following the account across devices. Callback URL: `<web-origin>/api/auth/callback/{google,github}`.
+---
 
-## Development Workflow
-
-Common commands:
-
-```bash
-make install          # uv sync --all-packages --all-groups
-make lint             # ruff check + format check
-make fmt              # format and ruff --fix
-make typecheck        # mypy packages apps
-make test             # fast pytest lane
-make ci               # lint + typecheck + coverage
-make test-slow        # integration/slow tests, needs services and provider keys
-make docker-down      # stop and remove local service volumes
-```
-
-## Design Principles
-
-RepoPilot follows a few hard rules:
-
-- **Truthful over fluent:** claims need `CodeRef` source spans.
-- **No stat dumps:** metrics become actionable `Insight` objects with consequences.
-- **Intent first:** every downstream capability reads the user's stated purpose, and the persona decides what the answer must do — not only its tone.
-- **Deterministic facts, LLM narration:** parsing, graph construction, retrieval, and metrics are tool-driven.
-- **Verifier wrapped:** unsupported claims are flagged, not silently shipped.
-- **No fixed purpose enum:** there is no `learn/contribute/audit` branch; planner rules read continuous intent weights and raw-text signals.
-
-## Documentation Map
+## Documentation
 
 | File | Why read it |
 |---|---|
-| [docs/STATUS.md](docs/STATUS.md) | Where the project stands: in flight, next, known-broken, and the scope decisions |
-| [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
+| [docs/STATUS.md](docs/STATUS.md) | Where the project stands: in flight, next, known-broken, scope decisions |
 | [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md) | Local runbook: install, env, services, API, web, checks |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production containers, environment, migration, worker, and release sequence |
-| [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
-| [docs/AUDIT_REPORT.md](docs/AUDIT_REPORT.md) | The 2026-08-11 audit: 21 findings, what was fixed, what was accepted and why |
+| [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state schema, tools, verifier |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production containers, environment, migrations, release sequence |
+| [docs/AUDIT_REPORT.md](docs/AUDIT_REPORT.md) | Full engineering audit: 21 findings, what was fixed, what was accepted and why |
+| [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
 | [docs/archive/](docs/archive/) | Product thesis and historical stack rationale |
-
-## Known Limitations
-
-- AST dependency graphs are currently Python-only; other supported languages use grounded textual retrieval without invented graph edges.
-- Call edges resolve a receiver from its declared type, so a call through a base-class-typed variable lands on the **base**, not on whichever subclass runs. Dynamic dispatch, `getattr`, and untyped attributes yield no edge rather than a guessed one.
-- Public GitHub repos only.
-- Large live repo demos depend on external model/provider quotas.
-- Query Understanding, Ingestion Enrichment, and Context Compression are implemented/evaluated but switched off because their gates missed.
-- Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
-- Docker Compose is for local data services; the app dev flow runs API/web directly.
-- Identity is only as strong as the signed session cookie: the web app asserts who signed in, and the API trusts that cookie.
-- No spend ceiling on the platform model key. Safe while access is private; see the deployment note at the top and the scope decision in [docs/STATUS.md](docs/STATUS.md) before exposing it more widely.
-- The eval workflows and the retrieval artifact gate were removed in `d84e98d`. Retrieval-affecting changes are measured by running `make test-eval-sampled` deliberately; nothing automated will catch a regression.
 
 ## License
 
-Proprietary. See [pyproject.toml](pyproject.toml).
+Proprietary. See [pyproject.toml](pyproject.toml). The source is public to read; it is not licensed for reuse.

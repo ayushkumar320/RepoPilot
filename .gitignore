@@ -34,3 +34,12 @@ next-env.d.ts
 
 # Eval reports (timestamped JSON+Markdown produced by `python -m repopilot_evals run --report`)
 eval-reports/
+
+# Playwright output
+test-results/
+playwright-report/
+
+# Local scratch: one-off scripts and timing notes, kept out of the tree that
+# everyone else clones.
+scratch_*.py
+*_index_time.txt

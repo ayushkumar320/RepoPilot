@@ -4,7 +4,18 @@ RepoPilot is a purpose-driven codebase onboarding tool for public software repos
 
 The project is built around one bet: the system should ask *why you are here* before it analyzes the repo. A learner, a first-time contributor, and a security-minded reviewer should not receive the same tour.
 
-> Current status: launch-ready. Run it locally with the [startup guide](docs/STARTUP_GUIDE.md); deploy it with the [deployment guide](docs/DEPLOYMENT.md).
+> Current status: launch-ready. Run it locally with the [startup guide](docs/STARTUP_GUIDE.md); deploy it with the [deployment guide](docs/DEPLOYMENT.md). Where the project stands day to day is in [docs/STATUS.md](docs/STATUS.md).
+
+> **Deploy privately, not publicly.** RepoPilot has no rate limit and no spend
+> ceiling on the platform's model key: the free-repository allowance is keyed on
+> a cookie the caller controls, questions are unmetered, `/intent` answers
+> unauthenticated callers, and a repository is cloned in full before its size is
+> checked. This is a deliberate, recorded decision — it costs more to build a
+> ceiling than it protects when everyone who can reach the API is someone who
+> pays for it. **It stops being true the moment the API is reachable by anyone
+> else**, including an "unlisted" link or a shared staging URL. The
+> [2026-08-11 scope decision](docs/STATUS.md) names what has to close first and
+> what each item costs.
 
 ## What It Does
 
@@ -36,7 +47,7 @@ RepoPilot is not a general chatbot over code. The LLM never invents the call gra
 | Experience | FastAPI + Next.js product slice, SSE streams, claim-level verification badges |
 | Accounts | Sign-in gate (Google/GitHub), stable session identity, saved tours, BYOK provider keys |
 | Contribute mode | Lane A/B/C cores, ranker, and eval registration scaffold |
-| Ship hardening | RAG ship report and retrieval eval artifact gate in CI |
+| Ship hardening | RAG ship report; CI runs lint, `mypy --strict`, tests at 80% coverage, gitleaks, and the web typecheck/build/e2e suite |
 
 The operational runbook lives in [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md). Architecture details live in [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md).
 
@@ -297,10 +308,12 @@ RepoPilot follows a few hard rules:
 
 | File | Why read it |
 |---|---|
+| [docs/STATUS.md](docs/STATUS.md) | Where the project stands: in flight, next, known-broken, and the scope decisions |
 | [CLAUDE.md](CLAUDE.md) | Project rules and contributor workflow |
 | [docs/STARTUP_GUIDE.md](docs/STARTUP_GUIDE.md) | Local runbook: install, env, services, API, web, checks |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production containers, environment, migration, worker, and release sequence |
 | [docs/03_ARCHITECTURE.md](docs/03_ARCHITECTURE.md) | Agent topology, state, tools, verifier |
+| [docs/AUDIT_REPORT.md](docs/AUDIT_REPORT.md) | The 2026-08-11 audit: 21 findings, what was fixed, what was accepted and why |
 | [docs/archive/](docs/archive/) | Product thesis and historical stack rationale |
 
 ## Known Limitations
@@ -313,6 +326,8 @@ RepoPilot follows a few hard rules:
 - Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
 - Docker Compose is for local data services; the app dev flow runs API/web directly.
 - Identity is only as strong as the signed session cookie: the web app asserts who signed in, and the API trusts that cookie.
+- No rate limit and no spend ceiling on the platform model key — see the deployment note at the top. Safe while access is private; not safe otherwise.
+- The eval workflows and the retrieval artifact gate were removed in `d84e98d`. Retrieval-affecting changes are measured by running `make test-eval-sampled` deliberately; nothing automated will catch a regression.
 
 ## License
 

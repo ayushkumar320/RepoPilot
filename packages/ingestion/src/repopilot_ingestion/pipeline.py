@@ -198,10 +198,18 @@ async def index_repo(
             )
 
             model_started = time.perf_counter()
-            summarised, embedded = await asyncio.gather(
-                summarise_chunks(chunks, provider=provider, settings=settings),
-                embed_chunks(chunks, provider=provider, settings=settings),
-            )
+            # TaskGroup rather than gather: a bare gather propagates the first
+            # failure but leaves the sibling running, so a failed summarise
+            # left an embedding pass burning provider quota for a pipeline
+            # that had already given up.
+            async with asyncio.TaskGroup() as model_stage:
+                summary_task = model_stage.create_task(
+                    summarise_chunks(chunks, provider=provider, settings=settings)
+                )
+                embed_task = model_stage.create_task(
+                    embed_chunks(chunks, provider=provider, settings=settings)
+                )
+            summarised, embedded = summary_task.result(), embed_task.result()
             _log_stage(
                 "summary_and_embedding",
                 model_started,

@@ -57,6 +57,13 @@ from repopilot_ingestion.pipeline import index_repo, revisit_status
 
 log = structlog.get_logger(__name__)
 
+# What a reader is told when indexing fails for a reason we cannot summarise.
+# The cause goes to the log with its traceback; the reader gets something they
+# can act on instead of a stringified psycopg or provider error.
+INDEX_FAILED_MESSAGE = (
+    "Indexing failed. Try again, and check the repository is public and reachable."
+)
+
 
 def repo_slug(repo_url: str) -> str:
     owner, name = parse_github_url(repo_url)
@@ -207,10 +214,14 @@ class LiveRepoService:
             if job is None:
                 raise RuntimeError("repository indexing job could not be enqueued")
             await self._apply_worker_result(record, job)
-        except Exception as exc:
+        except Exception:
+            # The traceback goes to the log, never to the reader: `str(exc)` on
+            # a redis or SQLAlchemy failure carries connection targets, and a
+            # provider failure carries request detail.
+            log.exception("repo.index_failed", repo_id=slug, repo_url=repo_url)
             record.status = "error"
             record.progress = None
-            record.error = str(exc)
+            record.error = INDEX_FAILED_MESSAGE
         finally:
             progress_task.cancel()
 
@@ -291,11 +302,12 @@ class LiveRepoService:
                 f"{result.chunk_count or 0} chunks and {result.edge_count or 0} graph edges."
             )
             record.status = "ready"
-        except Exception as exc:
+        except Exception:
             progress_task.cancel()
+            log.exception("repo.index_failed", repo_id=slug, repo_url=repo_url)
             record.status = "error"
             record.progress = None
-            record.error = str(exc)
+            record.error = INDEX_FAILED_MESSAGE
 
     async def _advance_progress(self, record: RepoRecord) -> None:
         while record.status == "indexing":

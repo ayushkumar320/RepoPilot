@@ -255,11 +255,21 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
     @app.get("/repos/{repo_id:path}/first-impression")
     async def repo_first_impression(repo_id: str) -> StreamingResponse:
         async def event_source() -> AsyncIterator[BaseTourEvent]:
+            # Failures ride the stream, as they do on /ask/stream: by the time
+            # this generator runs the 200 and the SSE headers are already sent,
+            # so a raised HTTPException reaches nobody and the reader just sees
+            # the stream stop.
             try:
                 async for event in get_services().repos.first_impression_stream(repo_id):
                     yield event
-            except KeyError as exc:
-                raise HTTPException(status_code=404, detail="repo not found") from exc
+            except KeyError:
+                yield TourErrorEvent(code="REPO_NOT_FOUND", message="repo not found")
+            except Exception:
+                log.exception("repo.first_impression_failed", repo_id=repo_id)
+                yield TourErrorEvent(
+                    code="FIRST_IMPRESSION_FAILED",
+                    message="RepoPilot could not read this repository right now.",
+                )
 
         return StreamingResponse(
             with_heartbeats(event_source()),

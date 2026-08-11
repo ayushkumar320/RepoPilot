@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
+from dataclasses import dataclass
 from typing import Any, cast
 
 import pytest
 
 from repopilot_agents.types import ChunkContent, CodeRef
+from repopilot_agents.verifier import grounding as grounding_mod
 from repopilot_agents.verifier.grounding import (
     _MAX_PROMPT_CHARS,
     _SYSTEM_PROMPT,
@@ -376,3 +379,160 @@ def test_cache_evicts_the_least_recently_used_entry() -> None:
     assert cache.get("b") is None
     assert cache.get("a") is not None
     assert cache.get("c") is not None
+
+
+# ─── The recheck against the answerer's wider context ───────────────────────
+#
+# The commonest rejection is not an ungrounded claim — it is a true claim
+# citing the wrong [N]. One recheck against the chunks the answerer actually
+# had fixes that. It is also the only code that can turn a rejected claim into
+# a displayed one, so each branch below is a way trust could be granted wrongly
+# (or withheld wrongly) with nothing to notice.
+
+
+class _ScriptedProvider:
+    """Queues verdict payloads; an Exception in the queue is raised, not returned."""
+
+    def __init__(self, responses: list[Any]) -> None:
+        self._responses = list(responses)
+        self.calls = 0
+
+    async def generate(self, model: Any, messages: Any, **kwargs: Any) -> Any:
+        self.calls += 1
+        if not self._responses:
+            raise AssertionError("_ScriptedProvider exhausted")
+        head = self._responses.pop(0)
+        if isinstance(head, Exception):
+            raise head
+        return _Stub(head)
+
+
+@dataclass(slots=True)
+class _Stub:
+    text: str
+
+    @property
+    def total_tokens(self) -> int:
+        return 0
+
+
+def _verdict_json(decision: str, reason: str) -> str:
+    return json.dumps({"decision": decision, "reason": reason})
+
+
+@pytest.fixture
+def _chunks_for_every_ref(monkeypatch: pytest.MonkeyPatch) -> None:
+    """read_chunks returns one distinct chunk per ref, without a database."""
+
+    async def fake_read_chunks(refs: Any, **_: Any) -> list[ChunkContent]:
+        return [
+            ChunkContent(ref=ref, content=f"# {ref.file_path}:{ref.start_line}\nbody\n")
+            for ref in refs
+        ]
+
+    monkeypatch.setattr(grounding_mod, "read_chunks", fake_read_chunks)
+
+
+def _cited() -> CodeRef:
+    return CodeRef(file_path="pkg/cited.py", start_line=1, end_line=4, symbol="pkg.cited.fn")
+
+
+def _elsewhere() -> CodeRef:
+    return CodeRef(file_path="pkg/other.py", start_line=9, end_line=20, symbol="pkg.other.fn")
+
+
+@pytest.mark.asyncio
+async def test_recheck_upgrades_a_claim_supported_by_the_wider_context(
+    _chunks_for_every_ref: None,
+) -> None:
+    claim = Claim(text="the client retries on 429", refs=[_cited()])
+    provider = _ScriptedProvider(
+        [
+            _verdict_json("rejected", "the cited chunk does not mention retries"),
+            _verdict_json("supported", "ignored — the recheck writes its own reason"),
+        ]
+    )
+
+    result = await verify_claim(
+        claim,
+        provider=cast(Any, provider),
+        engine=cast(Any, object()),
+        repo_id="owner/name@sha",
+        fallback_refs=[_elsewhere()],
+    )
+
+    assert provider.calls == 2
+    assert result.verdict.decision == "supported"
+    assert claim.status == "verified"
+    assert claim.verifier_note == "verified against answer context"
+
+
+@pytest.mark.asyncio
+async def test_recheck_that_rejects_again_keeps_the_original_reason(
+    _chunks_for_every_ref: None,
+) -> None:
+    """A second rejection changes nothing — and the reader sees the first reason."""
+    claim = Claim(text="the client retries on 429", refs=[_cited()])
+    provider = _ScriptedProvider(
+        [
+            _verdict_json("rejected", "the cited chunk does not mention retries"),
+            _verdict_json("rejected", "nor does anything else here"),
+        ]
+    )
+
+    await verify_claim(
+        claim,
+        provider=cast(Any, provider),
+        engine=cast(Any, object()),
+        repo_id="owner/name@sha",
+        fallback_refs=[_elsewhere()],
+    )
+
+    assert provider.calls == 2
+    assert claim.status == "rejected"
+    assert claim.verifier_note == "the cited chunk does not mention retries"
+
+
+@pytest.mark.asyncio
+async def test_recheck_outage_leaves_the_first_verdict_standing(
+    _chunks_for_every_ref: None,
+) -> None:
+    """A transient outage on the recheck must not upgrade a rejected claim."""
+    claim = Claim(text="the client retries on 429", refs=[_cited()])
+    provider = _ScriptedProvider(
+        [
+            _verdict_json("rejected", "not supported by the cited chunk"),
+            ProviderError("every provider exhausted"),
+        ]
+    )
+
+    await verify_claim(
+        claim,
+        provider=cast(Any, provider),
+        engine=cast(Any, object()),
+        repo_id="owner/name@sha",
+        fallback_refs=[_elsewhere()],
+    )
+
+    assert claim.status == "rejected"
+    assert claim.verifier_note == "not supported by the cited chunk"
+
+
+@pytest.mark.asyncio
+async def test_no_recheck_when_the_fallback_adds_nothing_new(
+    _chunks_for_every_ref: None,
+) -> None:
+    """Re-asking with the identical context would spend a call to learn nothing."""
+    claim = Claim(text="the client retries on 429", refs=[_cited()])
+    provider = _ScriptedProvider([_verdict_json("rejected", "not in the cited chunk")])
+
+    await verify_claim(
+        claim,
+        provider=cast(Any, provider),
+        engine=cast(Any, object()),
+        repo_id="owner/name@sha",
+        fallback_refs=[_cited()],
+    )
+
+    assert provider.calls == 1
+    assert claim.status == "rejected"

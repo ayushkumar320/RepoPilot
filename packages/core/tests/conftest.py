@@ -63,6 +63,51 @@ class FakeClient(_BaseClient):
         return head
 
 
+class FakeStreamingClient(_BaseClient):
+    """A client that streams, and can fail at a chosen point in the stream.
+
+    ``error`` is raised after ``deltas`` have been yielded, so ``deltas=[]``
+    models a failure before the first token (recoverable — ``generate_stream``
+    falls back to the full chain) and a non-empty ``deltas`` models a failure
+    mid-answer (not recoverable — the reader has already seen text).
+    """
+
+    def __init__(
+        self,
+        provider: ProviderName,
+        deltas: list[str] | None = None,
+        *,
+        error: Exception | None = None,
+        chat_responses: list[object] | None = None,
+    ) -> None:
+        self.provider = provider
+        self._deltas = list(deltas or [])
+        self._error = error
+        self._chat_responses = list(chat_responses or [])
+        self.stream_calls = 0
+        self.chat_calls = 0
+
+    def supports_streaming(self) -> bool:
+        return True
+
+    async def stream(self, binding, messages, kwargs):
+        self.stream_calls += 1
+        for delta in self._deltas:
+            yield delta
+        if self._error is not None:
+            raise self._error
+
+    async def chat(self, binding, messages, kwargs):
+        self.chat_calls += 1
+        if not self._chat_responses:
+            raise AssertionError(f"FakeStreamingClient({self.provider.value}) chat exhausted")
+        head = self._chat_responses.pop(0)
+        if isinstance(head, Exception):
+            raise head
+        assert isinstance(head, LLMResponse)
+        return head
+
+
 class FakeEmbedder(_BaseClient):
     """Test double for the sentence-transformers in-process embedder.
 

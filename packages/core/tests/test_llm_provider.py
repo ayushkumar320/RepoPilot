@@ -7,6 +7,7 @@ Test 5 (settings) lives in `test_settings.py`.
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 import httpx
 import pytest
@@ -22,8 +23,9 @@ from repopilot_core.llm.provider import (
     _extract_openai_compatible_text,
     _parse_retry_after,
 )
+from repopilot_core.settings import Settings
 
-from .conftest import FakeClient, make_provider, make_response
+from .conftest import FakeClient, FakeStreamingClient, make_provider, make_response
 
 # `asyncio_mode = auto` in pyproject means async tests are picked up automatically.
 
@@ -551,3 +553,122 @@ async def test_llm_falls_through_when_widening_does_not_help(tmp_settings) -> No
 
     assert response.text == "fallback-ok"
     assert len(groq.calls) == 2, "one widened retry, then move on"
+
+
+# ─── generate_stream ────────────────────────────────────────────────────────
+#
+# Streaming is an optimisation over `generate`, never a weaker substitute, and
+# every branch below is a way that promise can break: a cache hit that replays
+# in pieces, a pre-first-token failure that surfaces instead of falling back, a
+# mid-stream failure that retries and shows the reader the answer twice, or a
+# streamed answer that never reaches the cache.
+
+
+async def _collect(stream: Any) -> list[str]:
+    return [delta async for delta in stream]
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_yields_deltas_and_caches_the_result(
+    tmp_settings: Settings,
+) -> None:
+    client = FakeStreamingClient(ProviderName.GROQ, ["Hel", "lo ", "world"])
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: client})
+
+    deltas = await _collect(
+        provider.generate_stream(ModelId.INTENT_PROFILER, [Message("user", "hi")])
+    )
+
+    assert deltas == ["Hel", "lo ", "world"]
+    assert client.stream_calls == 1
+    # The cached copy carries zero token counts on purpose: streamed chunks
+    # carry no usage block, and the counter is accounting, not billing.
+    replay = await _collect(
+        provider.generate_stream(ModelId.INTENT_PROFILER, [Message("user", "hi")])
+    )
+    assert replay == ["Hello world"]
+    assert client.stream_calls == 1, "a cache hit must not reach the provider"
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_replays_a_cache_hit_in_one_piece(
+    tmp_settings: Settings,
+) -> None:
+    """A buffered `generate` primes the cache the streaming route reads."""
+    client = FakeStreamingClient(
+        ProviderName.GROQ,
+        chat_responses=[make_response(provider=ProviderName.GROQ, text="already known")],
+    )
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: client})
+    await provider.generate(ModelId.INTENT_PROFILER, [Message("user", "q")])
+
+    deltas = await _collect(
+        provider.generate_stream(ModelId.INTENT_PROFILER, [Message("user", "q")])
+    )
+
+    assert deltas == ["already known"]
+    assert client.stream_calls == 0
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_falls_back_when_it_fails_before_the_first_token(
+    tmp_settings: Settings,
+) -> None:
+    """Nothing was shown yet, so the full chain — retries and all — can run."""
+    client = FakeStreamingClient(
+        ProviderName.GROQ,
+        [],
+        error=httpx.ConnectError("stream refused"),
+        chat_responses=[make_response(provider=ProviderName.GROQ, text="buffered answer")],
+    )
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: client})
+
+    deltas = await _collect(
+        provider.generate_stream(ModelId.INTENT_PROFILER, [Message("user", "q")])
+    )
+
+    assert deltas == ["buffered answer"]
+    assert client.stream_calls == 1
+    assert client.chat_calls == 1
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_raises_when_it_fails_mid_answer(
+    tmp_settings: Settings,
+) -> None:
+    """Retrying here would render the answer to the reader twice."""
+    client = FakeStreamingClient(
+        ProviderName.GROQ,
+        ["The transport "],
+        error=httpx.ReadError("connection dropped"),
+        chat_responses=[make_response(provider=ProviderName.GROQ, text="must not be used")],
+    )
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: client})
+
+    seen: list[str] = []
+    with pytest.raises(ProviderError):
+        async for delta in provider.generate_stream(
+            ModelId.INTENT_PROFILER, [Message("user", "q")]
+        ):
+            seen.append(delta)
+
+    assert seen == ["The transport "]
+    assert client.chat_calls == 0, "a mid-stream failure must not fall back"
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_falls_back_when_no_client_can_stream(
+    tmp_settings: Settings,
+) -> None:
+    """`FakeClient` reports supports_streaming() False, like the embedder shim."""
+    client = FakeClient(
+        ProviderName.GROQ,
+        [make_response(provider=ProviderName.GROQ, text="no streaming here")],
+    )
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: client})
+
+    deltas = await _collect(
+        provider.generate_stream(ModelId.INTENT_PROFILER, [Message("user", "q")])
+    )
+
+    assert deltas == ["no streaming here"]

@@ -627,3 +627,69 @@ def test_non_python_file_hint_is_a_file_prefix_not_a_directory() -> None:
     spec = fallback_query_spec("where is the handler defined in src/index.ts?")
     assert spec.extracted_paths == ["src/index.ts"]
     assert qa_graph._single_path_prefix(spec) == "src/index.ts"
+
+
+@pytest.mark.asyncio
+async def test_sparse_lane_failure_falls_back_to_the_dense_lane(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """BM25 is a recall addition. Losing it must not lose the dense hits."""
+
+    async def boom(question: str, **kw: Any) -> list[ChunkHit]:
+        raise RuntimeError("websearch_to_tsquery: syntax error")
+
+    dense_calls: list[str] = []
+
+    async def dense(question: str, **kw: Any) -> list[ChunkHit]:
+        dense_calls.append(question)
+        return [ChunkHit(ref=_ref("alpha"), distance=0.1, kind="function")]
+
+    monkeypatch.setattr(qa_graph, "hybrid_search", boom)
+    monkeypatch.setattr(qa_graph, "vector_search", dense)
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+        k=8,
+        recall_k=50,
+        use_rerank=False,
+    )
+
+    assert dense_calls, "dense lane should still run when the sparse lane fails"
+    assert result.claims
+
+
+@pytest.mark.asyncio
+async def test_verifier_failure_ships_the_answer_as_unverified(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A crashing verifier is infra, not a grounding rejection."""
+
+    async def boom(claims: Any, **kw: Any) -> list[Any]:
+        raise RuntimeError("verifier provider exhausted")
+
+    monkeypatch.setattr(qa_graph, "verify_claims", boom)
+
+    provider = _ScriptedProvider(
+        [
+            '{"decision":"sufficient","reason":"enough","next_symbol":""}',
+            "alpha returns one. [0]",
+        ]
+    )
+    result = await answer_question(
+        "What does alpha return?",
+        engine=cast(Any, None),
+        provider=cast(Any, provider),
+        repo_id="repo",
+    )
+
+    assert "verify_skipped:RuntimeError" in result.retrieval_path
+    assert result.claims and all(c.status == "unverified" for c in result.claims)

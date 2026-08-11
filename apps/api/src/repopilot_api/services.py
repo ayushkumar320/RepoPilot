@@ -483,29 +483,55 @@ class LiveQAService:
     ) -> QAAnswerResponse:
         snapshot_repo_id = await self._snapshot_repo_id(repo_id)
         engine = make_engine(self.runtime.settings)
+        published = False
+
+        async def track(text: str) -> None:
+            nonlocal published
+            published = True
+            if on_token is not None:
+                await on_token(text)
+
+        sink: TokenSink | None = None if on_token is None else track
+
+        async def attempt() -> QAResult:
+            return await answer_question(
+                question,
+                engine=engine,
+                provider=provider or self.runtime.provider,
+                repo_id=snapshot_repo_id,
+                use_compress=self.runtime.settings.qa_compress_enabled,
+                retry_429_attempts=self.runtime.settings.qa_llm_max_429_retries,
+                intent_profile=intent_profile,
+                on_token=sink,
+            )
+
         try:
             try:
-                result = await answer_question(
-                    question,
-                    engine=engine,
-                    provider=provider or self.runtime.provider,
-                    repo_id=snapshot_repo_id,
-                    use_compress=self.runtime.settings.qa_compress_enabled,
-                    retry_429_attempts=self.runtime.settings.qa_llm_max_429_retries,
-                    intent_profile=intent_profile,
-                    on_token=on_token,
-                )
-            except Exception as exc:
-                # Log before degrading: the keyword-only answer looks like a
-                # product behaviour in the UI, so without this the real cause
-                # (provider error, model load, DB) leaves no trace anywhere.
-                log.exception("qa.llm_failed_falling_back", repo_id=repo_id)
-                result = await answer_deterministically(
-                    engine=engine,
-                    snapshot_repo_id=snapshot_repo_id,
-                    question=question,
-                    fallback_reason=str(exc),
-                )
+                result = await attempt()
+            except Exception:
+                # Every optional stage (query understanding, hybrid's sparse
+                # lane, rerank, compression, hops, the verifier) degrades in
+                # place inside ``answer_question``, so reaching here means a
+                # load-bearing stage failed — usually transiently. Retry once
+                # with the full pipeline, advanced RAG included, before showing
+                # the reader a keyword dump. Skipped when tokens already
+                # streamed: the answer would restart mid-sentence.
+                log.exception("qa.retrying", repo_id=repo_id)
+                try:
+                    if published:
+                        raise
+                    result = await attempt()
+                except Exception as exc:
+                    # Log before degrading: the keyword-only answer looks like a
+                    # product behaviour in the UI, so without this the real cause
+                    # (provider error, model load, DB) leaves no trace anywhere.
+                    log.exception("qa.llm_failed_falling_back", repo_id=repo_id)
+                    result = await answer_deterministically(
+                        engine=engine,
+                        snapshot_repo_id=snapshot_repo_id,
+                        question=question,
+                        fallback_reason=str(exc),
+                    )
         finally:
             await engine.dispose()
         answer_id = uuid4().hex[:8]

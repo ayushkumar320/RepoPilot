@@ -604,6 +604,37 @@ async def test_live_qa_ask_passes_persona_into_answer_question(
 
 
 @pytest.mark.asyncio
+async def test_live_qa_ask_retries_before_keyword_fallback(monkeypatch: Any) -> None:
+    """A transient failure must not cost the reader the LLM answer."""
+    attempts = 0
+
+    async def fake_answer_question(
+        question: str,
+        *,
+        engine: Any,
+        provider: Any,
+        repo_id: str,
+        **kwargs: Any,
+    ) -> QAResult:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise RuntimeError("provider timed out")
+        return QAResult(question=question, answer="Answered on the retry.")
+
+    monkeypatch.setattr("repopilot_api.services.answer_question", fake_answer_question)
+    service = LiveQAService(
+        runtime=Runtime(settings=Settings(), provider=cast(Any, object())),
+        repos=cast(Any, FakeRepoService()),
+    )
+
+    response = await service.ask("repo-123", "what is this repo?")
+
+    assert attempts == 2
+    assert response.answer == "Answered on the retry."
+
+
+@pytest.mark.asyncio
 async def test_live_qa_ask_rejects_unindexed_repo() -> None:
     repos = FakeRepoService()
     service = LiveQAService(

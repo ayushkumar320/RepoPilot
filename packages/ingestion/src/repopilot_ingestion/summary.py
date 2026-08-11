@@ -45,6 +45,12 @@ def _prompt(chunk: Chunk) -> list[Message]:
     return [Message("system", _SYSTEM), Message("user", user)]
 
 
+#: Consecutive provider failures that stop the summariser for the rest of the
+#: run. One failure used to be enough, which meant a single 429 at high
+#: concurrency downgraded every remaining chunk to a fallback summary. A real
+#: exhaustion still trips it within a few chunks.
+CIRCUIT_TRIP_FAILURES = 5
+
 #: Marks a summary the model never produced. Written by ``_fallback_summary``
 #: and read back by ``is_placeholder_summary`` — the two must not drift, or the
 #: re-summarise pass silently stops finding anything to fix.
@@ -86,10 +92,11 @@ async def summarise_chunks(
     """
     concurrency = max(1, settings.ingestion_summary_concurrency)
     circuit_open = False
+    consecutive_failures = 0
     circuit_lock = asyncio.Lock()
 
     async def one(chunk: Chunk) -> SummarisedChunk:
-        nonlocal circuit_open
+        nonlocal circuit_open, consecutive_failures
         async with circuit_lock:
             if circuit_open:
                 return SummarisedChunk(chunk=chunk, summary=_fallback_summary(chunk))
@@ -102,9 +109,12 @@ async def summarise_chunks(
                 max_tokens=120,
             )
             summary = response.text.strip() or _fallback_summary(chunk)
+            async with circuit_lock:
+                consecutive_failures = 0
         except ProviderError as exc:
             async with circuit_lock:
-                circuit_open = True
+                consecutive_failures += 1
+                circuit_open = consecutive_failures >= CIRCUIT_TRIP_FAILURES
             log.warning(
                 "summary.chunk_fallback_unknown",
                 file_path=chunk.file_path,
@@ -153,6 +163,7 @@ async def summarise_chunks(
 
 
 __all__ = [
+    "CIRCUIT_TRIP_FAILURES",
     "SUMMARY_UNAVAILABLE_SUFFIX",
     "SummarisedChunk",
     "is_placeholder_summary",

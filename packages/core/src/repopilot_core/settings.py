@@ -33,7 +33,9 @@ def _split_csv(value: str) -> list[str]:
 
 
 def _default_scan_workers() -> int:
-    return min(8, max(1, os.cpu_count() or 1))
+    # One thread per core, capped: parsing is CPU-bound but tree-sitter drops
+    # the GIL, so a big machine scanning a big repo should get to use it.
+    return min(16, max(1, os.cpu_count() or 1))
 
 
 class Settings(BaseSettings):
@@ -169,7 +171,13 @@ class Settings(BaseSettings):
     ingestion_text_chunk_lines: int = Field(default=120, ge=1)
     ingestion_text_chunk_chars: int = Field(default=6_000, ge=256)
     ingestion_text_chunk_overlap_lines: int = Field(default=10, ge=0)
-    ingestion_summary_concurrency: int = 8
+    # Summaries are one network round-trip per chunk and dominate wall-clock on
+    # large repos — the scan is threaded and embedding is batched, this stage is
+    # neither. It is latency-bound, not CPU-bound, so concurrency is the only
+    # lever. ``summarise_chunks`` tolerates a burst of provider errors before
+    # tripping its circuit, so a rate limit at this width costs retries rather
+    # than every remaining summary.
+    ingestion_summary_concurrency: int = 24
     # Measured on the local nomic backend: 8 outperformed 16/32 for realistic
     # code chunks while avoiding the memory spikes of larger batches.
     ingestion_embed_batch_size: int = Field(default=8, ge=1)

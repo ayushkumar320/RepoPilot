@@ -263,14 +263,21 @@ async def answer_question(
             )
     if use_compress and settings.compress_enabled and initial_chunks:
         with _timed(ctx, "compress"):
-            initial_chunks = await compress_chunks(
-                question,
-                initial_chunks,
-                provider=provider,
-                min_lines=settings.compress_min_chunk_lines,
-                retry_429_attempts=retry_429_attempts,
-            )
-        ctx.retrieval_path.append(f"compress:k={len(initial_chunks)}")
+            try:
+                initial_chunks = await compress_chunks(
+                    question,
+                    initial_chunks,
+                    provider=provider,
+                    min_lines=settings.compress_min_chunk_lines,
+                    retry_429_attempts=retry_429_attempts,
+                )
+            except Exception as exc:
+                # Compression narrows the answerer's view; it never creates
+                # evidence. Failing it should cost tokens, not the answer.
+                log.warning("compress.failed", error=str(exc))
+                ctx.retrieval_path.append(f"compress_skipped:{type(exc).__name__}")
+            else:
+                ctx.retrieval_path.append(f"compress:k={len(initial_chunks)}")
     _extend_context(ctx, initial_chunks)
 
     # Outer loop: sufficiency judge → optional traverse expansion.
@@ -356,17 +363,29 @@ async def answer_question(
     # skip the verifier entirely — there's no chunk to check them against.
     to_verify = [c for c in claims if c.verifier_note != UNCITED_CLAIM_REASON]
     with _timed(ctx, "verify"):
-        verify_results = await verify_claims(
-            to_verify,
-            provider=provider,
-            engine=engine,
-            repo_id=repo_id,
-            retry_429_attempts=retry_429_attempts,
-            # Every chunk the answerer saw. A claim rejected against its own
-            # citation gets one recheck against these — a mistyped [N] is the
-            # commonest cause of a rejection, not an ungrounded claim.
-            fallback_refs=[chunk.ref for chunk in ctx.chunks],
-        )
+        try:
+            verify_results = await verify_claims(
+                to_verify,
+                provider=provider,
+                engine=engine,
+                repo_id=repo_id,
+                retry_429_attempts=retry_429_attempts,
+                # Every chunk the answerer saw. A claim rejected against its own
+                # citation gets one recheck against these — a mistyped [N] is the
+                # commonest cause of a rejection, not an ungrounded claim.
+                fallback_refs=[chunk.ref for chunk in ctx.chunks],
+            )
+        except Exception as exc:
+            # The verifier crashing is a transient infra failure, not a
+            # grounding rejection. Ship the cited answer with every claim
+            # marked "unverified" — the same status a provider-exhausted
+            # verification already produces — rather than nothing at all.
+            log.warning("verify.failed", error=str(exc))
+            ctx.retrieval_path.append(f"verify_skipped:{type(exc).__name__}")
+            for claim in to_verify:
+                claim.status = "unverified"
+                claim.verifier_note = VERIFIER_PROVIDER_ERROR_REASON
+            verify_results = []
     objections = [r.objection for r in verify_results if r.objection is not None]
 
     # Flag the rejected ones (still shipped, but visually marked). A claim whose
@@ -517,16 +536,22 @@ async def _retrieve_one(
     sparse_query: str | None = None,
 ) -> list[ChunkHit]:
     if use_hybrid and recall_k is not None:
-        return await hybrid_search(
-            query,
-            engine=engine,
-            provider=provider,
-            repo_id=repo_id,
-            recall_k=recall_k,
-            path_prefix=path_prefix,
-            exclude_path_prefixes=exclude_path_prefixes,
-            sparse_query=sparse_query,
-        )
+        try:
+            return await hybrid_search(
+                query,
+                engine=engine,
+                provider=provider,
+                repo_id=repo_id,
+                recall_k=recall_k,
+                path_prefix=path_prefix,
+                exclude_path_prefixes=exclude_path_prefixes,
+                sparse_query=sparse_query,
+            )
+        except Exception as exc:
+            # The sparse lane is a recall *addition* — Postgres FTS config,
+            # a websearch_to_tsquery parse error, or a missing index must
+            # not cost the reader the dense lane's hits and the whole answer.
+            log.warning("hybrid_search.failed", error=str(exc))
     return await vector_search(
         query,
         engine=engine,

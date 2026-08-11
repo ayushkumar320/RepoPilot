@@ -23,9 +23,19 @@ REPOPILOT_SESSION_COOKIE_SECURE=true
 POSTGRES_DSN=<managed-postgres-with-pgvector>
 REDIS_URL=<managed-redis-tls-url>
 GROQ_API_KEY=<platform-free-tier-key>
+CEREBRAS_API_KEY=<platform-free-tier-key>
 API_PROXY_TARGET=https://api.your-domain.example
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
+
+`CEREBRAS_API_KEY` is not optional in practice. Groq's free tier caps
+`llama-3.3-70b-versatile` at 12,000 tokens per minute, and one question spends
+roughly 8,000 of them — so the second question inside a minute is refused
+(Groq reports this as HTTP 413, not 429). With a Cerebras key the chain fails
+over and the reader never sees it. Without one, every second question drops to
+the keyword-only answer. `LLM_HF_CHAT_FALLBACK=1` adds Hugging Face as a third
+tier; leave it off unless the HF account has credits, since its free budget is
+about $0.10/month.
 
 `REPOPILOT_SESSION_SECRET` must be stable across API deployments. Changing it signs every browser out. It also keys the Fernet cipher for stored provider keys (`product_credentials`): rotating it invalidates every saved key, and users must reconnect them.
 
@@ -223,6 +233,7 @@ build off the CUDA wheels, so the image stays near 2 GB rather than 6 GB.
    REPOPILOT_WEB_ORIGINS=https://<project>.vercel.app
    POSTGRES_DSN=<neon uri>
    GROQ_API_KEY=<key>
+   CEREBRAS_API_KEY=<key>
    HUGGINGFACE_API_KEY=<key>
    ```
 

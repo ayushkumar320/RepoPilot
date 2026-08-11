@@ -317,6 +317,28 @@ def _backoff_delay(attempt: int, base: float, cap: float) -> float:
     return random.uniform(0.0, expo)
 
 
+def _is_rate_limited(resp: httpx.Response) -> bool:
+    """True when the provider is refusing for quota, whatever status it used.
+
+    Groq reports a tokens-per-minute overrun as **413**, not 429, with
+    ``code: "rate_limit_exceeded"`` in the body. Read as a transport error it
+    skipped the backoff, ignored ``Retry-After``, and surfaced to the reader as
+    "413 Payload Too Large" — on a free-tier key that is what every second
+    question looked like. A 413 without the rate-limit marker is a genuinely
+    oversized body and stays a hard error: waiting never shrinks it.
+    """
+    if resp.status_code == 429:
+        return True
+    if resp.status_code != 413:
+        return False
+    try:
+        error = resp.json().get("error") or {}
+    except (ValueError, AttributeError):
+        return False
+    blob = f"{error.get('code', '')} {error.get('message', '')}".lower()
+    return "rate_limit" in blob or "per minute" in blob
+
+
 def _parse_retry_after(value: str | None) -> float | None:
     """Parse a ``Retry-After`` header (delta-seconds or HTTP-date) into seconds.
 
@@ -403,9 +425,9 @@ class _OpenAICompatibleClient(_BaseClient):
             json=body,
             headers=headers,
         )
-        if resp.status_code == 429:
+        if _is_rate_limited(resp):
             raise RateLimitError(
-                f"{self.provider.value} returned 429",
+                f"{self.provider.value} returned {resp.status_code} (quota)",
                 retry_after=_parse_retry_after(resp.headers.get("retry-after")),
             )
         resp.raise_for_status()
@@ -447,14 +469,13 @@ class _OpenAICompatibleClient(_BaseClient):
             json=body,
             headers=headers,
         ) as resp:
-            if resp.status_code == 429:
-                await resp.aread()
-                raise RateLimitError(
-                    f"{self.provider.value} returned 429",
-                    retry_after=_parse_retry_after(resp.headers.get("retry-after")),
-                )
             if resp.status_code >= 400:
                 await resp.aread()
+                if _is_rate_limited(resp):
+                    raise RateLimitError(
+                        f"{self.provider.value} returned {resp.status_code} (quota)",
+                        retry_after=_parse_retry_after(resp.headers.get("retry-after")),
+                    )
                 resp.raise_for_status()
             async for line in resp.aiter_lines():
                 if not line.startswith("data:"):

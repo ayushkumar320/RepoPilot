@@ -336,6 +336,55 @@ async def test_real_httpx_429_path(tmp_settings, respx_mock) -> None:  # type: i
     assert hf_route.call_count == 0, "HF must never be called for chat models"
 
 
+async def test_groq_413_tpm_is_a_quota_failure_not_a_payload_failure(  # type: ignore[no-untyped-def]
+    tmp_settings, respx_mock
+) -> None:
+    """Groq reports a tokens-per-minute overrun as 413, not 429.
+
+    Read as a transport error it skipped backoff and surfaced to the reader as
+    "413 Payload Too Large" — the second question of every free-tier session.
+    """
+    respx_mock.post("https://api.groq.com/openai/v1/chat/completions").mock(
+        return_value=httpx.Response(
+            413,
+            headers={"retry-after": "7"},
+            json={
+                "error": {
+                    "message": "Request too large for model `llama-3.3-70b-versatile` "
+                    "on tokens per minute (TPM): Limit 12000, Requested 13000",
+                    "code": "rate_limit_exceeded",
+                }
+            },
+        )
+    )
+    respx_mock.post("https://api.cerebras.ai/v1/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "choices": [{"message": {"content": "answered anyway"}}],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1},
+            },
+        )
+    )
+
+    provider = LLMProvider.build(settings=tmp_settings)
+    try:
+        response = await provider.generate(ModelId.INTENT_PROFILER, _msgs(), retry_429_attempts=1)
+    finally:
+        await provider.aclose()
+
+    assert response.provider == ProviderName.CEREBRAS
+
+
+def test_413_without_a_rate_limit_marker_stays_a_hard_error() -> None:
+    """A genuinely oversized body must not be retried — waiting can't shrink it."""
+    from repopilot_core.llm.provider import _is_rate_limited
+
+    oversized = httpx.Response(413, json={"error": {"message": "request body too large"}})
+    assert _is_rate_limited(oversized) is False
+    assert _is_rate_limited(httpx.Response(429, text="nope")) is True
+
+
 # ─── Retry-After handling ──────────────────────────────────────────────────
 
 

@@ -37,10 +37,10 @@ What is wrong falls into four groups:
 | # | Sev | Status | Where | What breaks |
 |---|---|---|---|---|
 | 1 | **P1** | ✅ fixed | `packages/core/tests/test_llm_provider.py:513` | CI format gate fails on `main` |
-| 2 | **P2** | open | `apps/api/src/repopilot_api/app.py:140` | Free-repo allowance resets by clearing a cookie |
-| 3 | **P2** | open | `apps/api/src/repopilot_api/access.py:353` | Questions unmetered — unbounded platform-key spend |
-| 4 | **P2** | open | `apps/api/src/repopilot_api/app.py:270` | `/intent` runs an unmetered LLM call for anonymous callers |
-| 5 | **P2** | open | `packages/ingestion/src/repopilot_ingestion/pipeline.py:132` | Repo cloned in full before any size limit applies |
+| 2 | **P2** | 🔒 accepted | `apps/api/src/repopilot_api/app.py:140` | Free-repo allowance resets by clearing a cookie |
+| 3 | **P2** | 🔒 accepted | `apps/api/src/repopilot_api/access.py:353` | Questions unmetered — unbounded platform-key spend |
+| 4 | **P2** | 🔒 accepted | `apps/api/src/repopilot_api/app.py:270` | `/intent` runs an unmetered LLM call for anonymous callers |
+| 5 | **P2** | 🔒 accepted | `packages/ingestion/src/repopilot_ingestion/pipeline.py:132` | Repo cloned in full before any size limit applies |
 | 6 | **P2** | ✅ fixed | `apps/api/src/repopilot_api/services.py:213,298` | Raw exception text served to clients; no traceback logged |
 | 7 | **P2** | open | `apps/web/package.json` (transitive `sharp`) | 4 high-severity CVEs in the web dependency tree |
 | 8 | **P2** | open | `packages/agents/src/repopilot_agents/verifier/grounding.py:360-415` | The claim-upgrade path has no test |
@@ -84,6 +84,17 @@ Everything else in this pass is green — see [What passed](#what-passed).
 ---
 
 ## Pass 2 — Security and abuse surface
+
+> **Findings 2–5 are accepted, not fixed** (decided 2026-08-11). The deployment
+> is private: everyone who can reach the API is someone who pays for it, so a
+> spend ceiling would cost more to build than it protects. The decision, the
+> cost of closing each one, and the conditions that revoke it are recorded in
+> [`STATUS.md`](STATUS.md) — the short version is that **findings 3 and 4 must
+> close before the API is reachable by anyone who is not paying for it**, since
+> neither needs an account or a repository to exploit. Finding 5 also fires by
+> accident rather than only by abuse, so it is the one to close first if disk
+> pressure ever appears. The descriptions below stand as written; only their
+> status changed.
 
 ### 2 — The free-repository allowance is cookie-scoped · **P2**
 
@@ -524,11 +535,9 @@ than through the repository.
 
 What is left, now that the sweep has landed.
 
-1. **Decide the spend question once**, for findings 2, 3, 4 and 5 together: is
-   this deployment public? If yes, a per-session rate limit on `/ask` and
-   `/intent` plus a pre-clone size check is the smallest thing that works. If
-   no, write that down where the next person will look. Everything else on this
-   list is smaller than this one.
+1. ~~**Decide the spend question**~~ — decided 2026-08-11: the deployment is
+   private, findings 2–5 accepted, conditions for revisiting written into
+   `STATUS.md`. No code was written for it, which was the point.
 2. **Test the two untested paths** — `_recheck` and `stream`. (8, 9) Both are
    pure enough to test with a fake provider; both are places where a silent
    regression is expensive, and `_recheck` is the only code that can overturn

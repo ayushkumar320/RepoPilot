@@ -352,6 +352,8 @@ class ProductAccessService:
 
     async def reserve_question(self, session_id: str, repo_id: str) -> UsageReservation:
         # Questions are unmetered; the row is still written for usage history.
+        # Accepted while this deployment is private — see the 2026-08-11 scope
+        # decision in docs/STATUS.md. Pass a limit here before exposing the API.
         return await self._reserve(
             session_id, action="question", resource_id=repo_id, free_limit=None
         )

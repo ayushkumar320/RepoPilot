@@ -3,7 +3,37 @@
 The one page to read before picking work up. `README.md` says what RepoPilot
 *is*; this says where it currently stands.
 
-**Last updated:** 2026-08-10 · `main` at `27fe7c9`
+**Last updated:** 2026-08-11 · `main` at `588102e`
+
+---
+
+## Scope decision — 2026-08-11: RepoPilot is not publicly exposed
+
+The audit ([`AUDIT_REPORT.md`](AUDIT_REPORT.md), findings 2–5) found four ways
+the platform's provider key can be spent without limit. All four are **accepted
+as they stand**, because this deployment is private — the people who can reach
+the API are the people who pay for it, so a spend ceiling would cost more to
+build than it protects.
+
+What was accepted, and what each would cost to close:
+
+| # | The gap | If it ever needs closing |
+|---|---|---|
+| 2 | The free-repository allowance is keyed on a cookie the caller controls, so clearing it grants another free repository | Bind the allowance to the signed-in account; `product_accounts` already carries the identity |
+| 3 | `reserve_question` passes `free_limit=None` — questions are unmetered | Pass a limit from settings; the counting code already exists |
+| 4 | `/intent` is an unauthenticated model call with no rate limit | A per-session sliding window in a FastAPI dependency, ~15 lines |
+| 5 | A repository is cloned in full before `ingestion_max_repo_loc` applies | Check repository size via the GitHub API before cloning, or `git clone --filter=blob:none` |
+
+**This decision expires the moment the API is reachable by anyone who is not
+paying for it.** That includes a public demo, a shared staging URL, and a
+deployment behind a link that is "unlisted" rather than authenticated. Before
+any of those, close 3 and 4 at minimum — they are the two that need no account
+and no repository to exploit.
+
+One caveat worth separating from the rest: **finding 5 has an accident mode**,
+not only an abuse mode. A trusted user who pastes a large monorepo by mistake
+still downloads all of it before anything rejects the size. If disk pressure
+ever shows up on the host, close 5 first regardless of exposure.
 
 ---
 

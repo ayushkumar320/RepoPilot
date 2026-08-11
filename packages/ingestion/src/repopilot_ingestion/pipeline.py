@@ -129,6 +129,11 @@ async def index_repo(
     total_started = time.perf_counter()
     try:
         clone_started = time.perf_counter()
+        # ``ingestion_max_repo_loc`` bounds what gets *indexed*, and is checked
+        # after the scan below — nothing bounds what gets *downloaded* here.
+        # Accepted while this deployment is private (docs/STATUS.md, 2026-08-11),
+        # but this one also fires by accident: a large monorepo pasted in error
+        # is cloned in full before anything rejects it.
         with clone_to_tempdir(repo_url, root=settings.ingestion_clone_root) as clone:
             _log_stage("clone", clone_started, repo_url=repo_url)
             already = await repo_already_indexed(engine, repo_url=repo_url, head_sha=clone.head_sha)

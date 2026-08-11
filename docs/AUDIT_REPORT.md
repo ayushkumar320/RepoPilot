@@ -2,7 +2,8 @@
 
 **Baseline:** `main` at `e40dc02`, clean working tree · **Run:** 2026-08-11
 **Method:** [`AUDIT_PLAN.md`](AUDIT_PLAN.md) · **Status:** complete — all eight
-passes run. **11 findings fixed** 2026-08-11; see [Fixed](#fixed).
+passes run. Of 21 findings: **12 fixed**, 4 accepted with a written expiry
+condition, 3 open, 1 revised, 1 withdrawn. See [Fixed](#fixed).
 
 ---
 
@@ -43,8 +44,8 @@ What is wrong falls into four groups:
 | 5 | **P2** | 🔒 accepted | `packages/ingestion/src/repopilot_ingestion/pipeline.py:132` | Repo cloned in full before any size limit applies |
 | 6 | **P2** | ✅ fixed | `apps/api/src/repopilot_api/services.py:213,298` | Raw exception text served to clients; no traceback logged |
 | 7 | **P2** | open | `apps/web/package.json` (transitive `sharp`) | 4 high-severity CVEs in the web dependency tree |
-| 8 | **P2** | open | `packages/agents/src/repopilot_agents/verifier/grounding.py:360-415` | The claim-upgrade path has no test |
-| 9 | **P2** | open | `packages/core/src/repopilot_core/llm/provider.py:735-789` | Token streaming has no unit test |
+| 8 | **P2** | ✅ fixed | `packages/agents/src/repopilot_agents/verifier/grounding.py:360-415` | The claim-upgrade path has no test |
+| 9 | **P2** | ✅ fixed | `packages/core/src/repopilot_core/llm/provider.py:730-789` | Token streaming has no unit test |
 | 10 | **P3** | open | `apps/api/src/repopilot_api/app.py:545` | Dead feature: `/graph/modules` has no consumer |
 | 11 | **P3** | open | `docs/STATUS.md:9` | Documents a UI file that no longer exists |
 | 12 | **P3** | ✅ fixed | `apps/api/src/repopilot_api/app.py:261` | `HTTPException` raised inside a started SSE stream |
@@ -367,18 +368,27 @@ tests. Its guards read correctly (a second rejection changes nothing, a
 `ProviderError` leaves the original verdict standing, an empty widening
 returns early), which is precisely why a regression here would be silent.
 
+**Fixed** — four tests in `test_verifier_grounding.py`, one per guard, driving
+the real `verify_claim` rather than the private helper so the wiring is covered
+too. Module coverage 75% → 94%.
+
 ### 9 — Token streaming has no test · **P2**
 
-`LLMProvider.stream` (`provider.py:735-789`) is uncovered. It carries real
-logic: cache-hit replay, first-streamable-binding selection, mid-stream failure
-that must *not* be retried because the reader has already seen text, a
-before-first-token failure that falls back to the full `generate` chain, and a
-cache write with deliberately zeroed token counts.
+`LLMProvider.generate_stream` (`provider.py:730-789`) is uncovered. (The
+original entry named the method `stream`; that is the client-level method it
+calls.) It carries real logic: cache-hit replay, first-streamable-binding
+selection, mid-stream failure that must *not* be retried because the reader has
+already seen text, a before-first-token failure that falls back to the full
+`generate` chain, and a cache write with deliberately zeroed token counts.
 
 It is also the newest user-facing feature — commit `74b396e` is named "token
 streaming" — and it is the newest feature that nothing verifies. `provider.py`
 is 73% covered overall across 409 statements; this block is the part of the gap
 that a user would notice.
+
+**Fixed** — five tests in `test_llm_provider.py`, one per branch, with a
+`FakeStreamingClient` that can fail at a chosen point in the stream. Module
+coverage 73% → 79%.
 
 Lower priority, same category: `clone.py` at 57% and `resummarise.py` at 28%
 are the weakest modules overall, but both are operator-facing rather than
@@ -557,6 +567,8 @@ coverage, 16/16 store tests, 12/12 Playwright.
 | 16 | Root `package.json` / `package-lock.json` removed; Next no longer infers the wrong workspace root |
 | 18 | `asyncio.TaskGroup` replaces the bare `gather`, so a failed summarise cancels the embedding pass |
 | 20 | Scratch files untracked; `test-results/`, `scratch_*.py`, `*_index_time.txt` gitignored |
+| 8, 9 | Nine tests over `_recheck_against_answer_context` and `generate_stream`, each guard mutation-checked — the guard was inverted and the matching test confirmed to fail. Suite 409 → 418, coverage 85% → 87% |
+| 21 | The pre-commit mypy hook runs CI's command through uv instead of in a three-dependency venv; it passes for the first time |
 
 Two findings did not survive the attempt to fix them — 17 (the obvious fix
 misroutes BYOK billing) and 19 (withdrawn). Both sections above are rewritten
@@ -575,10 +587,8 @@ What is left, now that the sweep has landed.
 1. ~~**Decide the spend question**~~ — decided 2026-08-11: the deployment is
    private, findings 2–5 accepted, conditions for revisiting written into
    `STATUS.md`. No code was written for it, which was the point.
-2. **Test the two untested paths** — `_recheck` and `stream`. (8, 9) Both are
-   pure enough to test with a fake provider; both are places where a silent
-   regression is expensive, and `_recheck` is the only code that can overturn
-   the verifier.
+2. ~~**Test the two untested paths**~~ — done: nine tests, each guard
+   mutation-checked. (8, 9)
 3. **Decide the module map**: finish removing it, or restore the UI. Leaving it
    half-deleted is the worst of the three options. (10, 11)
 4. **Track the CVEs** — add `npm audit --audit-level=high` to the `web` CI job,

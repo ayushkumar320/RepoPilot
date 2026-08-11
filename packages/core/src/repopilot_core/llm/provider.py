@@ -170,12 +170,24 @@ class _SQLiteCache:
     );
     """
 
+    # Entries older than this are dropped when the cache is opened. `created_at`
+    # was recorded from the start and never read, so the file grew for the life
+    # of the deployment. Embeddings are the expensive half to rebuild, so both
+    # tables share a generous window rather than expiring on model changes.
+    _MAX_AGE_SECONDS = 30 * 24 * 60 * 60
+
     def __init__(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         self._path = path
         self._lock = asyncio.Lock()
         with self._connect() as conn:
             conn.executescript(self._SCHEMA)
+            self._prune(conn)
+
+    def _prune(self, conn: sqlite3.Connection) -> None:
+        cutoff = time.time() - self._MAX_AGE_SECONDS
+        conn.execute("DELETE FROM llm_cache WHERE created_at < ?", (cutoff,))
+        conn.execute("DELETE FROM embedding_cache WHERE created_at < ?", (cutoff,))
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self._path, isolation_level=None, check_same_thread=False)

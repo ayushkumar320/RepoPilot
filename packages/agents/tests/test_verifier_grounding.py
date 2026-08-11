@@ -11,6 +11,8 @@ from repopilot_agents.verifier.grounding import (
     _MAX_PROMPT_CHARS,
     _SYSTEM_PROMPT,
     Claim,
+    VerifierVerdict,
+    _Cache,
     _fit_prompt_budget,
     _parse_verdict,
     _user_prompt,
@@ -359,3 +361,18 @@ def test_user_prompt_caps_the_total_across_many_chunks() -> None:
     rendered = _user_prompt(claim, chunks)
 
     assert len(rendered) < _MAX_PROMPT_CHARS + 500
+
+
+def test_cache_evicts_the_least_recently_used_entry() -> None:
+    """The verdict cache is bounded — unbounded, it grew for the process's life."""
+    cache = _Cache(max_entries=2)
+    verdict = VerifierVerdict(decision="supported", reason="ok")
+
+    cache.put("a", verdict)
+    cache.put("b", verdict)
+    assert cache.get("a") is not None  # touching "a" makes "b" the oldest
+    cache.put("c", verdict)
+
+    assert cache.get("b") is None
+    assert cache.get("a") is not None
+    assert cache.get("c") is not None

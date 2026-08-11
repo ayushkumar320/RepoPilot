@@ -27,6 +27,7 @@ import asyncio
 import hashlib
 import json
 import re
+from collections import OrderedDict
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Literal
@@ -92,11 +93,20 @@ class _VerifyResult:
     objection: VerifierObjection | None = None
 
 
+# Verdicts held in memory before the oldest is dropped. A verdict is small
+# (two short strings) and the win is within one answer, where the same claim is
+# checked against the same chunks more than once — so the cap only needs to be
+# comfortably larger than one answer's claims, not larger than a deployment's
+# history. Unbounded, this grew for the life of the process.
+_CACHE_MAX_ENTRIES = 2048
+
+
 @dataclass
 class _Cache:
-    """In-process cache keyed by sha256(claim_text + chunk_hashes)."""
+    """In-process LRU keyed by sha256(claim_text + chunk_hashes)."""
 
-    store: dict[str, VerifierVerdict] = field(default_factory=dict)
+    store: OrderedDict[str, VerifierVerdict] = field(default_factory=OrderedDict)
+    max_entries: int = _CACHE_MAX_ENTRIES
 
     def key(self, claim_text: str, chunks: Sequence[ChunkContent]) -> str:
         joined = "\n".join(c.content for c in chunks)
@@ -104,10 +114,16 @@ class _Cache:
         return digest.hexdigest()
 
     def get(self, k: str) -> VerifierVerdict | None:
-        return self.store.get(k)
+        verdict = self.store.get(k)
+        if verdict is not None:
+            self.store.move_to_end(k)
+        return verdict
 
     def put(self, k: str, v: VerifierVerdict) -> None:
         self.store[k] = v
+        self.store.move_to_end(k)
+        while len(self.store) > self.max_entries:
+            self.store.popitem(last=False)
 
 
 _CACHE = _Cache()

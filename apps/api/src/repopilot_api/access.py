@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from repopilot_api.product_db import product_accounts, product_credentials, usage_events
 from repopilot_core.llm.provider import LLMProvider
-from repopilot_core.settings import Settings
+from repopilot_core.settings import Settings, get_settings
 
 CredentialSource = Literal["platform", "user"]
 
@@ -58,12 +58,14 @@ class AccessService(Protocol):
     async def status(self, session_id: str) -> AccountUsage: ...
 
     async def connect_provider(
-        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str | None
+        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str
     ) -> AccountUsage: ...
 
     async def disconnect_provider(self, session_id: str) -> AccountUsage: ...
 
     async def provider_for(self, session_id: str) -> LLMProvider | None: ...
+
+    async def credentials_durable(self, session_id: str) -> bool: ...
 
     async def reserve_repository(self, session_id: str, repo_id: str) -> UsageReservation: ...
 
@@ -113,8 +115,13 @@ class ProductAccessService:
             return None
         return str(row.provider), str(row.provider_account_id)
 
-    async def _stored_keys(self, session_id: str) -> tuple[str, str | None] | None:
-        """Decrypted (groq, hugging face) keys saved for this session's account."""
+    async def _stored_keys(self, session_id: str) -> tuple[str, str] | None:
+        """Decrypted (groq, hugging face) keys saved for this session's account.
+
+        Both are required. A row saved before Hugging Face became mandatory has
+        no HF key, and is reported as not connected so the reader reconnects —
+        indexing on the platform's own token is exactly what that row would do.
+        """
         account = await self._account_key(session_id)
         if account is None:
             return None
@@ -132,23 +139,24 @@ class ProductAccessService:
             ).first()
         if row is None:
             return None
+        if not row.huggingface_api_key:
+            return None
         try:
             groq = self.cipher.decrypt(str(row.groq_api_key).encode()).decode()
-            stored_hf = row.huggingface_api_key
-            hf = self.cipher.decrypt(str(stored_hf).encode()).decode() if stored_hf else None
+            hf = self.cipher.decrypt(str(row.huggingface_api_key).encode()).decode()
         except InvalidToken:
             # Session secret rotated out from under the stored ciphertext.
             # Treat as not connected; the reader reconnects their key.
             return None
         return groq, hf
 
-    def _build_provider(self, groq: str, huggingface: str | None) -> LLMProvider:
+    def _build_provider(self, groq: str, huggingface: str) -> LLMProvider:
         user_settings = self.settings.model_copy(
             update={
                 "groq_api_key": groq,
                 "cerebras_api_key": None,
                 "huggingface_api_key": huggingface,
-                "llm_hf_chat_fallback": huggingface is not None,
+                "llm_hf_chat_fallback": True,
             }
         )
         return LLMProvider.build(settings=user_settings)
@@ -161,10 +169,9 @@ class ProductAccessService:
         stored = await self._stored_keys(session_id)
         if stored is None:
             return None
-        groq, huggingface = stored
-        provider = self._build_provider(groq, huggingface)
+        provider = self._build_provider(*stored)
         self.providers[session_id] = provider
-        self.connected[session_id] = (True, huggingface is not None)
+        self.connected[session_id] = (True, True)
         return provider
 
     async def _ensure_account(self, session_id: str) -> None:
@@ -203,33 +210,32 @@ class ProductAccessService:
         )
 
     async def connect_provider(
-        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str | None
+        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str
     ) -> AccountUsage:
         await self._ensure_account(session_id)
         clean_groq = groq_api_key.strip()
-        clean_hf = (huggingface_api_key or "").strip() or None
+        clean_hf = huggingface_api_key.strip()
         if len(clean_groq) < 12:
             raise ValueError("Enter a complete Groq API key.")
-        if clean_hf is not None and len(clean_hf) < 8:
-            raise ValueError("Enter a complete Hugging Face token or leave it blank.")
+        if len(clean_hf) < 8:
+            raise ValueError("Enter a complete Hugging Face token.")
 
         await self._validate_provider_key(
             provider="Groq",
             base_url=self.settings.groq_base_url,
             api_key=clean_groq,
         )
-        if clean_hf is not None:
-            await self._validate_provider_key(
-                provider="Hugging Face",
-                base_url=self.settings.huggingface_base_url,
-                api_key=clean_hf,
-            )
+        await self._validate_provider_key(
+            provider="Hugging Face",
+            base_url=self.settings.huggingface_base_url,
+            api_key=clean_hf,
+        )
 
         previous = self.providers.pop(session_id, None)
         if previous is not None:
             await previous.aclose()
         self.providers[session_id] = self._build_provider(clean_groq, clean_hf)
-        self.connected[session_id] = (True, clean_hf is not None)
+        self.connected[session_id] = (True, True)
 
         # Signed in? Keep the key with the account so a sign-out doesn't drop
         # it. Anonymous sessions have nothing durable to attach it to.
@@ -237,9 +243,7 @@ class ProductAccessService:
         if account is not None:
             values = {
                 "groq_api_key": self.cipher.encrypt(clean_groq.encode()).decode(),
-                "huggingface_api_key": (
-                    self.cipher.encrypt(clean_hf.encode()).decode() if clean_hf else None
-                ),
+                "huggingface_api_key": self.cipher.encrypt(clean_hf.encode()).decode(),
             }
             async with self.engine.begin() as conn:
                 await conn.execute(
@@ -291,6 +295,16 @@ class ProductAccessService:
 
     async def provider_for(self, session_id: str) -> LLMProvider | None:
         return await self._resolve_provider(session_id)
+
+    async def credentials_durable(self, session_id: str) -> bool:
+        """True when another process could rebuild this session's provider.
+
+        Indexing runs on the reader's own keys, so it can only be handed to the
+        background worker when the worker can reach those keys — which means an
+        account-bound row in Postgres. An anonymous session's keys live in this
+        process's memory only, so its indexing stays here.
+        """
+        return (await self._stored_keys(session_id)) is not None
 
     async def _reserve(
         self,
@@ -392,6 +406,7 @@ class InMemoryAccessService:
     repository_events: dict[str, set[str]] = field(default_factory=dict)
     question_counts: dict[str, int] = field(default_factory=dict)
     connected_sessions: dict[str, bool] = field(default_factory=dict)
+    providers: dict[str, LLMProvider] = field(default_factory=dict)
 
     async def status(self, session_id: str) -> AccountUsage:
         groq = session_id in self.connected_sessions
@@ -405,19 +420,40 @@ class InMemoryAccessService:
         )
 
     async def connect_provider(
-        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str | None
+        self, session_id: str, *, groq_api_key: str, huggingface_api_key: str
     ) -> AccountUsage:
         if len(groq_api_key.strip()) < 12:
             raise ValueError("Enter a complete Groq API key.")
-        self.connected_sessions[session_id] = bool(huggingface_api_key)
+        if len(huggingface_api_key.strip()) < 8:
+            raise ValueError("Enter a complete Hugging Face token.")
+        self.connected_sessions[session_id] = True
+        # A connected session must hand back a provider, exactly as the real
+        # service does — every caller that runs on the reader's own keys
+        # (indexing above all) branches on that being present.
+        self.providers[session_id] = LLMProvider.build(
+            settings=get_settings().model_copy(
+                update={
+                    "groq_api_key": groq_api_key.strip(),
+                    "cerebras_api_key": None,
+                    "huggingface_api_key": huggingface_api_key.strip(),
+                    "llm_hf_chat_fallback": True,
+                }
+            )
+        )
         return await self.status(session_id)
 
     async def disconnect_provider(self, session_id: str) -> AccountUsage:
         self.connected_sessions.pop(session_id, None)
+        provider = self.providers.pop(session_id, None)
+        if provider is not None:
+            await provider.aclose()
         return await self.status(session_id)
 
     async def provider_for(self, session_id: str) -> LLMProvider | None:
-        return None
+        return self.providers.get(session_id)
+
+    async def credentials_durable(self, session_id: str) -> bool:
+        return False
 
     async def reserve_repository(self, session_id: str, repo_id: str) -> UsageReservation:
         repos = self.repository_events.setdefault(session_id, set())

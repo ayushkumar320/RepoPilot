@@ -150,7 +150,7 @@ function ProviderDialog({
           </div>
           <div>
             <h2 id="provider-dialog-title">
-              {usage?.provider_connected ? "Provider connected" : "Continue with your Groq limit"}
+              {usage?.provider_connected ? "Provider connected" : "Connect your own keys"}
             </h2>
             <p>
               Keys go directly to the API and stay with your account, encrypted at rest, so they
@@ -175,7 +175,11 @@ function ProviderDialog({
             </div>
             <div>
               <strong>Hugging Face</strong>
-              <span>{usage.huggingface_connected ? "Connected as fallback" : "Not connected"}</span>
+              <span>
+                {usage.huggingface_connected
+                  ? "Connected for repository indexing and failover"
+                  : "Not connected"}
+              </span>
             </div>
             <button
               className="button button-secondary"
@@ -221,9 +225,7 @@ function ProviderDialog({
             </div>
 
             <div className="credential-field">
-              <label htmlFor="huggingface-api-key">
-                Hugging Face token <span>Optional</span>
-              </label>
+              <label htmlFor="huggingface-api-key">Hugging Face token</label>
               <div className="secret-input-wrap">
                 <input
                   id="huggingface-api-key"
@@ -235,6 +237,7 @@ function ProviderDialog({
                   spellCheck={false}
                   placeholder="hf_..."
                   aria-describedby="hf-key-help"
+                  required
                 />
                 <button
                   type="button"
@@ -246,7 +249,10 @@ function ProviderDialog({
                   {showHuggingface ? <EyeSlash size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <p id="hf-key-help">Used only as a fallback when the Groq request cannot complete.</p>
+              <p id="hf-key-help">
+                Required. Indexing a repository runs on this token, and it answers when Groq is
+                rate-limited.
+              </p>
             </div>
 
             {error ? (
@@ -262,7 +268,7 @@ function ProviderDialog({
               <button
                 className="button button-primary"
                 type="submit"
-                disabled={saving || groqKey.trim().length < 12}
+                disabled={saving || groqKey.trim().length < 12 || huggingfaceKey.trim().length < 8}
               >
                 {saving ? "Connecting" : "Connect keys"}
               </button>

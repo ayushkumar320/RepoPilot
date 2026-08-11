@@ -59,7 +59,10 @@ class IntentDraftRequest(BaseModel):
 
 class ProviderCredentialsRequest(BaseModel):
     groq_api_key: SecretStr
-    huggingface_api_key: SecretStr | None = None
+    # Both keys are required. Groq answers; Hugging Face is what indexing and
+    # the third failover tier run on, and a deployment that indexes on the
+    # platform's own key cannot bound its own cost.
+    huggingface_api_key: SecretStr
 
 
 class AccountUsageResponse(BaseModel):

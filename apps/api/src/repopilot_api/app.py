@@ -168,7 +168,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
                 "code": "PROVIDER_KEY_REQUIRED",
                 "action": exc.action,
                 "message": (
-                    "Your free repository is used. Connect your Groq key to analyze another."
+                    "Connect your Groq key and Hugging Face token to analyze a repository."
                 ),
             },
         )
@@ -192,11 +192,7 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             usage = await get_services().access.connect_provider(
                 session_id,
                 groq_api_key=request.groq_api_key.get_secret_value(),
-                huggingface_api_key=(
-                    request.huggingface_api_key.get_secret_value()
-                    if request.huggingface_api_key is not None
-                    else None
-                ),
+                huggingface_api_key=request.huggingface_api_key.get_secret_value(),
             )
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -217,19 +213,29 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             normalized_repo_id = repo_slug(request.repo_url)
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+        # Indexing runs on the reader's own keys, never the platform's: cloning,
+        # chunking, summarising and embedding a repository is the expensive half
+        # of this product, and a deployment that pays for it out of its own quota
+        # cannot bound its cost or its rate limits.
+        provider = await get_services().access.provider_for(session_id)
+        if provider is None:
+            raise allowance_error(AllowanceExceededError("repository"))
         try:
             reservation = await get_services().access.reserve_repository(
                 session_id, normalized_repo_id
             )
         except AllowanceExceededError as exc:
             raise allowance_error(exc) from exc
-        provider = (
-            await get_services().access.provider_for(session_id)
-            if reservation.source == "user"
-            else None
-        )
         try:
-            record = await get_services().repos.enqueue(request.repo_url, provider=provider)
+            record = await get_services().repos.enqueue(
+                request.repo_url,
+                provider=provider,
+                session_id=(
+                    session_id
+                    if await get_services().access.credentials_durable(session_id)
+                    else None
+                ),
+            )
         except Exception:
             await get_services().access.release(reservation)
             raise

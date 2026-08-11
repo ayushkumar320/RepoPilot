@@ -20,17 +20,24 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+  # Runs through uv in the workspace environment, not in a pre-commit venv.
+  # mirrors-mypy installs only what `additional_dependencies` lists — three
+  # packages against a project that imports sqlalchemy, fastapi, httpx, arq,
+  # networkx, git, tree_sitter, cryptography and sentence_transformers — so
+  # every one of those was an unresolved import and the hook reported 72
+  # phantom errors on every commit. A hook that can never pass is a hook
+  # everyone learns to skip, which is how an unformatted file reached `main`.
+  #
+  # `pass_filenames: false` is deliberate: mypy needs the whole program, and
+  # this is character-for-character the command CI runs.
+  - repo: local
     hooks:
       - id: mypy
-        additional_dependencies:
-          - pydantic>=2.7
-          - pydantic-settings>=2.4
-          - structlog>=24.0
-        args: [--strict, --config-file=pyproject.toml]
-        files: ^(packages|apps)/.*\.py$
-        exclude: ^.*/tests/.*$
+        name: mypy --strict (via uv)
+        entry: uv run mypy packages apps
+        language: system
+        types: [python]
+        pass_filenames: false
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.4

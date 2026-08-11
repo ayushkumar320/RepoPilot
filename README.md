@@ -6,16 +6,12 @@ The project is built around one bet: the system should ask *why you are here* be
 
 > Current status: launch-ready. Run it locally with the [startup guide](docs/STARTUP_GUIDE.md); deploy it with the [deployment guide](docs/DEPLOYMENT.md). Where the project stands day to day is in [docs/STATUS.md](docs/STATUS.md).
 
-> **Deploy privately, not publicly.** RepoPilot has no rate limit and no spend
-> ceiling on the platform's model key: the free-repository allowance is keyed on
-> a cookie the caller controls, questions are unmetered, `/intent` answers
-> unauthenticated callers, and a repository is cloned in full before its size is
-> checked. This is a deliberate, recorded decision — it costs more to build a
-> ceiling than it protects when everyone who can reach the API is someone who
-> pays for it. **It stops being true the moment the API is reachable by anyone
-> else**, including an "unlisted" link or a shared staging URL. The
-> [2026-08-11 scope decision](docs/STATUS.md) names what has to close first and
-> what each item costs.
+> **Deploy privately.** RepoPilot is built to run where everyone who can reach
+> the API is someone who pays for it, and it has no spend ceiling on the
+> platform's model key by deliberate, recorded decision. Before exposing it to
+> anyone else — including an "unlisted" link or a shared staging URL — read the
+> **2026-08-11 scope decision** in [docs/STATUS.md](docs/STATUS.md): it lists
+> what has to be closed first and what each item costs to close.
 
 ## What It Does
 
@@ -326,7 +322,7 @@ RepoPilot follows a few hard rules:
 - Grounding quality is strong at the claim level but the all-or-nothing product bar still needs follow-up.
 - Docker Compose is for local data services; the app dev flow runs API/web directly.
 - Identity is only as strong as the signed session cookie: the web app asserts who signed in, and the API trusts that cookie.
-- No rate limit and no spend ceiling on the platform model key — see the deployment note at the top. Safe while access is private; not safe otherwise.
+- No spend ceiling on the platform model key. Safe while access is private; see the deployment note at the top and the scope decision in [docs/STATUS.md](docs/STATUS.md) before exposing it more widely.
 - The eval workflows and the retrieval artifact gate were removed in `d84e98d`. Retrieval-affecting changes are measured by running `make test-eval-sampled` deliberately; nothing automated will catch a regression.
 
 ## License

@@ -13,8 +13,9 @@ from typing import Any, ClassVar
 import structlog
 from arq.connections import RedisSettings
 
-from repopilot_core.llm.provider import LLMProvider
+from repopilot_api.access import ProductAccessService
 from repopilot_core.settings import get_settings
+from repopilot_ingestion.persist import make_engine
 from repopilot_ingestion.pipeline import PipelineResult
 from repopilot_ingestion.pipeline import index_repo as _index_repo
 
@@ -33,21 +34,33 @@ def _redis_settings_from_url() -> RedisSettings:
 async def startup(ctx: dict[str, Any]) -> None:
     settings = get_settings()
     ctx["settings"] = settings
-    ctx["llm"] = LLMProvider.build(settings=settings)
+    # No platform-keyed provider here: indexing runs on the reader's own keys,
+    # resolved per job. A shared fallback provider would quietly put every
+    # unresolvable job back on the deployment's own quota.
+    ctx["access"] = ProductAccessService(engine=make_engine(settings), settings=settings)
     log.info("arq.startup")
 
 
 async def shutdown(ctx: dict[str, Any]) -> None:
-    llm: LLMProvider | None = ctx.get("llm")
-    if llm is not None:
-        await llm.aclose()
+    access: ProductAccessService | None = ctx.get("access")
+    if access is not None:
+        await access.aclose()
     log.info("arq.shutdown")
 
 
-async def index_repo(ctx: dict[str, Any], repo_url: str) -> dict[str, Any]:
-    """arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict."""
+async def index_repo(ctx: dict[str, Any], repo_url: str, session_id: str) -> dict[str, Any]:
+    """arq job: index a GitHub repo end-to-end. Returns a JSON-able status dict.
+
+    ``session_id`` names whose keys to index with. The keys themselves stay in
+    the encrypted credential store and are read here, so the job payload in
+    Redis carries no secret.
+    """
+    access: ProductAccessService = ctx["access"]
+    provider = await access.provider_for(session_id)
+    if provider is None:
+        raise RuntimeError("indexing requires the reader's connected provider keys")
     result: PipelineResult = await _index_repo(
-        repo_url, provider=ctx["llm"], settings=ctx["settings"]
+        repo_url, provider=provider, settings=ctx["settings"]
     )
     return {
         "status": result.status,

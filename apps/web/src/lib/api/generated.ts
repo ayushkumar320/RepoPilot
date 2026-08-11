@@ -232,12 +232,12 @@ export const api = {
   getAccountUsage(): Promise<AccountUsage> {
     return http("/account/usage");
   },
-  connectProvider(groqApiKey: string, huggingfaceApiKey?: string): Promise<AccountUsage> {
+  connectProvider(groqApiKey: string, huggingfaceApiKey: string): Promise<AccountUsage> {
     return http("/account/provider", {
       method: "POST",
       body: JSON.stringify({
         groq_api_key: groqApiKey,
-        huggingface_api_key: huggingfaceApiKey || null,
+        huggingface_api_key: huggingfaceApiKey,
       }),
     });
   },

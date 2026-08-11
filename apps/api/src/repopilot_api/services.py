@@ -41,7 +41,7 @@ from repopilot_api.models import (
     TourFirstImpressionEvent,
 )
 from repopilot_api.tours import InMemoryTourService, PostgresTourService, TourService
-from repopilot_core.llm.provider import LLMProvider, ProviderCredentialsError
+from repopilot_core.llm.provider import LLMProvider, ProviderCredentialsError, ProviderError
 from repopilot_core.settings import Settings, get_settings
 from repopilot_ingestion.clone import parse_github_url
 from repopilot_ingestion.db import INDEX_RECIPE_VERSION
@@ -91,7 +91,11 @@ class RepoRecord:
 
 class RepoService(Protocol):
     async def enqueue(
-        self, repo_url: str, *, provider: LLMProvider | None = None
+        self,
+        repo_url: str,
+        *,
+        provider: LLMProvider | None = None,
+        session_id: str | None = None,
     ) -> RepoRecord: ...
 
     async def get(self, repo_id: str) -> RepoRecord: ...
@@ -174,7 +178,21 @@ class LiveRepoService:
     tasks: dict[str, asyncio.Task[None]] = field(default_factory=dict)
     redis: ArqRedis | None = None
 
-    async def enqueue(self, repo_url: str, *, provider: LLMProvider | None = None) -> RepoRecord:
+    async def enqueue(
+        self,
+        repo_url: str,
+        *,
+        provider: LLMProvider | None = None,
+        session_id: str | None = None,
+    ) -> RepoRecord:
+        """Index ``repo_url`` on ``provider`` — the reader's own keys.
+
+        ``session_id`` is passed only when the reader's keys are account-bound,
+        because that is the one case the background worker can rebuild them
+        from: it resolves them out of the encrypted store itself, so no API key
+        is ever written to the job queue. Without it (an anonymous session,
+        whose keys live in this process's memory) indexing runs here instead.
+        """
         slug = repo_slug(repo_url)
         existing = await self._load_record_from_db(slug, repo_url=repo_url)
         if existing is not None and existing.status in {"ready", "stale"}:
@@ -186,15 +204,17 @@ class LiveRepoService:
             record = RepoRecord(repo_id=slug, repo_url=repo_url, status="queued", progress=5)
             self.records[slug] = record
         if slug not in self.tasks or self.tasks[slug].done():
-            if self.runtime.settings.repopilot_env == "production" and provider is None:
-                self.tasks[slug] = asyncio.create_task(self._enqueue_worker(slug, repo_url))
+            if self.runtime.settings.repopilot_env == "production" and session_id is not None:
+                self.tasks[slug] = asyncio.create_task(
+                    self._enqueue_worker(slug, repo_url, session_id)
+                )
             else:
                 self.tasks[slug] = asyncio.create_task(
                     self._index(slug, repo_url, provider=provider)
                 )
         return record
 
-    async def _enqueue_worker(self, slug: str, repo_url: str) -> None:
+    async def _enqueue_worker(self, slug: str, repo_url: str, session_id: str) -> None:
         record = self.records[slug]
         record.status = "indexing"
         record.progress = 15
@@ -205,7 +225,9 @@ class LiveRepoService:
                 self.redis = await create_pool(
                     RedisSettings.from_dsn(self.runtime.settings.redis_url)
                 )
-            job = await self.redis.enqueue_job("index_repo", repo_url)
+            # The session id, never the keys: the worker rehydrates them from
+            # the encrypted credential store, so nothing secret enters Redis.
+            job = await self.redis.enqueue_job("index_repo", repo_url, session_id)
             if job is None:
                 raise RuntimeError("repository indexing job could not be enqueued")
             await self._apply_worker_result(record, job)
@@ -534,7 +556,7 @@ class LiveQAService:
                         engine=engine,
                         snapshot_repo_id=snapshot_repo_id,
                         question=question,
-                        fallback_reason=str(exc),
+                        fallback_reason=_reader_facing_reason(exc),
                     )
         finally:
             await engine.dispose()
@@ -842,6 +864,21 @@ def decode_chunk_id(chunk_id: str) -> tuple[str, CodeRef]:
     except (binascii.Error, KeyError, UnicodeDecodeError, ValueError, TypeError) as exc:
         raise ValueError("invalid chunk id; use a chunk id emitted by a tour or ask claim") from exc
     return repo_id, ref
+
+
+def _reader_facing_reason(exc: BaseException) -> str:
+    """Turn a pipeline failure into something the reader can act on.
+
+    ``str(exc)`` went straight into ``retrieval_path`` and the web app renders
+    it verbatim ("Model call failed: …"), so a free-tier quota window showed up
+    as ``HTTPStatusError("413 Payload Too Large")`` — which reads as "my
+    question was too big" and sends the reader off shortening their question,
+    the one thing that cannot help. Only the shape of the failure is useful
+    here; the detail belongs in the log line above the call.
+    """
+    if isinstance(exc, ProviderError) and "RateLimitError" in str(exc):
+        return "the model provider is rate-limited right now — ask again in a minute"
+    return "the model call failed; the answer below is keyword matching only"
 
 
 async def answer_deterministically(

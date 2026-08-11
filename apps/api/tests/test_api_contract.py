@@ -66,9 +66,13 @@ class FakeRepoService:
             ),
         }
         self.enqueued: list[str] = []
+        self.indexed_on_reader_keys = False
 
-    async def enqueue(self, repo_url: str, *, provider: Any = None) -> RepoRecord:
-        del provider
+    async def enqueue(
+        self, repo_url: str, *, provider: Any = None, session_id: str | None = None
+    ) -> RepoRecord:
+        self.indexed_on_reader_keys = provider is not None
+        del session_id
         self.enqueued.append(repo_url)
         record = RepoRecord(repo_id="repo-new", repo_url=repo_url, status="queued")
         self.records[record.repo_id] = record
@@ -190,8 +194,21 @@ async def api_client(api_app: FastAPI) -> AsyncIterator[AsyncClient]:
         yield client
 
 
+async def _connect_keys(api_client: AsyncClient) -> None:
+    connected = await api_client.post(
+        "/account/provider",
+        json={
+            "groq_api_key": "gsk_test_key_long_enough",
+            "huggingface_api_key": "hf_test_key",
+        },
+    )
+    assert connected.status_code == 200
+
+
 @pytest.mark.asyncio
 async def test_post_repos_enqueues_indexing(api_client: AsyncClient) -> None:
+    await _connect_keys(api_client)
+
     response = await api_client.post(
         "/repos",
         json={"repo_url": "https://github.com/pallets/flask"},
@@ -199,6 +216,40 @@ async def test_post_repos_enqueues_indexing(api_client: AsyncClient) -> None:
 
     assert response.status_code == 202
     assert response.json() == {"repo_id": "repo-new", "status": "queued"}
+
+
+@pytest.mark.asyncio
+async def test_post_repos_indexes_on_the_readers_own_keys(
+    api_client: AsyncClient, api_app: FastAPI
+) -> None:
+    """Indexing is the expensive half — it never runs on the platform's quota."""
+    await _connect_keys(api_client)
+
+    await api_client.post("/repos", json={"repo_url": "https://github.com/pallets/flask"})
+
+    repos = cast(Any, api_app.state.services.repos)
+    assert repos.indexed_on_reader_keys is True
+
+
+@pytest.mark.asyncio
+async def test_post_repos_without_keys_is_refused(api_client: AsyncClient) -> None:
+    response = await api_client.post(
+        "/repos",
+        json={"repo_url": "https://github.com/pallets/flask"},
+    )
+
+    assert response.status_code == 402
+    assert response.json()["detail"]["code"] == "PROVIDER_KEY_REQUIRED"
+
+
+@pytest.mark.asyncio
+async def test_connect_provider_requires_a_hugging_face_token(api_client: AsyncClient) -> None:
+    response = await api_client.post(
+        "/account/provider",
+        json={"groq_api_key": "gsk_test_key_long_enough"},
+    )
+
+    assert response.status_code == 422
 
 
 @pytest.mark.asyncio

@@ -18,7 +18,7 @@ RepoPilot ("Codebase Archaeologist") generates purpose-driven, multi-agent guide
 - State discipline: Pydantic v2; mutate only via node returns; append-only lists use `Annotated[..., add]`; `recursion_limit=15`.
 - Six deterministic tools only; the AST builds the call graph, never the LLM.
 - Lane C uses guarded language and always ends with `confirm_before_pr`.
-- Prompt budget ≤ 2000 input tokens per node.
+- Prompt budget ≤ 2000 input tokens per node — a convention held by review, not by a test.
 - Gates: `ruff`, `mypy --strict`, `pytest` (80% coverage), `pre-commit` (ruff + mypy + gitleaks), GitHub Actions.
 
 ## Authoring

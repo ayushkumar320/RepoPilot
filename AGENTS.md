@@ -44,7 +44,7 @@ Enforced in code review and CI — not optional. Full rationale in [`docs/03_ARC
 - **State discipline.** Pydantic v2. No agent writes another agent's field; mutate only via node return values (`return {"foo": [item]}`, never `state.foo.append`). Append-only lists use `Annotated[..., add]`. `recursion_limit=15`.
 - **Six deterministic tools, no more.** A new tool needs a justification starting with "the model cannot do this from existing tools because…". The LLM never computes the call graph — the AST does.
 - **Lane C language constraints.** Suspicions use guarded language ("worth investigating", not "bug") and always end with a `confirm_before_pr` step. Enforced in prompt and post-checked by the Verifier.
-- **Prompt budget ≤ 2000 input tokens per node.** Enforced in CI. Past that, chunk harder or split the agent.
+- **Prompt budget ≤ 2000 input tokens per node.** A convention, held by review — no test measures tokens. What CI *does* enforce is the character cap on chunk bodies (`MAX_CHUNK_CHARS` / `MAX_CHUNKS_CHARS`, `test_prompt_size.py`), which is looser. Past the budget, chunk harder or split the agent.
 - **Quality gates:** `ruff` (lint), `mypy --strict` (from day one), `pytest` with **80% coverage**, `pre-commit` (ruff + mypy + gitleaks), GitHub Actions CI. `gitleaks` blocks secret leaks.
 
 ---

@@ -67,6 +67,18 @@ class ProviderError(RuntimeError):
     """All providers in the fallback chain failed."""
 
 
+class TruncatedReasoningError(ProviderError):
+    """The model spent its whole budget thinking and emitted no answer.
+
+    Reasoning models put their chain of thought in a separate ``reasoning``
+    field and only then write ``content``. Hit the ``max_tokens`` ceiling
+    inside that field and the response comes back ``finish_reason: "length"``
+    with content empty — not a malformed payload, just a budget too small for
+    this model. Distinct from ``ProviderError`` so the caller can retry with
+    more room instead of writing the whole binding off.
+    """
+
+
 class RateLimitError(RuntimeError):
     """HTTP 429 from a provider — triggers retry/fallback inside the provider.
 
@@ -433,6 +445,20 @@ class _OpenAICompatibleClient(_BaseClient):
                         yield str(delta)
 
 
+# Ceiling on the widened retry. Doubling is enough for a model that merely
+# thinks longer than the caller guessed; past this the budget is not the
+# problem and another provider is the better bet.
+_MAX_WIDENED_TOKENS = 16384
+
+
+def _widen_budget(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Same call, double the token room."""
+    current = kwargs.get("max_tokens")
+    if not isinstance(current, int):
+        return kwargs
+    return {**kwargs, "max_tokens": min(current * 2, _MAX_WIDENED_TOKENS)}
+
+
 def _extract_openai_compatible_text(data: dict[str, Any]) -> str:
     """Extract assistant text from OpenAI-compatible payload variants.
 
@@ -476,6 +502,11 @@ def _extract_openai_compatible_text(data: dict[str, Any]) -> str:
     text = choice.get("text")
     if isinstance(text, str) and text.strip():
         return text
+
+    if choice.get("finish_reason") == "length":
+        raise TruncatedReasoningError(
+            f"provider hit max_tokens before emitting any content: {data!r}"
+        )
 
     raise ProviderError(f"provider response missing assistant text: {data!r}")
 
@@ -910,13 +941,41 @@ class LLMProvider:
                 log.debug("llm.skip_unconfigured_provider", provider=binding.provider.value)
                 continue
             try:
-                response = await self._call_with_429_retry(
-                    client,
-                    binding,
-                    messages,
-                    kwargs,
-                    max_attempts=retry_429_attempts,
+                try:
+                    response = await self._call_with_429_retry(
+                        client,
+                        binding,
+                        messages,
+                        kwargs,
+                        max_attempts=retry_429_attempts,
+                    )
+                except TruncatedReasoningError:
+                    # This model reasons more verbosely than the caller
+                    # budgeted for. One retry with double the room, then give
+                    # up on the binding — the next one may not reason at all.
+                    log.info(
+                        "llm.retry_wider_budget",
+                        model=model.value,
+                        provider=binding.provider.value,
+                        physical=binding.physical_model,
+                        max_tokens=_widen_budget(kwargs).get("max_tokens"),
+                    )
+                    response = await self._call_with_429_retry(
+                        client,
+                        binding,
+                        messages,
+                        _widen_budget(kwargs),
+                        max_attempts=retry_429_attempts,
+                    )
+            except TruncatedReasoningError as exc:
+                last_error = exc
+                log.warning(
+                    "llm.truncated_reasoning",
+                    model=model.value,
+                    provider=binding.provider.value,
+                    physical=binding.physical_model,
                 )
+                continue
             except RateLimitError as exc:
                 last_error = exc
                 log.warning(

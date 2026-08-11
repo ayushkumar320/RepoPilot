@@ -17,6 +17,7 @@ from repopilot_core.llm.provider import (
     Message,
     ProviderError,
     RateLimitError,
+    TruncatedReasoningError,
     _backoff_delay,
     _extract_openai_compatible_text,
     _parse_retry_after,
@@ -505,3 +506,50 @@ def test_extract_openai_compatible_text_falls_back_to_choice_text() -> None:
 def test_extract_openai_compatible_text_raises_on_missing_text() -> None:
     with pytest.raises(ProviderError):
         _extract_openai_compatible_text({"choices": [{"message": {}}]})
+
+
+# ─── Reasoning models that spend the whole budget thinking ─────────────────
+
+
+def test_extract_flags_length_truncation_distinctly() -> None:
+    """finish_reason 'length' with no content is a budget problem, not a bad payload."""
+    payload = {
+        "choices": [{"finish_reason": "length", "message": {"reasoning": "thinking…"}}]
+    }
+
+    with pytest.raises(TruncatedReasoningError):
+        _extract_openai_compatible_text(payload)
+
+
+async def test_llm_retries_same_binding_with_double_the_budget(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    groq = FakeClient(
+        ProviderName.GROQ,
+        [
+            TruncatedReasoningError("all reasoning, no answer"),
+            make_response(provider=ProviderName.GROQ, text="answer-after-widening"),
+        ],
+    )
+    provider = make_provider(tmp_settings, {ProviderName.GROQ: groq})
+
+    response = await provider.generate(ModelId.INTENT_PROFILER, _msgs(), max_tokens=4096)
+
+    assert response.text == "answer-after-widening"
+    assert [c[2]["max_tokens"] for c in groq.calls] == [4096, 8192]
+
+
+async def test_llm_falls_through_when_widening_does_not_help(tmp_settings) -> None:  # type: ignore[no-untyped-def]
+    """Two truncations mean the model, not the budget — try the next binding."""
+    groq = FakeClient(ProviderName.GROQ, [TruncatedReasoningError("thinking")] * 2)
+    cerebras = FakeClient(
+        ProviderName.CEREBRAS,
+        [make_response(provider=ProviderName.CEREBRAS, text="fallback-ok")],
+    )
+    provider = make_provider(
+        tmp_settings,
+        {ProviderName.GROQ: groq, ProviderName.CEREBRAS: cerebras},
+    )
+
+    response = await provider.generate(ModelId.INTENT_PROFILER, _msgs(), max_tokens=1024)
+
+    assert response.text == "fallback-ok"
+    assert len(groq.calls) == 2, "one widened retry, then move on"

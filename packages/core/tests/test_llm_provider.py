@@ -513,9 +513,7 @@ def test_extract_openai_compatible_text_raises_on_missing_text() -> None:
 
 def test_extract_flags_length_truncation_distinctly() -> None:
     """finish_reason 'length' with no content is a budget problem, not a bad payload."""
-    payload = {
-        "choices": [{"finish_reason": "length", "message": {"reasoning": "thinking…"}}]
-    }
+    payload = {"choices": [{"finish_reason": "length", "message": {"reasoning": "thinking…"}}]}
 
     with pytest.raises(TruncatedReasoningError):
         _extract_openai_compatible_text(payload)

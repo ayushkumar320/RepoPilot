@@ -2,12 +2,15 @@
 
 **Baseline:** `main` at `e40dc02`, clean working tree · **Run:** 2026-08-11
 **Method:** [`AUDIT_PLAN.md`](AUDIT_PLAN.md) · **Status:** complete — all eight
-passes run. Of 21 findings: **12 fixed**, 4 accepted with a written expiry
-condition, 3 open, 1 revised, 1 withdrawn. See [Fixed](#fixed).
+passes run. Of 21 findings: **14 fixed**, 4 accepted with a written expiry
+condition, 1 open, 1 revised, 1 withdrawn. See [Fixed](#fixed).
 
 ---
 
 ## Verdict
+
+*Written at audit time, 2026-08-11, and left as written — the per-finding
+status column above is what is current.*
 
 The backend is in better shape than most projects of this size. `mypy --strict`
 is clean across 152 files, 408 tests pass in under three seconds at 85%
@@ -46,8 +49,8 @@ What is wrong falls into four groups:
 | 7 | **P2** | open | `apps/web/package.json` (transitive `sharp`) | 4 high-severity CVEs in the web dependency tree |
 | 8 | **P2** | ✅ fixed | `packages/agents/src/repopilot_agents/verifier/grounding.py:360-415` | The claim-upgrade path has no test |
 | 9 | **P2** | ✅ fixed | `packages/core/src/repopilot_core/llm/provider.py:730-789` | Token streaming has no unit test |
-| 10 | **P3** | open | `apps/api/src/repopilot_api/app.py:545` | Dead feature: `/graph/modules` has no consumer |
-| 11 | **P3** | open | `docs/STATUS.md:9` | Documents a UI file that no longer exists |
+| 10 | **P3** | ✅ fixed | `apps/api/src/repopilot_api/app.py:545` | Dead feature: `/graph/modules` has no consumer |
+| 11 | **P3** | ✅ fixed | `docs/STATUS.md:9` | Documents a UI file that no longer exists |
 | 12 | **P3** | ✅ fixed | `apps/api/src/repopilot_api/app.py:261` | `HTTPException` raised inside a started SSE stream |
 | 13 | **P3** | ✅ fixed | `CLAUDE.md` §3 | "Prompt budget ≤2000 tokens, enforced in CI" is not enforced |
 | 14 | **P3** | ✅ fixed | `verifier/grounding.py:96` | Verdict cache is an unbounded process-global dict |
@@ -314,6 +317,13 @@ feature as "still ships, no further investment". Half of it has since been
 removed. The freeze needs re-deciding now that the decision has partly been
 made by accident.
 
+**Fixed** — removed end to end on 2026-08-11: the route, `LiveGraphService.modules`
+and `_module_owners`, `_rollup_modules` and `_owning_module`, `MAX_MODULES`, the
+three response models, the client method and its interfaces, and
+`test_graph_modules.py`. No re-index: the map read the same `imports` edges the
+"Related code" panel and retrieval read, and stored nothing of its own. The
+panel is untouched. `STATUS.md` records the decision.
+
 ### 11 — `STATUS.md` describes a file that does not exist · **P3**
 
 `docs/STATUS.md:9` names `apps/web/src/components/module-map.tsx` as code that
@@ -324,6 +334,10 @@ three spec files.
 
 `STATUS.md` is the file the project tells everyone to read first. It is the one
 document where drift costs the most.
+
+**Fixed** — the scope decision now records the removal, the stale test counts
+are corrected in place with a note saying why they moved, and the per-module
+measurement table carries a line saying the feature it measured is gone.
 
 ### 16 — A dev tool is the repository's root dependency · **P3**
 
@@ -569,6 +583,7 @@ coverage, 16/16 store tests, 12/12 Playwright.
 | 20 | Scratch files untracked; `test-results/`, `scratch_*.py`, `*_index_time.txt` gitignored |
 | 8, 9 | Nine tests over `_recheck_against_answer_context` and `generate_stream`, each guard mutation-checked — the guard was inverted and the matching test confirmed to fail. Suite 409 → 418, coverage 85% → 87% |
 | 21 | The pre-commit mypy hook runs CI's command through uv instead of in a three-dependency venv; it passes for the first time |
+| 10, 11 | Module map removed end to end — route, service, rollup helpers, models, client method, tests. `STATUS.md` records the decision and its corrected test counts |
 
 Two findings did not survive the attempt to fix them — 17 (the obvious fix
 misroutes BYOK billing) and 19 (withdrawn). Both sections above are rewritten
@@ -589,8 +604,7 @@ What is left, now that the sweep has landed.
    `STATUS.md`. No code was written for it, which was the point.
 2. ~~**Test the two untested paths**~~ — done: nine tests, each guard
    mutation-checked. (8, 9)
-3. **Decide the module map**: finish removing it, or restore the UI. Leaving it
-   half-deleted is the worst of the three options. (10, 11)
+3. ~~**Decide the module map**~~ — decided: removed end to end. (10, 11)
 4. **Track the CVEs** — add `npm audit --audit-level=high` to the `web` CI job,
    and schedule the Next 16 upgrade separately rather than inside a fix pass.
    (7)

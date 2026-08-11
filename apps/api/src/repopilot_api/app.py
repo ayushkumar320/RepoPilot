@@ -33,7 +33,6 @@ from repopilot_api.models import (
     CreateRepoResponse,
     CreateTourRequest,
     CreateTourResponse,
-    GraphModulesResponse,
     GraphNeighboursResponse,
     IdentityRequest,
     IdentityResponse,
@@ -47,7 +46,6 @@ from repopilot_api.models import (
     TourSummaryResponse,
 )
 from repopilot_api.services import (
-    MAX_MODULES,
     MAX_NEIGHBOURS,
     AppServices,
     RepoNotReadyError,
@@ -549,28 +547,6 @@ def create_app(*, services: AppServices | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="graph view is not configured")
         try:
             return await graph.neighbours(repo_id, symbol, limit=limit)
-        except KeyError as exc:
-            raise HTTPException(status_code=404, detail="repo not found") from exc
-
-    @app.get(
-        "/repos/{repo_id:path}/graph/modules",
-        response_model=GraphModulesResponse,
-    )
-    async def repo_graph_modules(
-        repo_id: str,
-        limit: int = Query(default=60, ge=1, le=MAX_MODULES),
-        session_id: str = Depends(resolve_session),
-    ) -> GraphModulesResponse:
-        """The snapshot's intra-repo module dependency map.
-
-        Not metered, for the same reason as the neighbourhood read: it runs no
-        model over data the AST already produced.
-        """
-        graph = get_services().graph
-        if graph is None:
-            raise HTTPException(status_code=404, detail="graph view is not configured")
-        try:
-            return await graph.modules(repo_id, limit=limit)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail="repo not found") from exc
 

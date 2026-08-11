@@ -32,9 +32,6 @@ from repopilot_api.models import (
     ChunkPayload,
     ClaimPayload,
     GraphEdgeKind,
-    GraphModule,
-    GraphModuleEdge,
-    GraphModulesResponse,
     GraphNeighbour,
     GraphNeighboursResponse,
     QAAnswerResponse,
@@ -126,8 +123,6 @@ class GraphService(Protocol):
     async def neighbours(
         self, repo_id: str, symbol: str, *, limit: int = 60
     ) -> GraphNeighboursResponse: ...
-
-    async def modules(self, repo_id: str, *, limit: int = 60) -> GraphModulesResponse: ...
 
 
 class RepoNotReadyError(Exception):
@@ -586,105 +581,6 @@ _EDGE_ORDER: tuple[GraphEdgeKind, ...] = (
 #: Hard ceiling on one neighbourhood response, whatever the caller asks for.
 MAX_NEIGHBOURS = 200
 
-#: Hard ceiling on the module map. Past roughly this many boxes a dependency
-#: diagram stops being read and starts being scrolled, and the layout cost
-#: grows faster than the insight does. fastapi and flask both fit well under it;
-#: a monorepo will not, which is what `truncated` is for.
-MAX_MODULES = 120
-
-
-def _owning_module(symbol: str, module_names_longest_first: Sequence[str]) -> str | None:
-    """Which module defines ``symbol``, by longest matching dotted prefix.
-
-    Longest wins because package names nest: ``flask.json`` and
-    ``flask.json.provider`` are both modules, and a symbol in the latter must
-    not be attributed to the former. Callers pass the names pre-sorted so this
-    stays a scan rather than a sort per symbol.
-    """
-    for name in module_names_longest_first:
-        if symbol == name or symbol.startswith(f"{name}."):
-            return name
-    return None
-
-
-def _rollup_modules(
-    adjacency: dict[str, dict[str, list[str]]],
-    owners: dict[str, tuple[str | None, str | None, int]],
-    *,
-    limit: int,
-) -> GraphModulesResponse:
-    """Symbol graph + module ownership -> the module map. No I/O.
-
-    Split out from ``LiveGraphService.modules`` so the parts that are easy to
-    get quietly wrong — prefix ownership, self-edges, which edges survive
-    scoping — are testable without a database.
-    """
-    # A snapshot with chunks but no module rows has nothing to draw. Say
-    # unavailable rather than returning an empty map, which reads as a broken
-    # feature instead of one that does not apply here.
-    if not owners:
-        return GraphModulesResponse(available=False)
-
-    # `chunks.kind = 'module'` is broader than "Python module": the generic
-    # chunker files README.md and requirements.txt under it too, and those
-    # arrived on the map as boxes that can never have a dependency. The graph
-    # is Python-only by construction and `build_graph` adds a node for every
-    # module it parses, so being an adjacency key *is* the test for whether a
-    # module participates in the dependency structure at all.
-    owners = {name: value for name, value in owners.items() if name in adjacency}
-    if not owners:
-        return GraphModulesResponse(available=False)
-
-    module_names = sorted(owners, key=len, reverse=True)
-    edges: set[tuple[str, str]] = set()
-    for source, buckets in adjacency.items():
-        if source not in owners:
-            continue
-        for target in buckets.get("imports", []):
-            owner = _owning_module(target, module_names)
-            # Third-party and stdlib targets own no module here, and a module
-            # importing from itself is not a dependency.
-            if owner is not None and owner != source:
-                edges.add((source, owner))
-
-    degree_out: dict[str, int] = dict.fromkeys(owners, 0)
-    degree_in: dict[str, int] = dict.fromkeys(owners, 0)
-    for source, target in edges:
-        degree_out[source] += 1
-        degree_in[target] += 1
-
-    # Scope to the busiest modules when the repo is too big to draw. Total
-    # degree, not either direction alone: a pure sink (imported everywhere,
-    # imports nothing) is as structural as a pure source.
-    ranked = sorted(owners, key=lambda name: (-(degree_in[name] + degree_out[name]), name))
-    kept = set(ranked[:limit])
-
-    return GraphModulesResponse(
-        available=True,
-        modules=[
-            GraphModule(
-                symbol=name,
-                label=name.rsplit(".", 1)[-1] or name,
-                file_path=owners[name][0],
-                chunk_id=owners[name][1],
-                symbol_count=owners[name][2],
-                depends_on=degree_out[name],
-                depended_on_by=degree_in[name],
-            )
-            for name in sorted(kept)
-        ],
-        # Edges between kept modules only: an edge to a box that was scoped
-        # out would render as a line into nothing.
-        edges=[
-            GraphModuleEdge(source=source, target=target)
-            for source, target in sorted(edges)
-            if source in kept and target in kept
-        ],
-        total_modules=len(owners),
-        total_edges=len(edges),
-        truncated=len(ranked) > limit,
-    )
-
 
 @dataclass(slots=True)
 class LiveGraphService:
@@ -769,96 +665,6 @@ class LiveGraphService:
             total=total,
             truncated=truncated,
         )
-
-    async def modules(self, repo_id: str, *, limit: int = 60) -> GraphModulesResponse:
-        """Roll the symbol graph up to one node per module.
-
-        The symbol graph already carries what this needs: ``imports`` edges are
-        emitted from the importing *module* to a fully-qualified target, so the
-        rollup is a matter of asking which module owns each target. No second
-        graph is stored, and no re-index is required.
-        """
-        limit = max(1, min(limit, MAX_MODULES))
-        snapshot_repo_id = repo_id
-        if "@" not in repo_id:
-            repo = await self.repos.get(repo_id)
-            if repo.indexed_repo_id is None:
-                raise KeyError(repo_id)
-            snapshot_repo_id = repo.indexed_repo_id
-
-        engine = make_engine(self.runtime.settings)
-        try:
-            async with engine.connect() as conn:
-                adjacency_row = (
-                    await conn.execute(
-                        select(graph_table.c.adjacency).where(
-                            graph_table.c.repo_id == snapshot_repo_id
-                        )
-                    )
-                ).first()
-                if adjacency_row is None or not adjacency_row[0]:
-                    return GraphModulesResponse(available=False)
-                adjacency: dict[str, dict[str, list[str]]] = adjacency_row[0]
-                owners = await self._module_owners(conn, snapshot_repo_id)
-        finally:
-            await engine.dispose()
-
-        return _rollup_modules(adjacency, owners, limit=limit)
-
-    @staticmethod
-    async def _module_owners(
-        conn: Any, snapshot_repo_id: str
-    ) -> dict[str, tuple[str | None, str | None, int]]:
-        """Module name -> (file_path, chunk_id, symbols defined under it).
-
-        Modules come from ``chunks.kind = 'module'`` rather than from the
-        adjacency keys, because the JSONB sidecar stores edges only — it has no
-        node kinds, so a module and a function in it are indistinguishable
-        there.
-        """
-        rows = (
-            await conn.execute(
-                select(
-                    chunks_table.c.symbol,
-                    chunks_table.c.file_path,
-                    chunks_table.c.start_line,
-                    chunks_table.c.end_line,
-                ).where(
-                    chunks_table.c.repo_id == snapshot_repo_id,
-                    chunks_table.c.kind == "module",
-                )
-            )
-        ).fetchall()
-
-        out: dict[str, tuple[str | None, str | None, int]] = {}
-        for symbol, file_path, start_line, end_line in rows:
-            name = str(symbol)
-            if name in out:
-                continue
-            ref = CodeRef(
-                file_path=str(file_path),
-                start_line=int(start_line),
-                end_line=int(end_line),
-                symbol=name,
-            )
-            out[name] = (str(file_path), encode_chunk_id(snapshot_repo_id, ref), 0)
-
-        # Symbol counts, so a box can show how much code it stands for.
-        counts = (
-            await conn.execute(
-                select(chunks_table.c.symbol).where(
-                    chunks_table.c.repo_id == snapshot_repo_id,
-                    chunks_table.c.kind != "module",
-                )
-            )
-        ).fetchall()
-        names_by_length = sorted(out, key=len, reverse=True)
-        for (symbol,) in counts:
-            owner = _owning_module(str(symbol), names_by_length)
-            if owner is not None:
-                path, chunk_id, count = out[owner]
-                out[owner] = (path, chunk_id, count + 1)
-        return out
 
     @staticmethod
     def _to_neighbour(

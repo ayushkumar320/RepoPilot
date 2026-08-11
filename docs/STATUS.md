@@ -37,20 +37,38 @@ ever shows up on the host, close 5 first regardless of exposure.
 
 ---
 
-## Scope decision — 2026-08-10: no further graph or map work
+## Scope decision — 2026-08-10, closed 2026-08-11: the module map is gone
 
-The "Related code" panel, the module dependency map and both read endpoints
-**remain in the codebase and still ship.** Nothing was removed. What stopped is
-further investment: no symbol-level node-link view, no map iteration, no new
-graph surfaces.
+The open question below has an answer: **remove**. The module dependency map is
+deleted end to end — `GET /repos/{id}/graph/modules`, `LiveGraphService.modules`
+and `_module_owners`, `_rollup_modules` and `_owning_module`, `MAX_MODULES`,
+`GraphModule` / `GraphModuleEdge` / `GraphModulesResponse`, the `getGraphModules`
+client method and its interfaces, and `test_graph_modules.py`. The UI half went
+in `74b396e` on 2026-08-10; this is the rest of it.
 
-**Open question, and it needs an answer before anyone touches this area.** If
-"not implementing" was meant as *remove*, that is real work, not a doc edit —
-`apps/web/src/components/graph-neighbours.tsx` and `module-map.tsx`,
-`GET /repos/{id}/graph/neighbours` and `/graph/modules`, their services, models
-and specs, plus the `defines` edges added at `INDEX_RECIPE_VERSION = 6`. Until
-that is decided, treat the feature as **frozen, not deprecated**, and leave it
-working.
+**The "Related code" panel stays and still ships** —
+`apps/web/src/components/graph-neighbours.tsx`,
+`GET /repos/{id}/graph/neighbours`, and its service and models are untouched,
+along with the `defines` edges added at `INDEX_RECIPE_VERSION = 6`. No re-index
+is needed: the map read the same `imports` edges the panel and retrieval read,
+and stored nothing of its own.
+
+The original wording is kept below because the reasoning still holds for the
+panel, which remains frozen — no symbol-level node-link view, no new graph
+surfaces.
+
+> The "Related code" panel, the module dependency map and both read endpoints
+> **remain in the codebase and still ship.** Nothing was removed. What stopped
+> is further investment: no symbol-level node-link view, no map iteration, no
+> new graph surfaces.
+>
+> **Open question, and it needs an answer before anyone touches this area.** If
+> "not implementing" was meant as *remove*, that is real work, not a doc edit —
+> `apps/web/src/components/graph-neighbours.tsx` and `module-map.tsx`,
+> `GET /repos/{id}/graph/neighbours` and `/graph/modules`, their services,
+> models and specs, plus the `defines` edges added at
+> `INDEX_RECIPE_VERSION = 6`. Until that is decided, treat the feature as
+> **frozen, not deprecated**, and leave it working.
 
 The 60s promo no longer depicts either surface (`4a92fac`, `27fe7c9`): frame 3
 shows spans resolving out of source, frame 4 shows findings reordering per
@@ -90,8 +108,9 @@ Two things this session settled that are worth not relitigating:
   linked to their methods, one-hop-only, no module map, no claim-to-code — is
   shipped. It is now frozen; see the scope decision above.
 - **CI now covers the frontend**, so the newest work is no longer the part with
-  no safety net. 15 store tests and 15 e2e specs run on every push to `main` and
-  every pull request.
+  no safety net. 16 store tests and 12 e2e cases run on every push to `main` and
+  every pull request. (Counts corrected 2026-08-11: the module map's 5 specs
+  went with the feature.)
 
 ## Shipped earlier (the graph foundation)
 
@@ -135,7 +154,10 @@ change; every number here was measured, not estimated.
 | iprashantraj/mcp-discord-bridge | **0** | — | — | — |
 
 Rolled up per module — the map's own scale, measured on clones rather than on
-the database:
+the database. **The map was removed on 2026-08-11**; these two rows are kept
+only because the "Next work" section below still cites them when correcting the
+cross-package edge figures, and because the rollup is derivable from the
+`imports` edges that remain.
 
 | Repo | Module nodes | Intra-repo module→module edges |
 |---|---|---|

@@ -1,0 +1,56 @@
+# API image for a Hugging Face Docker Space (free tier: 2 vCPU / 16 GB / 50 GB).
+#
+# Differs from Dockerfile.api in three ways, all forced by the host:
+#   1. Redis runs inside this container. arq needs blocking pops, and the free
+#      hosted Redis tiers meter commands per day; a local redis-server costs
+#      ~10 MB of the 16 GB we already have.
+#   2. The arq worker runs here too, as a second process. One free box, both
+#      halves of the queue.
+#   3. Model weights are downloaded at build time. A Space sleeps after idle,
+#      and a cold start that also downloads ~340 MB of weights times out the
+#      first request instead of serving it.
+#
+# HOME=/app because the reranker caches under Path.home() and Spaces give the
+# runtime user no writable home.
+
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS build
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+WORKDIR /app
+COPY . .
+RUN uv sync --frozen --no-dev --all-packages
+
+FROM python:3.12-slim-bookworm AS runtime
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git libgomp1 redis-server \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    HOME=/app \
+    HF_HOME=/app/.cache/huggingface \
+    PORT=7860
+
+WORKDIR /app
+COPY --from=build /app /app
+COPY infra/deploy/space-start.sh /app/space-start.sh
+RUN chmod +x /app/space-start.sh
+
+# Bake the weights in. Keep these model ids in step with
+# Settings.huggingface_embedding_model and Settings.rerank_model.
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+SentenceTransformer('nomic-ai/nomic-embed-text-v1.5', trust_remote_code=True)" \
+ && python -c "\
+from fastembed.rerank.cross_encoder import TextCrossEncoder; \
+TextCrossEncoder('Xenova/ms-marco-MiniLM-L-6-v2', cache_dir='/app/.cache/repopilot/fastembed')"
+
+# Spaces run the container as uid 1000, which must own every path written at
+# runtime: the caches above, plus the repo clones and the LLM sqlite cache.
+RUN chmod -R 777 /app/.cache /app
+
+EXPOSE 7860
+CMD ["/app/space-start.sh"]
